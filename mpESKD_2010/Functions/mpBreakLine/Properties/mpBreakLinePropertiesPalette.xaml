@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="mpESKD.Functions.mpBreakLine.Properties.mpBreakLinePropertiesPalette"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrls="clr-namespace:mpESKD.Base.Properties.Controls"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../../Base/Properties/Controls/ControlStyles.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Expander Header="Линия обрыва" IsExpanded="True" Name="Expander">
+        <Grid >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" SharedSizeGroup="Names"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*" ></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Основные" Style="{StaticResource HeaderTextBox}"></TextBox>
+            <!--BreakLineType-->
+            <TextBox Grid.Row="1" Grid.Column="0" Text="Тип линии обрыва:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <ComboBox Grid.Row="1" Grid.Column="2" Text="{Binding BreakLineType}" x:Name="CbBreakLineType"
+                      Style="{StaticResource PropertyValueComboBox}"
+                      GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
+            </ComboBox>
+            <!--Scale-->
+            <TextBox Grid.Row="2" Grid.Column="0" Text="Масштаб:"  Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <ComboBox Grid.Row="2" Grid.Column="2" x:Name="CbScale" Text="{Binding Scale}" Style="{StaticResource PropertyValueComboBox}"
+                      GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
+                      ></ComboBox>
+            <!--LinetypeScale-->
+            <TextBox Grid.Row="3" Grid.Column="0" Text="Масштаб типа линий:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <ctrls:DoubleTextBox Grid.Row="3" Grid.Column="2" Value="{Binding LineTypeScale}" 
+                                 Style="{StaticResource PropertyValueDoubleTextBox}"
+                                 Minimum="0" Maximum="{x:Static sys:Double.MaxValue}"
+                                 x:Name="TbLineTypeScale" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:DoubleTextBox>
+            <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" BorderThickness="1,0,1,0"
+                          HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
+            <!--Geometry-->
+            <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="Геометрия" Style="{StaticResource HeaderTextBox}"></TextBox>
+            <!--Overhang-->
+            <TextBox Grid.Row="5" Grid.Column="0" Text="Выступы за объект:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <ctrls:IntTextBox Grid.Row="5" Grid.Column="2" Value="{Binding Overhang}" Style="{StaticResource PropertyValueIntTextBox}"
+                              x:Name="TbOverhang" Minimum="0" Maximum="10" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
+            <TextBox Grid.Row="6" Grid.Column="0" Text="Высота разрыва:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <ctrls:IntTextBox Grid.Row="6" Grid.Column="2" Value="{Binding BreakHeight}" Style="{StaticResource PropertyValueIntTextBox}"
+                              x:Name="TbBreakHeight" Minimum="1" Maximum="20" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
+            <TextBox Grid.Row="7" Grid.Column="0" Text="Ширина разрыва:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <ctrls:IntTextBox Grid.Row="7" Grid.Column="2" Value="{Binding BreakWidth}" Style="{StaticResource PropertyValueIntTextBox}"
+                              x:Name="TbBreakWidth" Minimum="1" Maximum="13" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
+            <GridSplitter Grid.Column="1" Grid.Row="5" Grid.RowSpan="3" BorderThickness="1,0,1,0"
+                          HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
+        </Grid>
+    </Expander>
+</UserControl>

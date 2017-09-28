@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{67ED9D0B-D000-4361-A1C3-3EC6CB23B555}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>mpESKD</RootNamespace>
+    <AssemblyName>mpESKD_2010</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\..\ModPlus\Functions\mpESKD\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;ac2010</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\..\..\ModPlus\Functions\mpESKD\</OutputPath>
+    <DefineConstants>TRACE;ac2010</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="acdbmgd">
+      <HintPath>..\..\..\_Acad dlls\2010\acdbmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acmgd">
+      <HintPath>..\..\..\_Acad dlls\2010\acmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AdWindows">
+      <HintPath>..\..\..\_Acad dlls\2010\AdWindows.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MahApps.Metro">
+      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\MahApps.Metro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ModPlusAPI">
+      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlusAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="ModPlus_2010">
+      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlus_2010.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity">
+      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\System.Windows.Interactivity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\Helpers\AcadHelpers.cs" />
+    <Compile Include="Base\MPCOEntity.cs" />
+    <Compile Include="Base\Overrules\MPCOGrips.cs" />
+    <Compile Include="Base\Properties\BaseProperties.cs" />
+    <Compile Include="Base\Properties\BaseSummaryProperties.cs" />
+    <Compile Include="Base\Properties\Controls\ControlStylesForEditor.xaml.cs">
+      <DependentUpon>ControlStylesForEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Base\Properties\Controls\ControlStyles.xaml.cs">
+      <DependentUpon>ControlStyles.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Base\Properties\Controls\DoubleTextBox.xaml.cs">
+      <DependentUpon>DoubleTextBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Base\Properties\Controls\IntTextBox.xaml.cs">
+      <DependentUpon>IntTextBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Base\Properties\Converters\ToTextConverter.cs" />
+    <Compile Include="Base\Properties\Converters\ValidationRules.cs" />
+    <Compile Include="Base\Properties\Converters\ValueConverters.cs" />
+    <Compile Include="Base\Properties\Converters\TextInputToVisibilityConverterForInt.cs" />
+    <Compile Include="Base\Properties\PaletteSettings.xaml.cs">
+      <DependentUpon>PaletteSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Base\Properties\PropertiesHelpers.cs" />
+    <Compile Include="Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs" />
+    <Compile Include="Functions\mpBreakLine\Properties\mpBreakLineProperties.cs" />
+    <Compile Include="Functions\mpBreakLine\Properties\mpBreakLinePropertiesPalette.xaml.cs">
+      <DependentUpon>mpBreakLinePropertiesPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Base\Properties\PropertiesPalette.xaml.cs">
+      <DependentUpon>PropertiesPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Base\Styles\Helpers.cs" />
+    <Compile Include="Base\Styles\BaseStyle.cs" />
+    <Compile Include="Base\Styles\StyleEditor.xaml.cs">
+      <DependentUpon>StyleEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Functions\mpBreakLine\BreakLine.cs" />
+    <Compile Include="Functions\mpBreakLine\BreakLineFunction.cs" />
+    <Compile Include="Functions\mpBreakLine\BreakLineInterface.cs" />
+    <Compile Include="Functions\mpBreakLine\BreakLineJig.cs" />
+    <Compile Include="Functions\mpBreakLine\Styles\BreakLineStyle.cs" />
+    <Compile Include="Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs" />
+    <Compile Include="Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs" />
+    <Compile Include="Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs" />
+    <Compile Include="Functions\mpBreakLine\Properties\mpBreakLinePropertiesData.cs" />
+    <Compile Include="Functions\mpBreakLine\Properties\mpBreakLineSummaryProperties.cs" />
+    <Compile Include="Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml.cs">
+      <DependentUpon>BreakLineStyleProperties.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Interface.cs" />
+    <Compile Include="LoadHelpers\RibbonBuilder.cs" />
+    <Compile Include="MainFunction.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Base\Properties\Controls\ControlStylesForEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Base\Properties\Controls\ControlStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Base\Properties\Controls\DoubleTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Base\Properties\Controls\IntTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Base\Properties\PaletteSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Functions\mpBreakLine\Properties\mpBreakLinePropertiesPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Base\Properties\PropertiesPalette.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Base\Styles\StyleEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_16x16.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_16x16.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_16x16.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Functions\mpBreakLine\Help\Curvilinear.png" />
+    <Resource Include="Functions\mpBreakLine\Help\Cylindrical.png" />
+    <Resource Include="Functions\mpBreakLine\Help\Linear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Properties_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\StyleEditor_32x32.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

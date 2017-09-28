@@ -1,0 +1,67 @@
+﻿<ResourceDictionary x:Class="mpESKD.Base.Properties.Controls.ControlStylesForEditor"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ctrls="clr-namespace:mpESKD.Base.Properties.Controls">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <SolidColorBrush Color="#FF696969" x:Key="MainGrayBrush"></SolidColorBrush>
+    <SolidColorBrush Color="#adadad" x:Key="HeaderBackgroundBrush"></SolidColorBrush>
+    <SolidColorBrush Color="#abadb3" x:Key="ValueBorderColor"></SolidColorBrush>
+    
+    <Style x:Key="HeaderTextBoxForStyleEditor" TargetType="{x:Type TextBox}">
+        <Setter Property="BorderThickness" Value="1"></Setter>
+        <Setter Property="BorderBrush" Value="{StaticResource AccentColorBrush}"></Setter>
+        <Setter Property="Background" Value="{StaticResource AccentColorBrush4}"></Setter>
+        <Setter Property="FontWeight" Value="Bold"></Setter>
+        <Setter Property="IsReadOnly" Value="True"></Setter>
+        <Setter Property="Margin" Value="2,2,2,0"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+        <Setter Property="Padding" Value="3"></Setter>
+    </Style>
+    <!--Базовый стиль для заголовков (левый столбец) в палитре свойств-->
+    <Style x:Key="PropertyNameTextBoxBase" TargetType="{x:Type TextBox}">
+        <Setter Property="Background" Value="Transparent"></Setter>
+        <Setter Property="Padding" Value="2,0,0,0"></Setter>
+        <Setter Property="IsReadOnly" Value="True"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="BorderBrush" Value="{StaticResource MainGrayBrush}"></Setter>
+        <Setter Property="Height" Value="20"></Setter>
+        <Setter Property="Margin" Value="15,0,0,0"></Setter>
+        <Setter Property="BorderThickness" Value="1,0,1,1"></Setter>
+    </Style>
+
+    <Style x:Key="PropertyValueComboBox" TargetType="{x:Type ComboBox}">
+        <Setter Property="Padding" Value="2,0,0,0"></Setter>
+        <Setter Property="Margin" Value="0,0,2,0"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="IsReadOnly" Value="True"></Setter>
+        <Setter Property="IsEditable" Value="True"></Setter>
+        <Setter Property="BorderBrush" Value="{StaticResource MainGrayBrush}"></Setter>
+        <Setter Property="BorderThickness" Value="0,0,1,1"></Setter>
+        <Setter Property="Height" Value="20"></Setter>
+    </Style>
+    <Style x:Key="PropertyValueDoubleTextBox" TargetType="{x:Type ctrls:DoubleTextBox}">
+        <Setter Property="Padding" Value="0"></Setter>
+        <Setter Property="Margin" Value="0,0,2,0"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="BorderBrush" Value="{StaticResource ValueBorderColor}"></Setter>
+        <Setter Property="BorderThickness" Value="0,0,1,1"></Setter>
+        <Setter Property="Height" Value="20"></Setter>
+    </Style>
+    <Style x:Key="PropertyValueIntTextBox" TargetType="{x:Type ctrls:IntTextBox}">
+        <Setter Property="Padding" Value="0"></Setter>
+        <Setter Property="Margin" Value="0,0,2,0"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="BorderBrush" Value="{StaticResource ValueBorderColor}"></Setter>
+        <Setter Property="BorderThickness" Value="0,0,1,1"></Setter>
+        <Setter Property="Height" Value="20"></Setter>
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,95 @@
+﻿<UserControl x:Class="mpESKD.Functions.mpBreakLine.Styles.BreakLineStyleProperties"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:behaviors="clr-namespace:mpESKD.Base.Styles.Behaviors"
+             xmlns:styleHelpers="clr-namespace:mpESKD.Base.Styles"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../../Base/Properties/Controls/ControlStylesForEditor.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Название стиля" Margin="2"></TextBlock>
+        <TextBox Grid.Row="1" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 IsEnabled="{Binding CanEdit}" Margin="2" MaxLength="80"></TextBox>
+        <TextBlock Grid.Row="2" Text="Описание стиля" Margin="2"></TextBlock>
+        <TextBox Grid.Row="3" Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 IsEnabled="{Binding CanEdit}" Margin="2" TextWrapping="Wrap"></TextBox>
+        <!--Properties-->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.Resources>
+                <styleHelpers:AnnotationScaleValueConverter x:Key="AnnotationScaleValueConverter"></styleHelpers:AnnotationScaleValueConverter>
+            </Grid.Resources>
+            <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Основные" Style="{StaticResource HeaderTextBoxForStyleEditor}"></TextBox>
+            <!--Scale-->
+            <TextBox Grid.Row="1" Grid.Column="0" Text="Масштаб:"  Margin="15,0,0,0"></TextBox>
+            <ComboBox Grid.Row="1" Grid.Column="2" x:Name="CbScale" 
+                      SelectedItem="{Binding Scale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource AnnotationScaleValueConverter}}" 
+                      GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
+            ></ComboBox>
+            <!--LinetypeScale-->
+            <TextBox Grid.Row="2" Grid.Column="0" Text="Масштаб типа линий:" Margin="15,0,0,0"></TextBox>
+            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding LineTypeScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     x:Name="TbLineTypeScale" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
+                     IsEnabled="{Binding CanEdit}" Margin="0,0,2,0" >
+                <i:Interaction.Behaviors>
+                    <behaviors:AllowableCharactersTextBoxBehavior RegularExpression="^[0-9.]+$" MaxLength="5" />
+                </i:Interaction.Behaviors>
+            </TextBox>
+            
+            <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" BorderThickness="1,0,1,0"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="{DynamicResource MainGrayBrush}"></GridSplitter>
+            <!--Geometry-->
+            <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Text="Геометрия" Style="{StaticResource HeaderTextBoxForStyleEditor}"></TextBox>
+            <!--Overhang-->
+            <TextBox Grid.Row="4" Grid.Column="0" Text="Выступы за объект:" Margin="15,0,0,0"></TextBox>
+            <controls:NumericUpDown Grid.Row="4" Grid.Column="2" Value="{Binding Overhang, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                x:Name="TbOverhang" Minimum="0" Maximum="10" Margin="0,0,2,0"
+                                GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
+                                    IsEnabled="{Binding CanEdit}"></controls:NumericUpDown>
+            <TextBox Grid.Row="5" Grid.Column="0" Text="Высота разрыва:" Margin="15,0,0,0"></TextBox>
+            <controls:NumericUpDown Grid.Row="5" Grid.Column="2" Value="{Binding BreakHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                x:Name="TbBreakHeight" Minimum="1" Maximum="20" Margin="0,0,2,0"
+                                GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
+                                    IsEnabled="{Binding CanEdit}"></controls:NumericUpDown>
+            <TextBox Grid.Row="6" Grid.Column="0" Text="Ширина разрыва:" Margin="15,0,0,0"></TextBox>
+            <controls:NumericUpDown Grid.Row="6" Grid.Column="2" Value="{Binding BreakWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                x:Name="TbBreakWidth" Minimum="1" Maximum="13" Margin="0,0,2,0"
+                                GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
+                                    IsEnabled="{Binding CanEdit}"></controls:NumericUpDown>
+            <GridSplitter Grid.Column="1" Grid.Row="4" Grid.RowSpan="3" BorderThickness="1,0,1,0"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
+        </Grid>
+    </Grid>
+</UserControl>
