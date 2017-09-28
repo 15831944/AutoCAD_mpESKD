@@ -55,8 +55,8 @@ namespace mpESKD.Functions.mpBreakLine
 
         private static void CreateBreakLine(BreakLineType breakLineType)
         {
-            Statistic.SendCommandStarting(new Interface());//?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+            // send statistic
+            Statistic.SendCommandStarting(BreakLineFunction.MPCOEntName, MpVersionData.CurCadVers);
             try
             {
                 Overrule.Overruling = false;
@@ -71,7 +71,7 @@ namespace mpESKD.Functions.mpBreakLine
                     BreakLineType = breakLineType
                 };
                 var blockReference = CreateBreakLineBlock(ref breakLine);
-                bool breakLoop = false;
+                var breakLoop = false;
                 while (!breakLoop)
                 {
                     var breakLineJig = new BreakLineJig(breakLine, blockReference);

@@ -68,8 +68,8 @@ namespace mpESKD.Base.Properties
                 var scale = new AnnotationScale
                 {
                     Name = str,
-                    DrawingUnits = double.TryParse(splitted[0], out double d) ? d : 1.0,
-                    PaperUnits = double.TryParse(splitted[1], out d) ? d : 1.0
+                    PaperUnits = double.TryParse(splitted[0], out double d) ? d : 1.0,
+                    DrawingUnits = double.TryParse(splitted[1], out d) ? d : 1.0
                 };
                 return scale;
             }

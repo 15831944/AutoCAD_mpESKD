@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -10,6 +11,7 @@ using mpESKD.Functions.mpBreakLine.Properties;
 using mpESKD.Functions.mpBreakLine.Styles;
 using ModPlus.Helpers;
 using ModPlusAPI.Windows;
+// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Functions.mpBreakLine
 {
@@ -38,12 +40,11 @@ namespace mpESKD.Functions.mpBreakLine
             BlockRecord = blockTableRecord;
             //BreakLineType = breakLineType;
             StyleGuid = style.Guid;
-            // scale
+            // Устанавливаю текущий масштаб
             Scale = AcadHelpers.Database.Cannoscale;
+            Debug.Print(AcadHelpers.Database.Cannoscale.Name);
             // Применяем текущий стиль к СПДС примитиву
             ApplyStyle(style);
-            //
-            //MakeSimplyEntity("Create");
         }
         // Основные свойства  примитива
 
@@ -111,10 +112,7 @@ namespace mpESKD.Functions.mpBreakLine
         /// </summary>
         public double LineTypeScale { get; set; } = mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue;
 
-        /// <summary>
-        /// Текущий масштаб
-        /// </summary>
-        /// <returns></returns>
+        /// <summary>Текущий масштаб</summary>
         public double GetScale()
         {
             return Scale.DrawingUnits / Scale.PaperUnits;
@@ -386,27 +384,17 @@ namespace mpESKD.Functions.mpBreakLine
 
         /* Применение стиля по сути должно переопределять текущие параметры
          */
-        // Работа со стилем 
-        public void ApplyStyle()
-        {
-            var style = BreakLineStylesManager.GetCurrentStyle();
-            // apply settings from style
-            ApplyPropertiesFormStyle(style);
-        }
         // Работа со стилем и параметрами
         public void ApplyStyle(BreakLineStyle style)
         {
             // apply settings from style
-            ApplyPropertiesFormStyle(style);
-        }
-
-        private void ApplyPropertiesFormStyle(IMPCOStyle style)
-        {
-            Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang),mpBreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
+            Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), mpBreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
             BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), mpBreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
             BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), mpBreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue);
-            Scale = StyleHelpers.GetPropertyValue(style, nameof(Scale), mpBreakLineProperties.ScalePropertyDescriptive.DefaultValue);
-            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale),mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
+            if(new MainSettings().UseScaleFromStyle)
+                Scale = StyleHelpers.GetPropertyValue(style, nameof(Scale), mpBreakLineProperties.ScalePropertyDescriptive.DefaultValue);
+            Debug.Print(Scale.Name);
+            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
         }
         #endregion
 

@@ -6,6 +6,7 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
 using mpESKD.Base.Helpers;
 using ModPlusAPI.Windows;
+// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Base
 {
@@ -56,6 +57,7 @@ namespace mpESKD.Base
                                 _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite);
                                 if (_blockRecord.GetBlockReferenceIds(true, true).Count <= 1)
                                 {
+                                    //Debug.Print("Erasing");
                                     foreach (var objectId in _blockRecord)
                                     {
                                         tr.GetObject(objectId, OpenMode.ForWrite).Erase();
@@ -67,12 +69,12 @@ namespace mpESKD.Base
                                     using (var blockTable =
                                         AcadHelpers.Database.BlockTableId.Write<BlockTable>())
                                     {
+                                        //Debug.Print("Creating new (no erasing)");
                                         blockTable.Add(_blockRecord);
                                         tr.AddNewlyCreatedDBObject(_blockRecord, true);
                                     }
                                     blkRef.BlockTableRecord = _blockRecord.Id;
                                 }
-
                                 tr.Commit();
                             }
                             using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
@@ -81,20 +83,21 @@ namespace mpESKD.Base
                                 _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite);
                                 _blockRecord.BlockScaling = BlockScaling.Uniform;
                                 var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
+                                //Debug.Print("Transformed copy");
                                 foreach (var entity in Entities)
                                 {
                                     var transformedCopy = entity.GetTransformedCopy(matrix3D);
                                     _blockRecord.AppendEntity(transformedCopy);
                                     tr.AddNewlyCreatedDBObject(transformedCopy, true);
                                 }
-
-
                                 tr.Commit();
                             }
+                            AcadHelpers.Document.TransactionManager.FlushGraphics();
                         }
                     }
                     else if (!IsValueCreated)
                     {
+                        //Debug.Print("Value not created");
                         var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
                         foreach (var ent in Entities)
                         {

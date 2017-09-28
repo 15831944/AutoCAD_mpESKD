@@ -56,6 +56,7 @@
             <TextBox Grid.Row="1" Grid.Column="0" Text="Масштаб:"  Margin="15,0,0,0"></TextBox>
             <ComboBox Grid.Row="1" Grid.Column="2" x:Name="CbScale" 
                       SelectedItem="{Binding Scale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource AnnotationScaleValueConverter}}" 
+                      IsEnabled="{Binding CanEdit}" 
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
             ></ComboBox>
             <!--LinetypeScale-->

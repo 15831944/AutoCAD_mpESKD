@@ -155,14 +155,14 @@ namespace mpESKD.LoadHelpers
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpStyleEditor",
-                    "Стили",
+                    "Стили и настройки",
                     "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32.png",
                     "Работа со стилями примитивов ModPlus", Orientation.Vertical, "", ""
                 ));
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpPropertiesPalette",
-                    "Свойства",
+                    "Палитра\nсвойств",
                     "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32.png",
                     "Палитра свойств примитивов ModPlus", Orientation.Vertical, "", ""
                 ));

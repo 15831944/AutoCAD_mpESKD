@@ -29,7 +29,6 @@ namespace mpESKD.Functions.mpBreakLine
                         return _insertionPoint.Acquire(prompts, "\nВведите точку вставки:", value =>
                         {
                             _breakLine.InsertionPoint = value;
-
                         });
                     case BreakLineJigState.PromptEndPoint:
                         return _endPoint.Acquire(prompts, "\nВведите конечную точку:", _insertionPoint.Value, value =>
@@ -75,12 +74,12 @@ namespace mpESKD.Functions.mpBreakLine
 
     public class PointSampler
     {
-        //private static readonly Tolerance Tolerance;
+        private static readonly Tolerance Tolerance;
         public Point3d Value { get; set; }
 
         static PointSampler()
         {
-            //Tolerance = new Tolerance(1E-1, 1E-1);
+            Tolerance = new Tolerance(1E-1, 1E-1);
         }
 
         public PointSampler(Point3d value)
@@ -107,7 +106,7 @@ namespace mpESKD.Functions.mpBreakLine
                 }
                 return SamplerStatus.Cancel;
             }
-            if (Value.IsEqualTo(promptPointResult.Value/*, Tolerance*/))
+            if (Value.IsEqualTo(promptPointResult.Value, Tolerance))
             {
                 return SamplerStatus.NoChange;
             }
