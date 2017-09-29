@@ -16,17 +16,9 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             InitializeComponent();
             CbBreakLineType.ItemsSource = mpBreakLinePropertiesHelpers.BreakLineTypeLocalNames;
             // get list of scales
-            var scales = new List<string>();
-            var ocm = AcadHelpers.Database.ObjectContextManager;
-            if (ocm != null)
-            {
-                var occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
-                foreach (ObjectContext objectContext in occ)
-                {
-                    scales.Add(((AnnotationScale)objectContext).Name);
-                }
-            }
-            CbScale.ItemsSource = scales;
+            CbScale.ItemsSource = AcadHelpers.Scales;
+            // fill layers
+            CbLayerName.ItemsSource = AcadHelpers.Layers;
             if (AcadHelpers.Document != null)
                 ShowProperties();
         }
@@ -85,6 +77,8 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.ScalePropertyDescriptive.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
                 Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.LineTypeScalePropertyDescriptive.Description);
+            if (fe.Name.Equals("CbLayerName"))
+                Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.LayerName.Description);
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)

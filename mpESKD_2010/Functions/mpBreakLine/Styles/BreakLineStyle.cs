@@ -42,6 +42,8 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                 mpBreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale),
                 mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
+            LayerName = StyleHelpers.GetPropertyValue(style, nameof(LayerName),
+                mpBreakLineProperties.LayerName.DefaultValue);
             Scale = StyleHelpers.GetPropertyValue<AnnotationScale>(style, nameof(Scale),
                 mpBreakLineProperties.ScalePropertyDescriptive.DefaultValue);
         }
@@ -53,6 +55,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
             BreakWidth = mpBreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue;
             BreakHeight = mpBreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue;
             LineTypeScale = mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue;
+            LayerName = mpBreakLineProperties.LayerName.DefaultValue;
             Scale = mpBreakLineProperties.ScalePropertyDescriptive.DefaultValue;
         }
 
@@ -61,12 +64,14 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         public int BreakHeight { get; set; }
         public int BreakWidth { get; set; }
         public double LineTypeScale { get; set; }
+        public string LayerName { get; set; }
         public AnnotationScale Scale { get; set; }
         #endregion
     }
 
     public static class BreakLineStylesManager
     {
+        private const string StylesFileName = "BreakLineStyles.xml";
         private static string _currentStyleGuid;
         /// <summary>Guid текущего стиля</summary>
         public static string CurrentStyleGuid
@@ -92,11 +97,33 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         }
         /// <summary>Коллекция стилей</summary>
         public static List<BreakLineStyle> Styles = new List<BreakLineStyle>();
+        /// <summary>Проверка и создание в случае необходимости файла стилей</summary>
+        public static void CheckStylesFile()
+        {
+            bool needToCreate;
+            var stylesFile = Path.Combine(MainFunction.StylesPath, StylesFileName);
+            if (File.Exists(stylesFile))
+            {
+                try
+                {
+                    XElement.Load(stylesFile);
+                    needToCreate = false;
+                }
+                catch
+                {
+                    needToCreate = true;
+                }
+            }
+            else needToCreate = true;
 
-        /// <summary>
-        /// Получение стиля из коллекции по его идентификатору или первого системного стиля, если не найден
-        /// В случае, если коллекция пустая, то происходит ее загрузка (с созданием, если нужно)
-        /// </summary>
+            if (needToCreate)
+            {
+                XElement fXel = new XElement("Styles");
+                fXel.Save(stylesFile);
+            }
+        }
+        /// <summary>Получение стиля из коллекции по его идентификатору или первого системного стиля, если не найден
+        /// В случае, если коллекция пустая, то происходит ее загрузка (с созданием, если нужно)</summary>
         /// <returns></returns>
         public static BreakLineStyle GetCurrentStyle()
         {
@@ -118,18 +145,15 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                 return CreateSystemStyles().FirstOrDefault();
             }
         }
-
-        /// <summary>
-        /// Загрузка (десериализация) стилей из xml-файла
-        /// В случае отсутсвия файла - создание коллекции с одним системным стилем и ее сохранение в xml-файл
-        /// </summary>
+        /// <summary>Загрузка (десериализация) стилей из xml-файла
+        /// В случае отсутсвия файла - создание коллекции с одним системным стилем и ее сохранение в xml-файл</summary>
         private static void LoadStylesFromXmlFile()
         {
             Styles.Clear();
             // Добавляю системные стили
             Styles.AddRange(CreateSystemStyles());
             // load from file
-            var stylesFile = Path.Combine(MainFunction.StylesPath, "BreakLineStyles.xml");
+            var stylesFile = Path.Combine(MainFunction.StylesPath, StylesFileName);
             var fXel = XElement.Load(stylesFile);
             foreach (XElement styleXel in fXel.Elements("UserStyle"))
             {
@@ -205,6 +229,17 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                                     Maximum = mpBreakLineProperties.LineTypeScalePropertyDescriptive.Maximum
                                 });
                                 break;
+                            case "LayerName":
+                                style.Properties.Add(new MPCOStringProperty
+                                {
+                                    Name = nameAttr.Value,
+                                    Value = propXel.Attribute("Value")?.Value,
+                                    Description = mpBreakLineProperties.LayerName.Description,
+                                    DefaultValue = mpBreakLineProperties.LayerName.DefaultValue,
+                                    PropertyType = mpBreakLineProperties.LayerName.PropertyType,
+                                    DisplayName = mpBreakLineProperties.LayerName.DisplayName
+                                });
+                                break;
                             case "Scale":
                                 style.Properties.Add(new MPCOTypeProperty<AnnotationScale>
                                 {
@@ -223,9 +258,10 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                 Styles.Add(style);
             }
         }
+
         public static void SaveStylesToXml(List<BreakLineStyleForEditor> styles)
         {
-            var stylesFile = Path.Combine(MainFunction.StylesPath, "BreakLineStyles.xml");
+            var stylesFile = Path.Combine(MainFunction.StylesPath, StylesFileName);
             // Если файла нет, то создаем
             if (!File.Exists(stylesFile))
                 new XElement("Styles").Save(stylesFile);
@@ -266,6 +302,11 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                     propXel.SetAttributeValue("PropertyType", style.Scale.GetType().Name);
                     propXel.SetAttributeValue("Value", style.Scale.Name);
                     styleXel.Add(propXel);
+                    propXel = new XElement("Property");
+                    propXel.SetAttributeValue("Name", nameof(style.LayerName));
+                    propXel.SetAttributeValue("PropertyType", style.LayerName.GetType().Name);
+                    propXel.SetAttributeValue("Value", style.LayerName);
+                    styleXel.Add(propXel);
 
                     fXel.Add(styleXel);
                 }
@@ -293,6 +334,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
             style.Properties.Add(StyleHelpers.CreateProperty(mpBreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue, mpBreakLineProperties.BreakWidthPropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(mpBreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue, mpBreakLineProperties.BreakHeightPropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue, mpBreakLineProperties.LineTypeScalePropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(mpBreakLineProperties.LayerName.DefaultValue, mpBreakLineProperties.LayerName));
             style.Properties.Add(StyleHelpers.CreateProperty<BreakLineType>(mpBreakLineProperties.BreakLineTypePropertyDescriptive.DefaultValue, mpBreakLineProperties.BreakLineTypePropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty<AnnotationScale>(mpBreakLineProperties.ScalePropertyDescriptive.DefaultValue, mpBreakLineProperties.ScalePropertyDescriptive));
 

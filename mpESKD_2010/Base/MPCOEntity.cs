@@ -7,6 +7,7 @@ using Autodesk.AutoCAD.GraphicsInterface;
 using mpESKD.Base.Helpers;
 using ModPlusAPI.Windows;
 // ReSharper disable InconsistentNaming
+#pragma warning disable CS0618
 
 namespace mpESKD.Base
 {
@@ -157,18 +158,21 @@ namespace mpESKD.Base
             {
                 using (blockTableRecord = blkRef.BlockTableRecord.Open(OpenMode.ForWrite) as BlockTableRecord)
                 {
-                    foreach (ObjectId objectId in blockTableRecord)
+                    if (blockTableRecord != null)
                     {
-                        using (var ent = objectId.Open(OpenMode.ForWrite))
+                        foreach (ObjectId objectId in blockTableRecord)
                         {
-                            ent.Erase(true);
+                            using (var ent = objectId.Open(OpenMode.ForWrite))
+                            {
+                                ent.Erase(true);
+                            }
                         }
-                    }
-                    foreach (Entity entity in Entities)
-                    {
-                        using (entity)
+                        foreach (Entity entity in Entities)
                         {
-                            blockTableRecord.AppendEntity(entity);
+                            using (entity)
+                            {
+                                blockTableRecord.AppendEntity(entity);
+                            }
                         }
                     }
                 }

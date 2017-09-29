@@ -26,6 +26,8 @@ namespace mpESKD.Functions.mpBreakLine
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance(), true);
             Overrule.Overruling = true;
+            // создание файла хранения стилей, если отсутсвует
+            BreakLineStylesManager.CheckStylesFile();
         }
         public static void Terminate()
         {

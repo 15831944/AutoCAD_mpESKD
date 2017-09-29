@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using System.Windows;
 using mpESKD.Base.Helpers;
 using mpESKD.Base.Styles;
 using mpESKD.Functions.mpBreakLine.Properties;
@@ -9,21 +7,17 @@ namespace mpESKD.Functions.mpBreakLine.Styles
 {
     public partial class BreakLineStyleProperties
     {
-        public BreakLineStyleProperties()
+        public BreakLineStyleProperties(string layerNameFromStyle)
         {
             InitializeComponent();
             // get list of scales
-            var scales = new List<string>();
-            var ocm = AcadHelpers.Database.ObjectContextManager;
-            if (ocm != null)
-            {
-                var occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
-                foreach (ObjectContext objectContext in occ)
-                {
-                    scales.Add(((AnnotationScale)objectContext).Name);
-                }
-            }
-            CbScale.ItemsSource = scales;
+            CbScale.ItemsSource = AcadHelpers.Scales;
+            // layers
+            var layers = AcadHelpers.Layers;
+            layers.Insert(0, "По умолчанию");
+            if(!layers.Contains(layerNameFromStyle))
+                layers.Insert(1, layerNameFromStyle);
+            CbLayerName.ItemsSource = layers;
         }
         private void FrameworkElement_OnGotFocus(object sender, RoutedEventArgs e)
         {
@@ -40,6 +34,8 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                 StyleEditorWork.ShowDescription(mpBreakLineProperties.ScalePropertyDescriptive.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
                 StyleEditorWork.ShowDescription(mpBreakLineProperties.LineTypeScalePropertyDescriptive.Description);
+            if (fe.Name.Equals("CbLayerName"))
+                StyleEditorWork.ShowDescription(mpBreakLineProperties.LayerName.Description);
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)

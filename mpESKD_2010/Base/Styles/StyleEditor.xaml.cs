@@ -89,8 +89,8 @@ namespace mpESKD.Base.Styles
                 BtRemoveStyle.IsEnabled = styleForEditor.CanEdit;
                 BtSetCurrentStyle.IsEnabled = !styleForEditor.IsCurrent;
 
-                if (styleForEditor is BreakLineStyleForEditor)
-                    BorderProperties.Child = new BreakLineStyleProperties { DataContext = item };
+                if (styleForEditor is BreakLineStyleForEditor breakLineStyle)
+                    BorderProperties.Child = new BreakLineStyleProperties(breakLineStyle.LayerName) { DataContext = item };
             }
         }
         // add new style

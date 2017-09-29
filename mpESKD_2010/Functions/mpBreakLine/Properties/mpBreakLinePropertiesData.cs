@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Helpers;
 // ReSharper disable InconsistentNaming
+#pragma warning disable CS0618
 
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
@@ -26,15 +27,16 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                             breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = breakLine.GetParametersForXData())
                             {
-                                blkRef.XData = resBuf;
+                                if (blkRef != null) blkRef.XData = resBuf;
                             }
                         }
-                        blkRef.ResetBlock();
+                        if (blkRef != null) blkRef.ResetBlock();
                     }
                 }
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
             }
         }
+
         private int _breakHeight;
         public int BreakHeight
         {
@@ -52,15 +54,16 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                             breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = breakLine.GetParametersForXData())
                             {
-                                blkRef.XData = resBuf;
+                                if (blkRef != null) blkRef.XData = resBuf;
                             }
                         }
-                        blkRef.ResetBlock();
+                        if (blkRef != null) blkRef.ResetBlock();
                     }
                 }
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
             }
         }
+
         private int _breakWidth;
         public int BreakWidth
         {
@@ -78,10 +81,10 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                             breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = breakLine.GetParametersForXData())
                             {
-                                blkRef.XData = resBuf;
+                                if (blkRef != null) blkRef.XData = resBuf;
                             }
                         }
-                        blkRef.ResetBlock();
+                        if (blkRef != null) blkRef.ResetBlock();
                     }
                 }
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
@@ -89,7 +92,6 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         }
 
         private string _breakLineType;
-
         public string BreakLineType
         {
             get => _breakLineType;
@@ -106,10 +108,10 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                             breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = breakLine.GetParametersForXData())
                             {
-                                blkRef.XData = resBuf;
+                                if (blkRef != null) blkRef.XData = resBuf;
                             }
                         }
-                        blkRef.ResetBlock();
+                        if (blkRef != null) blkRef.ResetBlock();
                     }
                 }
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
@@ -117,7 +119,6 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         }
 
         private string _scale;
-
         public string Scale
         {
             get => _scale;
@@ -134,10 +135,10 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                             breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = breakLine.GetParametersForXData())
                             {
-                                blkRef.XData = resBuf;
+                                if (blkRef != null) blkRef.XData = resBuf;
                             }
                         }
-                        blkRef.ResetBlock();
+                        if (blkRef != null) blkRef.ResetBlock();
                     }
                 }
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
@@ -145,7 +146,6 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         }
 
         private double _lineTypeScale;
-
         public double LineTypeScale
         {
             get => _lineTypeScale;
@@ -162,10 +162,28 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                             breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = breakLine.GetParametersForXData())
                             {
-                                blkRef.XData = resBuf;
+                                if (blkRef != null) blkRef.XData = resBuf;
                             }
                         }
-                        blkRef.ResetBlock();
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private string _layerName;
+
+        public string LayerName
+        {
+            get => _layerName;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        if (blkRef != null) blkRef.Layer = value;
                     }
                 }
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
@@ -182,8 +200,11 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 _blkRefObjectId = blkRefObjectId;
                 using (BlockReference blkRef = blkRefObjectId.Open(OpenMode.ForRead, false, true) as BlockReference)
                 {
-                    blkRef.Modified += BlkRef_Modified;
-                    Update(blkRef);
+                    if (blkRef != null)
+                    {
+                        blkRef.Modified += BlkRef_Modified;
+                        Update(blkRef);
+                    }
                 }
             }
             else IsValid = false;
@@ -211,6 +232,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 _breakWidth = breakLine.BreakWidth;
                 _breakLineType = mpBreakLinePropertiesHelpers.GetLocalBreakLineTypeName(breakLine.BreakLineType);
                 _scale = breakLine.Scale.Name;
+                _layerName = blkReference.Layer;
                 _lineTypeScale = breakLine.LineTypeScale;
                 AnyPropertyChangedReise();
             }
@@ -230,10 +252,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         /// </summary>
         protected void AnyPropertyChangedReise()
         {
-            if (AnyPropertyChanged != null)
-            {
-                AnyPropertyChanged(this, null);
-            }
+            AnyPropertyChanged?.Invoke(this, null);
         }
     }
 }

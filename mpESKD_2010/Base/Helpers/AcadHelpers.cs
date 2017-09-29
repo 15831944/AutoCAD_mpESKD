@@ -15,22 +15,55 @@ namespace mpESKD.Base.Helpers
 {
     public static class AcadHelpers
     {
-        /// <summary>
-        /// БД активного документа
-        /// </summary>
+        /// <summary>БД активного документа</summary>
         public static Database Database => HostApplicationServices.WorkingDatabase;
-        /// <summary>
-        /// Коллекция документов
-        /// </summary>
+        /// <summary>Коллекция документов</summary>
         public static DocumentCollection Documents => AcApp.DocumentManager;
-        /// <summary>
-        /// Активный документ
-        /// </summary>
+        /// <summary>Активный документ</summary>
         public static Document Document => AcApp.DocumentManager.MdiActiveDocument;
-        /// <summary>
-        /// Редактор активного документа
-        /// </summary>
+        /// <summary>Редактор активного документа</summary>
         public static Editor Editor => AcApp.DocumentManager.MdiActiveDocument.Editor;
+        /// <summary>Список слоёв текущей базы данных</summary>
+        public static List<string> Layers
+        {
+            get
+            {
+                var layers = new List<string>();
+                using (Document.LockDocument())
+                {
+                    using (OpenCloseTransaction tr = Database.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        LayerTable lt = tr.GetObject(Database.LayerTableId, OpenMode.ForRead) as LayerTable;
+                        if (lt != null)
+                            foreach (ObjectId layerId in lt)
+                            {
+                                var layer = tr.GetObject(layerId, OpenMode.ForWrite) as LayerTableRecord;
+                                if (layer != null)
+                                    layers.Add(layer.Name);
+                            }
+                    }
+                }
+                return layers;
+            }
+        }
+        /// <summary>Список масштабов текущего чертежа</summary>
+        public static List<string> Scales
+        {
+            get
+            {
+                var scales = new List<string>();
+                var ocm = Database.ObjectContextManager;
+                if (ocm != null)
+                {
+                    var occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
+                    foreach (ObjectContext objectContext in occ)
+                    {
+                        scales.Add(((AnnotationScale)objectContext).Name);
+                    }
+                }
+                return scales;
+            }
+        }
 
         /// <summary>
         /// Открыть объект для чтения
@@ -117,9 +150,7 @@ namespace mpESKD.Base.Helpers
             }
             return new BlockReference(point, blockTableRecord.ObjectId);
         }
-        /// <summary>
-        /// Получение аннотативного масштаба по имени из текущего чертежа
-        /// </summary>
+        /// <summary>Получение аннотативного масштаба по имени из текущего чертежа</summary>
         /// <param name="name">Имя масштаба</param>
         /// <returns>Аннотативный масштаб с таким именем или текущий масштаб в БД</returns>
         public static AnnotationScale GetAnnotationScaleByName(string name)
@@ -128,21 +159,26 @@ namespace mpESKD.Base.Helpers
             if (ocm != null)
             {
                 var occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
-                if(occ != null)
-                foreach (var objectContext in occ)
-                {
-                    var asc = objectContext as AnnotationScale;
-                    if (asc?.Name == name) return asc;
-                }
+                if (occ != null)
+                    foreach (var objectContext in occ)
+                    {
+                        var asc = objectContext as AnnotationScale;
+                        if (asc?.Name == name) return asc;
+                    }
             }
             return Database.Cannoscale;
         }
+        /// <summary>Применение стиля к блоку согласно стиля</summary>
+        /// <param name="blockReference">Блок</param>
+        /// <param name="layer">Имя слоя</param>
+        public static void SetLayerByName(this BlockReference blockReference, string layer)
+        {
+            
+        }
     }
-    /// <summary>
-    /// Вспомогательные методы работы с расширенными данными
+    /// <summary>Вспомогательные методы работы с расширенными данными
     /// Есть аналогичные в MpCadHelpers. Некоторые будут совпадать
-    /// но все-равно делаю отдельно
-    /// </summary>
+    /// но все-равно делаю отдельно</summary>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class ExtendedDataHelpers
     {

@@ -30,6 +30,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(BreakHeight)));
             }
         }
+
         public int? BreakWidth
         {
             get => GetIntProp(nameof(BreakWidth));
@@ -57,6 +58,16 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             {
                 SetPropValue(nameof(Scale), value);
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(Scale)));
+            }
+        }
+
+        public string LayerName
+        {
+            get => GetStrProp(nameof(LayerName));
+            set
+            {
+                SetPropValue(nameof(LayerName), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(LayerName)));
             }
         }
 

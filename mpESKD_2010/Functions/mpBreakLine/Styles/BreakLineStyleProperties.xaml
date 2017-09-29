@@ -47,21 +47,28 @@
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.Resources>
                 <styleHelpers:AnnotationScaleValueConverter x:Key="AnnotationScaleValueConverter"></styleHelpers:AnnotationScaleValueConverter>
             </Grid.Resources>
             <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Основные" Style="{StaticResource HeaderTextBoxForStyleEditor}"></TextBox>
+            <!--Layer-->
+            <TextBox Grid.Row="1" Grid.Column="0" Text="Слой:"  Margin="15,0,0,0"></TextBox>
+            <ComboBox Grid.Row="1" Grid.Column="2" x:Name="CbLayerName"
+                      SelectedItem="{Binding LayerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      IsEnabled="{Binding CanEdit}"
+                      GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
             <!--Scale-->
-            <TextBox Grid.Row="1" Grid.Column="0" Text="Масштаб:"  Margin="15,0,0,0"></TextBox>
-            <ComboBox Grid.Row="1" Grid.Column="2" x:Name="CbScale" 
+            <TextBox Grid.Row="2" Grid.Column="0" Text="Масштаб:"  Margin="15,0,0,0"></TextBox>
+            <ComboBox Grid.Row="2" Grid.Column="2" x:Name="CbScale" 
                       SelectedItem="{Binding Scale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource AnnotationScaleValueConverter}}" 
                       IsEnabled="{Binding CanEdit}" 
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
             ></ComboBox>
             <!--LinetypeScale-->
-            <TextBox Grid.Row="2" Grid.Column="0" Text="Масштаб типа линий:" Margin="15,0,0,0"></TextBox>
-            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding LineTypeScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox Grid.Row="3" Grid.Column="0" Text="Масштаб типа линий:" Margin="15,0,0,0"></TextBox>
+            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding LineTypeScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                      x:Name="TbLineTypeScale" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
                      IsEnabled="{Binding CanEdit}" Margin="0,0,2,0" >
                 <i:Interaction.Behaviors>
@@ -69,27 +76,27 @@
                 </i:Interaction.Behaviors>
             </TextBox>
             
-            <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" BorderThickness="1,0,1,0"
+            <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" BorderThickness="1,0,1,0"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="{DynamicResource MainGrayBrush}"></GridSplitter>
             <!--Geometry-->
-            <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Text="Геометрия" Style="{StaticResource HeaderTextBoxForStyleEditor}"></TextBox>
+            <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="Геометрия" Style="{StaticResource HeaderTextBoxForStyleEditor}"></TextBox>
             <!--Overhang-->
-            <TextBox Grid.Row="4" Grid.Column="0" Text="Выступы за объект:" Margin="15,0,0,0"></TextBox>
-            <controls:NumericUpDown Grid.Row="4" Grid.Column="2" Value="{Binding Overhang, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox Grid.Row="5" Grid.Column="0" Text="Выступы за объект:" Margin="15,0,0,0"></TextBox>
+            <controls:NumericUpDown Grid.Row="5" Grid.Column="2" Value="{Binding Overhang, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                 x:Name="TbOverhang" Minimum="0" Maximum="10" Margin="0,0,2,0"
                                 GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
                                     IsEnabled="{Binding CanEdit}"></controls:NumericUpDown>
-            <TextBox Grid.Row="5" Grid.Column="0" Text="Высота разрыва:" Margin="15,0,0,0"></TextBox>
-            <controls:NumericUpDown Grid.Row="5" Grid.Column="2" Value="{Binding BreakHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox Grid.Row="6" Grid.Column="0" Text="Высота разрыва:" Margin="15,0,0,0"></TextBox>
+            <controls:NumericUpDown Grid.Row="6" Grid.Column="2" Value="{Binding BreakHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                 x:Name="TbBreakHeight" Minimum="1" Maximum="20" Margin="0,0,2,0"
                                 GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
                                     IsEnabled="{Binding CanEdit}"></controls:NumericUpDown>
-            <TextBox Grid.Row="6" Grid.Column="0" Text="Ширина разрыва:" Margin="15,0,0,0"></TextBox>
-            <controls:NumericUpDown Grid.Row="6" Grid.Column="2" Value="{Binding BreakWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox Grid.Row="7" Grid.Column="0" Text="Ширина разрыва:" Margin="15,0,0,0"></TextBox>
+            <controls:NumericUpDown Grid.Row="7" Grid.Column="2" Value="{Binding BreakWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                 x:Name="TbBreakWidth" Minimum="1" Maximum="13" Margin="0,0,2,0"
                                 GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
                                     IsEnabled="{Binding CanEdit}"></controls:NumericUpDown>
-            <GridSplitter Grid.Column="1" Grid.Row="4" Grid.RowSpan="3" BorderThickness="1,0,1,0"
+            <GridSplitter Grid.Column="1" Grid.Row="5" Grid.RowSpan="3" BorderThickness="1,0,1,0"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
         </Grid>
     </Grid>
