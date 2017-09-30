@@ -5,14 +5,19 @@ using System.Linq;
 using System.Windows;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.DatabaseServices;
+using mpESKD.Base.Properties;
+
 // ReSharper disable InconsistentNaming
 
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
     public partial class mpBreakLinePropertiesPalette
     {
-        public mpBreakLinePropertiesPalette()
+        private PropertiesPalette _parentPalette;
+
+        public mpBreakLinePropertiesPalette(PropertiesPalette palette)
         {
+            _parentPalette = palette;
             InitializeComponent();
             CbBreakLineType.ItemsSource = mpBreakLinePropertiesHelpers.BreakLineTypeLocalNames;
             // get list of scales
@@ -66,24 +71,24 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         {
             if(!(sender is FrameworkElement fe)) return;
             if (fe.Name.Equals("TbOverhang"))
-                Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.OverhangPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(mpBreakLineProperties.OverhangPropertyDescriptive.Description);
             if (fe.Name.Equals("TbBreakHeight"))
-                Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.BreakHeightPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(mpBreakLineProperties.BreakHeightPropertyDescriptive.Description);
             if (fe.Name.Equals("TbBreakWidth"))
-                Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.BreakWidthPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(mpBreakLineProperties.BreakWidthPropertyDescriptive.Description);
             if (fe.Name.Equals("CbBreakLineType"))
-                Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.BreakLineTypePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(mpBreakLineProperties.BreakLineTypePropertyDescriptive.Description);
             if (fe.Name.Equals("CbScale"))
-                Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.ScalePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(mpBreakLineProperties.ScalePropertyDescriptive.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
-                Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.LineTypeScalePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(mpBreakLineProperties.LineTypeScalePropertyDescriptive.Description);
             if (fe.Name.Equals("CbLayerName"))
-                Base.Properties.PropertiesFunction.ShowDescription(mpBreakLineProperties.LayerName.Description);
+                _parentPalette.ShowDescription(mpBreakLineProperties.LayerName.Description);
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)
         {
-            Base.Properties.PropertiesFunction.ShowDescription(String.Empty);
+            _parentPalette.ShowDescription(String.Empty);
         }
     }
 }

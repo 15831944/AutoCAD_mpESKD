@@ -8,6 +8,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
 using mpESKD.Base.Helpers;
+using ModPlus;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
 
@@ -61,7 +62,7 @@ namespace mpESKD.Base.Properties
                 if (StackPanelProperties.Children.Count > 0)
                     StackPanelProperties.Children.Clear();
                 // Очищаем панель описания
-                PropertiesFunction.ShowDescription(String.Empty);
+                ShowDescription(String.Empty);
             }
             else
             {
@@ -77,7 +78,7 @@ namespace mpESKD.Base.Properties
                                 // mpBreakLine
                                 if (!HasPropertyControl(Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
                                 {
-                                    var mpBreakLineProperties = new mpESKD.Functions.mpBreakLine.Properties.mpBreakLinePropertiesPalette
+                                    var mpBreakLineProperties = new mpESKD.Functions.mpBreakLine.Properties.mpBreakLinePropertiesPalette(this)
                                     {
                                         Name = Functions.mpBreakLine.BreakLineFunction.MPCOEntName
                                     };
@@ -88,6 +89,10 @@ namespace mpESKD.Base.Properties
                     }
                 }
             }
+        }
+        public void ShowDescription(string description)
+        {
+            TbDescription.Text = description;
         }
         private bool HasPropertyControl(string name)
         {
@@ -107,7 +112,7 @@ namespace mpESKD.Base.Properties
                 Topmost = true
             };
             lmSetting.ShowDialog();
-            
+
             if (!lmSetting.ChkAddToMpPalette.IsChecked ?? true)
             {
                 MainFunction.RemoveFromMpPalette(true);
@@ -122,7 +127,7 @@ namespace mpESKD.Base.Properties
     public static class PropertiesFunction
     {
         public static PaletteSet _paletteSet;
-        private static PropertiesPalette propertiesPalette;
+        private static PropertiesPalette _propertiesPalette;
         [CommandMethod("ModPlus", "mpPropertiesPalette", CommandFlags.Modal)]
         public static void Start()
         {
@@ -143,12 +148,12 @@ namespace mpESKD.Base.Properties
                             new Guid("1c0dc0f7-0d06-49df-a2d3-bcea4241e036"));
                         _paletteSet.Load += _paletteSet_Load;
                         _paletteSet.Save += _paletteSet_Save;
-                        propertiesPalette = new PropertiesPalette();
+                        _propertiesPalette = new PropertiesPalette();
                         ElementHost elementHost = new ElementHost()
                         {
                             AutoSize = true,
                             Dock = DockStyle.Fill,
-                            Child = propertiesPalette
+                            Child = _propertiesPalette
                         };
                         _paletteSet.Add("Свойства примитивов ModPlus", elementHost);
                         _paletteSet.Style = PaletteSetStyles.ShowCloseButton | PaletteSetStyles.ShowPropertiesMenu |
@@ -180,14 +185,6 @@ namespace mpESKD.Base.Properties
         private static void _paletteSet_Save(object sender, PalettePersistEventArgs e)
         {
             e.ConfigurationSection.WriteProperty("mpPropertiesPalette", 32.3);
-        }
-
-        public static void ShowDescription(string description)
-        {
-            if (propertiesPalette != null)
-            {
-                propertiesPalette.TbDescription.Text = description;
-            }
         }
     }
 }

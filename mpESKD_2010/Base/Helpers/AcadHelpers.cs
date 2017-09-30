@@ -5,11 +5,14 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Xml.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using mpESKD.Base.Properties;
+using mpESKD.Base.Styles;
 
 namespace mpESKD.Base.Helpers
 {
@@ -168,12 +171,48 @@ namespace mpESKD.Base.Helpers
             }
             return Database.Cannoscale;
         }
+
         /// <summary>Применение стиля к блоку согласно стиля</summary>
-        /// <param name="blockReference">Блок</param>
-        /// <param name="layer">Имя слоя</param>
-        public static void SetLayerByName(this BlockReference blockReference, string layer)
+        /// <param name="blkRefObjectId">ObjectId of block reference</param>
+        /// <param name="layerName">Имя слоя</param>
+        /// <param name="layerXmlData">Данные слоя</param>
+        public static void SetLayerByName(ObjectId blkRefObjectId, string layerName, XElement layerXmlData)
         {
-            
+            var mainSettings = new MainSettings();
+            if (mainSettings.UseLayerFromStyle)
+            {
+                if (!layerName.Equals("По умолчанию"))
+                {
+                    if (LayerHelper.HasLayer(layerName))
+                    {
+                        using (Document.LockDocument())
+                        {
+                            using (Transaction tr = Database.TransactionManager.StartTransaction())
+                            {
+                                var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                                if (blockReference != null) blockReference.Layer = layerName;
+                                tr.Commit();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (mainSettings.IfNoLayer == 1)
+                        {
+                            if(LayerHelper.AddLayerFromXelement(layerXmlData))
+                                using (Document.LockDocument())
+                                {
+                                    using (Transaction tr = Database.TransactionManager.StartTransaction())
+                                    {
+                                        var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                                        if (blockReference != null) blockReference.Layer = layerName;
+                                        tr.Commit();
+                                    }
+                                }
+                        }
+                    }
+                }
+            }
         }
     }
     /// <summary>Вспомогательные методы работы с расширенными данными

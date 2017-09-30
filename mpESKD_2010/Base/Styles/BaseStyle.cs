@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Xml.Linq;
 using mpESKD.Base.Properties;
 using ModPlusAPI;
 
@@ -18,6 +19,7 @@ namespace mpESKD.Base.Styles
         string Guid { get; }
         MPCOStyleType StyleType { get; set; }
         List<MPCOBaseProperty> Properties { get; set; }
+        XElement LayerXmlData { get; set; }
     }
     /// <inheritdoc />
     /// <summary>Базовый класс презентора стиля для работы в редакторе стилей</summary>
@@ -96,6 +98,7 @@ namespace mpESKD.Base.Styles
         public string FunctionName { get; set; }
         public string Description { get; set; }
         public string Guid { get; set; }
+        public XElement LayerXmlData { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

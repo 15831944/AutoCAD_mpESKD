@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
+using mpESKD.Base.Helpers;
 using mpESKD.Base.Properties;
 using mpESKD.Base.Styles;
 using mpESKD.Functions.mpBreakLine.Properties;
@@ -25,6 +25,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         public string Description { get; set; }
         public string Guid { get; set; }
         public MPCOStyleType StyleType { get; set; }
+        public XElement LayerXmlData { get; set; }
         // Properties
         public List<MPCOBaseProperty> Properties { get; set; }
     }
@@ -46,6 +47,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                 mpBreakLineProperties.LayerName.DefaultValue);
             Scale = StyleHelpers.GetPropertyValue<AnnotationScale>(style, nameof(Scale),
                 mpBreakLineProperties.ScalePropertyDescriptive.DefaultValue);
+            LayerXmlData = style.LayerXmlData;
         }
 
         public BreakLineStyleForEditor(StyleToBind parent) : base(parent)
@@ -174,7 +176,6 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                     if (nameAttr != null)
                     {
                         int i;
-                        double d;
                         switch (nameAttr.Value)
                         {
                             case "Overhang":
@@ -220,7 +221,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                                 style.Properties.Add(new MPCODoubleProperty
                                 {
                                     Name = nameAttr.Value,
-                                    Value = double.TryParse(propXel.Attribute("Value")?.Value, out d) ? d : mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue,
+                                    Value = double.TryParse(propXel.Attribute("Value")?.Value, out double d) ? d : mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue,
                                     Description = mpBreakLineProperties.LineTypeScalePropertyDescriptive.Description,
                                     DefaultValue = mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue,
                                     PropertyType = mpBreakLineProperties.LineTypeScalePropertyDescriptive.PropertyType,
@@ -254,11 +255,14 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                         }
                     }
                 }
+                // get layer
+                var layerData = styleXel.Element("LayerTableRecord");
+                style.LayerXmlData = layerData ?? null;
                 // add style
                 Styles.Add(style);
             }
         }
-
+        
         public static void SaveStylesToXml(List<BreakLineStyleForEditor> styles)
         {
             var stylesFile = Path.Combine(MainFunction.StylesPath, StylesFileName);
@@ -307,7 +311,10 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                     propXel.SetAttributeValue("PropertyType", style.LayerName.GetType().Name);
                     propXel.SetAttributeValue("Value", style.LayerName);
                     styleXel.Add(propXel);
-
+                    // add layer
+                    if(LayerHelper.HasLayer(style.LayerName))
+                        styleXel.Add(LayerHelper.SetLayerXml(LayerHelper.GetLayerTableRecordByLayerName(style.LayerName)));
+                    else if(style.LayerXmlData != null) styleXel.Add(style.LayerXmlData);
                     fXel.Add(styleXel);
                 }
                 fXel.Save(stylesFile);

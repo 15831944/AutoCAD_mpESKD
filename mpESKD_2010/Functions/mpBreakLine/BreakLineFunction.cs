@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using mpESKD.Functions.mpBreakLine.Overrules;
 using mpESKD.Base.Helpers;
+using mpESKD.Base.Styles;
 using mpESKD.Functions.mpBreakLine.Properties;
 using mpESKD.Functions.mpBreakLine.Styles;
 using ModPlusAPI;
@@ -67,12 +68,18 @@ namespace mpESKD.Functions.mpBreakLine
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(BreakLineFunction.MPCOEntName);
-                //
-                var breakLine = new BreakLine(BreakLineStylesManager.GetCurrentStyle())
+                // add layer from style
+                var style = BreakLineStylesManager.GetCurrentStyle();
+                var layerName = StyleHelpers.GetPropertyValue(style, mpBreakLineProperties.LayerName.Name,
+                    mpBreakLineProperties.LayerName.DefaultValue);
+                var breakLine = new BreakLine(style)
                 {
                     BreakLineType = breakLineType
                 };
                 var blockReference = CreateBreakLineBlock(ref breakLine);
+                // set layer
+                AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
+
                 var breakLoop = false;
                 while (!breakLoop)
                 {

@@ -83,19 +83,19 @@
             <!--Overhang-->
             <TextBox Grid.Row="5" Grid.Column="0" Text="Выступы за объект:" Margin="15,0,0,0"></TextBox>
             <controls:NumericUpDown Grid.Row="5" Grid.Column="2" Value="{Binding Overhang, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                x:Name="TbOverhang" Minimum="0" Maximum="10" Margin="0,0,2,0"
-                                GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
-                                    IsEnabled="{Binding CanEdit}"></controls:NumericUpDown>
+                                    x:Name="TbOverhang" Minimum="0" Maximum="10" Margin="0,0,2,0"
+                                    GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
+                                    IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></controls:NumericUpDown>
             <TextBox Grid.Row="6" Grid.Column="0" Text="Высота разрыва:" Margin="15,0,0,0"></TextBox>
             <controls:NumericUpDown Grid.Row="6" Grid.Column="2" Value="{Binding BreakHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                x:Name="TbBreakHeight" Minimum="1" Maximum="20" Margin="0,0,2,0"
-                                GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
-                                    IsEnabled="{Binding CanEdit}"></controls:NumericUpDown>
+                                    x:Name="TbBreakHeight" Minimum="1" Maximum="20" Margin="0,0,2,0"
+                                    GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
+                                    IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></controls:NumericUpDown>
             <TextBox Grid.Row="7" Grid.Column="0" Text="Ширина разрыва:" Margin="15,0,0,0"></TextBox>
             <controls:NumericUpDown Grid.Row="7" Grid.Column="2" Value="{Binding BreakWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                x:Name="TbBreakWidth" Minimum="1" Maximum="13" Margin="0,0,2,0"
-                                GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
-                                    IsEnabled="{Binding CanEdit}"></controls:NumericUpDown>
+                                    x:Name="TbBreakWidth" Minimum="1" Maximum="13" Margin="0,0,2,0"
+                                    GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
+                                    IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></controls:NumericUpDown>
             <GridSplitter Grid.Column="1" Grid.Row="5" Grid.RowSpan="3" BorderThickness="1,0,1,0"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
         </Grid>

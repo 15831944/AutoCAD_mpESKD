@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using mpESKD.Base.Helpers;
+using mpESKD.Base.Properties;
 using mpESKD.Base.Styles;
 using mpESKD.Functions.mpBreakLine.Properties;
 

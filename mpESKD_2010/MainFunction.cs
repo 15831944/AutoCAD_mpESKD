@@ -82,7 +82,7 @@ namespace mpESKD
             {
                 if (AcApp.DocumentManager.MdiActiveDocument != null)
                 {
-                    AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_MPPROPERTIESPALETTE ", true, false, false);
+                    PropertiesFunction.Start();
                 }
             }
         }
