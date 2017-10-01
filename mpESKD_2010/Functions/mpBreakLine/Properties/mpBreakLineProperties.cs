@@ -41,7 +41,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             DefaultValue = 10,
             Minimum = 1,
             Maximum = 13,
-            Description = "Высота разрыва в мм. Только для линии обрыва линейного типа"
+            Description = "Ширина разрыва в мм. Только для линии обрыва линейного типа"
         };
         /// <summary>Поле, описывающее свойство "Ширина обрыва"</summary>
         public static MPCOIntProperty BreakWidthPropertyDescriptive = new MPCOIntProperty
@@ -52,7 +52,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             DefaultValue = 5,
             Minimum = 1,
             Maximum = 20,
-            Description = "Ширина разрыва в мм. Только для линии обрыва линейного типа"
+            Description = "Высота разрыва в мм. Только для линии обрыва линейного типа"
         };
         /// <summary>Поле, описывающее свойство "Масштаб"</summary>
         public static MPCOTypeProperty<AnnotationScale> ScalePropertyDescriptive = new MPCOTypeProperty<AnnotationScale>

@@ -7,8 +7,6 @@
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <SolidColorBrush Color="#FF696969" x:Key="MainGrayBrush"></SolidColorBrush>
@@ -17,8 +15,6 @@
     
     <Style x:Key="HeaderTextBoxForStyleEditor" TargetType="{x:Type TextBox}">
         <Setter Property="BorderThickness" Value="1"></Setter>
-        <Setter Property="BorderBrush" Value="{StaticResource AccentColorBrush}"></Setter>
-        <Setter Property="Background" Value="{StaticResource AccentColorBrush4}"></Setter>
         <Setter Property="FontWeight" Value="Bold"></Setter>
         <Setter Property="IsReadOnly" Value="True"></Setter>
         <Setter Property="Margin" Value="2,2,2,0"></Setter>

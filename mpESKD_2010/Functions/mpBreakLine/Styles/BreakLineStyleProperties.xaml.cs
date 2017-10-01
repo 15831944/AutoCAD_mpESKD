@@ -11,6 +11,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         public BreakLineStyleProperties(string layerNameFromStyle)
         {
             InitializeComponent();
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(this.Resources,false);
             // get list of scales
             CbScale.ItemsSource = AcadHelpers.Scales;
             // layers

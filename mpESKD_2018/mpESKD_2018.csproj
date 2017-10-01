@@ -287,5 +287,10 @@
       <Link>Resources\StyleEditor_32x32.png</Link>
     </Resource>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpESKD_2010\Resources\mpESKD_32x32.png">
+      <Link>Resources\mpESKD_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

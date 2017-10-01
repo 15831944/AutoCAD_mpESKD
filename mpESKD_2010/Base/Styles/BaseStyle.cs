@@ -53,7 +53,7 @@ namespace mpESKD.Base.Styles
             Parent = parent;
             Name = "Новый пользовательский стиль";
             Description = string.Empty;
-            FunctionName = parent.MainFunctionName;
+            FunctionName = parent.FunctionLocalName;
             CanEdit = true;
             IsCurrent = false;
             Guid = System.Guid.NewGuid().ToString();

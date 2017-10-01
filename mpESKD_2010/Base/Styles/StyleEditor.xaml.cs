@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using mpESKD.Functions.mpBreakLine;
 using mpESKD.Functions.mpBreakLine.Styles;
@@ -62,7 +62,11 @@ namespace mpESKD.Base.Styles
             // т.к. подфункции у меня явные, то для каждой подфункции добавляем стили
 
             #region mpBreakLine
-            var styleToBind = new StyleToBind { MainFunctionName = BreakLineFunction.MPCOEntDisplayName };
+            var styleToBind = new StyleToBind
+            {
+                FunctionLocalName = BreakLineFunction.MPCOEntDisplayName,
+                FunctionName = BreakLineFunction.MPCOEntName
+            };
             var breakLineStyles = BreakLineStylesManager.GetStylesForEditor();
             foreach (BreakLineStyleForEditor style in breakLineStyles)
             {
@@ -80,18 +84,24 @@ namespace mpESKD.Base.Styles
             var item = e.NewValue;
             if (item != null)
                 BtAddNewStyle.IsEnabled = true;
-            if (item is StyleToBind)
+            if (item is StyleToBind styleToBind)
             {
                 BtRemoveStyle.IsEnabled = false;
+                // image
+                SetImage(styleToBind.FunctionName);
             }
-            if (item is MPCOStyleForEditor styleForEditor)
+            else if (item is MPCOStyleForEditor styleForEditor)
             {
                 BtRemoveStyle.IsEnabled = styleForEditor.CanEdit;
                 BtSetCurrentStyle.IsEnabled = !styleForEditor.IsCurrent;
 
                 if (styleForEditor is BreakLineStyleForEditor breakLineStyle)
+                {
                     BorderProperties.Child = new BreakLineStyleProperties(breakLineStyle.LayerName) { DataContext = item };
+                    SetImage(BreakLineFunction.MPCOEntName);
+                }
             }
+            else SetImage(string.Empty);
         }
         // add new style
         private void BtAddNewStyle_OnClick(object sender, RoutedEventArgs e)
@@ -100,12 +110,22 @@ namespace mpESKD.Base.Styles
             if (selected == null) return;
             if (selected is StyleToBind styleToBind)
             {
-                if (styleToBind.MainFunctionName == BreakLineFunction.MPCOEntDisplayName)
+                if (styleToBind.FunctionLocalName == BreakLineFunction.MPCOEntDisplayName)
                     styleToBind.Styles.Add(new BreakLineStyleForEditor(styleToBind));
             }
             if (selected is BreakLineStyleForEditor breakLineStyleForEditor)
             {
                 breakLineStyleForEditor.Parent.Styles.Add(new BreakLineStyleForEditor(breakLineStyleForEditor.Parent));
+            }
+        }
+
+        private void SetImage(string imageName)
+        {
+            if (string.IsNullOrEmpty(imageName)) VbImage.Child = null;
+            else
+            {
+                if (Resources["Image" + imageName] is Canvas imgResorce)
+                    VbImage.Child = imgResorce;
             }
         }
         // delete style
@@ -162,10 +182,49 @@ namespace mpESKD.Base.Styles
             // save styles
             // break line style
             BreakLineStylesManager.SaveStylesToXml(
-                _styles.Single(s => s.MainFunctionName == BreakLineFunction.MPCOEntDisplayName)
+                _styles.Single(s => s.FunctionLocalName == BreakLineFunction.MPCOEntDisplayName)
                 .Styles.Where(s => s.CanEdit).Cast<BreakLineStyleForEditor>().ToList());
         }
+
+        private void BtExpandCollapseImage_OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Button bt) bt.Opacity = 1.0;
+        }
+
+        private void BtExpandCollapseImage_OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is Button bt) bt.Opacity = 0.4;
+        }
+
+        private GridLength _topRowHeight;
+        private GridLength _rightColumnWidth;
+        private void BtExpandImage_OnClick(object sender, RoutedEventArgs e)
+        {
+            _topRowHeight = TopRow.Height;
+            _rightColumnWidth = RightColumn.Width;
+            TopRow.MinHeight = 0.0;
+            RightColumn.MinWidth = 0.0;
+            TopRow.Height = new GridLength(0);
+            RightColumn.Width = new GridLength(0);
+            BtExpandImage.Visibility = Visibility.Collapsed;
+            BtCollapseImage.Visibility = Visibility.Visible;
+            VerticalGridSplitter.Visibility = Visibility.Collapsed;
+            HorizontalGridSplitter.Visibility = Visibility.Collapsed;
+        }
+
+        private void BtCollapseImage_OnClick(object sender, RoutedEventArgs e)
+        {
+            TopRow.MinHeight = 50.0;
+            RightColumn.MinWidth = 200.0;
+            TopRow.Height = _topRowHeight;
+            RightColumn.Width = _rightColumnWidth;
+            BtExpandImage.Visibility = Visibility.Visible;
+            BtCollapseImage.Visibility = Visibility.Collapsed;
+            VerticalGridSplitter.Visibility = Visibility.Visible;
+            HorizontalGridSplitter.Visibility = Visibility.Visible;
+        }
     }
+    
     /// <summary>
     /// Класс, описывающий Стиль (группу стилей для каждого примитива) для использования в биндинге
     /// </summary>
@@ -175,7 +234,8 @@ namespace mpESKD.Base.Styles
         {
             Styles = new ObservableCollection<MPCOStyleForEditor>();
         }
-        public string MainFunctionName { get; set; }
+        public string FunctionLocalName { get; set; }
+        public string FunctionName { get; set; }
         public ObservableCollection<MPCOStyleForEditor> Styles { get; set; }
     }
 }

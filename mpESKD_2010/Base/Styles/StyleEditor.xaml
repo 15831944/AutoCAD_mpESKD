@@ -23,6 +23,145 @@
                 <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+            <!--Images-->
+            <Canvas x:Key="ImagempBreakLine" Width="190" Height="150">
+                <Canvas.RenderTransform>
+                    <MatrixTransform Matrix="0 -0.02 -0.02 0 190 150"/>
+                </Canvas.RenderTransform>
+                <Canvas.Resources>
+                    <ToolTip x:Key="DescriptionForA">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Выступы за объект" FontSize="14"></TextBlock>
+                            <TextBlock Text="Для линейного обрыва значение выступа задается в мм. Для криволинейного обрыва значение выступа задается в % от длины между основными точками. Для цилиндрического обрыва значение выступа не используется"
+                                       TextWrapping="Wrap" MaxWidth="350"></TextBlock>
+                        </StackPanel>
+                    </ToolTip>
+                </Canvas.Resources>
+                <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 6220 7717 v 944"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 1338 7717 v 944"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 1338 4535 v 944"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 6220 4535 v 944"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 6220 1352 v 945"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 1338 1352 v 945"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6598 7465 V 5995"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6220 7465 V 5995"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6850 6247 H 5968"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 6409 6058 378 378"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6409 6436 6031 6058"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 960 7465 V 5995"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1338 7465 V 5995"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 708 6247 h 882"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1149 6436 771 6058"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 1149 6058 378 378"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3307 7465 V 5388"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 4251 7465 V 5388"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3055 5640 H 4503"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3496 5829 3118 5451"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 4062 5451 378 378"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3291 8661 H 1705"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3763 6772 H 1705"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1956 8913 V 6520"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 2145 8472 -377 378"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 1768 6961 377 -378"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6611 4087 V 2813"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6220 4283 V 2813"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6863 3065 H 5968"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 6422 2876 378 378"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6409 3254 6031 2876"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1338 4283 V 2813"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 947 4478 V 2813"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1590 3065 H 695"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 1149 2876 378 378"></Path>
+                <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1136 3254 758 2876"></Path>
+                <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" 
+                      StrokeLineJoin="Miter" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
+                      Data="m 960 7717 h 378 1969 l 236 944 472 -1889 236 945 h 1969 378"></Path>
+                <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
+                      Data="m 947 4730 75 -45 76 -43 79 -39 79 -36 82 -32 105 -42 108 -38 108 -35 110 -30 111 -26 112 -23 112 -18 113 -14 114 -10 113 -7 114 -2 114 2 114 7 113 10 113 14 113 18 111 23 111 26 110 30 109 35 107 38 106 42 106 41 107 39 109 34 110 30 111 26 111 23 113 18 113 14 113 10 114 7 114 2 114 -2 113 -7 114 -10 113 -14 112 -18 112 -23 111 -26 110 -30 108 -34 108 -39 105 -41 391 -196"></Path>
+                <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" StrokeLineJoin="Miter" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
+                          Data="m 18.77691 -507.15253 c 265.54346 9.83155 478.54407 222.83216 488.37562 488.37562">
+                    <Path.RenderTransform>
+                        <RotateTransform Angle="-90" CenterX="1608.5" CenterY="-237"/>
+                    </Path.RenderTransform>
+                </Path>
+                <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}"
+                          Data="m 5732 1841 -120 4 h -120 l -120 -4 -120 -9 -120 -12 -119 -17 -118 -21 -118 -25 -116 -29 -116 -33 -114 -37 -113 -42 -111 -45 -110 -49 -108 -53 -106 -56 -104 -61 -104 -60 -106 -56 -108 -53 -110 -49 -111 -45 -113 -42 -114 -37 -116 -33 -116 -29 -118 -25 -118 -21 -119 -17 -120 -12 -120 -9 -120 -4 h -120 l -120 4"></Path>
+                <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}"
+                          Data="M -18.77691 507.15253 C -284.32037 497.32098 -497.32098 284.32037 -507.15253 18.77691">
+                    <Path.RenderTransform>
+                        <RotateTransform Angle="-90" CenterX="3524" CenterY="-2189.5"/>
+                    </Path.RenderTransform>
+                </Path>
+                <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}"
+                          Data="M 507.15253 18.77691 C 497.32098 284.32037 284.32037 497.32098 18.77691 507.15253">
+                    <Path.RenderTransform>
+                        <RotateTransform Angle="-90" CenterX="3542.5" CenterY="-2171"/>
+                    </Path.RenderTransform>
+                </Path>
+                <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}"
+                          Data="m 5732 864 -120 -4 h -120 l -120 4 -120 9 -120 12 -119 17 -118 21 -118 25 -116 29 -116 33 -114 37 -113 42 -111 45 -110 49 -108 53 -106 56 -104 60"></Path>
+                <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}" 
+                           Text="a" Canvas.Top="7250" Canvas.Left="5750" ToolTip="{StaticResource DescriptionForA}"
+                           ToolTipService.ShowDuration="15000" ToolTipService.InitialShowDelay="0">
+                    <TextBlock.RenderTransform>
+                        <ScaleTransform ScaleY="-1"></ScaleTransform>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}"
+                           Text="a" Canvas.Top="4050" Canvas.Left="5750" ToolTip="{StaticResource DescriptionForA}"
+                           ToolTipService.ShowDuration="15000" ToolTipService.InitialShowDelay="0">
+                    <TextBlock.RenderTransform>
+                        <ScaleTransform ScaleY="-1"></ScaleTransform>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}"
+                           Text="w" Canvas.Top="6600" Canvas.Left="3500"
+                           ToolTipService.ShowDuration="15000" ToolTipService.InitialShowDelay="0">
+                    <TextBlock.RenderTransform>
+                        <ScaleTransform ScaleY="-1"></ScaleTransform>
+                    </TextBlock.RenderTransform>
+                    <TextBlock.ToolTip>
+                        <ToolTip>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Ширина разрыва" FontSize="14"></TextBlock>
+                                <TextBlock Text="Ширина разрыва в мм. Только для линии обрыва линейного типа"></TextBlock>
+                            </StackPanel>
+                        </ToolTip>
+                    </TextBlock.ToolTip>
+                </TextBlock>
+                <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}"
+                           Text="h" Canvas.Left="2950" Canvas.Top="8350"
+                           ToolTipService.ShowDuration="15000" ToolTipService.InitialShowDelay="0">
+                    <TextBlock.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="-1"></ScaleTransform>
+                            <RotateTransform CenterX="0.5" CenterY="0.5" Angle="90"></RotateTransform>
+                        </TransformGroup>
+                    </TextBlock.RenderTransform>
+                    <TextBlock.ToolTip>
+                        <ToolTip>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Высота разрыва" FontSize="14"></TextBlock>
+                                <TextBlock Text="Высота разрыва в мм. Только для линии обрыва линейного типа"></TextBlock>
+                            </StackPanel>
+                        </ToolTip>
+                    </TextBlock.ToolTip>
+                </TextBlock>
+                <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}"
+                           Text="a" Canvas.Top="7250" Canvas.Left="500" ToolTip="{StaticResource DescriptionForA}"
+                           ToolTipService.ShowDuration="15000" ToolTipService.InitialShowDelay="0">
+                    <TextBlock.RenderTransform>
+                        <ScaleTransform ScaleY="-1"></ScaleTransform>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}" Text="a"
+                           Canvas.Top="4050" Canvas.Left="500" ToolTip="{StaticResource DescriptionForA}"
+                           ToolTipService.ShowDuration="15000" ToolTipService.InitialShowDelay="0">
+                    <TextBlock.RenderTransform>
+                        <ScaleTransform ScaleY="-1"></ScaleTransform>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+            </Canvas>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="5">
@@ -36,18 +175,24 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="*" MinHeight="150"></RowDefinition>
+                        <RowDefinition Height="*" Name="TopRow" MinHeight="50"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="*" MinHeight="150"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" MinWidth="200"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="*" MinWidth="350"></ColumnDefinition>
+                        <ColumnDefinition Width="*" Name="RightColumn" MinWidth="200"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Grid.Resources>
-                        <Canvas x:Key="folder" Width="24" Height="24">
+                        <Canvas x:Key="Folder" Width="24" Height="24">
                             <Path Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" Fill="Black" />
+                        </Canvas>
+                        <Canvas x:Key="Expand" Width="24" Height="24">
+                            <Path Data="M9.5,13.09L10.91,14.5L6.41,19H10V21H3V14H5V17.59L9.5,13.09M10.91,9.5L9.5,10.91L5,6.41V10H3V3H10V5H6.41L10.91,9.5M14.5,13.09L19,17.59V14H21V21H14V19H17.59L13.09,14.5L14.5,13.09M13.09,9.5L17.59,5H14V3H21V10H19V6.41L14.5,10.91L13.09,9.5Z" Fill="Black" />
+                        </Canvas>
+                        <Canvas x:Key="Collapse" Width="24" Height="24">
+                            <Path Data="M19.5,3.09L20.91,4.5L16.41,9H20V11H13V4H15V7.59L19.5,3.09M20.91,19.5L19.5,20.91L15,16.41V20H13V13H20V15H16.41L20.91,19.5M4.5,3.09L9,7.59V4H11V11H4V9H7.59L3.09,4.5L4.5,3.09M3.09,19.5L7.59,15H4V13H11V20H9V16.41L4.5,20.91L3.09,19.5Z" Fill="Black" />
                         </Canvas>
                     </Grid.Resources>
                     <!--Controls-->
@@ -70,8 +215,8 @@
                         </Grid.Resources>
                         <!--Add style-->
                         <Button Grid.Column="0" Name="BtAddNewStyle" Click="BtAddNewStyle_OnClick"
-                        Padding="0" Width="24" Height="24" BorderThickness="0" Margin="2"
-                        IsEnabled="False" ToolTip="Добавить новый пользовательский стиль">
+                                Padding="0" Width="24" Height="24" BorderThickness="0" Margin="2"
+                                IsEnabled="False" ToolTip="Добавить новый пользовательский стиль">
                             <Rectangle Width="16" Height="16" Fill="{DynamicResource AccentColorBrush}">
                                 <Rectangle.OpacityMask>
                                     <VisualBrush Visual="{StaticResource Plus-Outline}"></VisualBrush>
@@ -80,8 +225,8 @@
                         </Button>
                         <!--Remove style-->
                         <Button Grid.Column="1" Name="BtRemoveStyle" Click="BtRemoveStyle_OnClick"
-                        Padding="0" Width="24" Height="24" BorderThickness="0" Margin="2"
-                        IsEnabled="False" ToolTip="Удалить выбранный пользовательский стиль">
+                                Padding="0" Width="24" Height="24" BorderThickness="0" Margin="2"
+                                IsEnabled="False" ToolTip="Удалить выбранный пользовательский стиль">
                             <Rectangle Width="12" Height="16" Fill="{DynamicResource AccentColorBrush}">
                                 <Rectangle.OpacityMask>
                                     <VisualBrush Visual="{StaticResource Delete}"></VisualBrush>
@@ -90,8 +235,8 @@
                         </Button>
                         <!--Remove style-->
                         <Button Grid.Column="2" Name="BtSetCurrentStyle" Click="BtSetCurrentStyle_OnClick"
-                        Padding="0" Width="24" Height="24" BorderThickness="0" Margin="2"
-                        IsEnabled="False" ToolTip="Установить выбранный стиль как стиль по умолчанию">
+                                Padding="0" Width="24" Height="24" BorderThickness="0" Margin="2"
+                                IsEnabled="False" ToolTip="Установить выбранный стиль как стиль по умолчанию">
                             <Rectangle Width="16" Height="16" Fill="{DynamicResource AccentColorBrush}">
                                 <Rectangle.OpacityMask>
                                     <VisualBrush Visual="{StaticResource Current}"></VisualBrush>
@@ -101,17 +246,18 @@
                     </Grid>
                     <!--Styles-->
                     <TreeView Grid.Row="1" Grid.Column="0" BorderBrush="{DynamicResource AccentColorBrush}"
-                      BorderThickness="1" Name="TvStyles" SelectedItemChanged="TvStyles_OnSelectedItemChanged"
-                      MouseDoubleClick="TvStyles_OnMouseDoubleClick">
+                              MinHeight="50"
+                              BorderThickness="1" Name="TvStyles" SelectedItemChanged="TvStyles_OnSelectedItemChanged"
+                              MouseDoubleClick="TvStyles_OnMouseDoubleClick">
                         <TreeView.ItemTemplate>
                             <HierarchicalDataTemplate ItemsSource="{Binding Styles}">
                                 <StackPanel Orientation="Horizontal">
                                     <Rectangle Width="16" Height="16" Fill="{DynamicResource AccentColorBrush}">
                                         <Rectangle.OpacityMask>
-                                            <VisualBrush Visual="{StaticResource folder}" Stretch="Uniform"></VisualBrush>
+                                            <VisualBrush Visual="{StaticResource Folder}" Stretch="Uniform"></VisualBrush>
                                         </Rectangle.OpacityMask>
                                     </Rectangle>
-                                    <TextBlock Text="{Binding MainFunctionName}" Margin="5,0,0,0"></TextBlock>
+                                    <TextBlock Text="{Binding FunctionLocalName}" Margin="5,0,0,0"></TextBlock>
                                 </StackPanel>
                                 <HierarchicalDataTemplate.ItemTemplate>
                                     <DataTemplate>
@@ -121,23 +267,50 @@
                             </HierarchicalDataTemplate>
                         </TreeView.ItemTemplate>
                     </TreeView>
-                    <!--Image-->
-                    <Image Grid.Row="3" Grid.Column="0"></Image>
+                    <Viewbox Grid.Row="3" Grid.Column="0" Stretch="Uniform" Name="VbImage"></Viewbox>
+                    <!--Image show controls-->
+                    <Button Grid.Row="3" Grid.Column="0" Background="Transparent" BorderThickness="0"
+                            Padding="0" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                            Name="BtExpandImage" Margin="0,0,10,10" Command="{Binding Path=ExpandImageCommand}"
+                            MouseEnter="BtExpandCollapseImage_OnMouseEnter" 
+                            MouseLeave="BtExpandCollapseImage_OnMouseLeave"
+                            Click="BtExpandImage_OnClick">
+                        <Rectangle Fill="{DynamicResource AccentBaseColorBrush}" Width="24" Height="24">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Visual="{StaticResource Expand}"></VisualBrush>
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                    </Button>
+                    <Button Grid.Row="3" Grid.Column="0" Background="Transparent" BorderThickness="0"
+                            Padding="0" HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Name="BtCollapseImage" Margin="0,10,10,0" Command="{Binding Path=CollapseImageCommand}"
+                            MouseEnter="BtExpandCollapseImage_OnMouseEnter" 
+                            MouseLeave="BtExpandCollapseImage_OnMouseLeave"
+                            Click="BtCollapseImage_OnClick" Visibility="Collapsed">
+                        <Rectangle Fill="{DynamicResource AccentBaseColorBrush}" Width="24" Height="24">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Visual="{StaticResource Collapse}"></VisualBrush>
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                    </Button>
                     <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Margin="0,0,0,0"
-                          VerticalAlignment="Stretch" HorizontalAlignment="Center"
-                          BorderThickness="2,0,0,0" BorderBrush="{DynamicResource AccentColorBrush}"></GridSplitter>
+                                  VerticalAlignment="Stretch" HorizontalAlignment="Center"
+                                  Name="VerticalGridSplitter"
+                                  BorderThickness="2,0,0,0" BorderBrush="{DynamicResource AccentColorBrush}"></GridSplitter>
                     <GridSplitter Grid.Row="2" Grid.Column="0" BorderBrush="{DynamicResource AccentColorBrush}"
-                          HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                          Margin="0" BorderThickness="0,2,0,0"></GridSplitter>
+                                  Name="HorizontalGridSplitter"
+                                  HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                  Margin="0" BorderThickness="0,2,0,0"></GridSplitter>
                     <!--Properties-->
-                    <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="3" Margin="0,0,0,20">
+                    <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="3" Margin="0,0,0,20" MinWidth="50">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
                         <!--Properties-->
-                        <Border Grid.Row="0" Name="BorderProperties" BorderBrush="{StaticResource AccentColorBrush}" BorderThickness="1"></Border>
+                        <Border Grid.Row="0" Name="BorderProperties" 
+                                BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1"></Border>
                         <TextBlock Grid.Row="1" Text="Описание свойства:" Margin="2"></TextBlock>
                         <TextBox Grid.Row="2" TextWrapping="Wrap" Name="TbPropertyDescription" IsReadOnly="True"></TextBox>
                     </Grid>
@@ -203,4 +376,3 @@
         </controls:MetroAnimatedTabControl>
     </Grid>
 </controls:MetroWindow>
-

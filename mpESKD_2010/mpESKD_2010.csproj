@@ -191,5 +191,8 @@
   <ItemGroup>
     <Resource Include="Resources\StyleEditor_32x32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\mpESKD_32x32.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
