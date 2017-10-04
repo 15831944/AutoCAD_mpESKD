@@ -51,6 +51,7 @@
     </Reference>
     <Reference Include="ModPlusAPI">
       <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlusAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ModPlus_2010">
       <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlus_2010.dll</HintPath>

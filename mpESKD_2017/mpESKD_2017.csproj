@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{06E3DA7D-EDAE-402E-BDE1-BE643E066C55}</ProjectGuid>
+    <ProjectGuid>{5521EDFD-2121-4DAA-8041-E848C83A969F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>mpESKD</RootNamespace>
-    <AssemblyName>mpESKD_2018</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <AssemblyName>mpESKD_2017</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -31,31 +31,32 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>..\..\..\_Acad dlls\2018\accoremgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2017\accoremgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>..\..\..\_Acad dlls\2018\acdbmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2017\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>..\..\..\_Acad dlls\2018\acmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2017\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AdWindows">
-      <HintPath>..\..\..\_Acad dlls\2018\AdWindows.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2017\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro">
       <HintPath>..\..\..\..\..\..\ModPlus\Extensions\MahApps.Metro.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ModPlusAPI">
+    <Reference Include="ModPlusAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlusAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ModPlus_2018">
-      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlus_2018.dll</HintPath>
+    <Reference Include="ModPlus_2017">
+      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlus_2017.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -64,7 +65,8 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity">
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\ModPlus\Extensions\System.Windows.Interactivity.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -281,16 +283,14 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="..\mpESKD_2010\Resources\mpESKD_32x32.png">
+      <Link>Resources\mpESKD_32x32.png</Link>
+    </Resource>
     <Resource Include="..\mpESKD_2010\Resources\Properties_32x32.png">
       <Link>Resources\Properties_32x32.png</Link>
     </Resource>
     <Resource Include="..\mpESKD_2010\Resources\StyleEditor_32x32.png">
       <Link>Resources\StyleEditor_32x32.png</Link>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="..\mpESKD_2010\Resources\mpESKD_32x32.png">
-      <Link>Resources\mpESKD_32x32.png</Link>
     </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
