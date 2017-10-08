@@ -35,16 +35,16 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         {
             try
             {
+                // Получение базовых ручек
+                base.GetGripPoints(entity, grips, curViewUnitSize, gripSize, curViewDir, bitFlags);
+                // Пропускаю таблицы (они унаследованы от блока)
                 if (entity is Table) return;
                 // Чтобы "отключить" точку вставки блока, нужно получить сначал блок
                 // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
                 BlockReference blkRef = (BlockReference)entity;
                 Debug.Print("Type: " + entity.GetType().Name);
-                // Получение базовых ручек
-                base.GetGripPoints(entity, grips, curViewUnitSize, gripSize, curViewDir, bitFlags);
-
+                
                 // Если это примитив плагина (проверка по наличию XData)
-
                 if (IsApplicable(entity))
                 {
                     // Удаляем стандартную ручку позиции блока (точки вставки)
