@@ -1,9 +1,9 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using System.Diagnostics;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using ModPlus.Helpers;
 using mpESKD.Base.Helpers;
-using mpESKD.Base.Styles;
 using Exception = System.Exception;
 using mpESKD.Base.Overrules;
 using ModPlusAPI.Windows;
@@ -35,12 +35,16 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         {
             try
             {
+                if (entity is Table) return;
                 // Чтобы "отключить" точку вставки блока, нужно получить сначал блок
                 // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
                 BlockReference blkRef = (BlockReference)entity;
+                Debug.Print("Type: " + entity.GetType().Name);
                 // Получение базовых ручек
                 base.GetGripPoints(entity, grips, curViewUnitSize, gripSize, curViewDir, bitFlags);
+
                 // Если это примитив плагина (проверка по наличию XData)
+
                 if (IsApplicable(entity))
                 {
                     // Удаляем стандартную ручку позиции блока (точки вставки)
@@ -139,13 +143,13 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                                     // Если точки совпали, то задаем минимальное значение
                                     tmpInsertionPoint = new Point3d(gripPoint.breakLine.EndPoint.X + gripPoint.breakLine.BreakLineMinLength * scale * gripPoint.breakLine.BlockTransform.GetScale(), gripPoint.breakLine.EndPoint.Y, gripPoint.breakLine.EndPoint.Z);
                                 }
-                                
+
                                 ((BlockReference)entity).Position = tmpInsertionPoint;
                                 gripPoint.breakLine.InsertionPoint = tmpInsertionPoint;
                             }
                             else
                             {
-                                ((BlockReference) entity).Position = gripPoint.GripPoint + offset;
+                                ((BlockReference)entity).Position = gripPoint.GripPoint + offset;
                                 gripPoint.breakLine.InsertionPoint = gripPoint.GripPoint + offset;
                             }
                         }
@@ -160,7 +164,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         if (gripPoint.GripName == BreakLineGripName.EndGrip)
                         {
                             var newPt = gripPoint.GripPoint + offset;
-                            if (newPt.Equals(((BlockReference) entity).Position))
+                            if (newPt.Equals(((BlockReference)entity).Position))
                             {
                                 var scale = gripPoint.breakLine.GetScale();
                                 gripPoint.breakLine.EndPoint = new Point3d(
@@ -182,7 +186,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                 ExceptionBox.Show(exception);
             }
         }
-        
+
         // Проверка поддерживаемости примитива
         // Проверка происходит по наличию XData с определенным AppName
         public override bool IsApplicable(RXObject overruledSubject)

@@ -253,6 +253,10 @@ namespace mpESKD.Base.Helpers
         {
             DBObject dbObject = rxObject as DBObject;
             if (dbObject == null) return false;
+            if (dbObject.IsAProxy || 
+                dbObject.IsErased ||
+                dbObject.IsEraseStatusToggled ||
+                dbObject.IsUndoing) return false;
             return IsMPCOentity(dbObject, appName);
         }
 

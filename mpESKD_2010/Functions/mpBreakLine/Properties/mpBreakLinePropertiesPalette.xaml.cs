@@ -25,7 +25,15 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             // fill layers
             CbLayerName.ItemsSource = AcadHelpers.Layers;
             if (AcadHelpers.Document != null)
+            {
                 ShowProperties();
+                AcadHelpers.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+            }
+        }
+
+        private void Document_ImpliedSelectionChanged(object sender, EventArgs e)
+        {
+           ShowProperties();
         }
 
         private mpBreakLineSummaryProperties mpBreakLineSummaryProperties;
@@ -89,6 +97,12 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)
         {
             _parentPalette.ShowDescription(String.Empty);
+        }
+
+        private void MpBreakLinePropertiesPalette_OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            if (AcadHelpers.Document != null)
+                AcadHelpers.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
         }
     }
 }
