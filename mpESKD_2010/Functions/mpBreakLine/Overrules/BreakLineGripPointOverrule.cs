@@ -36,7 +36,14 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             try
             {
                 // Получение базовых ручек
-                base.GetGripPoints(entity, grips, curViewUnitSize, gripSize, curViewDir, bitFlags);
+                try
+                {
+                    base.GetGripPoints(entity, grips, curViewUnitSize, gripSize, curViewDir, bitFlags);
+                }
+                catch
+                {
+                    // ignored
+                }
                 // Пропускаю таблицы (они унаследованы от блока)
                 if (entity is Table) return;
                 // Чтобы "отключить" точку вставки блока, нужно получить сначал блок
