@@ -214,6 +214,13 @@ namespace mpESKD.Base.Helpers
                 }
             }
         }
+
+        public static void WriteMessageInDebug(string message)
+        {
+#if DEBUG
+            Editor.WriteMessage("\n" + message);
+#endif
+        }
     }
     /// <summary>Вспомогательные методы работы с расширенными данными
     /// Есть аналогичные в MpCadHelpers. Некоторые будут совпадать
@@ -257,7 +264,8 @@ namespace mpESKD.Base.Helpers
                 dbObject.IsErased ||
                 dbObject.IsEraseStatusToggled ||
                 dbObject.IsUndoing) return false;
-            return IsMPCOentity(dbObject, appName);
+            return true;
+            //return IsMPCOentity(dbObject, appName);
         }
 
         /// <summary>

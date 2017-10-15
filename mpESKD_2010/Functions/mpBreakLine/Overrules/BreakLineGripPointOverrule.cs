@@ -1,10 +1,8 @@
-﻿using System.Diagnostics;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using ModPlus.Helpers;
 using mpESKD.Base.Helpers;
-using Exception = System.Exception;
 using mpESKD.Base.Overrules;
 using ModPlusAPI.Windows;
 
@@ -18,7 +16,11 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         protected static BreakLineGripPointsOverrule _breakLineGripPointOverrule;
         public static BreakLineGripPointsOverrule Instance()
         {
-            return _breakLineGripPointOverrule ?? (_breakLineGripPointOverrule = new BreakLineGripPointsOverrule());
+            if (_breakLineGripPointOverrule != null) return _breakLineGripPointOverrule;
+            _breakLineGripPointOverrule = new BreakLineGripPointsOverrule();
+            // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
+            _breakLineGripPointOverrule.SetXDataFilter(BreakLineFunction.MPCOEntName);
+            return _breakLineGripPointOverrule;
         }
 
         /// <summary>
@@ -35,25 +37,12 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         {
             try
             {
-                // Получение базовых ручек
-                try
-                {
-                    base.GetGripPoints(entity, grips, curViewUnitSize, gripSize, curViewDir, bitFlags);
-                }
-                catch
-                {
-                    // ignored
-                }
-                // Пропускаю таблицы (они унаследованы от блока)
-                if (entity is Table) return;
-                // Чтобы "отключить" точку вставки блока, нужно получить сначал блок
-                // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
-                BlockReference blkRef = (BlockReference)entity;
-                Debug.Print("Type: " + entity.GetType().Name);
-                
-                // Если это примитив плагина (проверка по наличию XData)
+                // Проверка дополнительных условий
                 if (IsApplicable(entity))
                 {
+                    // Чтобы "отключить" точку вставки блока, нужно получить сначал блок
+                    // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
+                    BlockReference blkRef = (BlockReference)entity;
                     // Удаляем стандартную ручку позиции блока (точки вставки)
                     GripData toRemove = null;
                     foreach (GripData gd in grips)

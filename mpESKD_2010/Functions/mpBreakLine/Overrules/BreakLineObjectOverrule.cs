@@ -11,11 +11,16 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         protected static BreakLineObjectOverrule _breakLineObjectOverrule;
         public static BreakLineObjectOverrule Instance()
         {
-            return _breakLineObjectOverrule ?? (_breakLineObjectOverrule = new BreakLineObjectOverrule());
+            if (_breakLineObjectOverrule != null) return _breakLineObjectOverrule;
+            _breakLineObjectOverrule = new BreakLineObjectOverrule();
+            // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
+            _breakLineObjectOverrule.SetXDataFilter(BreakLineFunction.MPCOEntName);
+            return _breakLineObjectOverrule;
         }
 
         public override void Close(DBObject dbObject)
         {
+            // Проверка дополнительных условий
             if (IsApplicable(dbObject))
             {
                 try
