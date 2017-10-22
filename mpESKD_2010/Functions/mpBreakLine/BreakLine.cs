@@ -17,19 +17,14 @@ namespace mpESKD.Functions.mpBreakLine
 {
     public class BreakLine : MPCOEntity
     {
-        /// <summary>
-        /// Инициализация экземпляра класса для BreakLine без заполнения данными
+        /// <summary>Инициализация экземпляра класса для BreakLine без заполнения данными
         /// В данном случае уже все данные получены и нужно только "построить" 
-        /// базовые примитивы
-        /// </summary>
+        /// базовые примитивы</summary>
         public BreakLine(ObjectId blockId)
         {
             BlockId = blockId;
         }
-        /// <summary>
-        /// Инициализация экземпляра класса для BreakLine для создания
-        /// </summary>
-        /// <param name="style"></param>
+        /// <summary>Инициализация экземпляра класса для BreakLine для создания</summary>
         public BreakLine(BreakLineStyle style)
         {
             var blockTableRecord = new BlockTableRecord
@@ -38,19 +33,15 @@ namespace mpESKD.Functions.mpBreakLine
                 BlockScaling = BlockScaling.Uniform
             };
             BlockRecord = blockTableRecord;
-            //BreakLineType = breakLineType;
             StyleGuid = style.Guid;
             // Устанавливаю текущий масштаб
             Scale = AcadHelpers.Database.Cannoscale;
-            Debug.Print(AcadHelpers.Database.Cannoscale.Name);
             // Применяем текущий стиль к СПДС примитиву
             ApplyStyle(style);
         }
         // Основные свойства  примитива
 
-        /// <summary>
-        /// Средняя точка. Нужна для перемещения  примитива
-        /// </summary>
+        /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
         public Point3d MiddlePoint => new Point3d
         (
             (InsertionPoint.X + EndPoint.X) / 2,
@@ -58,9 +49,7 @@ namespace mpESKD.Functions.mpBreakLine
             (InsertionPoint.Z + EndPoint.Z) / 2
         );
 
-        /// <summary>
-        /// Вторая (конечная) точка примитива в мировой системе координат
-        /// </summary>
+        /// <summary>Вторая (конечная) точка примитива в мировой системе координат</summary>
         public Point3d EndPoint { get; set; } = Point3d.Origin;
         // Получение управляющих точек в системе координат блока для отрисовки содержимого
         private Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
@@ -87,31 +76,18 @@ namespace mpESKD.Functions.mpBreakLine
         public Point3d EndGrip => EndPoint;
         #endregion
 
-        /// <summary>
-        /// Выступ линии обрыва за граници "обрываемого" объекта
-        /// </summary>
-        public int Overhang { get; set; } = mpBreakLineProperties.OverhangPropertyDescriptive.DefaultValue;
-        /// <summary>
-        /// Ширина Обрыва для линейного обрыва
-        /// </summary>
-        public int BreakWidth { get; set; } = mpBreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue;
-        /// <summary>
-        /// Длина обрыва для линейного обрыва
-        /// </summary>
-        public int BreakHeight { get; set; } = mpBreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue;
-        /// <summary>
-        /// Тип линии обрыва: линейный, криволинейный, цилиндрический
-        /// </summary>
-        public BreakLineType BreakLineType { get; set; } = mpBreakLineProperties.BreakLineTypePropertyDescriptive.DefaultValue;
-        /// <summary>
-        /// Масштаб объекта. Задается как
-        /// </summary>
-        public AnnotationScale Scale { get; set; } = mpBreakLineProperties.ScalePropertyDescriptive.DefaultValue;
-        /// <summary>
-        /// Масштаб типа линии для входящей полилинии
-        /// </summary>
-        public double LineTypeScale { get; set; } = mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue;
-
+        /// <summary>Выступ линии обрыва за граници "обрываемого" объекта</summary>
+        public int Overhang { get; set; } = BreakLineProperties.OverhangPropertyDescriptive.DefaultValue;
+        /// <summary>Ширина Обрыва для линейного обрыва</summary>
+        public int BreakWidth { get; set; } = BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue;
+        /// <summary>Длина обрыва для линейного обрыва</summary>
+        public int BreakHeight { get; set; } = BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue;
+        /// <summary>Тип линии обрыва: линейный, криволинейный, цилиндрический</summary>
+        public BreakLineType BreakLineType { get; set; } = BreakLineProperties.BreakLineTypePropertyDescriptive.DefaultValue;
+        /// <summary>Масштаб объекта</summary>
+        public AnnotationScale Scale { get; set; } = BreakLineProperties.ScalePropertyDescriptive.DefaultValue;
+        /// <summary>Масштаб типа линии для входящей полилинии</summary>
+        public double LineTypeScale { get; set; } = BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue;
         /// <summary>Текущий масштаб</summary>
         public double GetScale()
         {
@@ -141,9 +117,7 @@ namespace mpESKD.Functions.mpBreakLine
             }
         }
 
-        /// <summary>
-        /// Минимальная длина линии обрыва от точки вставки до конечной точки
-        /// </summary>
+        /// <summary>Минимальная длина линии обрыва от точки вставки до конечной точки</summary>
         public double BreakLineMinLength
         {
             get
@@ -158,9 +132,7 @@ namespace mpESKD.Functions.mpBreakLine
             }
         }
 
-        /// <summary>
-        /// Обновление (перерисовка) базовых примитивов
-        /// </summary>
+        /// <summary>Обновление (перерисовка) базовых примитивов</summary>
         public void UpdateEntities()
         {
             try
@@ -170,12 +142,12 @@ namespace mpESKD.Functions.mpBreakLine
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки (т.е. второй точки еще нет)
-                    MakeSimplyEntity("SetInsertionPoint");
+                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint);
                 }
                 else if (length < BreakLineMinLength * scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    MakeSimplyEntity("SetEndPointMinLenght");
+                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength);
                 }
                 else
                 {
@@ -193,34 +165,34 @@ namespace mpESKD.Functions.mpBreakLine
         /// Построение "базового" простого варианта СПДС примитива
         /// Тот вид, который висит на мышке при создании и указании точки вставки
         /// </summary>
-        private void MakeSimplyEntity(string variant)
+        private void MakeSimplyEntity(UpdateVariant variant)
         {
             // need to add scale !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             var scale = GetScale();
             List<double> bulges;
             // Создание вершин полилинии
-            if (variant == "Create")
-            {
-                /* Построение базовых примитивов при создании СПДС объекта
-                 * При создании линии обрыва (создание базовой полилинии)
-                 * строим вторую точку на минимально допустимом расстоянии от первой
-                 * Готовый примитив будет висеть на курсоре
-                */
-                if (EndPointOCS.Equals(Point3d.Origin))
-                {
-                    var tmpEndPoint = new Point3d(InsertionPointOCS.X + BreakLineMinLength * scale, 0.0, 0.0);
-                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
-                    for (var i = 0; i < pts.Count; i++)
-                        MainPolyline.AddVertexAt(i, pts[i], bulges[i], 0.0, 0.0);
-                }
-                else
-                {
-                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out bulges);
-                    for (var i = 0; i < pts.Count; i++)
-                        MainPolyline.AddVertexAt(i, pts[i], bulges[i], 0.0, 0.0);
-                }
-            }
-            else if (variant == "SetInsertionPoint")
+            //if (variant == UpdateVariant.Create)
+            //{
+            //    /* Построение базовых примитивов при создании СПДС объекта
+            //     * При создании линии обрыва (создание базовой полилинии)
+            //     * строим вторую точку на минимально допустимом расстоянии от первой
+            //     * Готовый примитив будет висеть на курсоре
+            //    */
+            //    if (EndPointOCS.Equals(Point3d.Origin))
+            //    {
+            //        var tmpEndPoint = new Point3d(InsertionPointOCS.X + BreakLineMinLength * scale, 0.0, 0.0);
+            //        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
+            //        for (var i = 0; i < pts.Count; i++)
+            //            MainPolyline.AddVertexAt(i, pts[i], bulges[i], 0.0, 0.0);
+            //    }
+            //    else
+            //    {
+            //        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out bulges);
+            //        for (var i = 0; i < pts.Count; i++)
+            //            MainPolyline.AddVertexAt(i, pts[i], bulges[i], 0.0, 0.0);
+            //    }
+            //}
+            if (variant == UpdateVariant.SetInsertionPoint)
             {
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
@@ -230,7 +202,7 @@ namespace mpESKD.Functions.mpBreakLine
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
             }
-            else if (variant == "SetEndPointMinLenght") // изменение вершин полилинии
+            else if (variant == UpdateVariant.SetEndPointMinLength) // изменение вершин полилинии
             {
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
@@ -377,24 +349,20 @@ namespace mpESKD.Functions.mpBreakLine
 
         #region Style
 
-        /// <summary>
-        /// Идентификатор стиля
-        /// </summary>
+        /// <summary>Идентификатор стиля</summary>
         public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
 
-        /* Применение стиля по сути должно переопределять текущие параметры
-         */
-        // Работа со стилем и параметрами
+        /// <summary>Применение стиля по сути должно переопределять текущие параметры</summary>
         public void ApplyStyle(BreakLineStyle style)
         {
             // apply settings from style
-            Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), mpBreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
-            BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), mpBreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
-            BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), mpBreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue);
+            Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
+            BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
+            BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue);
             if(new MainSettings().UseScaleFromStyle)
-                Scale = StyleHelpers.GetPropertyValue(style, nameof(Scale), mpBreakLineProperties.ScalePropertyDescriptive.DefaultValue);
+                Scale = StyleHelpers.GetPropertyValue(style, nameof(Scale), BreakLineProperties.ScalePropertyDescriptive.DefaultValue);
             Debug.Print(Scale.Name);
-            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), mpBreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
+            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
         }
         #endregion
 
@@ -422,7 +390,6 @@ namespace mpESKD.Functions.mpBreakLine
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakWidth)); // 2
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, - 15.00015)); // 0
 
                 return resBuf;
             }
@@ -461,7 +428,7 @@ namespace mpESKD.Functions.mpBreakLine
                                 if (index1000 == 0) // 0 - это идентификатор стиля
                                     StyleGuid = typedValue.Value.ToString();
                                 if (index1000 == 1) // 1 - breakline type
-                                    BreakLineType = mpBreakLinePropertiesHelpers.GetBreakLineTypeFromString(typedValue.Value.ToString());
+                                    BreakLineType = BreakLinePropertiesHelpers.GetBreakLineTypeFromString(typedValue.Value.ToString());
                                 if (index1000 == 2) // 2 - scale
                                     Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
                                 // index
@@ -494,6 +461,12 @@ namespace mpESKD.Functions.mpBreakLine
             {
                 ExceptionBox.Show(exception);
             }
+        }
+
+        enum UpdateVariant
+        {
+            SetInsertionPoint,
+            SetEndPointMinLength
         }
     }
     /// <summary>

@@ -71,7 +71,8 @@ namespace mpESKD.LoadHelpers
                 var ribTab = new RibbonTab { Title = "ModPlus ЕСКД", Id = "ModPlus_ESKD" };
                 ribCntrl.Tabs.Add(ribTab);
                 // add content
-                AddPanels(ribTab);
+                AddAxisPanel(ribTab);
+                AddLinesPanel(ribTab);
                 // add settings panel
                 AddSettingsPanel(ribTab);
                 ////////////////////////
@@ -82,8 +83,35 @@ namespace mpESKD.LoadHelpers
                 ExceptionBox.Show(exception);
             }
         }
+        private static void AddAxisPanel(RibbonTab ribTab)
+        {
+            // Линии
+            // create the panel source
+            var ribSourcePanel = new RibbonPanelSource { Title = "Оси" };
+            // now the panel
+            var ribPanel = new RibbonPanel { Source = ribSourcePanel };
+            ribTab.Panels.Add(ribPanel);
 
-        private static void AddPanels(RibbonTab ribTab)
+            var ribRowPanel = new RibbonRowPanel();
+            #region mpAxis
+            // Добавляем в него первую функцию, которую делаем основной
+            var ribBtn = RibbonHelpers.AddBigButton(
+                Functions.mpAxis.AxisInterface.Name,
+                Functions.mpAxis.AxisInterface.LName,
+                GetBigIconForFunction(Functions.mpAxis.AxisInterface.Name, Functions.mpAxis.AxisInterface.Name),
+                Functions.mpAxis.AxisInterface.Description,
+                Orientation.Vertical,
+                Functions.mpAxis.AxisInterface.FullDescription,
+                GetHelpImageForFunction(Functions.mpAxis.AxisInterface.Name, Functions.mpAxis.AxisInterface.ToolTipHelpImage)
+                );
+            ribRowPanel.Items.Add(ribBtn);
+            #endregion
+            if (ribRowPanel.Items.Any())
+            {
+                ribSourcePanel.Items.Add(ribRowPanel);
+            }
+        }
+        private static void AddLinesPanel(RibbonTab ribTab)
         {
             // Линии
             // create the panel source

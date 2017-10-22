@@ -73,16 +73,28 @@ namespace mpESKD.Base.Properties
                         var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference)
                         {
-                            if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
+                            // mpBreakLine
+                            if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpBreakLine.BreakLineFunction.MPCOEntName, true))
                             {
-                                // mpBreakLine
                                 if (!HasPropertyControl(Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
                                 {
-                                    var mpBreakLineProperties = new mpESKD.Functions.mpBreakLine.Properties.mpBreakLinePropertiesPalette(this)
+                                    var mpBreakLineProperties = new Functions.mpBreakLine.Properties.BreakLinePropertiesPalette(this)
                                     {
                                         Name = Functions.mpBreakLine.BreakLineFunction.MPCOEntName
                                     };
                                     StackPanelProperties.Children.Add(mpBreakLineProperties);
+                                }
+                            }
+                            // mpAxis
+                            if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpAxis.AxisFunction.MPCOEntName, true))
+                            {
+                                if (!HasPropertyControl(Functions.mpAxis.AxisFunction.MPCOEntName))
+                                {
+                                    var mpAxisProperties = new Functions.mpAxis.Properties.AxisPropertiesPalette(this)
+                                    {
+                                        Name = Functions.mpAxis.AxisFunction.MPCOEntName
+                                    };
+                                    StackPanelProperties.Children.Add(mpAxisProperties);
                                 }
                             }
                         }

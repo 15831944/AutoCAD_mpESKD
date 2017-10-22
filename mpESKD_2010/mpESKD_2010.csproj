@@ -104,9 +104,23 @@
     </Compile>
     <Compile Include="Base\Properties\PropertiesHelpers.cs" />
     <Compile Include="Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs" />
-    <Compile Include="Functions\mpBreakLine\Properties\mpBreakLineProperties.cs" />
-    <Compile Include="Functions\mpBreakLine\Properties\mpBreakLinePropertiesPalette.xaml.cs">
-      <DependentUpon>mpBreakLinePropertiesPalette.xaml</DependentUpon>
+    <Compile Include="Functions\mpAxis\Axis.cs" />
+    <Compile Include="Functions\mpAxis\AxisFunction.cs" />
+    <Compile Include="Functions\mpAxis\AxisInterface.cs" />
+    <Compile Include="Functions\mpAxis\AxisJig.cs" />
+    <Compile Include="Functions\mpAxis\Overrules\AxisGripPointOverrule.cs" />
+    <Compile Include="Functions\mpAxis\Overrules\AxisObjectOverrule.cs" />
+    <Compile Include="Functions\mpAxis\Overrules\AxisOsnapOverrule.cs" />
+    <Compile Include="Functions\mpAxis\Properties\AxisProperties.cs" />
+    <Compile Include="Functions\mpAxis\Properties\AxisPropertiesData.cs" />
+    <Compile Include="Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs">
+      <DependentUpon>AxisPropertiesPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Functions\mpAxis\Properties\AxisSummaryProperties.cs" />
+    <Compile Include="Functions\mpAxis\Styles\AxisStyle.cs" />
+    <Compile Include="Functions\mpBreakLine\Properties\BreakLineProperties.cs" />
+    <Compile Include="Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs">
+      <DependentUpon>BreakLinePropertiesPalette.xaml</DependentUpon>
     </Compile>
     <Compile Include="Base\Properties\PropertiesPalette.xaml.cs">
       <DependentUpon>PropertiesPalette.xaml</DependentUpon>
@@ -124,8 +138,8 @@
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs" />
-    <Compile Include="Functions\mpBreakLine\Properties\mpBreakLinePropertiesData.cs" />
-    <Compile Include="Functions\mpBreakLine\Properties\mpBreakLineSummaryProperties.cs" />
+    <Compile Include="Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs" />
+    <Compile Include="Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs" />
     <Compile Include="Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml.cs">
       <DependentUpon>BreakLineStyleProperties.xaml</DependentUpon>
     </Compile>
@@ -156,7 +170,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Functions\mpBreakLine\Properties\mpBreakLinePropertiesPalette.xaml">
+    <Page Include="Functions\mpAxis\Properties\AxisPropertiesPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -194,6 +212,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\mpESKD_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Functions\mpAxis\Icons\mpAxis_32x32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

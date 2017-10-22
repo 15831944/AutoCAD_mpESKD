@@ -1,65 +1,55 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using mpESKD.Functions.mpBreakLine.Overrules;
+using Autodesk.AutoCAD.Runtime;
 using mpESKD.Base.Helpers;
-using mpESKD.Base.Styles;
-using mpESKD.Functions.mpBreakLine.Properties;
-using mpESKD.Functions.mpBreakLine.Styles;
+using mpESKD.Functions.mpAxis.Properties;
+using mpESKD.Functions.mpAxis.Styles;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Styles;
+using mpESKD.Functions.mpAxis.Overrules;
 
-namespace mpESKD.Functions.mpBreakLine
+namespace mpESKD.Functions.mpAxis
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static class BreakLineFunction
+    public static class AxisFunction
     {
         /// <summary>Имя примитива, помещаемое в XData</summary>
-        public const string MPCOEntName = "mpBreakLine";
+        public const string MPCOEntName = "mpAxis";
         /// <summary>Отображаемое имя примитива</summary>
-        public const string MPCOEntDisplayName = "Линия обрыва";
-        
+        public const string MPCOEntDisplayName = "Прямая ось";
+
         public static void Initialize()
         {
             // Включение работы переопределения ручек (нужна регенерация в конце метода (?))
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance(), true);
             Overrule.Overruling = true;
-            // создание файла хранения стилей, если отсутсвует
-            BreakLineStylesManager.CheckStylesFile();
+            //// создание файла хранения стилей, если отсутсвует
+            AxisStyleManager.CheckStylesFile();
         }
         public static void Terminate()
         {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance());
         }
     }
 
-    public class BreakLineCommands
+    public class AxisCommands
     {
-        [CommandMethod("ModPlus", "mpBreakLine", CommandFlags.Modal)]
-        public void CreateLinearBreakLine()
+        [CommandMethod("ModPlus", "mpAxis", CommandFlags.Modal)]
+        public void CreateAxisCommand()
         {
-            CreateBreakLine(BreakLineType.Linear);
-        }
-        [CommandMethod("ModPlus", "mpBreakLineCurve", CommandFlags.Modal)]
-        public void CreateCurvilinearBreakLine()
-        {
-            CreateBreakLine(BreakLineType.Curvilinear);
-        }
-        [CommandMethod("ModPlus", "mpBreakLineCylinder", CommandFlags.Modal)]
-        public void CreateCylindricalBreakLine()
-        {
-            CreateBreakLine(BreakLineType.Cylindrical);
+            CreateAxis();
         }
 
-        private static void CreateBreakLine(BreakLineType breakLineType)
+        private static void CreateAxis()
         {
             // send statistic
-            Statistic.SendCommandStarting(BreakLineFunction.MPCOEntName, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(AxisFunction.MPCOEntName, MpVersionData.CurCadVers);
             try
             {
                 Overrule.Overruling = false;
@@ -67,37 +57,34 @@ namespace mpESKD.Functions.mpBreakLine
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(BreakLineFunction.MPCOEntName);
+                ExtendedDataHelpers.AddRegAppTableRecord(AxisFunction.MPCOEntName);
                 // add layer from style
-                var style = BreakLineStylesManager.GetCurrentStyle();
-                var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,
-                    BreakLineProperties.LayerName.DefaultValue);
-                var breakLine = new BreakLine(style)
-                {
-                    BreakLineType = breakLineType
-                };
-                var blockReference = CreateBreakLineBlock(ref breakLine);
+                var style = AxisStyleManager.GetCurrentStyle();
+                var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name,
+                    AxisProperties.LayerName.DefaultValue);
+                var axis = new Axis(style);
+                var blockReference = CreateAxisBlock(ref axis);
                 // set layer
                 AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
 
                 var breakLoop = false;
                 while (!breakLoop)
                 {
-                    var breakLineJig = new BreakLineJig(breakLine, blockReference);
+                    var axisJig = new AxisJig(axis, blockReference);
                     do
                     {
                         label0:
-                        var status = AcadHelpers.Editor.Drag(breakLineJig).Status;
+                        var status = AcadHelpers.Editor.Drag(axisJig).Status;
                         if (status == PromptStatus.OK)
                         {
-                            if (breakLineJig.JigState != BreakLineJigState.PromptInsertPoint)
+                            if (axisJig.JigState != AxisJigState.PromptInsertPoint)
                             {
                                 breakLoop = true;
                                 status = PromptStatus.Other;
                             }
                             else
                             {
-                                breakLineJig.JigState = BreakLineJigState.PromptEndPoint;
+                                axisJig.JigState = AxisJigState.PromptEndPoint;
                                 goto label0;
                             }
                         }
@@ -116,17 +103,17 @@ namespace mpESKD.Functions.mpBreakLine
                         }
                         else
                         {
-                            breakLine.UpdateEntities();
-                            breakLine.BlockRecord.UpdateAnonymousBlocks();
+                            axis.UpdateEntities();
+                            axis.BlockRecord.UpdateAnonymousBlocks();
                         }
                     } while (!breakLoop);
                 }
-                if (!breakLine.BlockId.IsErased)
+                if (!axis.BlockId.IsErased)
                 {
                     using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
                     {
-                        var ent = tr.GetObject(breakLine.BlockId, OpenMode.ForWrite);
-                        ent.XData = breakLine.GetParametersForXData();
+                        var ent = tr.GetObject(axis.BlockId, OpenMode.ForWrite);
+                        ent.XData = axis.GetParametersForXData();
                         tr.Commit();
                     }
                 }
@@ -140,7 +127,7 @@ namespace mpESKD.Functions.mpBreakLine
                 Overrule.Overruling = true;
             }
         }
-        private static BlockReference CreateBreakLineBlock(ref BreakLine breakLine)
+        private static BlockReference CreateAxisBlock(ref Axis axis)
         {
             BlockReference blockReference;
             using (AcadHelpers.Document.LockDocument())
@@ -150,22 +137,21 @@ namespace mpESKD.Functions.mpBreakLine
                 {
                     using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
                     {
-                        var blockTableRecordObjectId = blockTable.Add(breakLine.BlockRecord);
-                        blockReference = new BlockReference(breakLine.InsertionPoint, blockTableRecordObjectId);
+                        var blockTableRecordObjectId = blockTable.Add(axis.BlockRecord);
+                        blockReference = new BlockReference(axis.InsertionPoint, blockTableRecordObjectId);
                         using (var blockTableRecord = AcadHelpers.Database.CurrentSpaceId.Write<BlockTableRecord>())
                         {
                             blockTableRecord.BlockScaling = BlockScaling.Uniform;
                             objectId = blockTableRecord.AppendEntity(blockReference);
                         }
                         transaction.AddNewlyCreatedDBObject(blockReference, true);
-                        transaction.AddNewlyCreatedDBObject(breakLine.BlockRecord, true);
+                        transaction.AddNewlyCreatedDBObject(axis.BlockRecord, true);
                     }
                     transaction.Commit();
                 }
-                breakLine.BlockId = objectId;
+                axis.BlockId = objectId;
             }
             return blockReference;
         }
     }
-
 }

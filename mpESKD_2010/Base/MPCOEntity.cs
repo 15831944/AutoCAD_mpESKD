@@ -87,9 +87,12 @@ namespace mpESKD.Base
                                 //Debug.Print("Transformed copy");
                                 foreach (var entity in Entities)
                                 {
-                                    var transformedCopy = entity.GetTransformedCopy(matrix3D);
-                                    _blockRecord.AppendEntity(transformedCopy);
-                                    tr.AddNewlyCreatedDBObject(transformedCopy, true);
+                                    if (entity.Visible)
+                                    {
+                                        var transformedCopy = entity.GetTransformedCopy(matrix3D);
+                                        _blockRecord.AppendEntity(transformedCopy);
+                                        tr.AddNewlyCreatedDBObject(transformedCopy, true);
+                                    }
                                 }
                                 tr.Commit();
                             }

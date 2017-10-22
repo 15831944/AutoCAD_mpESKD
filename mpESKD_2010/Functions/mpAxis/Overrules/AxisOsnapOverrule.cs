@@ -6,18 +6,18 @@ using mpESKD.Base.Helpers;
 using ModPlusAPI.Windows;
 // ReSharper disable InconsistentNaming
 
-namespace mpESKD.Functions.mpBreakLine.Overrules
+namespace mpESKD.Functions.mpAxis.Overrules
 {
-    public class BreakLineOsnapOverrule : OsnapOverrule
+    public class AxisOsnapOverrule : OsnapOverrule
     {
-        protected static BreakLineOsnapOverrule _breakLineOsnapOverrule;
-        public static BreakLineOsnapOverrule Instance()
+        protected static AxisOsnapOverrule _axisOsnapOverrule;
+        public static AxisOsnapOverrule Instance()
         {
-            if (_breakLineOsnapOverrule != null) return _breakLineOsnapOverrule;
-            _breakLineOsnapOverrule = new BreakLineOsnapOverrule();
+            if (_axisOsnapOverrule != null) return _axisOsnapOverrule;
+            _axisOsnapOverrule = new AxisOsnapOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineOsnapOverrule.SetXDataFilter(BreakLineFunction.MPCOEntName);
-            return _breakLineOsnapOverrule;
+            _axisOsnapOverrule.SetXDataFilter(AxisFunction.MPCOEntName);
+            return _axisOsnapOverrule;
         }
 
         public override void GetObjectSnapPoints(Entity entity, ObjectSnapModes snapMode, IntPtr gsSelectionMark, Point3d pickPoint,
@@ -28,11 +28,13 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             {
                 try
                 {
-                    var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(entity);
-                    if (breakLine != null)
+                    var axis = AxisXDataHelper.GetAxisFromEntity(entity);
+                    if (axis != null)
                     {
-                        snapPoints.Add(breakLine.InsertionPoint);
-                        snapPoints.Add(breakLine.EndPoint);
+                        snapPoints.Add(axis.InsertionPoint);
+                        snapPoints.Add(axis.EndPoint);
+                        snapPoints.Add(axis.BottomMarkerPoint);
+                        snapPoints.Add(axis.TopMarkerPoint);
                     }
                 }
                 catch (Autodesk.AutoCAD.Runtime.Exception exception)
@@ -45,7 +47,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineFunction.MPCOEntName);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisFunction.MPCOEntName);
         }
     }
 }

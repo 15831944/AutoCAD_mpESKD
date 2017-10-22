@@ -16,10 +16,10 @@ namespace mpESKD.Base.Styles
         string Name { get; set; }
         string FunctionName { get; set; }
         string Description { get; set; }
-        string Guid { get; }
+        string Guid { get; set; }
         MPCOStyleType StyleType { get; set; }
-        List<MPCOBaseProperty> Properties { get; set; }
         XElement LayerXmlData { get; set; }
+        List<MPCOBaseProperty> Properties { get; set; }
     }
     /// <inheritdoc />
     /// <summary>Базовый класс презентора стиля для работы в редакторе стилей</summary>

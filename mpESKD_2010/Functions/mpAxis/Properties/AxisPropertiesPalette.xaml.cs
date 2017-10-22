@@ -1,25 +1,23 @@
 ﻿using System;
-using mpESKD.Base.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using mpESKD.Base.Helpers;
 using mpESKD.Base.Properties;
 
-// ReSharper disable InconsistentNaming
-
-namespace mpESKD.Functions.mpBreakLine.Properties
+namespace mpESKD.Functions.mpAxis.Properties
 {
-    public partial class mpBreakLinePropertiesPalette
+    public partial class AxisPropertiesPalette
     {
-        private PropertiesPalette _parentPalette;
+        private readonly PropertiesPalette _parentPalette;
 
-        public mpBreakLinePropertiesPalette(PropertiesPalette palette)
+        public AxisPropertiesPalette(PropertiesPalette palette)
         {
             _parentPalette = palette;
             InitializeComponent();
-            CbBreakLineType.ItemsSource = mpBreakLinePropertiesHelpers.BreakLineTypeLocalNames;
+            CbMarkersPosition.ItemsSource = AxisPropertiesHelpers.BreakLineTypeLocalNames;
             // get list of scales
             CbScale.ItemsSource = AcadHelpers.Scales;
             // fill layers
@@ -30,20 +28,18 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 AcadHelpers.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
             }
         }
-
         private void Document_ImpliedSelectionChanged(object sender, EventArgs e)
         {
-           ShowProperties();
+            ShowProperties();
         }
-
-        private mpBreakLineSummaryProperties mpBreakLineSummaryProperties;
+        private AxisSummaryProperties _axisSummaryProperties;
         private void ShowProperties()
         {
             PromptSelectionResult psr = AcadHelpers.Editor.SelectImplied();
 
             if (psr.Status != PromptStatus.OK || psr.Value == null || psr.Value.Count == 0)
             {
-                mpBreakLineSummaryProperties = null;
+                _axisSummaryProperties = null;
             }
             else
             {
@@ -55,7 +51,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                         var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference)
                         {
-                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineFunction.MPCOEntName))
+                            if (ExtendedDataHelpers.IsApplicable(obj, AxisFunction.MPCOEntName, true))
                             {
                                 objectIds.Add(selectedObject.ObjectId);
                             }
@@ -64,34 +60,34 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 }
                 if (objectIds.Any())
                 {
-                    Expander.Header = BreakLineFunction.MPCOEntDisplayName + " (" + objectIds.Count + ")";
-                    mpBreakLineSummaryProperties = new mpBreakLineSummaryProperties(objectIds);
-                    SetData(mpBreakLineSummaryProperties);
+                    Expander.Header = AxisFunction.MPCOEntDisplayName + " (" + objectIds.Count + ")";
+                    _axisSummaryProperties = new AxisSummaryProperties(objectIds);
+                    SetData(_axisSummaryProperties);
                 }
             }
         }
-        public void SetData(mpBreakLineSummaryProperties data)
+        public void SetData(AxisSummaryProperties data)
         {
             DataContext = data;
         }
 
         private void FrameworkElement_OnGotFocus(object sender, RoutedEventArgs e)
         {
-            if(!(sender is FrameworkElement fe)) return;
-            if (fe.Name.Equals("TbOverhang"))
-                _parentPalette.ShowDescription(mpBreakLineProperties.OverhangPropertyDescriptive.Description);
-            if (fe.Name.Equals("TbBreakHeight"))
-                _parentPalette.ShowDescription(mpBreakLineProperties.BreakHeightPropertyDescriptive.Description);
-            if (fe.Name.Equals("TbBreakWidth"))
-                _parentPalette.ShowDescription(mpBreakLineProperties.BreakWidthPropertyDescriptive.Description);
-            if (fe.Name.Equals("CbBreakLineType"))
-                _parentPalette.ShowDescription(mpBreakLineProperties.BreakLineTypePropertyDescriptive.Description);
+            if (!(sender is FrameworkElement fe)) return;
+            //if (fe.Name.Equals("TbOverhang"))
+            //    _parentPalette.ShowDescription(AxisProperties.OverhangPropertyDescriptive.Description);
+            //if (fe.Name.Equals("TbBreakHeight"))
+            //    _parentPalette.ShowDescription(AxisProperties.BreakHeightPropertyDescriptive.Description);
+            //if (fe.Name.Equals("TbBreakWidth"))
+            //    _parentPalette.ShowDescription(AxisProperties.BreakWidthPropertyDescriptive.Description);
+            if (fe.Name.Equals("CbMarkersPosition"))
+                _parentPalette.ShowDescription(AxisProperties.MarkersPositionPropertyDescriptive.Description);
             if (fe.Name.Equals("CbScale"))
-                _parentPalette.ShowDescription(mpBreakLineProperties.ScalePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.ScalePropertyDescriptive.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
-                _parentPalette.ShowDescription(mpBreakLineProperties.LineTypeScalePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.LineTypeScalePropertyDescriptive.Description);
             if (fe.Name.Equals("CbLayerName"))
-                _parentPalette.ShowDescription(mpBreakLineProperties.LayerName.Description);
+                _parentPalette.ShowDescription(AxisProperties.LayerName.Description);
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)
@@ -99,7 +95,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             _parentPalette.ShowDescription(String.Empty);
         }
 
-        private void MpBreakLinePropertiesPalette_OnUnloaded(object sender, RoutedEventArgs e)
+        private void AxisPropertiesPalette_OnUnloaded(object sender, RoutedEventArgs e)
         {
             if (AcadHelpers.Document != null)
                 AcadHelpers.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;

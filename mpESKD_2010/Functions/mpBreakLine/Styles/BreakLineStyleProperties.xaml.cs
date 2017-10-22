@@ -25,19 +25,19 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         {
             if (!(sender is FrameworkElement fe)) return;
             if (fe.Name.Equals("TbOverhang"))
-                StyleEditorWork.ShowDescription(mpBreakLineProperties.OverhangPropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.OverhangPropertyDescriptive.Description);
             if (fe.Name.Equals("TbBreakHeight"))
-                StyleEditorWork.ShowDescription(mpBreakLineProperties.BreakHeightPropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.BreakHeightPropertyDescriptive.Description);
             if (fe.Name.Equals("TbBreakWidth"))
-                StyleEditorWork.ShowDescription(mpBreakLineProperties.BreakWidthPropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.BreakWidthPropertyDescriptive.Description);
             if (fe.Name.Equals("CbBreakLineType"))
-                StyleEditorWork.ShowDescription(mpBreakLineProperties.BreakLineTypePropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.BreakLineTypePropertyDescriptive.Description);
             if (fe.Name.Equals("CbScale"))
-                StyleEditorWork.ShowDescription(mpBreakLineProperties.ScalePropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.ScalePropertyDescriptive.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
-                StyleEditorWork.ShowDescription(mpBreakLineProperties.LineTypeScalePropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.LineTypeScalePropertyDescriptive.Description);
             if (fe.Name.Equals("CbLayerName"))
-                StyleEditorWork.ShowDescription(mpBreakLineProperties.LayerName.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.LayerName.Description);
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)

@@ -2,23 +2,22 @@
 using Autodesk.AutoCAD.Runtime;
 using mpESKD.Base.Helpers;
 using ModPlusAPI.Windows;
+
 // ReSharper disable InconsistentNaming
 
-namespace mpESKD.Functions.mpBreakLine.Overrules
+namespace mpESKD.Functions.mpAxis.Overrules
 {
-    public class BreakLineObjectOverrule : ObjectOverrule
+    public class AxisObjectOverrule : ObjectOverrule
     {
-
-        protected static BreakLineObjectOverrule _breakLineObjectOverrule;
-        public static BreakLineObjectOverrule Instance()
+        protected static AxisObjectOverrule _axisObjectOverrule;
+        public static AxisObjectOverrule Instance()
         {
-            if (_breakLineObjectOverrule != null) return _breakLineObjectOverrule;
-            _breakLineObjectOverrule = new BreakLineObjectOverrule();
+            if (_axisObjectOverrule != null) return _axisObjectOverrule;
+            _axisObjectOverrule = new AxisObjectOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineObjectOverrule.SetXDataFilter(BreakLineFunction.MPCOEntName);
-            return _breakLineObjectOverrule;
+            _axisObjectOverrule.SetXDataFilter(AxisFunction.MPCOEntName);
+            return _axisObjectOverrule;
         }
-
         public override void Close(DBObject dbObject)
         {
             // Проверка дополнительных условий
@@ -26,17 +25,17 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             {
                 try
                 {
-                    if(AcadHelpers.Document != null )
+                    if (AcadHelpers.Document != null)
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
-                    {
-                        var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity((Entity)dbObject);
-                        if (breakLine != null)
                         {
-                            breakLine.UpdateEntities();
-                            breakLine.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
+                            var axis = AxisXDataHelper.GetAxisFromEntity((Entity)dbObject);
+                            if (axis != null)
+                            {
+                                axis.UpdateEntities();
+                                axis.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
+                            }
                         }
-                    }
                 }
                 catch (Exception exception)
                 {
@@ -48,7 +47,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineFunction.MPCOEntName);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisFunction.MPCOEntName);
         }
     }
 }

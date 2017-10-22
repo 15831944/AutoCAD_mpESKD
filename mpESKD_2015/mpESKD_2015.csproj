@@ -151,6 +151,43 @@
       <Link>Base\Styles\StyleEditor.xaml.cs</Link>
       <DependentUpon>StyleEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Axis.cs">
+      <Link>Functions\mpAxis\Axis.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\AxisFunction.cs">
+      <Link>Functions\mpAxis\AxisFunction.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\AxisInterface.cs">
+      <Link>Functions\mpAxis\AxisInterface.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\AxisJig.cs">
+      <Link>Functions\mpAxis\AxisJig.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Overrules\AxisGripPointOverrule.cs">
+      <Link>Functions\mpAxis\Overrules\AxisGripPointOverrule.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Overrules\AxisObjectOverrule.cs">
+      <Link>Functions\mpAxis\Overrules\AxisObjectOverrule.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Overrules\AxisOsnapOverrule.cs">
+      <Link>Functions\mpAxis\Overrules\AxisOsnapOverrule.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisProperties.cs">
+      <Link>Functions\mpAxis\Properties\AxisProperties.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisPropertiesData.cs">
+      <Link>Functions\mpAxis\Properties\AxisPropertiesData.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs">
+      <Link>Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs</Link>
+      <DependentUpon>AxisPropertiesPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisSummaryProperties.cs">
+      <Link>Functions\mpAxis\Properties\AxisSummaryProperties.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Styles\AxisStyle.cs">
+      <Link>Functions\mpAxis\Styles\AxisStyle.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\BreakLine.cs">
       <Link>Functions\mpBreakLine\BreakLine.cs</Link>
     </Compile>
@@ -172,18 +209,18 @@
     <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\mpBreakLineProperties.cs">
-      <Link>Functions\mpBreakLine\Properties\mpBreakLineProperties.cs</Link>
+    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLineProperties.cs">
+      <Link>Functions\mpBreakLine\Properties\BreakLineProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\mpBreakLinePropertiesData.cs">
-      <Link>Functions\mpBreakLine\Properties\mpBreakLinePropertiesData.cs</Link>
+    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs">
+      <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\mpBreakLinePropertiesPalette.xaml.cs">
-      <Link>Functions\mpBreakLine\Properties\mpBreakLinePropertiesPalette.xaml.cs</Link>
-      <DependentUpon>mpBreakLinePropertiesPalette.xaml</DependentUpon>
+    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs">
+      <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs</Link>
+      <DependentUpon>BreakLinePropertiesPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\mpBreakLineSummaryProperties.cs">
-      <Link>Functions\mpBreakLine\Properties\mpBreakLineSummaryProperties.cs</Link>
+    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs">
+      <Link>Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Styles\BreakLineStyle.cs">
       <Link>Functions\mpBreakLine\Styles\BreakLineStyle.cs</Link>
@@ -240,8 +277,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\mpBreakLinePropertiesPalette.xaml">
-      <Link>Functions\mpBreakLine\Properties\mpBreakLinePropertiesPalette.xaml</Link>
+    <Page Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml">
+      <Link>Functions\mpAxis\Properties\AxisPropertiesPalette.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml">
+      <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -291,6 +333,11 @@
     </Resource>
     <Resource Include="..\mpESKD_2010\Resources\StyleEditor_32x32.png">
       <Link>Resources\StyleEditor_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpESKD_2010\Functions\mpAxis\Icons\mpAxis_32x32.png">
+      <Link>Functions\mpAxis\Icons\mpAxis_32x32.png</Link>
     </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

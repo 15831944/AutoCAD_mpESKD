@@ -6,7 +6,7 @@ using mpESKD.Base.Helpers;
 
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
-    public class mpBreakLinePropertiesData
+    public class BreakLinePropertiesData
     {
         private ObjectId _blkRefObjectId;
 
@@ -103,7 +103,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                     {
                         using (var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkRef))
                         {
-                            breakLine.BreakLineType = mpBreakLinePropertiesHelpers.GetBreakLineTypeByLocalName(value);
+                            breakLine.BreakLineType = BreakLinePropertiesHelpers.GetBreakLineTypeByLocalName(value);
                             breakLine.UpdateEntities();
                             breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = breakLine.GetParametersForXData())
@@ -118,6 +118,8 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             }
         }
 
+        #region General
+        
         private string _scale;
         public string Scale
         {
@@ -146,6 +148,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         }
 
         private double _lineTypeScale;
+        /// <summary>Масштаб типа линии</summary>
         public double LineTypeScale
         {
             get => _lineTypeScale;
@@ -173,7 +176,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         }
 
         private string _layerName;
-
+        /// <summary>Слой</summary>
         public string LayerName
         {
             get => _layerName;
@@ -190,9 +193,11 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             }
         }
 
+        #endregion
+
         public bool IsValid { get; set; }
 
-        public mpBreakLinePropertiesData(ObjectId blkRefObjectId)
+        public BreakLinePropertiesData(ObjectId blkRefObjectId)
         {
             if (Verify(blkRefObjectId))
             {
@@ -230,7 +235,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 _overgang = breakLine.Overhang;
                 _breakHeight = breakLine.BreakHeight;
                 _breakWidth = breakLine.BreakWidth;
-                _breakLineType = mpBreakLinePropertiesHelpers.GetLocalBreakLineTypeName(breakLine.BreakLineType);
+                _breakLineType = BreakLinePropertiesHelpers.GetLocalBreakLineTypeName(breakLine.BreakLineType);
                 _scale = breakLine.Scale.Name;
                 _layerName = blkReference.Layer;
                 _lineTypeScale = breakLine.LineTypeScale;
@@ -247,9 +252,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         }
 
         public event EventHandler AnyPropertyChanged;
-        /// <summary>
-        /// Вызов события изменения какого-либо свойства
-        /// </summary>
+        /// <summary>Вызов события изменения какого-либо свойства</summary>
         protected void AnyPropertyChangedReise()
         {
             AnyPropertyChanged?.Invoke(this, null);

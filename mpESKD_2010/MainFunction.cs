@@ -101,6 +101,7 @@ namespace mpESKD
             StartUpInitialize();
             // Functions Init
             Functions.mpBreakLine.BreakLineFunction.Initialize();
+            Functions.mpAxis.AxisFunction.Initialize();
             // ribbon build for
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
             // palette

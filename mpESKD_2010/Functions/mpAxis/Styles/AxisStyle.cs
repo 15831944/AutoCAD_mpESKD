@@ -7,15 +7,15 @@ using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Helpers;
 using mpESKD.Base.Properties;
 using mpESKD.Base.Styles;
-using mpESKD.Functions.mpBreakLine.Properties;
+using mpESKD.Functions.mpAxis.Properties;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
 
-namespace mpESKD.Functions.mpBreakLine.Styles
+namespace mpESKD.Functions.mpAxis.Styles
 {
-    public class BreakLineStyle : IMPCOStyle
+    public class AxisStyle : IMPCOStyle
     {
-        public BreakLineStyle()
+        public AxisStyle()
         {
             Properties = new List<MPCOBaseProperty>();
         }
@@ -30,50 +30,46 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         public List<MPCOBaseProperty> Properties { get; set; }
     }
 
-    public class BreakLineStyleForEditor : MPCOStyleForEditor
+    public class AxisStyleForEditor : MPCOStyleForEditor
     {
-        public BreakLineStyleForEditor(IMPCOStyle style, string currentStyleGuid, StyleToBind parent) : base(style, currentStyleGuid, parent)
+        public AxisStyleForEditor(IMPCOStyle style, string currentStyleGuid, StyleToBind parent) : base(style, currentStyleGuid, parent)
         {
             // Properties
-            Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang),
-                BreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
-            BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth),
-                BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue);
-            BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight),
-                BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
+            MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition),
+                AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue);
+            MarkerDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkerDiameter),
+                AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue);
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale),
-                BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
+                AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue);
             LayerName = StyleHelpers.GetPropertyValue(style, nameof(LayerName),
-                BreakLineProperties.LayerName.DefaultValue);
+                AxisProperties.LayerName.DefaultValue);
             Scale = StyleHelpers.GetPropertyValue<AnnotationScale>(style, nameof(Scale),
-                BreakLineProperties.ScalePropertyDescriptive.DefaultValue);
+                AxisProperties.ScalePropertyDescriptive.DefaultValue);
             LayerXmlData = style.LayerXmlData;
         }
 
-        public BreakLineStyleForEditor(StyleToBind parent) : base(parent)
+        public AxisStyleForEditor(StyleToBind parent) : base(parent)
         {
             // Properties
-            Overhang = BreakLineProperties.OverhangPropertyDescriptive.DefaultValue;
-            BreakWidth = BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue;
-            BreakHeight = BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue;
-            LineTypeScale = BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue;
-            LayerName = BreakLineProperties.LayerName.DefaultValue;
-            Scale = BreakLineProperties.ScalePropertyDescriptive.DefaultValue;
+            //Overhang = AxisProperties.OverhangPropertyDescriptive.DefaultValue;
+            MarkersPosition = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue;
+            MarkerDiameter = AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue;
+            LineTypeScale = AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue;
+            LayerName = AxisProperties.LayerName.DefaultValue;
+            Scale = AxisProperties.ScalePropertyDescriptive.DefaultValue;
         }
-
         #region Properties
-        public int Overhang { get; set; }
-        public int BreakHeight { get; set; }
-        public int BreakWidth { get; set; }
+        //public int Overhang { get; set; }
+        public AxisMarkersPosition MarkersPosition { get; set; }
+        public int MarkerDiameter { get; set; }
         public double LineTypeScale { get; set; }
         public string LayerName { get; set; }
         public AnnotationScale Scale { get; set; }
         #endregion
     }
-
-    public static class BreakLineStylesManager
+    public class AxisStyleManager
     {
-        private const string StylesFileName = "BreakLineStyles.xml";
+        private const string StylesFileName = "AxisStyles.xml";
         private static string _currentStyleGuid;
         /// <summary>Guid текущего стиля</summary>
         public static string CurrentStyleGuid
@@ -82,11 +78,11 @@ namespace mpESKD.Functions.mpBreakLine.Styles
             {
                 if (string.IsNullOrEmpty(_currentStyleGuid))
                 {
-                    var savedStyleGuid = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpBreakLine", "CurrentStyleGuid");
+                    var savedStyleGuid = UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpAxis", "CurrentStyleGuid");
                     if (!string.IsNullOrEmpty(savedStyleGuid))
                         return savedStyleGuid;
                     const string firstSystemGuid = "00000000-0000-0000-0000-000000000000";
-                    UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpBreakLine", "CurrentStyleGuid", firstSystemGuid, true);
+                    UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpAxis", "CurrentStyleGuid", firstSystemGuid, true);
                     return firstSystemGuid;
                 }
                 return _currentStyleGuid;
@@ -98,7 +94,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
             }
         }
         /// <summary>Коллекция стилей</summary>
-        public static List<BreakLineStyle> Styles = new List<BreakLineStyle>();
+        public static List<AxisStyle> Styles = new List<AxisStyle>();
         /// <summary>Проверка и создание в случае необходимости файла стилей</summary>
         public static void CheckStylesFile()
         {
@@ -127,16 +123,16 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         /// <summary>Получение стиля из коллекции по его идентификатору или первого системного стиля, если не найден
         /// В случае, если коллекция пустая, то происходит ее загрузка (с созданием, если нужно)</summary>
         /// <returns></returns>
-        public static BreakLineStyle GetCurrentStyle()
+        public static AxisStyle GetCurrentStyle()
         {
             try
             {
                 LoadStylesFromXmlFile();
 
-                foreach (BreakLineStyle breakLineStyle in Styles)
+                foreach (AxisStyle axisStyle in Styles)
                 {
-                    if (breakLineStyle.Guid.Equals(CurrentStyleGuid))
-                        return breakLineStyle;
+                    if (axisStyle.Guid.Equals(CurrentStyleGuid))
+                        return axisStyle;
                 }
                 return Styles.First(s => s.StyleType == MPCOStyleType.System);
             }
@@ -158,10 +154,10 @@ namespace mpESKD.Functions.mpBreakLine.Styles
             var fXel = XElement.Load(stylesFile);
             foreach (XElement styleXel in fXel.Elements("UserStyle"))
             {
-                BreakLineStyle style = new BreakLineStyle
+                AxisStyle style = new AxisStyle
                 {
                     StyleType = MPCOStyleType.User,
-                    FunctionName = BreakLineFunction.MPCOEntName
+                    FunctionName = AxisFunction.MPCOEntName
                 };
                 style.Name = styleXel.Attribute(nameof(style.Name))?.Value;
                 style.Description = styleXel.Attribute(nameof(style.Description))?.Value;
@@ -177,56 +173,41 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                         int i;
                         switch (nameAttr.Value)
                         {
-                            case "Overhang":
-                                style.Properties.Add(new MPCOIntProperty
+                            case "MarkersPosition":
+                                style.Properties.Add(new MPCOTypeProperty<AxisMarkersPosition>
                                 {
                                     Name = nameAttr.Value,
-                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : BreakLineProperties.OverhangPropertyDescriptive.DefaultValue,
-                                    Description = BreakLineProperties.OverhangPropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.OverhangPropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.OverhangPropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.OverhangPropertyDescriptive.DisplayName,
-                                    Minimum = BreakLineProperties.OverhangPropertyDescriptive.Minimum,
-                                    Maximum = BreakLineProperties.OverhangPropertyDescriptive.Maximum
+                                    Value = AxisPropertiesHelpers.GetAxisMarkersPositionFromString(propXel.Attribute("Value")?.Value),
+                                    Description = AxisProperties.MarkersPositionPropertyDescriptive.Description,
+                                    DefaultValue = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue,
+                                    PropertyType = AxisProperties.MarkersPositionPropertyDescriptive.PropertyType,
+                                    DisplayName = AxisProperties.MarkersPositionPropertyDescriptive.DisplayName
                                 });
                                 break;
-                            case "BreakHeight":
+                            case "MarkerDiameter":
                                 style.Properties.Add(new MPCOIntProperty
                                 {
                                     Name = nameAttr.Value,
-                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue,
-                                    Description = BreakLineProperties.BreakHeightPropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.BreakHeightPropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.BreakHeightPropertyDescriptive.DisplayName,
-                                    Minimum = BreakLineProperties.BreakHeightPropertyDescriptive.Minimum,
-                                    Maximum = BreakLineProperties.BreakHeightPropertyDescriptive.Maximum
-                                });
-                                break;
-                            case "BreakWidth":
-                                style.Properties.Add(new MPCOIntProperty
-                                {
-                                    Name = nameAttr.Value,
-                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue,
-                                    Description = BreakLineProperties.BreakWidthPropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.BreakWidthPropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.BreakWidthPropertyDescriptive.DisplayName,
-                                    Minimum = BreakLineProperties.BreakWidthPropertyDescriptive.Minimum,
-                                    Maximum = BreakLineProperties.BreakWidthPropertyDescriptive.Maximum
+                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue,
+                                    Description = AxisProperties.MarkerDiameterPropertyDescriptive.Description,
+                                    DefaultValue = AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue,
+                                    PropertyType = AxisProperties.MarkerDiameterPropertyDescriptive.PropertyType,
+                                    DisplayName = AxisProperties.MarkerDiameterPropertyDescriptive.DisplayName,
+                                    Minimum = AxisProperties.MarkerDiameterPropertyDescriptive.Minimum,
+                                    Maximum = AxisProperties.MarkerDiameterPropertyDescriptive.Maximum
                                 });
                                 break;
                             case "LineTypeScale":
                                 style.Properties.Add(new MPCODoubleProperty
                                 {
                                     Name = nameAttr.Value,
-                                    Value = double.TryParse(propXel.Attribute("Value")?.Value, out double d) ? d : BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue,
-                                    Description = BreakLineProperties.LineTypeScalePropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.LineTypeScalePropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.LineTypeScalePropertyDescriptive.DisplayName,
-                                    Minimum = BreakLineProperties.LineTypeScalePropertyDescriptive.Minimum,
-                                    Maximum = BreakLineProperties.LineTypeScalePropertyDescriptive.Maximum
+                                    Value = double.TryParse(propXel.Attribute("Value")?.Value, out double d) ? d : AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue,
+                                    Description = AxisProperties.LineTypeScalePropertyDescriptive.Description,
+                                    DefaultValue = AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue,
+                                    PropertyType = AxisProperties.LineTypeScalePropertyDescriptive.PropertyType,
+                                    DisplayName = AxisProperties.LineTypeScalePropertyDescriptive.DisplayName,
+                                    Minimum = AxisProperties.LineTypeScalePropertyDescriptive.Minimum,
+                                    Maximum = AxisProperties.LineTypeScalePropertyDescriptive.Maximum
                                 });
                                 break;
                             case "LayerName":
@@ -234,10 +215,10 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                                 {
                                     Name = nameAttr.Value,
                                     Value = propXel.Attribute("Value")?.Value,
-                                    Description = BreakLineProperties.LayerName.Description,
-                                    DefaultValue = BreakLineProperties.LayerName.DefaultValue,
-                                    PropertyType = BreakLineProperties.LayerName.PropertyType,
-                                    DisplayName = BreakLineProperties.LayerName.DisplayName
+                                    Description = AxisProperties.LayerName.Description,
+                                    DefaultValue = AxisProperties.LayerName.DefaultValue,
+                                    PropertyType = AxisProperties.LayerName.PropertyType,
+                                    DisplayName = AxisProperties.LayerName.DisplayName
                                 });
                                 break;
                             case "Scale":
@@ -245,10 +226,10 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                                 {
                                     Name = nameAttr.Value,
                                     Value = Parsers.AnnotationScaleFromString(propXel.Attribute("Value")?.Value),
-                                    Description = BreakLineProperties.ScalePropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.ScalePropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.ScalePropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.ScalePropertyDescriptive.DisplayName
+                                    Description = AxisProperties.ScalePropertyDescriptive.Description,
+                                    DefaultValue = AxisProperties.ScalePropertyDescriptive.DefaultValue,
+                                    PropertyType = AxisProperties.ScalePropertyDescriptive.PropertyType,
+                                    DisplayName = AxisProperties.ScalePropertyDescriptive.DisplayName
                                 });
                                 break;
                         }
@@ -261,8 +242,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                 Styles.Add(style);
             }
         }
-        
-        public static void SaveStylesToXml(List<BreakLineStyleForEditor> styles)
+        public static void SaveStylesToXml(List<AxisStyleForEditor> styles)
         {
             var stylesFile = Path.Combine(MainFunction.StylesPath, StylesFileName);
             // Если файла нет, то создаем
@@ -272,7 +252,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
             {
                 var fXel = XElement.Load(stylesFile);
                 fXel.RemoveAll();
-                foreach (BreakLineStyleForEditor style in styles)
+                foreach (AxisStyleForEditor style in styles)
                 {
                     if (!style.CanEdit) continue;
                     XElement styleXel = new XElement("UserStyle");
@@ -281,24 +261,24 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                     styleXel.SetAttributeValue(nameof(style.Guid), style.Guid);
                     // Properties
                     var propXel = new XElement("Property");
-                    propXel.SetAttributeValue("Name", nameof(style.BreakHeight));
-                    propXel.SetAttributeValue("PropertyType", style.BreakHeight.GetType().Name);
-                    propXel.SetAttributeValue("Value", style.BreakHeight);
+                    propXel.SetAttributeValue("Name", nameof(style.MarkersPosition));
+                    propXel.SetAttributeValue("PropertyType", style.MarkersPosition.GetType().Name);
+                    propXel.SetAttributeValue("Value", style.MarkersPosition);
                     styleXel.Add(propXel);
                     propXel = new XElement("Property");
-                    propXel.SetAttributeValue("Name", nameof(style.BreakWidth));
-                    propXel.SetAttributeValue("PropertyType", style.BreakWidth.GetType().Name);
-                    propXel.SetAttributeValue("Value", style.BreakWidth);
+                    propXel.SetAttributeValue("Name", nameof(style.MarkerDiameter));
+                    propXel.SetAttributeValue("PropertyType", style.MarkerDiameter.GetType().Name);
+                    propXel.SetAttributeValue("Value", style.MarkerDiameter);
                     styleXel.Add(propXel);
+                    //propXel = new XElement("Property");
+                    //propXel.SetAttributeValue("Name", nameof(style.BreakWidth));
+                    //propXel.SetAttributeValue("PropertyType", style.BreakWidth.GetType().Name);
+                    //propXel.SetAttributeValue("Value", style.BreakWidth);
+                    //styleXel.Add(propXel);
                     propXel = new XElement("Property");
                     propXel.SetAttributeValue("Name", nameof(style.LineTypeScale));
                     propXel.SetAttributeValue("PropertyType", style.LineTypeScale.GetType().Name);
                     propXel.SetAttributeValue("Value", style.LineTypeScale);
-                    styleXel.Add(propXel);
-                    propXel = new XElement("Property");
-                    propXel.SetAttributeValue("Name", nameof(style.Overhang));
-                    propXel.SetAttributeValue("PropertyType", style.Overhang.GetType().Name);
-                    propXel.SetAttributeValue("Value", style.Overhang);
                     styleXel.Add(propXel);
                     propXel = new XElement("Property");
                     propXel.SetAttributeValue("Name", nameof(style.Scale));
@@ -311,9 +291,9 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                     propXel.SetAttributeValue("Value", style.LayerName);
                     styleXel.Add(propXel);
                     // add layer
-                    if(LayerHelper.HasLayer(style.LayerName))
+                    if (LayerHelper.HasLayer(style.LayerName))
                         styleXel.Add(LayerHelper.SetLayerXml(LayerHelper.GetLayerTableRecordByLayerName(style.LayerName)));
-                    else if(style.LayerXmlData != null) styleXel.Add(style.LayerXmlData);
+                    else if (style.LayerXmlData != null) styleXel.Add(style.LayerXmlData);
                     fXel.Add(styleXel);
                 }
                 fXel.Save(stylesFile);
@@ -325,24 +305,24 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         }
         /// <summary>Создание системных (стандартных) стилей. Их может быть несколько</summary>
         /// <returns></returns>
-        public static List<BreakLineStyle> CreateSystemStyles()
+        public static List<AxisStyle> CreateSystemStyles()
         {
-            var styles = new List<BreakLineStyle>();
-            var style = new BreakLineStyle
+            var styles = new List<AxisStyle>();
+            var style = new AxisStyle
             {
-                Name = "Линия обрыва",
-                FunctionName = BreakLineFunction.MPCOEntName,
-                Description = "Базовый стиль для линии обрыва",
+                Name = "Прямая ось",
+                FunctionName = AxisFunction.MPCOEntName,
+                Description = "Базовый стиль для прямой оси",
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
             };
-            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.OverhangPropertyDescriptive.DefaultValue, BreakLineProperties.OverhangPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue, BreakLineProperties.BreakWidthPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue, BreakLineProperties.BreakHeightPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue, BreakLineProperties.LineTypeScalePropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.LayerName.DefaultValue, BreakLineProperties.LayerName));
-            style.Properties.Add(StyleHelpers.CreateProperty<BreakLineType>(BreakLineProperties.BreakLineTypePropertyDescriptive.DefaultValue, BreakLineProperties.BreakLineTypePropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty<AnnotationScale>(BreakLineProperties.ScalePropertyDescriptive.DefaultValue, BreakLineProperties.ScalePropertyDescriptive));
+            //style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.OverhangPropertyDescriptive.DefaultValue, AxisProperties.OverhangPropertyDescriptive));
+            //style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.BreakWidthPropertyDescriptive.DefaultValue, AxisProperties.BreakWidthPropertyDescriptive));
+            //style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.BreakHeightPropertyDescriptive.DefaultValue, AxisProperties.BreakHeightPropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue, AxisProperties.LineTypeScalePropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LayerName.DefaultValue, AxisProperties.LayerName));
+            style.Properties.Add(StyleHelpers.CreateProperty<AxisMarkersPosition>(AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue, AxisProperties.MarkersPositionPropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty<AnnotationScale>(AxisProperties.ScalePropertyDescriptive.DefaultValue, AxisProperties.ScalePropertyDescriptive));
 
             styles.Add(style);
 
@@ -350,15 +330,15 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         }
         /// <summary>Получение стилей в виде классов-презенторов для редактора</summary>
         /// <returns></returns>
-        public static List<BreakLineStyleForEditor> GetStylesForEditor()
+        public static List<AxisStyleForEditor> GetStylesForEditor()
         {
-            var stylesForEditor = new List<BreakLineStyleForEditor>();
-
+            var stylesForEditor = new List<AxisStyleForEditor>();
+            
             LoadStylesFromXmlFile();
 
-            foreach (BreakLineStyle breakLineStyle in Styles)
+            foreach (AxisStyle axisStyle in Styles)
             {
-                stylesForEditor.Add(new BreakLineStyleForEditor(breakLineStyle, CurrentStyleGuid, null));
+                stylesForEditor.Add(new AxisStyleForEditor(axisStyle, CurrentStyleGuid, null));
             }
 
             return stylesForEditor;

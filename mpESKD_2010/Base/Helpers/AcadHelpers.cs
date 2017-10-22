@@ -255,8 +255,9 @@ namespace mpESKD.Base.Helpers
         /// </summary>
         /// <param name="rxObject"></param>
         /// <param name="appName"></param>
+        /// <param name="forPalette">Проверка для палитры</param>
         /// <returns></returns>
-        public static bool IsApplicable(RXObject rxObject, string appName)
+        public static bool IsApplicable(RXObject rxObject, string appName, bool forPalette = false)
         {
             DBObject dbObject = rxObject as DBObject;
             if (dbObject == null) return false;
@@ -264,8 +265,9 @@ namespace mpESKD.Base.Helpers
                 dbObject.IsErased ||
                 dbObject.IsEraseStatusToggled ||
                 dbObject.IsUndoing) return false;
-            return true;
-            //return IsMPCOentity(dbObject, appName);
+            // Если проверка для палитры, то проверяем по наличию расширенных данных
+            // Для Overrule это не нужно
+            return !forPalette || IsMPCOentity(dbObject, appName);
         }
 
         /// <summary>

@@ -10,7 +10,7 @@ using mpESKD.Base.Properties;
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
     // ReSharper disable once InconsistentNaming
-    public static class mpBreakLineProperties
+    public static class BreakLineProperties
     {
         /// <summary>Поле, описывающее свойство "Тип линии обрыва"</summary>
         public static MPCOTypeProperty<BreakLineType> BreakLineTypePropertyDescriptive = new MPCOTypeProperty<BreakLineType>
@@ -81,7 +81,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             Description = "Слой примитива"
         };
     }
-    public static class mpBreakLinePropertiesHelpers
+    public static class BreakLinePropertiesHelpers
     {
         public static List<string> BreakLineTypeLocalNames = new List<string> { "Линейный", "Криволинейный", "Цилиндрический" };
         #region Methods
@@ -117,13 +117,13 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is BreakLineType breakLine)
-                return mpBreakLinePropertiesHelpers.GetLocalBreakLineTypeName(breakLine);
+                return BreakLinePropertiesHelpers.GetLocalBreakLineTypeName(breakLine);
             return string.Empty;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return mpBreakLinePropertiesHelpers.GetBreakLineTypeByLocalName(value?.ToString());
+            return BreakLinePropertiesHelpers.GetBreakLineTypeByLocalName(value?.ToString());
         }
     }
     /// <summary>

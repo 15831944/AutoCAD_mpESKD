@@ -10,7 +10,7 @@ using mpESKD.Base.Properties;
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class mpBreakLineSummaryProperties: BaseSummaryProperties<mpBreakLinePropertiesData>
+    public class BreakLineSummaryProperties: BaseSummaryProperties<BreakLinePropertiesData>
     {
         public int? Overhang
         {
@@ -30,7 +30,6 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(BreakHeight)));
             }
         }
-
         public int? BreakWidth
         {
             get => GetIntProp(nameof(BreakWidth));
@@ -40,7 +39,6 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(BreakWidth)));
             }
         }
-
         public string BreakLineType
         {
             get => GetStrProp(nameof(BreakLineType));
@@ -51,6 +49,8 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             }
         }
 
+        #region General
+        
         public string Scale
         {
             get => GetStrProp(nameof(Scale));
@@ -80,17 +80,20 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(LineTypeScale)));
             }
         }
-        public mpBreakLineSummaryProperties(IEnumerable<ObjectId> objectIds)
+
+        #endregion
+
+        public BreakLineSummaryProperties(IEnumerable<ObjectId> objectIds)
         {
             foreach (ObjectId objectId in objectIds)
             {
-                mpBreakLinePropertiesData data = new mpBreakLinePropertiesData(objectId);
+                BreakLinePropertiesData data = new BreakLinePropertiesData(objectId);
                 if (data.IsValid)
                     Add(data);
             }
         }
 
-        public new void Add(mpBreakLinePropertiesData data)
+        public new void Add(BreakLinePropertiesData data)
         {
             base.Add(data);
             data.AnyPropertyChanged += Data_AnyPropertyChanged;
