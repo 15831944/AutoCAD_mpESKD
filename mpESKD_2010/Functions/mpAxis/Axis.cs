@@ -54,8 +54,7 @@ namespace mpESKD.Functions.mpAxis
 
         /// <summary>Вторая (конечная) точка примитива в мировой системе координат</summary>
         public Point3d EndPoint { get; set; } = Point3d.Origin;
-
-        public double BottomLineLength { get; set; } = 10.0;
+        
         public double BottomLineAngle { get; set; } = 0.0;
 
         private Point3d _bottomMarkerPoint;
@@ -66,22 +65,20 @@ namespace mpESKD.Functions.mpAxis
             {
                 var baseVector = new Vector3d(1.0, 0.0, 0.0);
                 var angleA = baseVector.GetAngleTo(EndPoint - InsertionPoint, Vector3d.ZAxis);
-                BottomLineLength = Fracture / Math.Cos(BottomLineAngle) * GetScale();
+                var bottomLineLength = Fracture / Math.Cos(BottomLineAngle) * GetScale();
                 _bottomMarkerPoint = new Point3d(
-                    EndPoint.X + BottomLineLength * Math.Cos(angleA + BottomLineAngle),
-                    EndPoint.Y + BottomLineLength * Math.Sin(angleA + BottomLineAngle),
+                    EndPoint.X + bottomLineLength * Math.Cos(angleA + BottomLineAngle),
+                    EndPoint.Y + bottomLineLength * Math.Sin(angleA + BottomLineAngle),
                     EndPoint.Z);
                 return _bottomMarkerPoint;
             }
             set
             {
                 _bottomMarkerPoint = value;
-                //BottomLineLength = (value - EndPoint).Length;
                 BottomLineAngle = (EndPoint - InsertionPoint).GetAngleTo(value - EndPoint, Vector3d.ZAxis);
             }
         }
-
-        public double TopLineLength { get; set; } = 10.0;
+        
         public double TopLineAngle { get; set; } = 0.0;
 
         private Point3d _topMarkerPoint;
@@ -92,16 +89,16 @@ namespace mpESKD.Functions.mpAxis
             {
                 var baseVector = new Vector3d(1.0, 0.0, 0.0);
                 var angleA = baseVector.GetAngleTo(InsertionPoint - EndPoint, Vector3d.ZAxis);
+                var topLineLength = Fracture / Math.Cos(TopLineAngle) * GetScale();
                 _topMarkerPoint = new Point3d(
-                    InsertionPoint.X + TopLineLength * GetScale() * Math.Cos(angleA + TopLineAngle),
-                    InsertionPoint.Y + TopLineLength * GetScale() * Math.Sin(angleA + TopLineAngle),
+                    InsertionPoint.X + topLineLength * GetScale() * Math.Cos(angleA + TopLineAngle),
+                    InsertionPoint.Y + topLineLength * GetScale() * Math.Sin(angleA + TopLineAngle),
                     InsertionPoint.Z);
                 return _topMarkerPoint;
             }
             set
             {
                 _topMarkerPoint = value;
-                TopLineLength = (value - InsertionPoint).Length / GetScale();
                 TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint, Vector3d.ZAxis);
             }
         }
@@ -134,15 +131,7 @@ namespace mpESKD.Functions.mpAxis
         #endregion
 
         #region General Properties
-
-        public AnnotationScale Scale { get; set; } //= BreakLineProperties.ScalePropertyDescriptive.DefaultValue;
-        /// <summary>Масштаб типа линии для входящей полилинии</summary>
-        public double LineTypeScale { get; set; } //= BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue;
-        /// <summary>Текущий масштаб</summary>
-        public double GetScale()
-        {
-            return Scale.DrawingUnits / Scale.PaperUnits;
-        }
+        
         /// <summary>Минимальная длина от точки вставки до конечной точки</summary>
         public double AxisMinLength => 1.0;
 
@@ -155,7 +144,7 @@ namespace mpESKD.Functions.mpAxis
         /// <summary>Положение маркеров</summary>
         public AxisMarkersPosition MarkersPosition { get; set; } = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue;
         /// <summary>Излом</summary>
-        public double Fracture { get; set; } = 10.0;
+        public int Fracture { get; set; } = 10;
 
         #endregion
 
@@ -168,9 +157,7 @@ namespace mpESKD.Functions.mpAxis
         public void ApplyStyle(AxisStyle style)
         {
             // apply settings from style
-            //Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
-            //BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
-            //BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue);
+            Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture), AxisProperties.FracturePropertyDescriptive.DefaultValue);
             MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition), AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue);
             MarkerDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkerDiameter), AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue);
             if (new MainSettings().UseScaleFromStyle)
@@ -271,8 +258,8 @@ namespace mpESKD.Functions.mpAxis
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
                 var tmpEndPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y - AxisMinLength * scale, InsertionPointOCS.Z);
-                var tmpBottomMarkerPoint = new Point3d(tmpEndPoint.X, tmpEndPoint.Y - 10.0 * scale, tmpEndPoint.Z);
-                var tmpTopMarkerPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y + 10.0 * scale, InsertionPointOCS.Z);
+                var tmpBottomMarkerPoint = new Point3d(tmpEndPoint.X, tmpEndPoint.Y - Fracture * scale, tmpEndPoint.Z);
+                var tmpTopMarkerPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y + Fracture * scale, InsertionPointOCS.Z);
 
                 SetEntitiesPoints(InsertionPointOCS, tmpEndPoint, tmpBottomMarkerPoint, tmpTopMarkerPoint);
             }
@@ -297,6 +284,7 @@ namespace mpESKD.Functions.mpAxis
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Bottom)
             {
+                if(_bottomMarkerLine == null) _bottomMarkerLine = new Lazy<Line>(() => new Line());
                 // bottom line
                 _bottomMarkerLine.Value.StartPoint = endPoint;
                 _bottomMarkerLine.Value.EndPoint = bottomMarkerPoint;
@@ -308,6 +296,7 @@ namespace mpESKD.Functions.mpAxis
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Top)
             {
+                if (_topMarkerLine == null) _topMarkerLine = new Lazy<Line>(() => new Line());
                 // top line
                 _topMarkerLine.Value.StartPoint = insertionPoint;
                 _topMarkerLine.Value.EndPoint = topMarkerPoint;
@@ -318,6 +307,7 @@ namespace mpESKD.Functions.mpAxis
             }
         }
         #endregion
+
         public ResultBuffer GetParametersForXData()
         {
             try
@@ -339,14 +329,12 @@ namespace mpESKD.Functions.mpAxis
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 2
                 // Целочисленные значения (код 1070)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkerDiameter)); // 0
-                //resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakHeight)); // 1
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Fracture)); // 1
                 //resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakWidth)); // 2
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomLineAngle)); // 1
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomLineLength)); // 2
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopLineAngle)); // 3
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopLineLength)); // 4
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopLineAngle)); // 2
 
                 return resBuf;
             }
@@ -397,8 +385,8 @@ namespace mpESKD.Functions.mpAxis
                             {
                                 if (index1070 == 0) // 0 - MarkerDiameter
                                     MarkerDiameter = (Int16)typedValue.Value;
-                                //if (index1070 == 1) // 1- breakHeight
-                                //    BreakHeight = (Int16)typedValue.Value;
+                                if (index1070 == 1) // 1- Fracture
+                                    Fracture = (Int16)typedValue.Value;
                                 //if (index1070 == 2) // 2 - breakWidth
                                 //    BreakWidth = (Int16)typedValue.Value;
                                 //index
@@ -411,12 +399,8 @@ namespace mpESKD.Functions.mpAxis
                                     LineTypeScale = (double)typedValue.Value;
                                 if (index1040 == 1) // 1 - BottomLineAngle
                                     BottomLineAngle = (double)typedValue.Value;
-                                if (index1040 == 2) // 2 - BottomLineLenght
-                                    BottomLineLength = (double)typedValue.Value;
-                                if (index1040 == 3) // 3 - TopLineAngle
+                                if (index1040 == 2) // 2 - TopLineAngle
                                     TopLineAngle = (double)typedValue.Value;
-                                if (index1040 == 4) // 4 - TopLineLenght
-                                    TopLineLength = (double)typedValue.Value;
                                 index1040++;
                                 break;
                             }

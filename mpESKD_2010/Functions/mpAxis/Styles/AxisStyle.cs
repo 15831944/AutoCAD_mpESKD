@@ -35,6 +35,8 @@ namespace mpESKD.Functions.mpAxis.Styles
         public AxisStyleForEditor(IMPCOStyle style, string currentStyleGuid, StyleToBind parent) : base(style, currentStyleGuid, parent)
         {
             // Properties
+            Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture),
+                AxisProperties.FracturePropertyDescriptive.DefaultValue);
             MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition),
                 AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue);
             MarkerDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkerDiameter),
@@ -51,7 +53,7 @@ namespace mpESKD.Functions.mpAxis.Styles
         public AxisStyleForEditor(StyleToBind parent) : base(parent)
         {
             // Properties
-            //Overhang = AxisProperties.OverhangPropertyDescriptive.DefaultValue;
+            Fracture = AxisProperties.FracturePropertyDescriptive.DefaultValue;
             MarkersPosition = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue;
             MarkerDiameter = AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue;
             LineTypeScale = AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue;
@@ -59,9 +61,13 @@ namespace mpESKD.Functions.mpAxis.Styles
             Scale = AxisProperties.ScalePropertyDescriptive.DefaultValue;
         }
         #region Properties
-        //public int Overhang { get; set; }
+        // Позиция маркеров
         public AxisMarkersPosition MarkersPosition { get; set; }
+        // Диаметр маркеров
         public int MarkerDiameter { get; set; }
+        // Излом
+        public int Fracture { get; set; }
+        // Стандартные
         public double LineTypeScale { get; set; }
         public string LayerName { get; set; }
         public AnnotationScale Scale { get; set; }
@@ -197,6 +203,19 @@ namespace mpESKD.Functions.mpAxis.Styles
                                     Maximum = AxisProperties.MarkerDiameterPropertyDescriptive.Maximum
                                 });
                                 break;
+                            case "Fracture":
+                                style.Properties.Add(new MPCOIntProperty
+                                {
+                                    Name = nameAttr.Value,
+                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : AxisProperties.FracturePropertyDescriptive.DefaultValue,
+                                    Description = AxisProperties.FracturePropertyDescriptive.Description,
+                                    DefaultValue = AxisProperties.FracturePropertyDescriptive.DefaultValue,
+                                    PropertyType = AxisProperties.FracturePropertyDescriptive.PropertyType,
+                                    DisplayName = AxisProperties.FracturePropertyDescriptive.DisplayName,
+                                    Minimum = AxisProperties.FracturePropertyDescriptive.Minimum,
+                                    Maximum = AxisProperties.FracturePropertyDescriptive.Maximum
+                                });
+                                break;
                             case "LineTypeScale":
                                 style.Properties.Add(new MPCODoubleProperty
                                 {
@@ -270,11 +289,11 @@ namespace mpESKD.Functions.mpAxis.Styles
                     propXel.SetAttributeValue("PropertyType", style.MarkerDiameter.GetType().Name);
                     propXel.SetAttributeValue("Value", style.MarkerDiameter);
                     styleXel.Add(propXel);
-                    //propXel = new XElement("Property");
-                    //propXel.SetAttributeValue("Name", nameof(style.BreakWidth));
-                    //propXel.SetAttributeValue("PropertyType", style.BreakWidth.GetType().Name);
-                    //propXel.SetAttributeValue("Value", style.BreakWidth);
-                    //styleXel.Add(propXel);
+                    propXel = new XElement("Property");
+                    propXel.SetAttributeValue("Name", nameof(style.Fracture));
+                    propXel.SetAttributeValue("PropertyType", style.Fracture.GetType().Name);
+                    propXel.SetAttributeValue("Value", style.Fracture);
+                    styleXel.Add(propXel);
                     propXel = new XElement("Property");
                     propXel.SetAttributeValue("Name", nameof(style.LineTypeScale));
                     propXel.SetAttributeValue("PropertyType", style.LineTypeScale.GetType().Name);
@@ -318,7 +337,7 @@ namespace mpESKD.Functions.mpAxis.Styles
             };
             //style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.OverhangPropertyDescriptive.DefaultValue, AxisProperties.OverhangPropertyDescriptive));
             //style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.BreakWidthPropertyDescriptive.DefaultValue, AxisProperties.BreakWidthPropertyDescriptive));
-            //style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.BreakHeightPropertyDescriptive.DefaultValue, AxisProperties.BreakHeightPropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.FracturePropertyDescriptive.DefaultValue, AxisProperties.FracturePropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue, AxisProperties.LineTypeScalePropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LayerName.DefaultValue, AxisProperties.LayerName));
             style.Properties.Add(StyleHelpers.CreateProperty<AxisMarkersPosition>(AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue, AxisProperties.MarkersPositionPropertyDescriptive));

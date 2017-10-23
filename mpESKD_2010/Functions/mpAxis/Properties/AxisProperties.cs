@@ -15,6 +15,17 @@ namespace mpESKD.Functions.mpAxis.Properties
             DefaultValue = AxisMarkersPosition.Bottom,
             Description = "Позиция маркеров: с двух сторон, сверху или снизу"
         };
+        /// <summary>Поле, описывающее свойство "Излом"</summary>
+        public static MPCOIntProperty FracturePropertyDescriptive = new MPCOIntProperty
+        {
+            PropertyType = MPCOPropertyType.Int,
+            Name = "Fracture",
+            DisplayName = "Излом:",
+            DefaultValue = 10,
+            Minimum = 1,
+            Maximum = 20,
+            Description = "Высота излома оси"
+        };
         /// <summary>Поле, описывающее свойство "Диаметр маркеров"</summary>
         public static MPCOIntProperty MarkerDiameterPropertyDescriptive = new MPCOIntProperty
         {

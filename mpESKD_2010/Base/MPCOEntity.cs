@@ -22,20 +22,24 @@ namespace mpESKD.Base
         /// Должна соответствовать точке вставке блока
         /// </summary>
         public Point3d InsertionPoint { get; set; } = Point3d.Origin;
-        /// <summary>
-        /// Коллекция базовых примитивов, входящих в примитив 
-        /// </summary>
+        /// <summary>Коллекция базовых примитивов, входящих в примитив</summary>
         public abstract IEnumerable<Entity> Entities
         {
             get;
         }
 
         public bool IsValueCreated { get; set; }
-        /// <summary>
-        /// Матрица трансформации BlockReference
-        /// </summary>
+        /// <summary>Матрица трансформации BlockReference</summary>
         public Matrix3d BlockTransform { get; set; }
-        
+        /// <summary>Масштаб примитива</summary>
+        public AnnotationScale Scale { get; set; }
+        /// <summary>Масштаб типа линии для входящей полилинии</summary>
+        public double LineTypeScale { get; set; } 
+        /// <summary>Текущий масштаб</summary>
+        public double GetScale()
+        {
+            return Scale.DrawingUnits / Scale.PaperUnits;
+        }
         #region Block
         // ObjectId "примитива"
         public ObjectId BlockId { get; set; }

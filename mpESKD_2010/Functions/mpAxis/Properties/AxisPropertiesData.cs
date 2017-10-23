@@ -39,9 +39,35 @@ namespace mpESKD.Functions.mpAxis.Properties
             }
         }
 
+        private int _fracture;
+        public int Fracture
+        {
+            get => _fracture;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.Fracture = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
         #region General
 
-        
+
         private string _scale;
         /// <summary>Масштаб</summary>
         public string Scale
@@ -155,7 +181,7 @@ namespace mpESKD.Functions.mpAxis.Properties
             {
                 //_overgang = axis.Overhang;
                 //_breakHeight = axis.BreakHeight;
-                //_breakWidth = axis.BreakWidth;
+                _fracture = axis.Fracture;
                 _markersPosition = AxisPropertiesHelpers.GetLocalAxisMarkersPositionName(axis.MarkersPosition);
                 _scale = axis.Scale.Name;
                 _layerName = blkReference.Layer;

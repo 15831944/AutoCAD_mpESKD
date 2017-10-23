@@ -10,6 +10,7 @@ namespace mpESKD.Functions.mpAxis.Properties
 {
     public class AxisSummaryProperties : BaseSummaryProperties<AxisPropertiesData>
     {
+        /// <summary>Позиция маркеров</summary>
         public string MarkersPosition
         {
             get => GetStrProp(nameof(MarkersPosition));
@@ -17,6 +18,16 @@ namespace mpESKD.Functions.mpAxis.Properties
             {
                 SetPropValue(nameof(MarkersPosition), value);
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(MarkersPosition)));
+            }
+        }
+        /// <summary>Излом</summary>
+        public int? Fracture
+        {
+            get => GetIntProp(nameof(Fracture));
+            set
+            {
+                SetPropValue(nameof(Fracture), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Fracture)));
             }
         }
         #region General

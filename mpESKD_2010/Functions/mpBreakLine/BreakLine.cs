@@ -84,16 +84,7 @@ namespace mpESKD.Functions.mpBreakLine
         public int BreakHeight { get; set; } = BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue;
         /// <summary>Тип линии обрыва: линейный, криволинейный, цилиндрический</summary>
         public BreakLineType BreakLineType { get; set; } = BreakLineProperties.BreakLineTypePropertyDescriptive.DefaultValue;
-        /// <summary>Масштаб объекта</summary>
-        public AnnotationScale Scale { get; set; } = BreakLineProperties.ScalePropertyDescriptive.DefaultValue;
-        /// <summary>Масштаб типа линии для входящей полилинии</summary>
-        public double LineTypeScale { get; set; } = BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue;
-        /// <summary>Текущий масштаб</summary>
-        public double GetScale()
-        {
-            return Scale.DrawingUnits / Scale.PaperUnits;
-        }
-
+        
         #region Базовые примитивы СПДС объекта
         private Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
         public Polyline MainPolyline

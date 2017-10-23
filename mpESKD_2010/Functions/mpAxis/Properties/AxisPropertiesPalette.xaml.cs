@@ -78,8 +78,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             //    _parentPalette.ShowDescription(AxisProperties.OverhangPropertyDescriptive.Description);
             //if (fe.Name.Equals("TbBreakHeight"))
             //    _parentPalette.ShowDescription(AxisProperties.BreakHeightPropertyDescriptive.Description);
-            //if (fe.Name.Equals("TbBreakWidth"))
-            //    _parentPalette.ShowDescription(AxisProperties.BreakWidthPropertyDescriptive.Description);
+            if (fe.Name.Equals("TbFracture"))
+                _parentPalette.ShowDescription(AxisProperties.FracturePropertyDescriptive.Description);
             if (fe.Name.Equals("CbMarkersPosition"))
                 _parentPalette.ShowDescription(AxisProperties.MarkersPositionPropertyDescriptive.Description);
             if (fe.Name.Equals("CbScale"))

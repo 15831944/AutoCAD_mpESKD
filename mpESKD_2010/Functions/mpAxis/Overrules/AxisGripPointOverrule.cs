@@ -185,15 +185,15 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         }
                         if (gripPoint.GripName == AxisGripName.BottomMarkerGrip)
                         {
-                            var fracture = gripPoint.Axis.Fracture * gripPoint.Axis.GetScale();
                             var mainVector = gripPoint.Axis.EndPoint - gripPoint.Axis.InsertionPoint;
                             var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
-
                             gripPoint.Axis.BottomMarkerPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
                         }
                         if (gripPoint.GripName == AxisGripName.TopMarkerGrip)
                         {
-                            gripPoint.Axis.TopMarkerPoint = gripPoint.GripPoint + offset;
+                            var mainVector = gripPoint.Axis.InsertionPoint - gripPoint.Axis.EndPoint;
+                            var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
+                            gripPoint.Axis.TopMarkerPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
                         }
                         // Вот тут происходит перерисовка примитивов внутри блока
                         gripPoint.Axis.UpdateEntities();
