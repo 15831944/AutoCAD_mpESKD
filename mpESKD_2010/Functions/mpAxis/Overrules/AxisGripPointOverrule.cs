@@ -79,7 +79,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             GripPoint = axis.EndGrip
                         };
                         grips.Add(gp);
-                        if (axis.MarkersPosition == AxisMarkersPosition.Both || 
+                        if (axis.MarkersPosition == AxisMarkersPosition.Both ||
                             axis.MarkersPosition == AxisMarkersPosition.Bottom)
                         {
                             // other points
@@ -147,7 +147,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                                 {
                                     // Если точки совпали, то задаем минимальное значение
                                     tmpInsertionPoint = new Point3d(
-                                        gripPoint.Axis.EndPoint.X, 
+                                        gripPoint.Axis.EndPoint.X,
                                         gripPoint.Axis.EndPoint.Y - gripPoint.Axis.AxisMinLength * scale * gripPoint.Axis.BlockTransform.GetScale(),
                                         gripPoint.Axis.EndPoint.Z);
                                 }
@@ -185,7 +185,11 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         }
                         if (gripPoint.GripName == AxisGripName.BottomMarkerGrip)
                         {
-                            gripPoint.Axis.BottomMarkerPoint = gripPoint.GripPoint + offset;
+                            var fracture = gripPoint.Axis.Fracture * gripPoint.Axis.GetScale();
+                            var mainVector = gripPoint.Axis.EndPoint - gripPoint.Axis.InsertionPoint;
+                            var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
+
+                            gripPoint.Axis.BottomMarkerPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
                         }
                         if (gripPoint.GripName == AxisGripName.TopMarkerGrip)
                         {

@@ -66,6 +66,7 @@ namespace mpESKD.Functions.mpAxis
             {
                 var baseVector = new Vector3d(1.0, 0.0, 0.0);
                 var angleA = baseVector.GetAngleTo(EndPoint - InsertionPoint, Vector3d.ZAxis);
+                BottomLineLength = Fracture / Math.Cos(BottomLineAngle) * GetScale();
                 _bottomMarkerPoint = new Point3d(
                     EndPoint.X + BottomLineLength * Math.Cos(angleA + BottomLineAngle),
                     EndPoint.Y + BottomLineLength * Math.Sin(angleA + BottomLineAngle),
@@ -75,7 +76,7 @@ namespace mpESKD.Functions.mpAxis
             set
             {
                 _bottomMarkerPoint = value;
-                BottomLineLength = (value - EndPoint).Length;
+                //BottomLineLength = (value - EndPoint).Length;
                 BottomLineAngle = (EndPoint - InsertionPoint).GetAngleTo(value - EndPoint, Vector3d.ZAxis);
             }
         }
@@ -92,15 +93,15 @@ namespace mpESKD.Functions.mpAxis
                 var baseVector = new Vector3d(1.0, 0.0, 0.0);
                 var angleA = baseVector.GetAngleTo(InsertionPoint - EndPoint, Vector3d.ZAxis);
                 _topMarkerPoint = new Point3d(
-                    InsertionPoint.X + TopLineLength * Math.Cos(angleA + TopLineAngle),
-                    InsertionPoint.Y + TopLineLength * Math.Sin(angleA + TopLineAngle),
+                    InsertionPoint.X + TopLineLength * GetScale() * Math.Cos(angleA + TopLineAngle),
+                    InsertionPoint.Y + TopLineLength * GetScale() * Math.Sin(angleA + TopLineAngle),
                     InsertionPoint.Z);
                 return _topMarkerPoint;
             }
             set
             {
                 _topMarkerPoint = value;
-                TopLineLength = (value - InsertionPoint).Length;
+                TopLineLength = (value - InsertionPoint).Length / GetScale();
                 TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint, Vector3d.ZAxis);
             }
         }
@@ -153,6 +154,8 @@ namespace mpESKD.Functions.mpAxis
 
         /// <summary>Положение маркеров</summary>
         public AxisMarkersPosition MarkersPosition { get; set; } = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue;
+        /// <summary>Излом</summary>
+        public double Fracture { get; set; } = 10.0;
 
         #endregion
 
