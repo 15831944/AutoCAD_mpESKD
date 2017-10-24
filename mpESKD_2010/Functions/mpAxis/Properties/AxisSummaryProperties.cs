@@ -30,6 +30,26 @@ namespace mpESKD.Functions.mpAxis.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(Fracture)));
             }
         }
+        /// <summary>Маркер диаметров</summary>
+        public int? MarkersDiameter
+        {
+            get => GetIntProp(nameof(MarkersDiameter));
+            set
+            {
+                SetPropValue(nameof(MarkersDiameter), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(MarkersDiameter)));
+            }
+        }
+        /// <summary>Количество маркеров</summary>
+        public int? MarkersCount
+        {
+            get => GetIntProp(nameof(MarkersCount));
+            set
+            {
+                SetPropValue(nameof(MarkersCount), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(MarkersCount)));
+            }
+        }
         #region General
 
         public string Scale

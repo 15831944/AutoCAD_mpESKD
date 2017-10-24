@@ -39,8 +39,10 @@ namespace mpESKD.Functions.mpAxis.Styles
                 AxisProperties.FracturePropertyDescriptive.DefaultValue);
             MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition),
                 AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue);
-            MarkerDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkerDiameter),
-                AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue);
+            MarkersDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkersDiameter),
+                AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue);
+            MarkersCount = StyleHelpers.GetPropertyValue(style, nameof(MarkersCount),
+                AxisProperties.MarkersCountPropertyDescriptive.DefaultValue);
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale),
                 AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue);
             LayerName = StyleHelpers.GetPropertyValue(style, nameof(LayerName),
@@ -55,7 +57,8 @@ namespace mpESKD.Functions.mpAxis.Styles
             // Properties
             Fracture = AxisProperties.FracturePropertyDescriptive.DefaultValue;
             MarkersPosition = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue;
-            MarkerDiameter = AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue;
+            MarkersDiameter = AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue;
+            MarkersCount = AxisProperties.MarkersCountPropertyDescriptive.DefaultValue;
             LineTypeScale = AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue;
             LayerName = AxisProperties.LayerName.DefaultValue;
             Scale = AxisProperties.ScalePropertyDescriptive.DefaultValue;
@@ -64,7 +67,9 @@ namespace mpESKD.Functions.mpAxis.Styles
         // Позиция маркеров
         public AxisMarkersPosition MarkersPosition { get; set; }
         // Диаметр маркеров
-        public int MarkerDiameter { get; set; }
+        public int MarkersDiameter { get; set; }
+        // Количество маркеров
+        public int MarkersCount { get; set; }
         // Излом
         public int Fracture { get; set; }
         // Стандартные
@@ -190,17 +195,30 @@ namespace mpESKD.Functions.mpAxis.Styles
                                     DisplayName = AxisProperties.MarkersPositionPropertyDescriptive.DisplayName
                                 });
                                 break;
-                            case "MarkerDiameter":
+                            case "MarkersDiameter":
                                 style.Properties.Add(new MPCOIntProperty
                                 {
                                     Name = nameAttr.Value,
-                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue,
-                                    Description = AxisProperties.MarkerDiameterPropertyDescriptive.Description,
-                                    DefaultValue = AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue,
-                                    PropertyType = AxisProperties.MarkerDiameterPropertyDescriptive.PropertyType,
-                                    DisplayName = AxisProperties.MarkerDiameterPropertyDescriptive.DisplayName,
-                                    Minimum = AxisProperties.MarkerDiameterPropertyDescriptive.Minimum,
-                                    Maximum = AxisProperties.MarkerDiameterPropertyDescriptive.Maximum
+                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue,
+                                    Description = AxisProperties.MarkersDiameterPropertyDescriptive.Description,
+                                    DefaultValue = AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue,
+                                    PropertyType = AxisProperties.MarkersDiameterPropertyDescriptive.PropertyType,
+                                    DisplayName = AxisProperties.MarkersDiameterPropertyDescriptive.DisplayName,
+                                    Minimum = AxisProperties.MarkersDiameterPropertyDescriptive.Minimum,
+                                    Maximum = AxisProperties.MarkersDiameterPropertyDescriptive.Maximum
+                                });
+                                break;
+                            case "MarkersCount":
+                                style.Properties.Add(new MPCOIntProperty
+                                {
+                                    Name = nameAttr.Value,
+                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : AxisProperties.MarkersCountPropertyDescriptive.DefaultValue,
+                                    Description = AxisProperties.MarkersCountPropertyDescriptive.Description,
+                                    DefaultValue = AxisProperties.MarkersCountPropertyDescriptive.DefaultValue,
+                                    PropertyType = AxisProperties.MarkersCountPropertyDescriptive.PropertyType,
+                                    DisplayName = AxisProperties.MarkersCountPropertyDescriptive.DisplayName,
+                                    Minimum = AxisProperties.MarkersCountPropertyDescriptive.Minimum,
+                                    Maximum = AxisProperties.MarkersCountPropertyDescriptive.Maximum
                                 });
                                 break;
                             case "Fracture":
@@ -285,9 +303,14 @@ namespace mpESKD.Functions.mpAxis.Styles
                     propXel.SetAttributeValue("Value", style.MarkersPosition);
                     styleXel.Add(propXel);
                     propXel = new XElement("Property");
-                    propXel.SetAttributeValue("Name", nameof(style.MarkerDiameter));
-                    propXel.SetAttributeValue("PropertyType", style.MarkerDiameter.GetType().Name);
-                    propXel.SetAttributeValue("Value", style.MarkerDiameter);
+                    propXel.SetAttributeValue("Name", nameof(style.MarkersDiameter));
+                    propXel.SetAttributeValue("PropertyType", style.MarkersDiameter.GetType().Name);
+                    propXel.SetAttributeValue("Value", style.MarkersDiameter);
+                    styleXel.Add(propXel);
+                    propXel = new XElement("Property");
+                    propXel.SetAttributeValue("Name", nameof(style.MarkersCount));
+                    propXel.SetAttributeValue("PropertyType", style.MarkersCount.GetType().Name);
+                    propXel.SetAttributeValue("Value", style.MarkersCount);
                     styleXel.Add(propXel);
                     propXel = new XElement("Property");
                     propXel.SetAttributeValue("Name", nameof(style.Fracture));
@@ -335,8 +358,8 @@ namespace mpESKD.Functions.mpAxis.Styles
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
             };
-            //style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.OverhangPropertyDescriptive.DefaultValue, AxisProperties.OverhangPropertyDescriptive));
-            //style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.BreakWidthPropertyDescriptive.DefaultValue, AxisProperties.BreakWidthPropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue, AxisProperties.MarkersDiameterPropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.MarkersCountPropertyDescriptive.DefaultValue, AxisProperties.MarkersCountPropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.FracturePropertyDescriptive.DefaultValue, AxisProperties.FracturePropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue, AxisProperties.LineTypeScalePropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LayerName.DefaultValue, AxisProperties.LayerName));

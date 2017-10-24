@@ -38,8 +38,36 @@ namespace mpESKD.Functions.mpAxis.Properties
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
             }
         }
+        private int _markersCount;
+        /// <summary>Позиция маркеров</summary>
+        public int MarkersCount
+        {
+            get => _markersCount;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.MarkersCount = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
 
         private int _fracture;
+        /// <summary>Излом</summary>
         public int Fracture
         {
             get => _fracture;
@@ -52,6 +80,34 @@ namespace mpESKD.Functions.mpAxis.Properties
                         using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
                         {
                             axis.Fracture = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private int _markersDiameter;
+
+        public int MarkersDiameter
+        {
+            get => _markersDiameter;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.MarkersDiameter = value;
                             axis.UpdateEntities();
                             axis.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = axis.GetParametersForXData())
@@ -179,8 +235,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             var axis = AxisXDataHelper.GetAxisFromEntity(blkReference);
             if (axis != null)
             {
-                //_overgang = axis.Overhang;
-                //_breakHeight = axis.BreakHeight;
+                _markersCount = axis.MarkersCount;
+                _markersDiameter = axis.MarkersDiameter;
                 _fracture = axis.Fracture;
                 _markersPosition = AxisPropertiesHelpers.GetLocalAxisMarkersPositionName(axis.MarkersPosition);
                 _scale = axis.Scale.Name;

@@ -54,7 +54,7 @@ namespace mpESKD.Functions.mpAxis
 
         /// <summary>Вторая (конечная) точка примитива в мировой системе координат</summary>
         public Point3d EndPoint { get; set; } = Point3d.Origin;
-        
+
         public double BottomLineAngle { get; set; } = 0.0;
 
         private Point3d _bottomMarkerPoint;
@@ -78,7 +78,7 @@ namespace mpESKD.Functions.mpAxis
                 BottomLineAngle = (EndPoint - InsertionPoint).GetAngleTo(value - EndPoint, Vector3d.ZAxis);
             }
         }
-        
+
         public double TopLineAngle { get; set; } = 0.0;
 
         private Point3d _topMarkerPoint;
@@ -131,7 +131,7 @@ namespace mpESKD.Functions.mpAxis
         #endregion
 
         #region General Properties
-        
+
         /// <summary>Минимальная длина от точки вставки до конечной точки</summary>
         public double AxisMinLength => 1.0;
 
@@ -139,7 +139,10 @@ namespace mpESKD.Functions.mpAxis
 
         #region Axis Properties
         /// <summary>Диаметр маркеров</summary>
-        public double MarkerDiameter { get; set; } = AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue;
+        public int MarkersDiameter { get; set; } = AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue;
+
+        /// <summary>Количество маркеров</summary>
+        public int MarkersCount { get; set; } = AxisProperties.MarkersCountPropertyDescriptive.DefaultValue;
 
         /// <summary>Положение маркеров</summary>
         public AxisMarkersPosition MarkersPosition { get; set; } = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue;
@@ -159,7 +162,7 @@ namespace mpESKD.Functions.mpAxis
             // apply settings from style
             Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture), AxisProperties.FracturePropertyDescriptive.DefaultValue);
             MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition), AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue);
-            MarkerDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkerDiameter), AxisProperties.MarkerDiameterPropertyDescriptive.DefaultValue);
+            MarkersDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkersDiameter), AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue);
             if (new MainSettings().UseScaleFromStyle)
                 Scale = StyleHelpers.GetPropertyValue(style, nameof(Scale), AxisProperties.ScalePropertyDescriptive.DefaultValue);
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue);
@@ -168,7 +171,7 @@ namespace mpESKD.Functions.mpAxis
         #endregion
 
         #region Entities
-        private Lazy<Line> _mainLine = new Lazy<Line>(() => new Line());
+        private readonly Lazy<Line> _mainLine = new Lazy<Line>(() => new Line());
         /// <summary>Средняя (основная) линия оси</summary>
         public Line MainLine
         {
@@ -181,7 +184,7 @@ namespace mpESKD.Functions.mpAxis
                 return _mainLine.Value;
             }
         }
-        private Lazy<Line> _bottomMarkerLine = new Lazy<Line>(() => new Line());
+        private readonly Lazy<Line> _bottomMarkerLine = new Lazy<Line>(() => new Line());
         /// <summary>"Палочка" от конечной точки до кружка (маркера)</summary>
         public Line BottomMarkerLine
         {
@@ -194,7 +197,7 @@ namespace mpESKD.Functions.mpAxis
                 return _bottomMarkerLine.Value;
             }
         }
-        private Lazy<Line> _topMarkerLine = new Lazy<Line>(() => new Line());
+        private readonly Lazy<Line> _topMarkerLine = new Lazy<Line>(() => new Line());
         /// <summary>Палочка от точки вставки до кружка (маркера)</summary>
         public Line TopMarkerLine
         {
@@ -207,6 +210,90 @@ namespace mpESKD.Functions.mpAxis
                 return _topMarkerLine.Value;
             }
         }
+
+        #region Circles
+
+        
+        private readonly Lazy<Circle> _bottomFirstMarker = new Lazy<Circle>(() => new Circle());
+        public Circle BottomFirstCircle
+        {
+            get
+            {
+                _bottomFirstMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                _bottomFirstMarker.Value.LineWeight = LineWeight.ByBlock;
+                _bottomFirstMarker.Value.Linetype = "Continuous";
+                _bottomFirstMarker.Value.LinetypeScale = 1.0;
+                return _bottomFirstMarker.Value;
+            }
+        }
+
+        private readonly Lazy<Circle> _bottomSecondMarker = new Lazy<Circle>(() => new Circle());
+        public Circle BottomSecondCircle
+        {
+            get
+            {
+                _bottomSecondMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                _bottomSecondMarker.Value.LineWeight = LineWeight.ByBlock;
+                _bottomSecondMarker.Value.Linetype = "Continuous";
+                _bottomSecondMarker.Value.LinetypeScale = 1.0;
+                return _bottomSecondMarker.Value;
+            }
+        }
+
+        private readonly Lazy<Circle> _bottomThirdMarker = new Lazy<Circle>(() => new Circle());
+        public Circle BottomThirdCircle
+        {
+            get
+            {
+                _bottomThirdMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                _bottomThirdMarker.Value.LineWeight = LineWeight.ByBlock;
+                _bottomThirdMarker.Value.Linetype = "Continuous";
+                _bottomThirdMarker.Value.LinetypeScale = 1.0;
+                return _bottomThirdMarker.Value;
+            }
+        }
+
+        private readonly Lazy<Circle> _topFirstMarker = new Lazy<Circle>(() => new Circle());
+
+        public Circle TopFirstCircle
+        {
+            get
+            {
+                _topFirstMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                _topFirstMarker.Value.LineWeight = LineWeight.ByBlock;
+                _topFirstMarker.Value.Linetype = "Continuous";
+                _topFirstMarker.Value.LinetypeScale = 1.0;
+                return _topFirstMarker.Value;
+            }
+        }
+        private readonly Lazy<Circle> _topSecondMarker = new Lazy<Circle>(() => new Circle());
+
+        public Circle TopSecondCircle
+        {
+            get
+            {
+                _topSecondMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                _topSecondMarker.Value.LineWeight = LineWeight.ByBlock;
+                _topSecondMarker.Value.Linetype = "Continuous";
+                _topSecondMarker.Value.LinetypeScale = 1.0;
+                return _topSecondMarker.Value;
+            }
+        }
+        private readonly Lazy<Circle> _topThirdMarker = new Lazy<Circle>(() => new Circle());
+
+        public Circle TopThirdCircle
+        {
+            get
+            {
+                _topThirdMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                _topThirdMarker.Value.LineWeight = LineWeight.ByBlock;
+                _topThirdMarker.Value.Linetype = "Continuous";
+                _topThirdMarker.Value.LinetypeScale = 1.0;
+                return _topThirdMarker.Value;
+            }
+        }
+        #endregion
+
         public override IEnumerable<Entity> Entities
         {
             get
@@ -214,6 +301,12 @@ namespace mpESKD.Functions.mpAxis
                 yield return MainLine;
                 yield return BottomMarkerLine;
                 yield return TopMarkerLine;
+                yield return BottomFirstCircle;
+                yield return BottomSecondCircle;
+                yield return BottomThirdCircle;
+                yield return TopFirstCircle;
+                yield return TopSecondCircle;
+                yield return TopThirdCircle;
             }
         }
         /// <summary>Обновление (перерисовка) базовых примитивов</summary>
@@ -277,33 +370,79 @@ namespace mpESKD.Functions.mpAxis
         private void SetEntitiesPoints(Point3d insertionPoint, Point3d endPoint,
             Point3d bottomMarkerPoint, Point3d topMarkerPoint)
         {
-            if (_mainLine == null) _mainLine = new Lazy<Line>(() => new Line());
+            var scale = GetScale();
             // main line
             _mainLine.Value.StartPoint = insertionPoint;
             _mainLine.Value.EndPoint = endPoint;
+            var mainVector = endPoint - insertionPoint;
+            // Bottom
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Bottom)
             {
-                if(_bottomMarkerLine == null) _bottomMarkerLine = new Lazy<Line>(() => new Line());
                 // bottom line
                 _bottomMarkerLine.Value.StartPoint = endPoint;
                 _bottomMarkerLine.Value.EndPoint = bottomMarkerPoint;
+                // markers
+                var firstMarkerCenter = bottomMarkerPoint + mainVector.GetNormal() * MarkersDiameter / 2 * scale;
+                _bottomFirstMarker.Value.Center = firstMarkerCenter;
+                _bottomFirstMarker.Value.Diameter = MarkersDiameter * scale;
+                if (MarkersCount > 1)
+                {
+                    var secontMarkerCenter = firstMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
+                    _bottomSecondMarker.Value.Center = secontMarkerCenter;
+                    _bottomSecondMarker.Value.Diameter = MarkersDiameter * scale;
+
+                    if (MarkersCount > 2)
+                    {
+                        var thirdMarkerCenter = secontMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
+                        _bottomThirdMarker.Value.Center = thirdMarkerCenter;
+                        _bottomThirdMarker.Value.Diameter = MarkersDiameter * scale;
+                    }
+                    else _bottomThirdMarker.Value.Visible = false;
+                }
+                else _bottomSecondMarker.Value.Visible = false;
+                
             }
             else
             {
                 _bottomMarkerLine.Value.Visible = false;
+                _bottomFirstMarker.Value.Visible = false;
+                _bottomSecondMarker.Value.Visible = false;
+                _bottomThirdMarker.Value.Visible = false;
             }
+            // Top
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Top)
             {
-                if (_topMarkerLine == null) _topMarkerLine = new Lazy<Line>(() => new Line());
                 // top line
                 _topMarkerLine.Value.StartPoint = insertionPoint;
                 _topMarkerLine.Value.EndPoint = topMarkerPoint;
+                // markers
+                var firstMarkerCenter = topMarkerPoint - mainVector.GetNormal() * MarkersDiameter / 2 * scale;
+                _topFirstMarker.Value.Center = firstMarkerCenter;
+                _topFirstMarker.Value.Diameter = MarkersDiameter * scale;
+                if (MarkersCount > 1)
+                {
+                    var secontMarkerCenter = firstMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
+                    _topSecondMarker.Value.Center = secontMarkerCenter;
+                    _topSecondMarker.Value.Diameter = MarkersDiameter * scale;
+
+                    if (MarkersCount > 2)
+                    {
+                        var thirdMarkerCenter = secontMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
+                        _topThirdMarker.Value.Center = thirdMarkerCenter;
+                        _topThirdMarker.Value.Diameter = MarkersDiameter * scale;
+                    }
+                    else _topThirdMarker.Value.Visible = false;
+                }
+                else _topSecondMarker.Value.Visible = false;
             }
             else
             {
                 _topMarkerLine.Value.Visible = false;
+                _topFirstMarker.Value.Visible = false;
+                _topSecondMarker.Value.Visible = false;
+                _topThirdMarker.Value.Visible = false;
             }
         }
         #endregion
@@ -328,9 +467,9 @@ namespace mpESKD.Functions.mpAxis
                 // scale
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 2
                 // Целочисленные значения (код 1070)
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkerDiameter)); // 0
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersDiameter)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Fracture)); // 1
-                //resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakWidth)); // 2
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersCount)); // 2
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomLineAngle)); // 1
@@ -383,12 +522,12 @@ namespace mpESKD.Functions.mpAxis
                             }
                         case DxfCode.ExtendedDataInteger16:
                             {
-                                if (index1070 == 0) // 0 - MarkerDiameter
-                                    MarkerDiameter = (Int16)typedValue.Value;
+                                if (index1070 == 0) // 0 - MarkersDiameter
+                                    MarkersDiameter = (Int16)typedValue.Value;
                                 if (index1070 == 1) // 1- Fracture
                                     Fracture = (Int16)typedValue.Value;
-                                //if (index1070 == 2) // 2 - breakWidth
-                                //    BreakWidth = (Int16)typedValue.Value;
+                                if (index1070 == 2) // 2 - MarkersCount
+                                    MarkersCount = (Int16)typedValue.Value;
                                 //index
                                 index1070++;
                                 break;

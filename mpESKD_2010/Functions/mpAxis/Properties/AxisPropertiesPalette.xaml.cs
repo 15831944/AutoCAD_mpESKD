@@ -74,10 +74,10 @@ namespace mpESKD.Functions.mpAxis.Properties
         private void FrameworkElement_OnGotFocus(object sender, RoutedEventArgs e)
         {
             if (!(sender is FrameworkElement fe)) return;
-            //if (fe.Name.Equals("TbOverhang"))
-            //    _parentPalette.ShowDescription(AxisProperties.OverhangPropertyDescriptive.Description);
-            //if (fe.Name.Equals("TbBreakHeight"))
-            //    _parentPalette.ShowDescription(AxisProperties.BreakHeightPropertyDescriptive.Description);
+            if (fe.Name.Equals("TbMarkersCount"))
+                _parentPalette.ShowDescription(AxisProperties.MarkersCountPropertyDescriptive.Description);
+            if (fe.Name.Equals("TbMarkersDiameter"))
+                _parentPalette.ShowDescription(AxisProperties.MarkersDiameterPropertyDescriptive.Description);
             if (fe.Name.Equals("TbFracture"))
                 _parentPalette.ShowDescription(AxisProperties.FracturePropertyDescriptive.Description);
             if (fe.Name.Equals("CbMarkersPosition"))

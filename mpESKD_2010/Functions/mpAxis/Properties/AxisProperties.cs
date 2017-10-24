@@ -27,15 +27,26 @@ namespace mpESKD.Functions.mpAxis.Properties
             Description = "Высота излома оси"
         };
         /// <summary>Поле, описывающее свойство "Диаметр маркеров"</summary>
-        public static MPCOIntProperty MarkerDiameterPropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty MarkersDiameterPropertyDescriptive = new MPCOIntProperty
         {
             PropertyType = MPCOPropertyType.Int,
-            Name = "MarkerDiameter",
+            Name = "MarkersDiameter",
             DisplayName = "Диаметр маркеров:",
             DefaultValue = 10,
             Minimum = 6,
             Maximum = 12,
             Description = "Диаметр маркеров оси"
+        };
+        /// <summary>Поле, описывающее свойство "Количество маркеров"</summary>
+        public static MPCOIntProperty MarkersCountPropertyDescriptive = new MPCOIntProperty
+        {
+            PropertyType = MPCOPropertyType.Int,
+            Name = "MarkersCount",
+            DisplayName = "Количество маркеров:",
+            DefaultValue = 1,
+            Minimum = 1,
+            Maximum = 3,
+            Description = "Количество маркеров оси"
         };
         /// <summary>Поле, описывающее свойство "Масштаб"</summary>
         public static MPCOTypeProperty<AnnotationScale> ScalePropertyDescriptive = new MPCOTypeProperty<AnnotationScale>
