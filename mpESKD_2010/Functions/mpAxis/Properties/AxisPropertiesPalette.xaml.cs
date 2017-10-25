@@ -80,6 +80,10 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _parentPalette.ShowDescription(AxisProperties.MarkersDiameterPropertyDescriptive.Description);
             if (fe.Name.Equals("TbFracture"))
                 _parentPalette.ShowDescription(AxisProperties.FracturePropertyDescriptive.Description);
+            if (fe.Name.Equals("TbBottomFractureOffset"))
+                _parentPalette.ShowDescription(AxisProperties.BottomFractureOffsetPropertyDescriptive.Description);
+            if (fe.Name.Equals("TbTopFractureOffset"))
+                _parentPalette.ShowDescription(AxisProperties.TopFractureOffsetPropertyDescriptive.Description);
             if (fe.Name.Equals("CbMarkersPosition"))
                 _parentPalette.ShowDescription(AxisProperties.MarkersPositionPropertyDescriptive.Description);
             if (fe.Name.Equals("CbScale"))

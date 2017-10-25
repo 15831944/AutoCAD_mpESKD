@@ -30,6 +30,26 @@ namespace mpESKD.Functions.mpAxis.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(Fracture)));
             }
         }
+        /// <summary>Нижний отступ излома</summary>
+        public int? BottomFractureOffset
+        {
+            get => GetIntProp(nameof(BottomFractureOffset));
+            set
+            {
+                SetPropValue(nameof(BottomFractureOffset), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(BottomFractureOffset)));
+            }
+        }
+        /// <summary>Верхний отступ излома</summary>
+        public int? TopFractureOffset
+        {
+            get => GetIntProp(nameof(TopFractureOffset));
+            set
+            {
+                SetPropValue(nameof(TopFractureOffset), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(TopFractureOffset)));
+            }
+        }
         /// <summary>Маркер диаметров</summary>
         public int? MarkersDiameter
         {

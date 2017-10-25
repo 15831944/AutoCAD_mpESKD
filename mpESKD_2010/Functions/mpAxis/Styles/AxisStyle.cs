@@ -37,6 +37,10 @@ namespace mpESKD.Functions.mpAxis.Styles
             // Properties
             Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture),
                 AxisProperties.FracturePropertyDescriptive.DefaultValue);
+            BottomFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(BottomFractureOffset),
+                AxisProperties.BottomFractureOffsetPropertyDescriptive.DefaultValue);
+            TopFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(TopFractureOffset),
+                AxisProperties.TopFractureOffsetPropertyDescriptive.DefaultValue);
             MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition),
                 AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue);
             MarkersDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkersDiameter),
@@ -56,6 +60,8 @@ namespace mpESKD.Functions.mpAxis.Styles
         {
             // Properties
             Fracture = AxisProperties.FracturePropertyDescriptive.DefaultValue;
+            BottomFractureOffset = AxisProperties.BottomFractureOffsetPropertyDescriptive.DefaultValue;
+            TopFractureOffset = AxisProperties.TopFractureOffsetPropertyDescriptive.DefaultValue;
             MarkersPosition = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue;
             MarkersDiameter = AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue;
             MarkersCount = AxisProperties.MarkersCountPropertyDescriptive.DefaultValue;
@@ -72,6 +78,9 @@ namespace mpESKD.Functions.mpAxis.Styles
         public int MarkersCount { get; set; }
         // Излом
         public int Fracture { get; set; }
+        // Отступы излома
+        public int BottomFractureOffset { get; set; }
+        public int TopFractureOffset { get; set; }
         // Стандартные
         public double LineTypeScale { get; set; }
         public string LayerName { get; set; }
@@ -234,6 +243,32 @@ namespace mpESKD.Functions.mpAxis.Styles
                                     Maximum = AxisProperties.FracturePropertyDescriptive.Maximum
                                 });
                                 break;
+                            case "BottomFractureOffset":
+                                style.Properties.Add(new MPCOIntProperty
+                                {
+                                    Name = nameAttr.Value,
+                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : AxisProperties.BottomFractureOffsetPropertyDescriptive.DefaultValue,
+                                    Description = AxisProperties.BottomFractureOffsetPropertyDescriptive.Description,
+                                    DefaultValue = AxisProperties.BottomFractureOffsetPropertyDescriptive.DefaultValue,
+                                    PropertyType = AxisProperties.BottomFractureOffsetPropertyDescriptive.PropertyType,
+                                    DisplayName = AxisProperties.BottomFractureOffsetPropertyDescriptive.DisplayName,
+                                    Minimum = AxisProperties.BottomFractureOffsetPropertyDescriptive.Minimum,
+                                    Maximum = AxisProperties.BottomFractureOffsetPropertyDescriptive.Maximum
+                                });
+                                break;
+                            case "TopFractureOffset":
+                                style.Properties.Add(new MPCOIntProperty
+                                {
+                                    Name = nameAttr.Value,
+                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : AxisProperties.TopFractureOffsetPropertyDescriptive.DefaultValue,
+                                    Description = AxisProperties.TopFractureOffsetPropertyDescriptive.Description,
+                                    DefaultValue = AxisProperties.TopFractureOffsetPropertyDescriptive.DefaultValue,
+                                    PropertyType = AxisProperties.TopFractureOffsetPropertyDescriptive.PropertyType,
+                                    DisplayName = AxisProperties.TopFractureOffsetPropertyDescriptive.DisplayName,
+                                    Minimum = AxisProperties.TopFractureOffsetPropertyDescriptive.Minimum,
+                                    Maximum = AxisProperties.TopFractureOffsetPropertyDescriptive.Maximum
+                                });
+                                break;
                             case "LineTypeScale":
                                 style.Properties.Add(new MPCODoubleProperty
                                 {
@@ -313,6 +348,16 @@ namespace mpESKD.Functions.mpAxis.Styles
                     propXel.SetAttributeValue("Value", style.MarkersCount);
                     styleXel.Add(propXel);
                     propXel = new XElement("Property");
+                    propXel.SetAttributeValue("Name", nameof(style.BottomFractureOffset));
+                    propXel.SetAttributeValue("PropertyType", style.BottomFractureOffset.GetType().Name);
+                    propXel.SetAttributeValue("Value", style.BottomFractureOffset);
+                    styleXel.Add(propXel);
+                    propXel = new XElement("Property");
+                    propXel.SetAttributeValue("Name", nameof(style.TopFractureOffset));
+                    propXel.SetAttributeValue("PropertyType", style.TopFractureOffset.GetType().Name);
+                    propXel.SetAttributeValue("Value", style.TopFractureOffset);
+                    styleXel.Add(propXel);
+                    propXel = new XElement("Property");
                     propXel.SetAttributeValue("Name", nameof(style.Fracture));
                     propXel.SetAttributeValue("PropertyType", style.Fracture.GetType().Name);
                     propXel.SetAttributeValue("Value", style.Fracture);
@@ -359,6 +404,8 @@ namespace mpESKD.Functions.mpAxis.Styles
                 StyleType = MPCOStyleType.System
             };
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue, AxisProperties.MarkersDiameterPropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.BottomFractureOffsetPropertyDescriptive.DefaultValue, AxisProperties.BottomFractureOffsetPropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.TopFractureOffsetPropertyDescriptive.DefaultValue, AxisProperties.TopFractureOffsetPropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.MarkersCountPropertyDescriptive.DefaultValue, AxisProperties.MarkersCountPropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.FracturePropertyDescriptive.DefaultValue, AxisProperties.FracturePropertyDescriptive));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue, AxisProperties.LineTypeScalePropertyDescriptive));

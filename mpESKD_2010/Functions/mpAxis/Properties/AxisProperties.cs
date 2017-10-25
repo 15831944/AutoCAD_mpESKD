@@ -48,6 +48,30 @@ namespace mpESKD.Functions.mpAxis.Properties
             Maximum = 3,
             Description = "Количество маркеров оси"
         };
+        /// <summary>Поле, описывающее свойство "Нижний отступ излома"</summary>
+        public static MPCOIntProperty BottomFractureOffsetPropertyDescriptive = new MPCOIntProperty
+        {
+            PropertyType = MPCOPropertyType.Int,
+            Name = "BottomFractureOffset",
+            DisplayName = "Нижний отступ излома:",
+            DefaultValue = 0,
+            Minimum = 0,
+            Maximum = 30,
+            Description = "Нижний отступ излома"
+        };
+        /// <summary>Поле, описывающее свойство "Верхний отступ излома"</summary>
+        public static MPCOIntProperty TopFractureOffsetPropertyDescriptive = new MPCOIntProperty
+        {
+            PropertyType = MPCOPropertyType.Int,
+            Name = "TopFractureOffset",
+            DisplayName = "Верхний отступ излома:",
+            DefaultValue = 0,
+            Minimum = 0,
+            Maximum = 30,
+            Description = "Верхний отступ излома"
+        };
+
+        // General
         /// <summary>Поле, описывающее свойство "Масштаб"</summary>
         public static MPCOTypeProperty<AnnotationScale> ScalePropertyDescriptive = new MPCOTypeProperty<AnnotationScale>
         {

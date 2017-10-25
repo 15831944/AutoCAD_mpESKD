@@ -51,6 +51,7 @@
                                  Style="{StaticResource PropertyValueDoubleTextBox}"
                                  Minimum="0" Maximum="{x:Static sys:Double.MaxValue}"
                                  x:Name="TbLineTypeScale" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:DoubleTextBox>
+                <!--GridSplitter-->
                 <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" BorderThickness="1,0,1,0"
                           HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
             </Grid>
@@ -84,16 +85,29 @@
                 <ctrls:IntTextBox Grid.Row="2" Grid.Column="2" Value="{Binding Fracture}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbFracture" Minimum="1" Maximum="20" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
+                <!--BottomFractureOffset-->
+                <TextBox Grid.Row="3" Grid.Column="0" Text="Нижний отступ излома:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <ctrls:IntTextBox Grid.Row="3" Grid.Column="2" Value="{Binding BottomFractureOffset}" Style="{StaticResource PropertyValueIntTextBox}"
+                                  x:Name="TbBottomFractureOffset" Minimum="0" Maximum="30" GotFocus="FrameworkElement_OnGotFocus" 
+                                  LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
+                <!--TopFractureOffset-->
+                <TextBox Grid.Row="4" Grid.Column="0" Text="Верхний отступ излома:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <ctrls:IntTextBox Grid.Row="4" Grid.Column="2" Value="{Binding TopFractureOffset}" Style="{StaticResource PropertyValueIntTextBox}"
+                                  x:Name="TbTopFractureOffset" Minimum="0" Maximum="30" GotFocus="FrameworkElement_OnGotFocus" 
+                                  LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--MarkersDiameter-->
-                <TextBox Grid.Row="3" Grid.Column="0" Text="Диаметр маркеров:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
-                <ctrls:IntTextBox Grid.Row="3" Grid.Column="2" Value="{Binding MarkersDiameter}" Style="{StaticResource PropertyValueIntTextBox}"
+                <TextBox Grid.Row="5" Grid.Column="0" Text="Диаметр маркеров:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <ctrls:IntTextBox Grid.Row="5" Grid.Column="2" Value="{Binding MarkersDiameter}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbMarkerDiameter" Minimum="6" Maximum="12" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--MarkersCount-->
-                <TextBox Grid.Row="4" Grid.Column="0" Text="Количество маркеров:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
-                <ctrls:IntTextBox Grid.Row="4" Grid.Column="2" Value="{Binding MarkersCount}" Style="{StaticResource PropertyValueIntTextBox}"
+                <TextBox Grid.Row="6" Grid.Column="0" Text="Количество маркеров:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <ctrls:IntTextBox Grid.Row="6" Grid.Column="2" Value="{Binding MarkersCount}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbMarkersCount" Minimum="1" Maximum="3" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
+                <!--GridSplitter-->
+                <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="6" BorderThickness="1,0,1,0"
+                              HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
             </Grid>
             <!---->
             <Grid Grid.Row="2">

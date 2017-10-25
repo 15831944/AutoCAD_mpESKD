@@ -47,7 +47,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisFunction.MPCOEntName);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisFunction.MPCOEntName, true);
         }
     }
 }

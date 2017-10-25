@@ -94,6 +94,62 @@ namespace mpESKD.Functions.mpAxis.Properties
             }
         }
 
+        private int _bottomFractureOffset;
+        /// <summary>Нижний отступ излома</summary>
+        public int BottomFractureOffset
+        {
+            get => _bottomFractureOffset;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.BottomFractureOffset = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private int _topFractureOffset;
+        /// <summary>Верхний отступ излома</summary>
+        public int TopFractureOffset
+        {
+            get => _topFractureOffset;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.TopFractureOffset = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
         private int _markersDiameter;
 
         public int MarkersDiameter
@@ -238,6 +294,8 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _markersCount = axis.MarkersCount;
                 _markersDiameter = axis.MarkersDiameter;
                 _fracture = axis.Fracture;
+                _bottomFractureOffset = axis.BottomFractureOffset;
+                _topFractureOffset = axis.TopFractureOffset;
                 _markersPosition = AxisPropertiesHelpers.GetLocalAxisMarkersPositionName(axis.MarkersPosition);
                 _scale = axis.Scale.Name;
                 _layerName = blkReference.Layer;

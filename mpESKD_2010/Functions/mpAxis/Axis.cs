@@ -70,12 +70,12 @@ namespace mpESKD.Functions.mpAxis
                     EndPoint.X + bottomLineLength * Math.Cos(angleA + BottomLineAngle),
                     EndPoint.Y + bottomLineLength * Math.Sin(angleA + BottomLineAngle),
                     EndPoint.Z);
-                return _bottomMarkerPoint;
+                return _bottomMarkerPoint + (EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetScale();
             }
             set
             {
                 _bottomMarkerPoint = value;
-                BottomLineAngle = (EndPoint - InsertionPoint).GetAngleTo(value - EndPoint, Vector3d.ZAxis);
+                BottomLineAngle = (EndPoint - InsertionPoint).GetAngleTo(value - EndPoint - (EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetScale(), Vector3d.ZAxis);
             }
         }
 
@@ -91,15 +91,15 @@ namespace mpESKD.Functions.mpAxis
                 var angleA = baseVector.GetAngleTo(InsertionPoint - EndPoint, Vector3d.ZAxis);
                 var topLineLength = Fracture / Math.Cos(TopLineAngle) * GetScale();
                 _topMarkerPoint = new Point3d(
-                    InsertionPoint.X + topLineLength * GetScale() * Math.Cos(angleA + TopLineAngle),
-                    InsertionPoint.Y + topLineLength * GetScale() * Math.Sin(angleA + TopLineAngle),
+                    InsertionPoint.X + topLineLength * Math.Cos(angleA + TopLineAngle),
+                    InsertionPoint.Y + topLineLength * Math.Sin(angleA + TopLineAngle),
                     InsertionPoint.Z);
-                return _topMarkerPoint;
+                return _topMarkerPoint + (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetScale();
             }
             set
             {
                 _topMarkerPoint = value;
-                TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint, Vector3d.ZAxis);
+                TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint - (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetScale(), Vector3d.ZAxis);
             }
         }
         // Получение управляющих точек в системе координат блока для отрисовки содержимого
@@ -148,6 +148,10 @@ namespace mpESKD.Functions.mpAxis
         public AxisMarkersPosition MarkersPosition { get; set; } = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue;
         /// <summary>Излом</summary>
         public int Fracture { get; set; } = 10;
+        /// <summary>Нижний отступ излома</summary>
+        public int BottomFractureOffset { get; set; } = 0;
+        /// <summary>Верхний отступ излома</summary>
+        public int TopFractureOffset { get; set; } = 0;
 
         #endregion
 
@@ -184,6 +188,10 @@ namespace mpESKD.Functions.mpAxis
                 return _mainLine.Value;
             }
         }
+
+        #region Fractures
+
+
         private readonly Lazy<Line> _bottomMarkerLine = new Lazy<Line>(() => new Line());
         /// <summary>"Палочка" от конечной точки до кружка (маркера)</summary>
         public Line BottomMarkerLine
@@ -195,6 +203,32 @@ namespace mpESKD.Functions.mpAxis
                 _bottomMarkerLine.Value.Linetype = "Continuous";
                 _bottomMarkerLine.Value.LinetypeScale = 1.0;
                 return _bottomMarkerLine.Value;
+            }
+        }
+        private readonly Lazy<Line> _bottomFractureOffsetLine = new Lazy<Line>(() => new Line());
+        /// <summary>Палочка отступа нижнего излома</summary>
+        public Line BottomFractureOffsetLine
+        {
+            get
+            {
+                _bottomFractureOffsetLine.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                _bottomFractureOffsetLine.Value.LineWeight = LineWeight.ByBlock;
+                _bottomFractureOffsetLine.Value.Linetype = "Continuous";
+                _bottomFractureOffsetLine.Value.LinetypeScale = 1.0;
+                return _bottomFractureOffsetLine.Value;
+            }
+        }
+        private readonly Lazy<Line> _topFractureOffsetLine = new Lazy<Line>(() => new Line());
+        /// <summary>Палочка отступа верхнего излома</summary>
+        public Line TopFractureOffsetLine
+        {
+            get
+            {
+                _topFractureOffsetLine.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                _topFractureOffsetLine.Value.LineWeight = LineWeight.ByBlock;
+                _topFractureOffsetLine.Value.Linetype = "Continuous";
+                _topFractureOffsetLine.Value.LinetypeScale = 1.0;
+                return _topFractureOffsetLine.Value;
             }
         }
         private readonly Lazy<Line> _topMarkerLine = new Lazy<Line>(() => new Line());
@@ -211,9 +245,10 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
+        #endregion
+
         #region Circles
 
-        
         private readonly Lazy<Circle> _bottomFirstMarker = new Lazy<Circle>(() => new Circle());
         public Circle BottomFirstCircle
         {
@@ -307,6 +342,8 @@ namespace mpESKD.Functions.mpAxis
                 yield return TopFirstCircle;
                 yield return TopSecondCircle;
                 yield return TopThirdCircle;
+                yield return BottomFractureOffsetLine;
+                yield return TopFractureOffsetLine;
             }
         }
         /// <summary>Обновление (перерисовка) базовых примитивов</summary>
@@ -379,11 +416,20 @@ namespace mpESKD.Functions.mpAxis
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Bottom)
             {
-                // bottom line
-                _bottomMarkerLine.Value.StartPoint = endPoint;
-                _bottomMarkerLine.Value.EndPoint = bottomMarkerPoint;
-                // markers
                 var firstMarkerCenter = bottomMarkerPoint + mainVector.GetNormal() * MarkersDiameter / 2 * scale;
+                // bottom line
+                var bottomLineStartPoint = endPoint + mainVector.GetNormal() * BottomFractureOffset * scale;
+                if (BottomFractureOffset > 0)
+                {
+                    _bottomFractureOffsetLine.Value.StartPoint = endPoint;
+                    _bottomFractureOffsetLine.Value.EndPoint = bottomLineStartPoint;
+                }
+                else _bottomFractureOffsetLine.Value.Visible = false;
+
+                var markerLineVector = firstMarkerCenter - bottomLineStartPoint;
+                _bottomMarkerLine.Value.StartPoint = bottomLineStartPoint;
+                _bottomMarkerLine.Value.EndPoint = bottomLineStartPoint + markerLineVector.GetNormal() * (markerLineVector.Length - MarkersDiameter * scale / 2.0);
+                // markers
                 _bottomFirstMarker.Value.Center = firstMarkerCenter;
                 _bottomFirstMarker.Value.Diameter = MarkersDiameter * scale;
                 if (MarkersCount > 1)
@@ -400,8 +446,12 @@ namespace mpESKD.Functions.mpAxis
                     }
                     else _bottomThirdMarker.Value.Visible = false;
                 }
-                else _bottomSecondMarker.Value.Visible = false;
-                
+                else
+                {
+                    _bottomSecondMarker.Value.Visible = false;
+                    _bottomThirdMarker.Value.Visible = false;
+                }
+
             }
             else
             {
@@ -409,16 +459,27 @@ namespace mpESKD.Functions.mpAxis
                 _bottomFirstMarker.Value.Visible = false;
                 _bottomSecondMarker.Value.Visible = false;
                 _bottomThirdMarker.Value.Visible = false;
+                _bottomFractureOffsetLine.Value.Visible = false;
             }
             // Top
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Top)
             {
-                // top line
-                _topMarkerLine.Value.StartPoint = insertionPoint;
-                _topMarkerLine.Value.EndPoint = topMarkerPoint;
-                // markers
                 var firstMarkerCenter = topMarkerPoint - mainVector.GetNormal() * MarkersDiameter / 2 * scale;
+                // top line
+                var topLineStartPoint = insertionPoint - mainVector.GetNormal() * TopFractureOffset * scale;
+                if (TopFractureOffset > 0)
+                {
+                    _topFractureOffsetLine.Value.StartPoint = insertionPoint;
+                    _topFractureOffsetLine.Value.EndPoint = topLineStartPoint;
+                }
+                else _topFractureOffsetLine.Value.Visible = false;
+
+                var markerLineVector = firstMarkerCenter - topLineStartPoint;
+                _topMarkerLine.Value.StartPoint = topLineStartPoint;
+                _topMarkerLine.Value.EndPoint = topLineStartPoint + markerLineVector.GetNormal() * (markerLineVector.Length - MarkersDiameter * scale / 2.0);
+                // markers
+
                 _topFirstMarker.Value.Center = firstMarkerCenter;
                 _topFirstMarker.Value.Diameter = MarkersDiameter * scale;
                 if (MarkersCount > 1)
@@ -435,7 +496,11 @@ namespace mpESKD.Functions.mpAxis
                     }
                     else _topThirdMarker.Value.Visible = false;
                 }
-                else _topSecondMarker.Value.Visible = false;
+                else
+                {
+                    _topThirdMarker.Value.Visible = false;
+                    _topSecondMarker.Value.Visible = false;
+                }
             }
             else
             {
@@ -443,6 +508,7 @@ namespace mpESKD.Functions.mpAxis
                 _topFirstMarker.Value.Visible = false;
                 _topSecondMarker.Value.Visible = false;
                 _topThirdMarker.Value.Visible = false;
+                _topFractureOffsetLine.Value.Visible = false;
             }
         }
         #endregion
@@ -470,6 +536,8 @@ namespace mpESKD.Functions.mpAxis
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersDiameter)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Fracture)); // 1
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersCount)); // 2
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BottomFractureOffset)); // 3
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, TopFractureOffset)); // 4
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomLineAngle)); // 1
@@ -528,6 +596,10 @@ namespace mpESKD.Functions.mpAxis
                                     Fracture = (Int16)typedValue.Value;
                                 if (index1070 == 2) // 2 - MarkersCount
                                     MarkersCount = (Int16)typedValue.Value;
+                                if (index1070 == 3) // 2 - BottomFractureOffset
+                                    BottomFractureOffset = (Int16)typedValue.Value;
+                                if (index1070 == 4) // 2 - TopFractureOffset
+                                    TopFractureOffset = (Int16)typedValue.Value;
                                 //index
                                 index1070++;
                                 break;
