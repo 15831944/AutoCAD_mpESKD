@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -54,9 +56,7 @@ namespace mpESKD.Base.Styles
                 ExceptionBox.Show(exception);
             }
         }
-        /// <summary>
-        /// Получение списка стилей. Системных и пользовательских
-        /// </summary>
+        /// <summary>Получение списка стилей. Системных и пользовательских</summary>
         private void GetSyles()
         {
             // т.к. подфункции у меня явные, то для каждой подфункции добавляем стили
@@ -176,9 +176,32 @@ namespace mpESKD.Base.Styles
             }
             style.IsCurrent = true;
         }
+        private void StyleEditor_OnClosing(object sender, CancelEventArgs e)
+        {
+            foreach (StyleToBind styleToBind in _styles)
+            {
+                var styleNames = new List<string>();
+                foreach (var style in styleToBind.Styles)
+                {
+                    if(!styleNames.Contains(style.Name))
+                        styleNames.Add(style.Name);
+                    else
+                    {
+                        ModPlusAPI.Windows.MessageBox.Show("Группа стилей \"" + styleToBind.FunctionLocalName +
+                                                           "\" содержит стили с одинаковым именем \"" + style.Name +
+                                                           "\"!" + Environment.NewLine +
+                                                           "Переименуйте стили так, чтобы не было одинаковых названий", MessageBoxIcon.Alert);
+                        e.Cancel = true;
+                        return;
+                    }
+                }
+            }
+        }
         // При закрытии сохраняю все стили в файлы
         private void StyleEditor_OnClosed(object sender, EventArgs e)
         {
+            // reload static settings
+            MainStaticSettings.ReloadSettings();
             // save styles
             // break line style
             BreakLineStylesManager.SaveStylesToXml(
@@ -223,6 +246,8 @@ namespace mpESKD.Base.Styles
             VerticalGridSplitter.Visibility = Visibility.Visible;
             HorizontalGridSplitter.Visibility = Visibility.Visible;
         }
+
+        
     }
     
     /// <summary>

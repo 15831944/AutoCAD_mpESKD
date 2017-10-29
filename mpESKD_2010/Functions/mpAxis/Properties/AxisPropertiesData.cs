@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Helpers;
+using mpESKD.Functions.mpAxis.Styles;
 
 // ReSharper disable InconsistentNaming
 #pragma warning disable CS0618
@@ -10,6 +12,39 @@ namespace mpESKD.Functions.mpAxis.Properties
     public class AxisPropertiesData
     {
         private ObjectId _blkRefObjectId;
+
+        private string _style;
+
+        public string Style
+        {
+            get => _style;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var breakLine = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            var style = AxisStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value));
+                            if (style != null)
+                            {
+                                breakLine.StyleGuid = style.Guid;
+                                breakLine.ApplyStyle(style);
+                                breakLine.UpdateEntities();
+                                breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
+                                using (var resBuf = breakLine.GetParametersForXData())
+                                {
+                                    if (blkRef != null) blkRef.XData = resBuf;
+                                }
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
 
         private string _markersPosition;
         /// <summary>Позиция маркеров</summary>
@@ -177,6 +212,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
             }
         }
+
         #region General
 
 
@@ -193,7 +229,18 @@ namespace mpESKD.Functions.mpAxis.Properties
                     {
                         using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
                         {
+                            var oldScale = axis.GetScale();
+                            AcadHelpers.WriteMessageInDebug("old scale: " + oldScale);
                             axis.Scale = AcadHelpers.GetAnnotationScaleByName(value);
+                            if (MainStaticSettings.Settings.AxisLineTypeScaleProportionScale)
+                            {
+                                var newScale = axis.GetScale();
+                                AcadHelpers.WriteMessageInDebug("new scale: " + newScale);
+                                if (newScale > oldScale)
+                                    axis.LineTypeScale = axis.LineTypeScale * newScale;
+                                if(newScale < oldScale)
+                                    axis.LineTypeScale = axis.LineTypeScale * newScale/ oldScale;
+                            }
                             axis.UpdateEntities();
                             axis.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = axis.GetParametersForXData())
@@ -235,6 +282,23 @@ namespace mpESKD.Functions.mpAxis.Properties
             }
         }
 
+        private string _lineType;
+        /// <summary>Слой</summary>
+        public string LineType
+        {
+            get => _lineType;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        if (blkRef != null) blkRef.Linetype = value;
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
         private string _layerName;
         /// <summary>Слой</summary>
         public string LayerName
@@ -291,6 +355,7 @@ namespace mpESKD.Functions.mpAxis.Properties
             var axis = AxisXDataHelper.GetAxisFromEntity(blkReference);
             if (axis != null)
             {
+                _style = AxisStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(axis.StyleGuid))?.Name;
                 _markersCount = axis.MarkersCount;
                 _markersDiameter = axis.MarkersDiameter;
                 _fracture = axis.Fracture;
@@ -299,6 +364,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _markersPosition = AxisPropertiesHelpers.GetLocalAxisMarkersPositionName(axis.MarkersPosition);
                 _scale = axis.Scale.Name;
                 _layerName = blkReference.Layer;
+                _lineType = blkReference.Linetype;
                 _lineTypeScale = axis.LineTypeScale;
                 AnyPropertyChangedReise();
             }

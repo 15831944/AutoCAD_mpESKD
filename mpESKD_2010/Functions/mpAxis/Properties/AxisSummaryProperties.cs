@@ -70,39 +70,27 @@ namespace mpESKD.Functions.mpAxis.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(MarkersCount)));
             }
         }
-        #region General
-
-        public string Scale
+        /// <summary>Тип линии</summary>
+        public string LineType
+        {
+            get => GetStrProp(nameof(LineType));
+            set
+            {
+                SetPropValue(nameof(LineType), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(LineType)));
+            }
+        }
+        public new string Scale
         {
             get => GetStrProp(nameof(Scale));
             set
             {
                 SetPropValue(nameof(Scale), value);
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(Scale)));
+                if (MainStaticSettings.Settings.AxisLineTypeScaleProportionScale)
+                    OnPropertyChanged(new PropertyChangedEventArgs(nameof(LineTypeScale)));
             }
         }
-
-        public string LayerName
-        {
-            get => GetStrProp(nameof(LayerName));
-            set
-            {
-                SetPropValue(nameof(LayerName), value);
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(LayerName)));
-            }
-        }
-
-        public double? LineTypeScale
-        {
-            get => GetDoubleProp(nameof(LineTypeScale));
-            set
-            {
-                SetPropValue(nameof(LineTypeScale), value);
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(LineTypeScale)));
-            }
-        }
-
-        #endregion
 
         public AxisSummaryProperties(IEnumerable<ObjectId> objectIds)
         {

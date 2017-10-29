@@ -135,6 +135,7 @@ namespace mpESKD.Functions.mpAxis
         /// <summary>Минимальная длина от точки вставки до конечной точки</summary>
         public double AxisMinLength => 1.0;
 
+
         #endregion
 
         #region Axis Properties
@@ -167,9 +168,13 @@ namespace mpESKD.Functions.mpAxis
             Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture), AxisProperties.FracturePropertyDescriptive.DefaultValue);
             MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition), AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue);
             MarkersDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkersDiameter), AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue);
-            if (new MainSettings().UseScaleFromStyle)
+            if (MainStaticSettings.Settings.UseScaleFromStyle)
                 Scale = StyleHelpers.GetPropertyValue(style, nameof(Scale), AxisProperties.ScalePropertyDescriptive.DefaultValue);
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue);
+            // set layer
+            var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name,
+                AxisProperties.LayerName.DefaultValue);
+            AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
         }
 
         #endregion

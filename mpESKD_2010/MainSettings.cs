@@ -11,13 +11,13 @@ namespace mpESKD
         public bool UseScaleFromStyle
         {
             get => bool.TryParse(
-                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "UseScaleFromStyle"),
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseScaleFromStyle)),
                        out _useScaleFromStyle) && _useScaleFromStyle; // false
             set
             {
                 _useScaleFromStyle = value;
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "UseScaleFromStyle", value.ToString(), true);
-                OnPropertyChanged(nameof(UseScaleFromStyle));
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseScaleFromStyle), value.ToString(), true);
+                OnPropertyChanged();
             }
         }
 
@@ -26,13 +26,13 @@ namespace mpESKD
         public bool UseLayerFromStyle
         {
             get => bool.TryParse(
-                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "UseLayerFromStyle"),
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseLayerFromStyle)),
                        out _useLayerFromStyle) && _useLayerFromStyle; // false
             set
             {
                 _useLayerFromStyle = value;
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "UseLayerFromStyle", value.ToString(), true);
-                OnPropertyChanged(nameof(UseLayerFromStyle));
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseLayerFromStyle), value.ToString(), true);
+                OnPropertyChanged();
             }
         }
 
@@ -41,15 +41,31 @@ namespace mpESKD
         public int IfNoLayer
         {
             get => int.TryParse(
-                UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "IfNoLayer"),
+                UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(IfNoLayer)),
                 out _ifNoLayer)
                 ? _ifNoLayer
                 : 0;
             set
             {
                 _ifNoLayer = value;
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "IfNoLayer", value.ToString(), true);
-                OnPropertyChanged(nameof(IfNoLayer));
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(IfNoLayer), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _axisLineTypeScaleProportionScale;
+        /// <summary>Менять масштаб типа линии прямой оси пропорционально масштабу примитива</summary>
+        public bool AxisLineTypeScaleProportionScale
+        {
+            get => !bool.TryParse(
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD",
+                           nameof(AxisLineTypeScaleProportionScale)),
+                       out _axisLineTypeScaleProportionScale) || _axisLineTypeScaleProportionScale; // true
+            set
+            {
+                _axisLineTypeScaleProportionScale = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(AxisLineTypeScaleProportionScale), value.ToString(), true);
+                OnPropertyChanged();
             }
         }
 
@@ -57,6 +73,21 @@ namespace mpESKD
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public static class MainStaticSettings
+    {
+        public static MainSettings Settings;
+        static MainStaticSettings()
+        {
+            if (Settings == null)
+                ReloadSettings();
+        }
+
+        public static void ReloadSettings()
+        {
+            Settings = new MainSettings();
         }
     }
 }

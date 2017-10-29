@@ -12,6 +12,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class BreakLineSummaryProperties: BaseSummaryProperties<BreakLinePropertiesData>
     {
+        
         public int? Overhang
         {
             get => GetIntProp(nameof(Overhang));
@@ -48,41 +49,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(BreakLineType)));
             }
         }
-
-        #region General
         
-        public string Scale
-        {
-            get => GetStrProp(nameof(Scale));
-            set
-            {
-                SetPropValue(nameof(Scale), value);
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Scale)));
-            }
-        }
-
-        public string LayerName
-        {
-            get => GetStrProp(nameof(LayerName));
-            set
-            {
-                SetPropValue(nameof(LayerName), value);
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(LayerName)));
-            }
-        }
-
-        public double? LineTypeScale
-        {
-            get => GetDoubleProp(nameof(LineTypeScale));
-            set
-            {
-                SetPropValue(nameof(LineTypeScale), value);
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(LineTypeScale)));
-            }
-        }
-
-        #endregion
-
         public BreakLineSummaryProperties(IEnumerable<ObjectId> objectIds)
         {
             foreach (ObjectId objectId in objectIds)

@@ -13,6 +13,7 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using mpESKD.Base.Properties;
 using mpESKD.Base.Styles;
+using ModPlusAPI.Windows;
 
 namespace mpESKD.Base.Helpers
 {
@@ -178,8 +179,9 @@ namespace mpESKD.Base.Helpers
         /// <param name="layerXmlData">Данные слоя</param>
         public static void SetLayerByName(ObjectId blkRefObjectId, string layerName, XElement layerXmlData)
         {
-            var mainSettings = new MainSettings();
-            if (mainSettings.UseLayerFromStyle)
+            //var mainSettings = new MainSettings();
+            if(blkRefObjectId == ObjectId.Null) return;
+            if (MainStaticSettings.Settings.UseLayerFromStyle)
             {
                 if (!layerName.Equals("По умолчанию"))
                 {
@@ -197,9 +199,9 @@ namespace mpESKD.Base.Helpers
                     }
                     else
                     {
-                        if (mainSettings.IfNoLayer == 1)
+                        if (MainStaticSettings.Settings.IfNoLayer == 1)
                         {
-                            if(LayerHelper.AddLayerFromXelement(layerXmlData))
+                            if (LayerHelper.AddLayerFromXelement(layerXmlData))
                                 using (Document.LockDocument())
                                 {
                                     using (Transaction tr = Database.TransactionManager.StartTransaction())
@@ -212,6 +214,17 @@ namespace mpESKD.Base.Helpers
                         }
                     }
                 }
+                else
+                {
+                    if (Database.Clayer != ObjectId.Null && blkRefObjectId != ObjectId.Null)
+                        using (Transaction tr = Database.TransactionManager.StartTransaction())
+                        {
+                            var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                            var layer = tr.GetObject(Database.Clayer, OpenMode.ForRead) as LayerTableRecord;
+                            if (blockReference != null) blockReference.Layer = layer?.Name;
+                            tr.Commit();
+                        }
+                }
             }
         }
 
@@ -220,6 +233,136 @@ namespace mpESKD.Base.Helpers
 #if DEBUG
             Editor.WriteMessage("\n" + message);
 #endif
+        }
+        /// <summary>Получить имя типа линии по ObjectId</summary>
+        /// <param name="ltid">ObjectId</param>
+        /// <returns></returns>
+        public static string GetLineTypeName(ObjectId ltid)
+        {
+
+            var lt = "Continuous";
+            if (ltid == ObjectId.Null) return lt;
+
+            using (Document.LockDocument())
+            {
+                using (var tr = Database.TransactionManager.StartTransaction())
+                {
+                    var linetype = tr.GetObject(ltid, OpenMode.ForRead) as LinetypeTableRecord;
+                    lt = linetype?.Name;
+                    tr.Commit();
+                }
+            }
+            return lt;
+        }
+        /// <summary>Получить ObjectId типа линии по имени в текущем документе</summary>
+        /// <param name="ltname">Имя типа линии</param>
+        /// <returns></returns>
+        public static ObjectId GetLineTypeObjectId(string ltname)
+        {
+            var ltid = ObjectId.Null;
+            if (string.IsNullOrEmpty(ltname)) return ObjectId.Null;
+
+            using (Document.LockDocument())
+            {
+                using (var tr = Database.TransactionManager.StartTransaction())
+                {
+                    var lttbl = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+                    if (lttbl != null)
+                        if (lttbl.Has(ltname))
+                        {
+                            ltid = lttbl[ltname];
+                        }
+                        else
+                        {
+                            const string filename = "acad.lin";
+                            try
+                            {
+                                var path = HostApplicationServices.Current.FindFile(
+                                    filename, Database, FindFileHint.Default);
+                                Database.LoadLineTypeFile(ltname, path);
+                                ltid = lttbl[ltname];
+                            }
+                            catch (Exception exception)
+                            {
+                                if (exception.ErrorStatus == ErrorStatus.FilerError)
+                                    MessageBox.Show("Не удалось найти файл: " + filename, MessageBoxIcon.Close);
+                                else if (exception.ErrorStatus == ErrorStatus.DuplicateRecordName)
+                                {
+                                    // ignore
+                                }
+                                else MessageBox.Show("Не удалось загрузить тип линий: " + ltname, MessageBoxIcon.Close);
+                            }
+                        }
+                    tr.Commit();
+                }
+            }
+            return ltid;
+        }
+        /// <summary>Установка типа линии для блока согласно стиля</summary>
+        public static void SetLineType(ObjectId blkRefObjectId, string lineTypeName)
+        {
+            using (Document.LockDocument())
+            {
+                using (var tr = Document.TransactionManager.StartTransaction())
+                {
+                    var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                    if (blockReference != null)
+                    {
+                        if (HasLineType(lineTypeName, tr))
+                            blockReference.Linetype = lineTypeName;
+                        else
+                        {
+                            if(LoadLineType(lineTypeName))
+                                blockReference.Linetype = lineTypeName;
+                        }
+                    }
+                    tr.Commit();
+                }
+            }
+        }
+        /// <summary>Проверка наличия типа линии в документе</summary>
+        private static bool HasLineType(string lineTypeName, Transaction tr)
+        {
+            var lttbl = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+            if (lttbl != null)
+                return (lttbl.Has(lineTypeName));
+            return false;
+        }
+        /// <summary>Загрузка типа линии в файл</summary>
+        /// <param name="lineTypeName">Имя типа линии</param>
+        /// <param name="fileNames">Файлы, в которых искать тип линии. Если не указаны, то из стандартного</param>
+        public static bool LoadLineType(string lineTypeName, List<string> fileNames = null)
+        {
+            var loaded = false;
+            if (fileNames != null)
+            {
+                foreach (var fileName in fileNames)
+                {
+                    try
+                    {
+                        Database.LoadLineTypeFile(lineTypeName, fileName);
+                        loaded = true;
+                        break;
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+                }
+            }
+            if (!loaded)
+            {
+                try
+                {
+                    Database.LoadLineTypeFile(lineTypeName, "acad.lin");
+                    loaded = true;
+                }
+                catch
+                {
+                    // ignore
+                }
+            }
+            return loaded;
         }
     }
     /// <summary>Вспомогательные методы работы с расширенными данными
@@ -261,10 +404,6 @@ namespace mpESKD.Base.Helpers
         {
             DBObject dbObject = rxObject as DBObject;
             if (dbObject == null) return false;
-            if (dbObject.IsAProxy || 
-                dbObject.IsErased ||
-                dbObject.IsEraseStatusToggled ||
-                dbObject.IsUndoing) return false;
             // Если проверка для палитры, то проверяем по наличию расширенных данных
             // Для Overrule это не нужно
             return !forPalette || IsMPCOentity(dbObject, appName);

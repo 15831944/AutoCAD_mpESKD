@@ -2,6 +2,7 @@
 using System.Xml.Linq;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
 using ModPlusAPI.Windows;
 
 namespace mpESKD.Base.Helpers
@@ -88,7 +89,7 @@ namespace mpESKD.Base.Helpers
                 layerTableRecordXml.SetAttributeValue("IsOff", layerTableRecord.IsOff); //bool
                 layerTableRecordXml.SetAttributeValue("IsPlottable", layerTableRecord.IsPlottable); //bool
                 layerTableRecordXml.SetAttributeValue("Color", layerTableRecord.Color.ColorIndex); //color
-                layerTableRecordXml.SetAttributeValue("Linetype", GetLineTypeName(layerTableRecord.LinetypeObjectId)); //ObjectId
+                layerTableRecordXml.SetAttributeValue("Linetype", AcadHelpers.GetLineTypeName(layerTableRecord.LinetypeObjectId)); //ObjectId
                 layerTableRecordXml.SetAttributeValue("LineWeight", layerTableRecord.LineWeight); //LineWeight
                 layerTableRecordXml.SetAttributeValue("ViewportVisibilityDefault", layerTableRecord.ViewportVisibilityDefault); //bool
 
@@ -117,7 +118,7 @@ namespace mpESKD.Base.Helpers
                 layerTblR.Color = Color.FromColorIndex(ColorMethod.ByAci,
                     short.TryParse(layerXElement.Attribute("Color")?.Value, out short sh) ? sh : short.Parse("7"));
                 // linetype
-                layerTblR.LinetypeObjectId = GetLineTypeObjectId(layerXElement.Attribute("Linetype")?.Value);
+                layerTblR.LinetypeObjectId = AcadHelpers.GetLineTypeObjectId(layerXElement.Attribute("Linetype")?.Value);
                 //LineWeight
                 layerTblR.LineWeight =
                     Enum.TryParse(layerXElement.Attribute("LineWeight")?.Value, out LineWeight lw)
@@ -127,57 +128,6 @@ namespace mpESKD.Base.Helpers
                 return layerTblR;
             }
             return null;
-        }
-        private static string GetLineTypeName(ObjectId ltid)
-        {
-
-            var lt = "Continuous";
-            if (ltid == ObjectId.Null) return lt;
-
-            using (AcadHelpers.Document.LockDocument())
-            {
-                using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
-                {
-                    var linetype = tr.GetObject(ltid, OpenMode.ForRead) as LinetypeTableRecord;
-                    lt = linetype?.Name;
-                    tr.Commit();
-                }
-            }
-            return lt;
-        }
-        private static ObjectId GetLineTypeObjectId(string ltname)
-        {
-            var ltid = ObjectId.Null;
-            if (string.IsNullOrEmpty(ltname)) return ObjectId.Null;
-
-            using (AcadHelpers.Document.LockDocument())
-            {
-                using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
-                {
-                    var lttbl = tr.GetObject(AcadHelpers.Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
-                    if (lttbl != null)
-                        if (lttbl.Has(ltname))
-                        {
-                            ltid = lttbl[ltname];
-                        }
-                        else
-                        {
-                            try
-                            {
-                                var path = HostApplicationServices.Current.FindFile(
-                                    "acad.lin", AcadHelpers.Database, FindFileHint.Default);
-                                AcadHelpers.Database.LoadLineTypeFile(ltname, path);
-                                ltid = lttbl[ltname];
-                            }
-                            catch
-                            {
-                                MessageBox.Show("Не удалось загрузить тип линий: " + ltname, MessageBoxIcon.Close);
-                            }
-                        }
-                    tr.Commit();
-                }
-            }
-            return ltid;
         }
     }
 }

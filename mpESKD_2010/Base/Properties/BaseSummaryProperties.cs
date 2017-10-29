@@ -1,11 +1,53 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 
 namespace mpESKD.Base.Properties
 {
     public class BaseSummaryProperties<T> : ObservableCollection<T>
     {
+        #region Общие свойства - свойства которые есть у всех примитивов
+        public string Style
+        {
+            get => GetStrProp(nameof(Style));
+            set
+            {
+                SetPropValue(nameof(Style), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Style)));
+            }
+        }
+        public string Scale
+        {
+            get => GetStrProp(nameof(Scale));
+            set
+            {
+                SetPropValue(nameof(Scale), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Scale)));
+            }
+        }
+
+        public string LayerName
+        {
+            get => GetStrProp(nameof(LayerName));
+            set
+            {
+                SetPropValue(nameof(LayerName), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(LayerName)));
+            }
+        }
+
+        public double? LineTypeScale
+        {
+            get => GetDoubleProp(nameof(LineTypeScale));
+            set
+            {
+                SetPropValue(nameof(LineTypeScale), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(LineTypeScale)));
+            }
+        }
+        #endregion
+
         protected string GetStrProp(string propName)
         {
             IEnumerable<string> vals = this.Select(data => (string)data.GetType().GetProperty(propName).GetValue(data, null)).ToArray();

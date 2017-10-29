@@ -34,7 +34,8 @@ namespace mpESKD.Base
         /// <summary>Масштаб примитива</summary>
         public AnnotationScale Scale { get; set; }
         /// <summary>Масштаб типа линии для входящей полилинии</summary>
-        public double LineTypeScale { get; set; } 
+        public double LineTypeScale { get; set; }
+        
         /// <summary>Текущий масштаб</summary>
         public double GetScale()
         {
@@ -188,10 +189,7 @@ namespace mpESKD.Base
             return blockTableRecord;
         }
         #endregion
-        /// <summary>
-        /// Получение свойств блока, которые присуще примитиву
-        /// </summary>
-        /// <param name="entity"></param>
+        /// <summary>Получение свойств блока, которые присуще примитиву</summary>
         public void GetParametersFromEntity(Entity entity)
         {
             var blockReference = (BlockReference)entity;

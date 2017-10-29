@@ -66,6 +66,11 @@ namespace mpESKD.Functions.mpAxis
                 var blockReference = CreateAxisBlock(ref axis);
                 // set layer
                 AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
+                // set linetype
+                var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineTypePropertyDescriptive.Name,
+                    AxisProperties.LineTypePropertyDescriptive.DefaultValue);
+                AcadHelpers.SetLineType(blockReference.ObjectId, lineType);
+                
 
                 var breakLoop = false;
                 while (!breakLoop)

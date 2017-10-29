@@ -45,6 +45,14 @@
         <Setter Property="BorderThickness" Value="0,0,1,1"></Setter>
         <Setter Property="Height" Value="20"></Setter>
     </Style>
+    <Style x:Key="PropertyValueTextBox" TargetType="{x:Type TextBox}">
+        <Setter Property="Padding" Value="0"></Setter>
+        <Setter Property="Margin" Value="0,0,5,0"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="BorderBrush" Value="{StaticResource ValueBorderColor}"></Setter>
+        <Setter Property="BorderThickness" Value="0,0,1,1"></Setter>
+        <Setter Property="Height" Value="20"></Setter>
+    </Style>
     <Style x:Key="PropertyValueDoubleTextBox" TargetType="{x:Type ctrls:DoubleTextBox}">
         <Setter Property="Padding" Value="0"></Setter>
         <Setter Property="Margin" Value="0,0,5,0"></Setter>

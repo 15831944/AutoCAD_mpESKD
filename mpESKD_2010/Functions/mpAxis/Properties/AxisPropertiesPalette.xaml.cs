@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Windows;
 using mpESKD.Base.Helpers;
 using mpESKD.Base.Properties;
 
@@ -74,6 +77,8 @@ namespace mpESKD.Functions.mpAxis.Properties
         private void FrameworkElement_OnGotFocus(object sender, RoutedEventArgs e)
         {
             if (!(sender is FrameworkElement fe)) return;
+            if (fe.Name.Equals("CbStyle"))
+                _parentPalette.ShowDescription("Стиль интеллектуального примитива");
             if (fe.Name.Equals("TbMarkersCount"))
                 _parentPalette.ShowDescription(AxisProperties.MarkersCountPropertyDescriptive.Description);
             if (fe.Name.Equals("TbMarkersDiameter"))
@@ -90,6 +95,8 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _parentPalette.ShowDescription(AxisProperties.ScalePropertyDescriptive.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
                 _parentPalette.ShowDescription(AxisProperties.LineTypeScalePropertyDescriptive.Description);
+            if (fe.Name.Equals("TbLineType"))
+                _parentPalette.ShowDescription(AxisProperties.LineTypePropertyDescriptive.Description);
             if (fe.Name.Equals("CbLayerName"))
                 _parentPalette.ShowDescription(AxisProperties.LayerName.Description);
         }
@@ -103,6 +110,30 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             if (AcadHelpers.Document != null)
                 AcadHelpers.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
+        }
+        // set line type
+        private void TbLineType_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            using (AcadHelpers.Document.LockDocument())
+            {
+                var ltd = new LinetypeDialog { IncludeByBlockByLayer = false };
+                if (ltd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    if (!ltd.Linetype.IsNull)
+                        using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                        {
+                            using (var ltr = tr.GetObject(ltd.Linetype, OpenMode.ForRead) as LinetypeTableRecord)
+                            {
+                                if (ltr != null)
+                                {
+                                    //TbLineType.Text = ltr.Name;
+                                    ((AxisSummaryProperties) DataContext).LineType = ltr.Name;
+                                }
+                            }
+                            tr.Commit();
+                        }
+                }
+            }
         }
     }
 }

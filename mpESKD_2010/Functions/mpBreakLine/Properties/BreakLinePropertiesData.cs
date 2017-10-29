@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Helpers;
+using mpESKD.Functions.mpBreakLine.Styles;
+
 // ReSharper disable InconsistentNaming
 #pragma warning disable CS0618
 
@@ -10,6 +13,38 @@ namespace mpESKD.Functions.mpBreakLine.Properties
     {
         private ObjectId _blkRefObjectId;
 
+        private string _style;
+
+        public string Style
+        {
+            get => _style;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkRef))
+                        {
+                            var style = BreakLineStylesManager.Styles.FirstOrDefault(s => s.Name.Equals(value));
+                            if (style != null)
+                            {
+                                breakLine.StyleGuid = style.Guid;
+                                breakLine.ApplyStyle(style);
+                                breakLine.UpdateEntities();
+                                breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
+                                using (var resBuf = breakLine.GetParametersForXData())
+                                {
+                                    if (blkRef != null) blkRef.XData = resBuf;
+                                }
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
         private int _overgang;
         public int Overhang
         {
@@ -232,6 +267,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkReference);
             if (breakLine != null)
             {
+                _style = BreakLineStylesManager.Styles.FirstOrDefault(s => s.Guid.Equals(breakLine.StyleGuid))?.Name;
                 _overgang = breakLine.Overhang;
                 _breakHeight = breakLine.BreakHeight;
                 _breakWidth = breakLine.BreakWidth;

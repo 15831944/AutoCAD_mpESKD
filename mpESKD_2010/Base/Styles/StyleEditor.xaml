@@ -10,6 +10,7 @@
                       ShowMaxRestoreButton="False" SaveWindowPosition="True"
                       ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen"
                       MinHeight="410" MinWidth="580" Closed="StyleEditor_OnClosed"
+                      Closing="StyleEditor_OnClosing"
                       >
     <Window.Resources>
         <ResourceDictionary>
@@ -322,55 +323,92 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Grid.DataContext>
                         <local:MainSettings></local:MainSettings>
                     </Grid.DataContext>
-                    <!--Use scale from style-->
-                    <CheckBox Grid.Row="0" Margin="2"
+                    <TextBlock Grid.Row="0" HorizontalAlignment="Center" FontSize="16" Margin="2"
+                               Text="ОБЩИЕ НАСТРОЙКИ" Foreground="{DynamicResource AccentBaseColorBrush}"></TextBlock>
+                    <!--Main settings-->
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <!--Use scale from style-->
+                        <CheckBox Grid.Row="0" Margin="2"
                               Content="При создании примитива устанавливать масштаб из стиля"
                               IsChecked="{Binding Path=UseScaleFromStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="15000">
-                        <CheckBox.ToolTip>
-                            <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
+                            <CheckBox.ToolTip>
+                                <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
                                        Text="Если галочка установлена, то при создании примитива к нему будет применён масштаб, установленный в текущем стиле независимо от аннотативного масштаба чертежа. Иначе к примитиву будет применён аннотативный масштаб чертежа"></TextBlock>
-                        </CheckBox.ToolTip>
-                    </CheckBox>
-                    <!--Use Layer from style-->
-                    <CheckBox Grid.Row="1" Margin="2" Name="ChkUseLayerFromStyle"
+                            </CheckBox.ToolTip>
+                        </CheckBox>
+                        <!--Use Layer from style-->
+                        <CheckBox Grid.Row="1" Margin="2" Name="ChkUseLayerFromStyle"
                               Content="При создании примитива устанавливать слой из стиля"
                               IsChecked="{Binding Path=UseLayerFromStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="15000">
-                        <CheckBox.ToolTip>
-                            <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
+                            <CheckBox.ToolTip>
+                                <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
                                        Text="Если галочка установлена, то при создании примитива к нему будет применён слой, установленный в текущем стиле независимо от текущего слоя чертежа. Иначе к примитиву будет применён текущий слой чертежа"
                                        ></TextBlock>
-                        </CheckBox.ToolTip>
-                    </CheckBox>
-                    <Grid Grid.Row="2" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseLayerFromStyle}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Margin="2" Text="При отсутствии в текущем документе слоя, указанного в стиле:"
+                            </CheckBox.ToolTip>
+                        </CheckBox>
+                        <Grid Grid.Row="2" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseLayerFromStyle}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Margin="2" Text="При отсутствии в текущем документе слоя, указанного в стиле:"
                                    VerticalAlignment="Center"></TextBlock>
-                        <ComboBox Grid.Column="1" Margin="2" SelectedIndex="{Binding Path=IfNoLayer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ComboBoxItem Content="Применить текущий слой"
+                            <ComboBox Grid.Column="1" Margin="2" SelectedIndex="{Binding Path=IfNoLayer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBoxItem Content="Применить текущий слой"
                                           ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="15000">
-                                <ComboBoxItem.ToolTip>
-                                    <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
+                                    <ComboBoxItem.ToolTip>
+                                        <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
                                                Text="При создании примитива к нему будет применён текущий слой чертежа"></TextBlock>
-                                </ComboBoxItem.ToolTip>
-                            </ComboBoxItem>
-                            <ComboBoxItem Content="Создать и применить слой из стиля"
+                                    </ComboBoxItem.ToolTip>
+                                </ComboBoxItem>
+                                <ComboBoxItem Content="Создать и применить слой из стиля"
                                           ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="15000">
-                                <ComboBoxItem.ToolTip>
-                                    <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
+                                    <ComboBoxItem.ToolTip>
+                                        <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
                                                Text="В текущем документе будет создан и применён к примитиву слой, установленный в стиле"></TextBlock>
-                                </ComboBoxItem.ToolTip>
-                            </ComboBoxItem>
-                        </ComboBox>
+                                    </ComboBoxItem.ToolTip>
+                                </ComboBoxItem>
+                            </ComboBox>
+                        </Grid>
                     </Grid>
+                    <TextBlock Grid.Row="2" HorizontalAlignment="Center" FontSize="16" Margin="2"
+                               Text="НАСТРОЙКИ ПРИМИТИВОВ" Foreground="{DynamicResource AccentBaseColorBrush}"></TextBlock>
+                    <!-- settings for entities -->
+                    <controls:MetroAnimatedTabControl Grid.Row="3" controls:TabControlHelper.Underlined="SelectedTabItem"
+                                                      TabStripPlacement="Left">
+                        <controls:MetroTabItem Header="Прямая ось" controls:ControlsHelper.HeaderFontSize="14">
+                            <Border BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <CheckBox Grid.Row="0" Margin="2" Content="Менять масштаб типа линии пропорционально масштабу примитива"
+                                              IsChecked="{Binding Path=AxisLineTypeScaleProportionScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="15000">
+                                        <CheckBox.ToolTip>
+                                            <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
+                                                       Text="Масштаб типа линии, который устанавливается для оси, будет меняться пропорционально основному масштабу оси. Например, если был установлен масштаб оси равный 1:1 и масштаб типа линии равный 2, то при установке масштаба оси равному 1:100 масштаб типа линии станет равным 200"></TextBlock>
+                                        </CheckBox.ToolTip>
+                                    </CheckBox>
+                                </Grid>
+                            </Border>
+                        </controls:MetroTabItem>
+                        <controls:MetroTabItem Header="Прямая ось2" controls:ControlsHelper.HeaderFontSize="14"></controls:MetroTabItem>
+                        <controls:MetroTabItem Header="Прямая ось2" controls:ControlsHelper.HeaderFontSize="14"></controls:MetroTabItem>
+                        <controls:MetroTabItem Header="Прямая ось2" controls:ControlsHelper.HeaderFontSize="14"></controls:MetroTabItem>
+                    </controls:MetroAnimatedTabControl>
                 </Grid>
             </controls:MetroTabItem>
         </controls:MetroAnimatedTabControl>

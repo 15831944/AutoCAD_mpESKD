@@ -87,10 +87,18 @@ namespace mpESKD.Functions.mpAxis.Properties
             PropertyType = MPCOPropertyType.Double,
             Name = "LineTypeScale",
             DisplayName = "Масштаб типа линий:",
-            DefaultValue = 1.0,
+            DefaultValue = 10.0,
             Minimum = 0,
             Maximum = double.MaxValue,
             Description = "Масштаб типа линии для заданного в свойствах блока типа линии"
+        };
+        public static MPCOStringProperty LineTypePropertyDescriptive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "LineType",
+            DisplayName = "Тип линии:",
+            DefaultValue = "осевая",
+            Description = "Тип линии оси"
         };
         /// <summary>Поле, описывающее слой</summary>
         public static MPCOStringProperty LayerName = new MPCOStringProperty

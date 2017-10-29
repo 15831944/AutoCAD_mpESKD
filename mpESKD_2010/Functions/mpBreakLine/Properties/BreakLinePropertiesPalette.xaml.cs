@@ -6,6 +6,7 @@ using System.Windows;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Properties;
+using mpESKD.Functions.mpBreakLine.Styles;
 
 // ReSharper disable InconsistentNaming
 
@@ -19,6 +20,14 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         {
             _parentPalette = palette;
             InitializeComponent();
+            // styles
+            var sNames = new List<string>();
+            foreach (var style in BreakLineStylesManager.Styles)
+            {
+                sNames.Add(style.Name);
+            }
+            CbStyle.ItemsSource = sNames;
+
             CbBreakLineType.ItemsSource = BreakLinePropertiesHelpers.BreakLineTypeLocalNames;
             // get list of scales
             CbScale.ItemsSource = AcadHelpers.Scales;
@@ -78,6 +87,8 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         private void FrameworkElement_OnGotFocus(object sender, RoutedEventArgs e)
         {
             if(!(sender is FrameworkElement fe)) return;
+            if (fe.Name.Equals("CbStyle"))
+                _parentPalette.ShowDescription("Стиль интеллектуального примитива");
             if (fe.Name.Equals("TbOverhang"))
                 _parentPalette.ShowDescription(BreakLineProperties.OverhangPropertyDescriptive.Description);
             if (fe.Name.Equals("TbBreakHeight"))

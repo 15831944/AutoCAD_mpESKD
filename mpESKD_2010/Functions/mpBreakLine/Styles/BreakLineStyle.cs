@@ -317,6 +317,8 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                     fXel.Add(styleXel);
                 }
                 fXel.Save(stylesFile);
+                // reload styles
+                LoadStylesFromXmlFile();
             }
             catch (Exception exception)
             {

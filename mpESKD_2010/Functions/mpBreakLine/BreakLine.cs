@@ -84,7 +84,7 @@ namespace mpESKD.Functions.mpBreakLine
         public int BreakHeight { get; set; } = BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue;
         /// <summary>Тип линии обрыва: линейный, криволинейный, цилиндрический</summary>
         public BreakLineType BreakLineType { get; set; } = BreakLineProperties.BreakLineTypePropertyDescriptive.DefaultValue;
-        
+
         #region Базовые примитивы СПДС объекта
         private Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
         public Polyline MainPolyline
@@ -161,28 +161,6 @@ namespace mpESKD.Functions.mpBreakLine
             // need to add scale !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             var scale = GetScale();
             List<double> bulges;
-            // Создание вершин полилинии
-            //if (variant == UpdateVariant.Create)
-            //{
-            //    /* Построение базовых примитивов при создании СПДС объекта
-            //     * При создании линии обрыва (создание базовой полилинии)
-            //     * строим вторую точку на минимально допустимом расстоянии от первой
-            //     * Готовый примитив будет висеть на курсоре
-            //    */
-            //    if (EndPointOCS.Equals(Point3d.Origin))
-            //    {
-            //        var tmpEndPoint = new Point3d(InsertionPointOCS.X + BreakLineMinLength * scale, 0.0, 0.0);
-            //        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
-            //        for (var i = 0; i < pts.Count; i++)
-            //            MainPolyline.AddVertexAt(i, pts[i], bulges[i], 0.0, 0.0);
-            //    }
-            //    else
-            //    {
-            //        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out bulges);
-            //        for (var i = 0; i < pts.Count; i++)
-            //            MainPolyline.AddVertexAt(i, pts[i], bulges[i], 0.0, 0.0);
-            //    }
-            //}
             if (variant == UpdateVariant.SetInsertionPoint)
             {
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
@@ -350,10 +328,13 @@ namespace mpESKD.Functions.mpBreakLine
             Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
             BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
             BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue);
-            if(new MainSettings().UseScaleFromStyle)
+            if (MainStaticSettings.Settings.UseScaleFromStyle)
                 Scale = StyleHelpers.GetPropertyValue(style, nameof(Scale), BreakLineProperties.ScalePropertyDescriptive.DefaultValue);
-            Debug.Print(Scale.Name);
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
+            // set layer
+            var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,
+                BreakLineProperties.LayerName.DefaultValue);
+            AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
         }
         #endregion
 
