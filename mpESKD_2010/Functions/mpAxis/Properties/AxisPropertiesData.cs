@@ -230,16 +230,11 @@ namespace mpESKD.Functions.mpAxis.Properties
                         using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
                         {
                             var oldScale = axis.GetScale();
-                            AcadHelpers.WriteMessageInDebug("old scale: " + oldScale);
                             axis.Scale = AcadHelpers.GetAnnotationScaleByName(value);
                             if (MainStaticSettings.Settings.AxisLineTypeScaleProportionScale)
                             {
                                 var newScale = axis.GetScale();
-                                AcadHelpers.WriteMessageInDebug("new scale: " + newScale);
-                                if (newScale > oldScale)
-                                    axis.LineTypeScale = axis.LineTypeScale * newScale;
-                                if(newScale < oldScale)
-                                    axis.LineTypeScale = axis.LineTypeScale * newScale/ oldScale;
+                                axis.LineTypeScale = axis.LineTypeScale * newScale / oldScale;
                             }
                             axis.UpdateEntities();
                             axis.GetBlockTableRecordWithoutTransaction(blkRef);
