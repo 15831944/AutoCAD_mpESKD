@@ -9,6 +9,8 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Windows;
 using mpESKD.Base.Helpers;
 using mpESKD.Base.Properties;
+using mpESKD.Base.Properties.Controls;
+using Visibility = System.Windows.Visibility;
 
 namespace mpESKD.Functions.mpAxis.Properties
 {
@@ -25,6 +27,14 @@ namespace mpESKD.Functions.mpAxis.Properties
             CbScale.ItemsSource = AcadHelpers.Scales;
             // fill layers
             CbLayerName.ItemsSource = AcadHelpers.Layers;
+            // fill text styles
+            CbTextStyle.ItemsSource = AcadHelpers.TextStyles;
+            // marker types
+            var markerTypes = new List<string> { "Тип 1", "Тип 2" };
+            CbFirstMarkerType.ItemsSource = markerTypes;
+            CbSecondMarkerType.ItemsSource = markerTypes;
+            CbThirdMarkerType.ItemsSource = markerTypes;
+            // get data
             if (AcadHelpers.Document != null)
             {
                 ShowProperties();
@@ -64,7 +74,8 @@ namespace mpESKD.Functions.mpAxis.Properties
                 if (objectIds.Any())
                 {
                     Expander.Header = AxisFunction.MPCOEntDisplayName + " (" + objectIds.Count + ")";
-                    _axisSummaryProperties = new AxisSummaryProperties(objectIds);
+                    _axisSummaryProperties = new AxisSummaryProperties(objectIds, out int maxCount);
+                    ChangeMarkersTypesVisibility(maxCount);
                     SetData(_axisSummaryProperties);
                 }
             }
@@ -91,6 +102,12 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _parentPalette.ShowDescription(AxisProperties.TopFractureOffsetPropertyDescriptive.Description);
             if (fe.Name.Equals("CbMarkersPosition"))
                 _parentPalette.ShowDescription(AxisProperties.MarkersPositionPropertyDescriptive.Description);
+            if (fe.Name.Equals("CbFirstMarkerType"))
+                _parentPalette.ShowDescription(AxisProperties.FirstMarkerTypePropertyDescriptive.Description);
+            if (fe.Name.Equals("CbSecondMarkerType"))
+                _parentPalette.ShowDescription(AxisProperties.SecondMarkerTypePropertyDescriptive.Description);
+            if (fe.Name.Equals("CbThirdMarkerType"))
+                _parentPalette.ShowDescription(AxisProperties.ThirdMarkerTypePropertyDescriptive.Description);
             if (fe.Name.Equals("CbScale"))
                 _parentPalette.ShowDescription(AxisProperties.ScalePropertyDescriptive.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
@@ -99,6 +116,10 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _parentPalette.ShowDescription(AxisProperties.LineTypePropertyDescriptive.Description);
             if (fe.Name.Equals("CbLayerName"))
                 _parentPalette.ShowDescription(AxisProperties.LayerName.Description);
+            if (fe.Name.Equals("CbTextStyle"))
+                _parentPalette.ShowDescription(AxisProperties.TextStylePropertyDescriptive.Description);
+            if (fe.Name.Equals("TbTextHeight"))
+                _parentPalette.ShowDescription(AxisProperties.TextHeightPropertyDescriptive.Description);
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)
@@ -133,6 +154,37 @@ namespace mpESKD.Functions.mpAxis.Properties
                             tr.Commit();
                         }
                 }
+            }
+        }
+
+        private void ChangeMarkersTypesVisibility(int markerCount)
+        {
+            switch (markerCount)
+            {
+                case 1:
+                    TbFirstMarkerTypeHeader.Visibility = CbFirstMarkerType.Visibility = Visibility.Visible;
+                    TbSecondMarkerTypeHeader.Visibility = CbSecondMarkerType.Visibility = Visibility.Collapsed;
+                    TbThirdMarkerTypeHeader.Visibility = CbThirdMarkerType.Visibility = Visibility.Collapsed;
+                    break;
+                case 2:
+                    TbFirstMarkerTypeHeader.Visibility = CbFirstMarkerType.Visibility = Visibility.Visible;
+                    TbSecondMarkerTypeHeader.Visibility = CbSecondMarkerType.Visibility = Visibility.Visible;
+                    TbThirdMarkerTypeHeader.Visibility = CbThirdMarkerType.Visibility = Visibility.Collapsed;
+                    break;
+                case 3:
+                    TbFirstMarkerTypeHeader.Visibility = CbFirstMarkerType.Visibility = Visibility.Visible;
+                    TbSecondMarkerTypeHeader.Visibility = CbSecondMarkerType.Visibility = Visibility.Visible;
+                    TbThirdMarkerTypeHeader.Visibility = CbThirdMarkerType.Visibility = Visibility.Visible;
+                    break;
+            }
+        }
+        
+        private void TbMarkersCount_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is IntTextBox itb)
+            {
+                if (int.TryParse(itb.Value.ToString(), out int i))
+                    ChangeMarkersTypesVisibility(i);
             }
         }
     }

@@ -48,6 +48,36 @@ namespace mpESKD.Functions.mpAxis.Properties
             Maximum = 3,
             Description = "Количество маркеров оси"
         };
+        public static MPCOIntProperty FirstMarkerTypePropertyDescriptive = new MPCOIntProperty
+        {
+            PropertyType = MPCOPropertyType.Int,
+            Name = "FirstMarkerType",
+            DisplayName = "Тип первого маркера:",
+            DefaultValue = 0,
+            Minimum = 0,
+            Maximum = 1,
+            Description = "Тип первого маркера"
+        };
+        public static MPCOIntProperty SecondMarkerTypePropertyDescriptive = new MPCOIntProperty
+        {
+            PropertyType = MPCOPropertyType.Int,
+            Name = "SecondMarkerType",
+            DisplayName = "Тип второго маркера:",
+            DefaultValue = 0,
+            Minimum = 0,
+            Maximum = 1,
+            Description = "Тип второго маркера"
+        };
+        public static MPCOIntProperty ThirdMarkerTypePropertyDescriptive = new MPCOIntProperty
+        {
+            PropertyType = MPCOPropertyType.Int,
+            Name = "ThirdMarkerType",
+            DisplayName = "Тип третьего маркера:",
+            DefaultValue = 0,
+            Minimum = 0,
+            Maximum = 1,
+            Description = "Тип третьего маркера"
+        };
         /// <summary>Поле, описывающее свойство "Нижний отступ излома"</summary>
         public static MPCOIntProperty BottomFractureOffsetPropertyDescriptive = new MPCOIntProperty
         {
@@ -70,7 +100,24 @@ namespace mpESKD.Functions.mpAxis.Properties
             Maximum = 30,
             Description = "Верхний отступ излома"
         };
-
+        public static MPCOStringProperty TextStylePropertyDescriptive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "TextStyle",
+            DisplayName = "Текстовый стиль:",
+            DefaultValue = "Standard",
+            Description = "Текстовый стиль"
+        };
+        public static MPCODoubleProperty TextHeightPropertyDescriptive = new MPCODoubleProperty
+        {
+            PropertyType = MPCOPropertyType.Double,
+            Name = "TextHeight",
+            DisplayName = "Высота текста:",
+            DefaultValue = 3.5,
+            Minimum = 0.000000001,
+            Maximum = double.MaxValue,
+            Description = "Высота текста"
+        };
         // General
         /// <summary>Поле, описывающее свойство "Масштаб"</summary>
         public static MPCOTypeProperty<AnnotationScale> ScalePropertyDescriptive = new MPCOTypeProperty<AnnotationScale>

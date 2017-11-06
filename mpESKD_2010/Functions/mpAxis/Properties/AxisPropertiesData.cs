@@ -186,7 +186,6 @@ namespace mpESKD.Functions.mpAxis.Properties
         }
 
         private int _markersDiameter;
-
         public int MarkersDiameter
         {
             get => _markersDiameter;
@@ -212,6 +211,144 @@ namespace mpESKD.Functions.mpAxis.Properties
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
             }
         }
+
+        private string _textStyle;
+        public string TextStyle
+        {
+            get => _textStyle;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.TextStyle = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private double _textHeight;
+        public double TextHeight
+        {
+            get => _textHeight;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.TextHeight = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        #region Типы маркеров
+
+        private string _firstMarkerType;
+        public string FirstMarkerType
+        {
+            get => _firstMarkerType;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.FirstMarkerType = value.Equals("Тип 1") ? 0 : 1;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private string _secondMarkerType;
+        public string SecondMarkerType
+        {
+            get => _secondMarkerType;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.SecondMarkerType = value.Equals("Тип 1") ? 0 : 1;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private string _thirdMarkerType;
+        public string ThirdMarkerType
+        {
+            get => _thirdMarkerType;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.ThirdMarkerType = value.Equals("Тип 1") ? 0 : 1;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+        #endregion
 
         #region General
 
@@ -353,6 +490,9 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _style = AxisStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(axis.StyleGuid))?.Name;
                 _markersCount = axis.MarkersCount;
                 _markersDiameter = axis.MarkersDiameter;
+                _firstMarkerType = axis.FirstMarkerType == 0 ? "Тип 1" : "Тип 2";
+                _secondMarkerType = axis.SecondMarkerType == 0 ? "Тип 1" : "Тип 2";
+                _thirdMarkerType = axis.ThirdMarkerType == 0 ? "Тип 1" : "Тип 2";
                 _fracture = axis.Fracture;
                 _bottomFractureOffset = axis.BottomFractureOffset;
                 _topFractureOffset = axis.TopFractureOffset;
@@ -361,6 +501,8 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _layerName = blkReference.Layer;
                 _lineType = blkReference.Linetype;
                 _lineTypeScale = axis.LineTypeScale;
+                _textStyle = axis.TextStyle;
+                _textHeight = axis.TextHeight;
                 AnyPropertyChangedReise();
             }
         }

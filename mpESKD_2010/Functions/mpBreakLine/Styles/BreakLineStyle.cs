@@ -174,82 +174,26 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                     var nameAttr = propXel.Attribute("Name");
                     if (nameAttr != null)
                     {
-                        int i;
                         switch (nameAttr.Value)
                         {
                             case "Overhang":
-                                style.Properties.Add(new MPCOIntProperty
-                                {
-                                    Name = nameAttr.Value,
-                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : BreakLineProperties.OverhangPropertyDescriptive.DefaultValue,
-                                    Description = BreakLineProperties.OverhangPropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.OverhangPropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.OverhangPropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.OverhangPropertyDescriptive.DisplayName,
-                                    Minimum = BreakLineProperties.OverhangPropertyDescriptive.Minimum,
-                                    Maximum = BreakLineProperties.OverhangPropertyDescriptive.Maximum
-                                });
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.OverhangPropertyDescriptive));
                                 break;
                             case "BreakHeight":
-                                style.Properties.Add(new MPCOIntProperty
-                                {
-                                    Name = nameAttr.Value,
-                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue,
-                                    Description = BreakLineProperties.BreakHeightPropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.BreakHeightPropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.BreakHeightPropertyDescriptive.DisplayName,
-                                    Minimum = BreakLineProperties.BreakHeightPropertyDescriptive.Minimum,
-                                    Maximum = BreakLineProperties.BreakHeightPropertyDescriptive.Maximum
-                                });
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.BreakHeightPropertyDescriptive));
                                 break;
                             case "BreakWidth":
-                                style.Properties.Add(new MPCOIntProperty
-                                {
-                                    Name = nameAttr.Value,
-                                    Value = int.TryParse(propXel.Attribute("Value")?.Value, out i) ? i : BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue,
-                                    Description = BreakLineProperties.BreakWidthPropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.BreakWidthPropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.BreakWidthPropertyDescriptive.DisplayName,
-                                    Minimum = BreakLineProperties.BreakWidthPropertyDescriptive.Minimum,
-                                    Maximum = BreakLineProperties.BreakWidthPropertyDescriptive.Maximum
-                                });
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.BreakWidthPropertyDescriptive));
                                 break;
                             case "LineTypeScale":
-                                style.Properties.Add(new MPCODoubleProperty
-                                {
-                                    Name = nameAttr.Value,
-                                    Value = double.TryParse(propXel.Attribute("Value")?.Value, out double d) ? d : BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue,
-                                    Description = BreakLineProperties.LineTypeScalePropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.LineTypeScalePropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.LineTypeScalePropertyDescriptive.DisplayName,
-                                    Minimum = BreakLineProperties.LineTypeScalePropertyDescriptive.Minimum,
-                                    Maximum = BreakLineProperties.LineTypeScalePropertyDescriptive.Maximum
-                                });
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.LineTypeScalePropertyDescriptive));
                                 break;
                             case "LayerName":
-                                style.Properties.Add(new MPCOStringProperty
-                                {
-                                    Name = nameAttr.Value,
-                                    Value = propXel.Attribute("Value")?.Value,
-                                    Description = BreakLineProperties.LayerName.Description,
-                                    DefaultValue = BreakLineProperties.LayerName.DefaultValue,
-                                    PropertyType = BreakLineProperties.LayerName.PropertyType,
-                                    DisplayName = BreakLineProperties.LayerName.DisplayName
-                                });
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.LayerName));
                                 break;
                             case "Scale":
-                                style.Properties.Add(new MPCOTypeProperty<AnnotationScale>
-                                {
-                                    Name = nameAttr.Value,
-                                    Value = Parsers.AnnotationScaleFromString(propXel.Attribute("Value")?.Value),
-                                    Description = BreakLineProperties.ScalePropertyDescriptive.Description,
-                                    DefaultValue = BreakLineProperties.ScalePropertyDescriptive.DefaultValue,
-                                    PropertyType = BreakLineProperties.ScalePropertyDescriptive.PropertyType,
-                                    DisplayName = BreakLineProperties.ScalePropertyDescriptive.DisplayName
-                                });
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.ScalePropertyDescriptive,
+                                    Parsers.AnnotationScaleFromString(propXel.Attribute("Value")?.Value)));
                                 break;
                         }
                     }
@@ -261,7 +205,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                 Styles.Add(style);
             }
         }
-        
+
         public static void SaveStylesToXml(List<BreakLineStyleForEditor> styles)
         {
             var stylesFile = Path.Combine(MainFunction.StylesPath, StylesFileName);
@@ -280,40 +224,27 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                     styleXel.SetAttributeValue(nameof(style.Description), style.Description);
                     styleXel.SetAttributeValue(nameof(style.Guid), style.Guid);
                     // Properties
+                    // Цифровые и текстовые значения сохранять через словарь
+                    var properties = new Dictionary<string, object>
+                    {
+                        {nameof(style.BreakHeight), style.BreakHeight},
+                        {nameof(style.BreakWidth), style.BreakWidth },
+                        {nameof(style.Overhang), style.Overhang },
+                        {nameof(style.LineTypeScale), style.LineTypeScale },
+                        {nameof(style.LayerName), style.LayerName }
+                    };
+                    foreach (KeyValuePair<string, object> property in properties)
+                        styleXel.Add(StyleHelpers.CreateXElementFromProperty(property));
+                    // Масштаб сохранять отдельно
                     var propXel = new XElement("Property");
-                    propXel.SetAttributeValue("Name", nameof(style.BreakHeight));
-                    propXel.SetAttributeValue("PropertyType", style.BreakHeight.GetType().Name);
-                    propXel.SetAttributeValue("Value", style.BreakHeight);
-                    styleXel.Add(propXel);
-                    propXel = new XElement("Property");
-                    propXel.SetAttributeValue("Name", nameof(style.BreakWidth));
-                    propXel.SetAttributeValue("PropertyType", style.BreakWidth.GetType().Name);
-                    propXel.SetAttributeValue("Value", style.BreakWidth);
-                    styleXel.Add(propXel);
-                    propXel = new XElement("Property");
-                    propXel.SetAttributeValue("Name", nameof(style.LineTypeScale));
-                    propXel.SetAttributeValue("PropertyType", style.LineTypeScale.GetType().Name);
-                    propXel.SetAttributeValue("Value", style.LineTypeScale);
-                    styleXel.Add(propXel);
-                    propXel = new XElement("Property");
-                    propXel.SetAttributeValue("Name", nameof(style.Overhang));
-                    propXel.SetAttributeValue("PropertyType", style.Overhang.GetType().Name);
-                    propXel.SetAttributeValue("Value", style.Overhang);
-                    styleXel.Add(propXel);
-                    propXel = new XElement("Property");
                     propXel.SetAttributeValue("Name", nameof(style.Scale));
                     propXel.SetAttributeValue("PropertyType", style.Scale.GetType().Name);
                     propXel.SetAttributeValue("Value", style.Scale.Name);
                     styleXel.Add(propXel);
-                    propXel = new XElement("Property");
-                    propXel.SetAttributeValue("Name", nameof(style.LayerName));
-                    propXel.SetAttributeValue("PropertyType", style.LayerName.GetType().Name);
-                    propXel.SetAttributeValue("Value", style.LayerName);
-                    styleXel.Add(propXel);
                     // add layer
-                    if(LayerHelper.HasLayer(style.LayerName))
+                    if (LayerHelper.HasLayer(style.LayerName))
                         styleXel.Add(LayerHelper.SetLayerXml(LayerHelper.GetLayerTableRecordByLayerName(style.LayerName)));
-                    else if(style.LayerXmlData != null) styleXel.Add(style.LayerXmlData);
+                    else if (style.LayerXmlData != null) styleXel.Add(style.LayerXmlData);
                     fXel.Add(styleXel);
                 }
                 fXel.Save(stylesFile);

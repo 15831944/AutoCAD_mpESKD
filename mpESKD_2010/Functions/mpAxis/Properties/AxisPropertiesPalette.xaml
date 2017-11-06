@@ -87,6 +87,7 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Геометрия" Style="{StaticResource HeaderTextBox}"></TextBox>
                 <!--MarkersPosition-->
@@ -119,9 +120,28 @@
                 <TextBox Grid.Row="6" Grid.Column="0" Text="Количество маркеров:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="6" Grid.Column="2" Value="{Binding MarkersCount}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbMarkersCount" Minimum="1" Maximum="3" GotFocus="FrameworkElement_OnGotFocus" 
-                                  LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
+                                  LostFocus="FrameworkElement_OnLostFocus" 
+                                  TextBox.TextChanged="TbMarkersCount_OnTextChanged"></ctrls:IntTextBox>
+                <!--FirstMarkerType-->
+                <TextBox Grid.Row="7" Grid.Column="0" Text="Тип первого маркера:" Style="{StaticResource PropertyNameTextBoxBase}"
+                         x:Name="TbFirstMarkerTypeHeader"></TextBox>
+                <ComboBox Grid.Row="7" Grid.Column="2" Text="{Binding FirstMarkerType}" x:Name="CbFirstMarkerType"
+                          Style="{StaticResource PropertyValueComboBox}"
+                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
+                <!--SecondMarkerType-->
+                <TextBox Grid.Row="8" Grid.Column="0" Text="Тип второго маркера:" Style="{StaticResource PropertyNameTextBoxBase}"
+                         x:Name="TbSecondMarkerTypeHeader"></TextBox>
+                <ComboBox Grid.Row="8" Grid.Column="2" Text="{Binding SecondMarkerType}" x:Name="CbSecondMarkerType"
+                          Style="{StaticResource PropertyValueComboBox}"
+                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
+                <!--ThirdMarkerType-->
+                <TextBox Grid.Row="9" Grid.Column="0" Text="Тип третьего маркера:" Style="{StaticResource PropertyNameTextBoxBase}"
+                         x:Name="TbThirdMarkerTypeHeader"></TextBox>
+                <ComboBox Grid.Row="9" Grid.Column="2" Text="{Binding ThirdMarkerType}" x:Name="CbThirdMarkerType"
+                          Style="{StaticResource PropertyValueComboBox}"
+                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
                 <!--GridSplitter-->
-                <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="6" BorderThickness="1,0,1,0"
+                <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="9" BorderThickness="1,0,1,0"
                               HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
             </Grid>
             <!---->
@@ -135,15 +155,23 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Содержимое" Style="{StaticResource HeaderTextBox}"></TextBox>
-            </Grid>
+                <!--TextStyle-->
+                <TextBox Grid.Row="1" Grid.Column="0" Text="Текстовый стиль:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <ComboBox Grid.Row="1" Grid.Column="2" Text="{Binding TextStyle}" x:Name="CbTextStyle"
+                          Style="{StaticResource PropertyValueComboBox}"
+                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
+                <!--TextHeight-->
+                <TextBox Grid.Row="2" Grid.Column="0" Text="Высота текста:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <ctrls:DoubleTextBox Grid.Row="2" Grid.Column="2" Value="{Binding TextHeight}" 
+                                     Style="{StaticResource PropertyValueDoubleTextBox}"
+                                     Minimum="0.000000001" Maximum="{x:Static sys:Double.MaxValue}"
+                                     x:Name="TbTextHeight" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:DoubleTextBox>
+                <!--GridSplitter-->
+                <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" BorderThickness="1,0,1,0"
+                              HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
+        </Grid>
         </Grid>
     </Expander>
 </UserControl>

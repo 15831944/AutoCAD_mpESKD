@@ -69,6 +69,37 @@ namespace mpESKD
             }
         }
 
+        private bool _useTextStyleFromStyle;
+        /// <summary>Использовать текстовый стиль из стиля</summary>
+        public bool UseTextStyleFromStyle
+        {
+            get => bool.TryParse(
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseTextStyleFromStyle)),
+                       out _useTextStyleFromStyle) && _useTextStyleFromStyle; // false
+            set
+            {
+                _useTextStyleFromStyle = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseTextStyleFromStyle), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+        private int _ifNoTextStyle;
+        /// <summary>Поведение при отсутствии текстового стиля: 0 - применить текущий, 1 - создать новый</summary>
+        public int IfNoTextStyle
+        {
+            get => int.TryParse(
+                UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(IfNoTextStyle)),
+                out _ifNoTextStyle)
+                ? _ifNoTextStyle
+                : 0;
+            set
+            {
+                _ifNoTextStyle = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(IfNoTextStyle), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

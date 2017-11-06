@@ -6,6 +6,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using mpESKD.Base;
 using mpESKD.Base.Helpers;
+using mpESKD.Base.Properties;
 using mpESKD.Base.Styles;
 using mpESKD.Functions.mpBreakLine.Properties;
 using mpESKD.Functions.mpBreakLine.Styles;
@@ -34,8 +35,6 @@ namespace mpESKD.Functions.mpBreakLine
             };
             BlockRecord = blockTableRecord;
             StyleGuid = style.Guid;
-            // Устанавливаю текущий масштаб
-            Scale = AcadHelpers.Database.Cannoscale;
             // Применяем текущий стиль к СПДС примитиву
             ApplyStyle(style);
         }
@@ -328,8 +327,9 @@ namespace mpESKD.Functions.mpBreakLine
             Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
             BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
             BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue);
-            if (MainStaticSettings.Settings.UseScaleFromStyle)
-                Scale = StyleHelpers.GetPropertyValue(style, nameof(Scale), BreakLineProperties.ScalePropertyDescriptive.DefaultValue);
+            Scale = MainStaticSettings.Settings.UseScaleFromStyle 
+                ? StyleHelpers.GetPropertyValue(style, nameof(Scale), BreakLineProperties.ScalePropertyDescriptive.DefaultValue) 
+                : AcadHelpers.Database.Cannoscale;
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
             // set layer
             var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,

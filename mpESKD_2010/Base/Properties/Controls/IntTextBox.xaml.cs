@@ -165,7 +165,7 @@ namespace mpESKD.Base.Properties.Controls
 
         private void SelectAddress(object sender, RoutedEventArgs e)
         {
-            TextBox tb = (sender as TextBox);
+            TextBox tb = (TextBox) sender;
             if (tb != null)
             {
                 tb.SelectAll();
@@ -174,7 +174,7 @@ namespace mpESKD.Base.Properties.Controls
 
         private void SelectivelyIgnoreMouseButton(object sender, MouseButtonEventArgs e)
         {
-            TextBox tb = (sender as TextBox);
+            TextBox tb = (TextBox) sender;
             if (tb != null)
             {
                 if (!tb.IsKeyboardFocusWithin)

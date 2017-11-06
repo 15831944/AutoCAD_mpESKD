@@ -6,6 +6,7 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.Geometry;
 using mpESKD.Base;
 using mpESKD.Base.Helpers;
+using mpESKD.Base.Properties;
 using mpESKD.Base.Styles;
 using mpESKD.Functions.mpAxis.Properties;
 using mpESKD.Functions.mpAxis.Styles;
@@ -35,8 +36,6 @@ namespace mpESKD.Functions.mpAxis
             };
             BlockRecord = blockTableRecord;
             StyleGuid = style.Guid;
-            // Устанавливаю текущий масштаб
-            Scale = AcadHelpers.Database.Cannoscale;
             // Применяем текущий стиль к СПДС примитиву
             ApplyStyle(style);
         }
@@ -153,6 +152,18 @@ namespace mpESKD.Functions.mpAxis
         public int BottomFractureOffset { get; set; } = 0;
         /// <summary>Верхний отступ излома</summary>
         public int TopFractureOffset { get; set; } = 0;
+        // Типы маркеров: 0 - один кружок, 1 - два кружка
+        public int FirstMarkerType { get; set; } = 0;
+        public int SecondMarkerType { get; set; } = 0;
+        public int ThirdMarkerType { get; set; } = 0;
+        public int OrientMarkerType { get; set; } = 0;
+
+        // 
+        public string TextStyle { get; set; } = AxisProperties.TextStylePropertyDescriptive.DefaultValue;
+        public double TextHeight { get; set; }
+        public string FirstTextPrefix { get; set; } = string.Empty;
+        public string FirstText { get; set; } = "A";
+        public string FirstTextSuffix { get; set; } = string.Empty;
 
         #endregion
 
@@ -168,25 +179,60 @@ namespace mpESKD.Functions.mpAxis
             Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture), AxisProperties.FracturePropertyDescriptive.DefaultValue);
             MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition), AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue);
             MarkersDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkersDiameter), AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue);
-            if (MainStaticSettings.Settings.UseScaleFromStyle)
-                Scale = StyleHelpers.GetPropertyValue(style, nameof(Scale), AxisProperties.ScalePropertyDescriptive.DefaultValue);
+            MarkersCount = StyleHelpers.GetPropertyValue(style, nameof(MarkersCount), AxisProperties.MarkersCountPropertyDescriptive.DefaultValue);
+            BottomFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(BottomFractureOffset), AxisProperties.BottomFractureOffsetPropertyDescriptive.DefaultValue);
+            FirstMarkerType = StyleHelpers.GetPropertyValue(style, nameof(FirstMarkerType), AxisProperties.FirstMarkerTypePropertyDescriptive.DefaultValue);
+            SecondMarkerType = StyleHelpers.GetPropertyValue(style, nameof(SecondMarkerType), AxisProperties.SecondMarkerTypePropertyDescriptive.DefaultValue);
+            ThirdMarkerType = StyleHelpers.GetPropertyValue(style, nameof(ThirdMarkerType), AxisProperties.ThirdMarkerTypePropertyDescriptive.DefaultValue);
+            TopFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(TopFractureOffset), AxisProperties.TopFractureOffsetPropertyDescriptive.DefaultValue);
+            TextHeight = StyleHelpers.GetPropertyValue(style, nameof(TextHeight), AxisProperties.TextHeightPropertyDescriptive.DefaultValue);
+            Scale = MainStaticSettings.Settings.UseScaleFromStyle
+                ? StyleHelpers.GetPropertyValue(style, nameof(Scale), AxisProperties.ScalePropertyDescriptive.DefaultValue)
+                : AcadHelpers.Database.Cannoscale;
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue);
             // set layer
-            var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name,
-                AxisProperties.LayerName.DefaultValue);
+            var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name, AxisProperties.LayerName.DefaultValue);
             AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
+            // set line type
+            var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineTypePropertyDescriptive.Name, AxisProperties.LineTypePropertyDescriptive.DefaultValue);
+            AcadHelpers.SetLineType(BlockId, lineType);
+            // set text style
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }
 
         #endregion
 
         #region Entities
+        /// <summary>Установка свойств для примитивов, которые не меняются</summary>
+        /// <param name="entity">Примитив автокада</param>
+        private void SetPropertiesToCadEntity(Entity entity)
+        {
+            entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+            entity.LineWeight = LineWeight.ByBlock;
+            entity.Linetype = "Continuous";
+            entity.LinetypeScale = 1.0;
+        }
+        /// <summary>Установка свойств для однострочного текста</summary>
+        /// <param name="dbText"></param>
+        private void SetPropertiesToDBText(DBText dbText)
+        {
+            dbText.Height = TextHeight * GetScale();
+            dbText.HorizontalMode = TextHorizontalMode.TextCenter;
+            dbText.Justify = AttachmentPoint.MiddleCenter;
+            dbText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+            dbText.Linetype = "ByBlock";
+            dbText.LineWeight = LineWeight.ByBlock;
+            dbText.TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
+        }
         private readonly Lazy<Line> _mainLine = new Lazy<Line>(() => new Line());
         /// <summary>Средняя (основная) линия оси</summary>
         public Line MainLine
         {
             get
             {
-                _mainLine.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 1);
+                _mainLine.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
                 _mainLine.Value.LineWeight = LineWeight.ByBlock;
                 _mainLine.Value.Linetype = "ByBlock";
                 _mainLine.Value.LinetypeScale = LineTypeScale;
@@ -203,10 +249,7 @@ namespace mpESKD.Functions.mpAxis
         {
             get
             {
-                _bottomMarkerLine.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _bottomMarkerLine.Value.LineWeight = LineWeight.ByBlock;
-                _bottomMarkerLine.Value.Linetype = "Continuous";
-                _bottomMarkerLine.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_bottomMarkerLine.Value);
                 return _bottomMarkerLine.Value;
             }
         }
@@ -216,10 +259,7 @@ namespace mpESKD.Functions.mpAxis
         {
             get
             {
-                _bottomFractureOffsetLine.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _bottomFractureOffsetLine.Value.LineWeight = LineWeight.ByBlock;
-                _bottomFractureOffsetLine.Value.Linetype = "Continuous";
-                _bottomFractureOffsetLine.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_bottomFractureOffsetLine.Value);
                 return _bottomFractureOffsetLine.Value;
             }
         }
@@ -229,10 +269,7 @@ namespace mpESKD.Functions.mpAxis
         {
             get
             {
-                _topFractureOffsetLine.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _topFractureOffsetLine.Value.LineWeight = LineWeight.ByBlock;
-                _topFractureOffsetLine.Value.Linetype = "Continuous";
-                _topFractureOffsetLine.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_topFractureOffsetLine.Value);
                 return _topFractureOffsetLine.Value;
             }
         }
@@ -242,10 +279,7 @@ namespace mpESKD.Functions.mpAxis
         {
             get
             {
-                _topMarkerLine.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _topMarkerLine.Value.LineWeight = LineWeight.ByBlock;
-                _topMarkerLine.Value.Linetype = "Continuous";
-                _topMarkerLine.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_topMarkerLine.Value);
                 return _topMarkerLine.Value;
             }
         }
@@ -254,16 +288,25 @@ namespace mpESKD.Functions.mpAxis
 
         #region Circles
 
+        #region Bottom
+
         private readonly Lazy<Circle> _bottomFirstMarker = new Lazy<Circle>(() => new Circle());
         public Circle BottomFirstCircle
         {
             get
             {
-                _bottomFirstMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _bottomFirstMarker.Value.LineWeight = LineWeight.ByBlock;
-                _bottomFirstMarker.Value.Linetype = "Continuous";
-                _bottomFirstMarker.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_bottomFirstMarker.Value);
                 return _bottomFirstMarker.Value;
+            }
+        }
+        // Второй кружок при типе маркера 2
+        private readonly Lazy<Circle> _bottomFirstMarkerType2 = new Lazy<Circle>(() => new Circle());
+        public Circle BottomFirstCircleType2
+        {
+            get
+            {
+                SetPropertiesToCadEntity(_bottomFirstMarkerType2.Value);
+                return _bottomFirstMarkerType2.Value;
             }
         }
 
@@ -272,11 +315,18 @@ namespace mpESKD.Functions.mpAxis
         {
             get
             {
-                _bottomSecondMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _bottomSecondMarker.Value.LineWeight = LineWeight.ByBlock;
-                _bottomSecondMarker.Value.Linetype = "Continuous";
-                _bottomSecondMarker.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_bottomSecondMarker.Value);
                 return _bottomSecondMarker.Value;
+            }
+        }
+
+        private readonly Lazy<Circle> _bottomSecondMarkerType2 = new Lazy<Circle>(() => new Circle());
+        public Circle BottomSecondCircleType2
+        {
+            get
+            {
+                SetPropertiesToCadEntity(_bottomSecondMarkerType2.Value);
+                return _bottomSecondMarkerType2.Value;
             }
         }
 
@@ -285,53 +335,110 @@ namespace mpESKD.Functions.mpAxis
         {
             get
             {
-                _bottomThirdMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _bottomThirdMarker.Value.LineWeight = LineWeight.ByBlock;
-                _bottomThirdMarker.Value.Linetype = "Continuous";
-                _bottomThirdMarker.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_bottomThirdMarker.Value);
                 return _bottomThirdMarker.Value;
             }
         }
 
-        private readonly Lazy<Circle> _topFirstMarker = new Lazy<Circle>(() => new Circle());
+        private readonly Lazy<Circle> _bottomThirdMarkerType2 = new Lazy<Circle>(() => new Circle());
+        public Circle BottomThirdCircleType2
+        {
+            get
+            {
+                SetPropertiesToCadEntity(_bottomThirdMarkerType2.Value);
+                return _bottomThirdMarkerType2.Value;
+            }
+        }
 
+        #endregion
+
+        #region Top
+
+        private readonly Lazy<Circle> _topFirstMarker = new Lazy<Circle>(() => new Circle());
         public Circle TopFirstCircle
         {
             get
             {
-                _topFirstMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _topFirstMarker.Value.LineWeight = LineWeight.ByBlock;
-                _topFirstMarker.Value.Linetype = "Continuous";
-                _topFirstMarker.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_topFirstMarker.Value);
                 return _topFirstMarker.Value;
             }
         }
-        private readonly Lazy<Circle> _topSecondMarker = new Lazy<Circle>(() => new Circle());
 
+        private readonly Lazy<Circle> _topFirstMarkerType2 = new Lazy<Circle>(() => new Circle());
+        public Circle TopFirstCircleType2
+        {
+            get
+            {
+                SetPropertiesToCadEntity(_topFirstMarkerType2.Value);
+                return _topFirstMarkerType2.Value;
+            }
+        }
+
+        private readonly Lazy<Circle> _topSecondMarker = new Lazy<Circle>(() => new Circle());
         public Circle TopSecondCircle
         {
             get
             {
-                _topSecondMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _topSecondMarker.Value.LineWeight = LineWeight.ByBlock;
-                _topSecondMarker.Value.Linetype = "Continuous";
-                _topSecondMarker.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_topSecondMarker.Value);
                 return _topSecondMarker.Value;
             }
         }
-        private readonly Lazy<Circle> _topThirdMarker = new Lazy<Circle>(() => new Circle());
 
+        private readonly Lazy<Circle> _topSecondMarkerType2 = new Lazy<Circle>(() => new Circle());
+        public Circle TopSecondCircleType2
+        {
+            get
+            {
+                SetPropertiesToCadEntity(_topSecondMarkerType2.Value);
+                return _topSecondMarkerType2.Value;
+            }
+        }
+
+        private readonly Lazy<Circle> _topThirdMarker = new Lazy<Circle>(() => new Circle());
         public Circle TopThirdCircle
         {
             get
             {
-                _topThirdMarker.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _topThirdMarker.Value.LineWeight = LineWeight.ByBlock;
-                _topThirdMarker.Value.Linetype = "Continuous";
-                _topThirdMarker.Value.LinetypeScale = 1.0;
+                SetPropertiesToCadEntity(_topThirdMarker.Value);
                 return _topThirdMarker.Value;
             }
         }
+
+        private readonly Lazy<Circle> _topThirdMarkerType2 = new Lazy<Circle>(() => new Circle());
+        public Circle TopThirdCircleType2
+        {
+            get
+            {
+                SetPropertiesToCadEntity(_topThirdMarkerType2.Value);
+                return _topThirdMarkerType2.Value;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Texts
+
+        private readonly Lazy<DBText> _bottomFirstDBText = new Lazy<DBText>(() => new DBText());
+        public DBText BottomFirstDBText
+        {
+            get
+            {
+                SetPropertiesToDBText(_bottomFirstDBText.Value);
+                return _bottomFirstDBText.Value;
+            }
+        }
+        private readonly Lazy<DBText> _topFirstDBText = new Lazy<DBText>(() => new DBText());
+        public DBText TopFirstDBText
+        {
+            get
+            {
+                SetPropertiesToDBText(_topFirstDBText.Value);
+                return _topFirstDBText.Value;
+            }
+        }
+
         #endregion
 
         public override IEnumerable<Entity> Entities
@@ -342,13 +449,20 @@ namespace mpESKD.Functions.mpAxis
                 yield return BottomMarkerLine;
                 yield return TopMarkerLine;
                 yield return BottomFirstCircle;
+                yield return BottomFirstCircleType2;
                 yield return BottomSecondCircle;
+                yield return BottomSecondCircleType2;
                 yield return BottomThirdCircle;
+                yield return BottomThirdCircleType2;
                 yield return TopFirstCircle;
+                yield return TopFirstCircleType2;
                 yield return TopSecondCircle;
+                yield return TopSecondCircleType2;
                 yield return TopThirdCircle;
+                yield return TopThirdCircleType2;
                 yield return BottomFractureOffsetLine;
                 yield return TopFractureOffsetLine;
+                yield return BottomFirstDBText;
             }
         }
         /// <summary>Обновление (перерисовка) базовых примитивов</summary>
@@ -373,6 +487,7 @@ namespace mpESKD.Functions.mpAxis
                     // Задание второй точки
                     SetEntitiesPoints(InsertionPointOCS, EndPointOCS, BottomMarkerPointOCS, TopMarkerPointOCS);
                 }
+                UpdateTextEntities();
             }
             catch (Exception exception)
             {
@@ -417,7 +532,7 @@ namespace mpESKD.Functions.mpAxis
             _mainLine.Value.StartPoint = insertionPoint;
             _mainLine.Value.EndPoint = endPoint;
             var mainVector = endPoint - insertionPoint;
-            // Bottom
+            #region Bottom
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Bottom)
             {
@@ -437,17 +552,49 @@ namespace mpESKD.Functions.mpAxis
                 // markers
                 _bottomFirstMarker.Value.Center = firstMarkerCenter;
                 _bottomFirstMarker.Value.Diameter = MarkersDiameter * scale;
+                // text
+                if (string.IsNullOrEmpty(FirstTextPrefix) && string.IsNullOrEmpty(FirstText) &&
+                    string.IsNullOrEmpty(FirstTextSuffix))
+                    BottomFirstDBText.Visible = false;
+                else
+                {
+                    BottomFirstDBText.Position = firstMarkerCenter;
+                    BottomFirstDBText.AlignmentPoint = firstMarkerCenter;
+                }
+                // Второй кружок первого маркера
+                if (FirstMarkerType == 1)
+                {
+                    _bottomFirstMarkerType2.Value.Center = firstMarkerCenter;
+                    _bottomFirstMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                }
+                else _bottomFirstMarkerType2.Value.Visible = false;
+                // Если количество маркеров больше 1
                 if (MarkersCount > 1)
                 {
+                    // Значит второй маркер точно есть (независимо от 3-го)
                     var secontMarkerCenter = firstMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
                     _bottomSecondMarker.Value.Center = secontMarkerCenter;
                     _bottomSecondMarker.Value.Diameter = MarkersDiameter * scale;
-
+                    // второй кружок второго маркера
+                    if (SecondMarkerType == 1)
+                    {
+                        _bottomSecondMarkerType2.Value.Center = secontMarkerCenter;
+                        _bottomSecondMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                    }
+                    else _bottomSecondMarkerType2.Value.Visible = false;
+                    // Если количество маркеров больше двух, тогда рисую 3-ий маркер
                     if (MarkersCount > 2)
                     {
                         var thirdMarkerCenter = secontMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
                         _bottomThirdMarker.Value.Center = thirdMarkerCenter;
                         _bottomThirdMarker.Value.Diameter = MarkersDiameter * scale;
+                        // второй кружок третьего маркера
+                        if (ThirdMarkerType == 1)
+                        {
+                            _bottomThirdMarkerType2.Value.Center = thirdMarkerCenter;
+                            _bottomThirdMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                        }
+                        else _bottomThirdMarkerType2.Value.Visible = false;
                     }
                     else _bottomThirdMarker.Value.Visible = false;
                 }
@@ -462,11 +609,15 @@ namespace mpESKD.Functions.mpAxis
             {
                 _bottomMarkerLine.Value.Visible = false;
                 _bottomFirstMarker.Value.Visible = false;
+                _bottomFirstMarkerType2.Value.Visible = false;
                 _bottomSecondMarker.Value.Visible = false;
+                _bottomSecondMarkerType2.Value.Visible = false;
                 _bottomThirdMarker.Value.Visible = false;
+                _bottomThirdMarkerType2.Value.Visible = false;
                 _bottomFractureOffsetLine.Value.Visible = false;
             }
-            // Top
+            #endregion
+            #region Top
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Top)
             {
@@ -484,20 +635,42 @@ namespace mpESKD.Functions.mpAxis
                 _topMarkerLine.Value.StartPoint = topLineStartPoint;
                 _topMarkerLine.Value.EndPoint = topLineStartPoint + markerLineVector.GetNormal() * (markerLineVector.Length - MarkersDiameter * scale / 2.0);
                 // markers
-
                 _topFirstMarker.Value.Center = firstMarkerCenter;
                 _topFirstMarker.Value.Diameter = MarkersDiameter * scale;
+                // Второй кружок первого маркера
+                if (FirstMarkerType == 1)
+                {
+                    _topFirstMarkerType2.Value.Center = firstMarkerCenter;
+                    _topFirstMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                }
+                else _topFirstMarkerType2.Value.Visible = false;
+                // Если количество маркеров больше 1
                 if (MarkersCount > 1)
                 {
+                    // Значит второй маркер точно есть (независимо от 3-го)
                     var secontMarkerCenter = firstMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
                     _topSecondMarker.Value.Center = secontMarkerCenter;
                     _topSecondMarker.Value.Diameter = MarkersDiameter * scale;
-
+                    // второй кружок второго маркера
+                    if (SecondMarkerType == 1)
+                    {
+                        _topSecondMarkerType2.Value.Center = secontMarkerCenter;
+                        _topSecondMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                    }
+                    else _topSecondMarkerType2.Value.Visible = false;
+                    // Если количество маркеров больше двух, тогда рисую 3-ий маркер
                     if (MarkersCount > 2)
                     {
                         var thirdMarkerCenter = secontMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
                         _topThirdMarker.Value.Center = thirdMarkerCenter;
                         _topThirdMarker.Value.Diameter = MarkersDiameter * scale;
+                        // второй кружок третьего маркера
+                        if (ThirdMarkerType == 1)
+                        {
+                            _topThirdMarkerType2.Value.Center = thirdMarkerCenter;
+                            _topThirdMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                        }
+                        else _topThirdMarkerType2.Value.Visible = false;
                     }
                     else _topThirdMarker.Value.Visible = false;
                 }
@@ -511,10 +684,19 @@ namespace mpESKD.Functions.mpAxis
             {
                 _topMarkerLine.Value.Visible = false;
                 _topFirstMarker.Value.Visible = false;
+                _topFirstMarkerType2.Value.Visible = false;
                 _topSecondMarker.Value.Visible = false;
+                _topSecondMarkerType2.Value.Visible = false;
                 _topThirdMarker.Value.Visible = false;
+                _topThirdMarkerType2.Value.Visible = false;
                 _topFractureOffsetLine.Value.Visible = false;
             }
+            #endregion
+        }
+
+        public void UpdateTextEntities()
+        {
+            BottomFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
         }
         #endregion
 
@@ -537,16 +719,25 @@ namespace mpESKD.Functions.mpAxis
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, MarkersPosition.ToString())); // 1
                 // scale
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 2
+                // text style
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TextStyle)); // 3
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstText)); // 4
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstTextPrefix)); // 5
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstTextSuffix)); // 6
                 // Целочисленные значения (код 1070)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersDiameter)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Fracture)); // 1
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersCount)); // 2
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BottomFractureOffset)); // 3
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, TopFractureOffset)); // 4
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, FirstMarkerType)); // 5
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, SecondMarkerType)); // 6
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, ThirdMarkerType)); // 7
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomLineAngle)); // 1
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopLineAngle)); // 2
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TextHeight)); // 3
 
                 return resBuf;
             }
@@ -589,6 +780,14 @@ namespace mpESKD.Functions.mpAxis
                                     MarkersPosition = AxisPropertiesHelpers.GetAxisMarkersPositionFromString(typedValue.Value.ToString());
                                 if (index1000 == 2) // 2 - scale
                                     Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
+                                if (index1000 == 3) // 3 - TextStyle
+                                    TextStyle = typedValue.Value.ToString();
+                                if (index1000 == 4) // 4 - FirstText
+                                    FirstText = typedValue.Value.ToString();
+                                if (index1000 == 5) // 5 - FirstTextPrefix
+                                    FirstTextPrefix = typedValue.Value.ToString();
+                                if (index1000 == 6) // 6 - FirstTextSuffix
+                                    FirstTextSuffix = typedValue.Value.ToString();
                                 // index
                                 index1000++;
                                 break;
@@ -601,10 +800,16 @@ namespace mpESKD.Functions.mpAxis
                                     Fracture = (Int16)typedValue.Value;
                                 if (index1070 == 2) // 2 - MarkersCount
                                     MarkersCount = (Int16)typedValue.Value;
-                                if (index1070 == 3) // 2 - BottomFractureOffset
+                                if (index1070 == 3) // 3 - BottomFractureOffset
                                     BottomFractureOffset = (Int16)typedValue.Value;
-                                if (index1070 == 4) // 2 - TopFractureOffset
+                                if (index1070 == 4) // 4 - TopFractureOffset
                                     TopFractureOffset = (Int16)typedValue.Value;
+                                if (index1070 == 5) // 5 - FirstMarkerType
+                                    FirstMarkerType = (Int16)typedValue.Value;
+                                if (index1070 == 6) // 6 - SecondMarkerType
+                                    SecondMarkerType = (Int16)typedValue.Value;
+                                if (index1070 == 7) // 7 - ThirdMarkerType
+                                    ThirdMarkerType = (Int16)typedValue.Value;
                                 //index
                                 index1070++;
                                 break;
@@ -617,6 +822,8 @@ namespace mpESKD.Functions.mpAxis
                                     BottomLineAngle = (double)typedValue.Value;
                                 if (index1040 == 2) // 2 - TopLineAngle
                                     TopLineAngle = (double)typedValue.Value;
+                                if (index1040 == 3) // 3 - TextHeight
+                                    TextHeight = (double)typedValue.Value;
                                 index1040++;
                                 break;
                             }

@@ -70,6 +70,60 @@ namespace mpESKD.Functions.mpAxis.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(MarkersCount)));
             }
         }
+        /// <summary>Текстовый стиль</summary>
+        public string TextStyle
+        {
+            get => GetStrProp(nameof(TextStyle));
+            set
+            {
+                SetPropValue(nameof(TextStyle), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(TextStyle)));
+            }
+        }
+        /// <summary>Высота текста</summary>
+        public double? TextHeight
+        {
+            get => GetDoubleProp(nameof(TextHeight));
+            set
+            {
+                SetPropValue(nameof(TextHeight), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(TextHeight)));
+            }
+        }
+
+        #region Типы маркеров
+        /// <summary>Тип первого маркера</summary>
+        public string FirstMarkerType
+        {
+            get => GetStrProp(nameof(FirstMarkerType));
+            set
+            {
+                SetPropValue(nameof(FirstMarkerType), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(FirstMarkerType)));
+            }
+        }
+        /// <summary>Тип второго маркера</summary>
+        public string SecondMarkerType
+        {
+            get => GetStrProp(nameof(SecondMarkerType));
+            set
+            {
+                SetPropValue(nameof(SecondMarkerType), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(SecondMarkerType)));
+            }
+        }
+        /// <summary>Тип третьего маркера</summary>
+        public string ThirdMarkerType
+        {
+            get => GetStrProp(nameof(ThirdMarkerType));
+            set
+            {
+                SetPropValue(nameof(ThirdMarkerType), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(ThirdMarkerType)));
+            }
+        }
+        #endregion
+
         /// <summary>Тип линии</summary>
         public string LineType
         {
@@ -92,11 +146,14 @@ namespace mpESKD.Functions.mpAxis.Properties
             }
         }
 
-        public AxisSummaryProperties(IEnumerable<ObjectId> objectIds)
+        public AxisSummaryProperties(IEnumerable<ObjectId> objectIds, out int maxCount)
         {
+            maxCount = 1;
             foreach (ObjectId objectId in objectIds)
             {
                 AxisPropertiesData data = new AxisPropertiesData(objectId);
+                if (data.MarkersCount > maxCount)
+                    maxCount = data.MarkersCount;
                 if (data.IsValid)
                     Add(data);
             }

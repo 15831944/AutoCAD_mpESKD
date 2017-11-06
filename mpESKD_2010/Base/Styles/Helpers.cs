@@ -4,12 +4,16 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Data;
+using System.Xml.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 using mpESKD.Base.Properties;
+using ModPlusAPI.Windows;
 
 namespace mpESKD.Base.Styles
 {
@@ -131,7 +135,72 @@ namespace mpESKD.Base.Styles
                 return MPCOStyleType.User;
             return MPCOStyleType.System;
         }
-        
+        /// <summary>Создание XElement из свойства для сохранения в файл стилей</summary>
+        public static XElement CreateXElementFromProperty(KeyValuePair<string, object> property)
+        {
+            var propXel = new XElement("Property");
+            propXel.SetAttributeValue("Name", property.Key);
+            propXel.SetAttributeValue("PropertyType", property.Value.GetType().Name);
+            propXel.SetAttributeValue("Value", property.Value);
+            return propXel;
+        }
+
+        public static MPCOIntProperty CreatePropertyFromXml(XElement propXel, MPCOIntProperty descriptiveProperty)
+        {
+            var nameAttr = propXel.Attribute("Name");
+            return new MPCOIntProperty
+            {
+                Name = nameAttr?.Value,
+                Value = int.TryParse(propXel.Attribute("Value")?.Value, out int i)? i: descriptiveProperty.DefaultValue,
+                Description = descriptiveProperty.Description,
+                DefaultValue = descriptiveProperty.DefaultValue,
+                PropertyType = descriptiveProperty.PropertyType,
+                DisplayName = descriptiveProperty.DisplayName,
+                Minimum = descriptiveProperty.Minimum,
+                Maximum = descriptiveProperty.Maximum
+            };
+        }
+        public static MPCODoubleProperty CreatePropertyFromXml(XElement propXel, MPCODoubleProperty descriptiveProperty)
+        {
+            var nameAttr = propXel.Attribute("Name");
+            return new MPCODoubleProperty
+            {
+                Name = nameAttr?.Value,
+                Value = double.TryParse(propXel.Attribute("Value")?.Value, out double d) ? d : descriptiveProperty.DefaultValue,
+                Description = descriptiveProperty.Description,
+                DefaultValue = descriptiveProperty.DefaultValue,
+                PropertyType = descriptiveProperty.PropertyType,
+                DisplayName = descriptiveProperty.DisplayName,
+                Minimum = descriptiveProperty.Minimum,
+                Maximum = descriptiveProperty.Maximum
+            };
+        }
+        public static MPCOStringProperty CreatePropertyFromXml(XElement propXel, MPCOStringProperty descriptiveProperty)
+        {
+            var nameAttr = propXel.Attribute("Name");
+            return new MPCOStringProperty
+            {
+                Name = nameAttr?.Value,
+                Value = propXel.Attribute("Value")?.Value,
+                Description = descriptiveProperty.Description,
+                DefaultValue = descriptiveProperty.DefaultValue,
+                PropertyType = descriptiveProperty.PropertyType,
+                DisplayName = descriptiveProperty.DisplayName,
+            };
+        }
+        public static MPCOTypeProperty<T> CreatePropertyFromXml<T>(XElement propXel, MPCOTypeProperty<T> descriptiveProperty, T value)
+        {
+            var nameAttr = propXel.Attribute("Name");
+            return new MPCOTypeProperty<T>
+            {
+                Name = nameAttr?.Value,
+                Value = value,
+                Description = descriptiveProperty.Description,
+                DefaultValue = descriptiveProperty.DefaultValue,
+                PropertyType = descriptiveProperty.PropertyType,
+                DisplayName = descriptiveProperty.DisplayName,
+            };
+        }
     }
 
     //public class MPCOstyle : IMPCOStyle

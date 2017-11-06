@@ -5,6 +5,7 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Xml.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -66,6 +67,28 @@ namespace mpESKD.Base.Helpers
                     }
                 }
                 return scales;
+            }
+        }
+        /// <summary>Текстовые стили текущего чертежа</summary>
+        public static List<string> TextStyles
+        {
+            get
+            {
+                List<string> textStyles = new List<string>();
+                using (Document.LockDocument())
+                {
+                    using (OpenCloseTransaction tr = Database.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        var txtstbl = (TextStyleTable)tr.GetObject(Database.TextStyleTableId, OpenMode.ForRead);
+                        foreach (ObjectId objectId in txtstbl)
+                        {
+                            var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
+                            if(!textStyles.Contains(txtStl.Name))
+                                textStyles.Add(txtStl.Name);
+                        }
+                    }
+                }
+                return textStyles;
             }
         }
 
@@ -301,6 +324,7 @@ namespace mpESKD.Base.Helpers
         /// <summary>Установка типа линии для блока согласно стиля</summary>
         public static void SetLineType(ObjectId blkRefObjectId, string lineTypeName)
         {
+            if(blkRefObjectId == ObjectId.Null) return;
             using (Document.LockDocument())
             {
                 using (var tr = Document.TransactionManager.StartTransaction())
@@ -363,6 +387,24 @@ namespace mpESKD.Base.Helpers
                 }
             }
             return loaded;
+        }
+
+        public static ObjectId GetTextStyleIdByName(string textStyleName)
+        {
+            using (Document.LockDocument())
+            {
+                using (OpenCloseTransaction tr = Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    var txtstbl = (TextStyleTable)tr.GetObject(Database.TextStyleTableId, OpenMode.ForRead);
+                    foreach (ObjectId objectId in txtstbl)
+                    {
+                        var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
+                        if (txtStl.Name.Equals(textStyleName))
+                            return objectId;
+                    }
+                }
+            }
+            return ObjectId.Null;
         }
     }
     /// <summary>Вспомогательные методы работы с расширенными данными
