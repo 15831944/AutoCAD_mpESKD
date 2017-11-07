@@ -58,7 +58,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             GripType = MPCOGrips.MPCOEntityGripType.Point,
                             Axis = axis,
                             GripName = AxisGripName.StartGrip,
-                            GripPoint = axis.StartGrip // вот эта точка из экземпляра класса breakline
+                            GripPoint = axis.StartGrip // вот эта точка из экземпляра класса axis
                         };
                         grips.Add(gp);
                         // получаем среднюю ручку
@@ -220,6 +220,12 @@ namespace mpESKD.Functions.mpAxis.Overrules
     /// <summary>Описание ручки линии обрыва</summary>
     public class AxisGrip : MPCOGrips.MPCOGripData //<-- Там будут определны типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
     {
+        public AxisGrip()
+        {
+            // отключение контекстного меню и возможности менять команду
+            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
+            ModeKeywordsDisabled = true;
+        }
         // Экземпляр класса breakline, связанный с этой ручкой
         public Axis Axis { get; set; }
         // Имя ручки

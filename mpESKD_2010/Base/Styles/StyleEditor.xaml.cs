@@ -50,6 +50,8 @@ namespace mpESKD.Base.Styles
                 _styles = new ObservableCollection<StyleToBind>();
                 GetSyles();
                 TvStyles.ItemsSource = _styles;
+                if (_styles.Any())
+                    BtCreateStyleFromEntity.IsEnabled = true;
             }
             catch (Exception exception)
             {
@@ -158,6 +160,12 @@ namespace mpESKD.Base.Styles
                 BtSetCurrentStyle.IsEnabled = false;
             }
         }
+        // create style from ent
+        private void BtCreateStyleFromEntity_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         private void TvStyles_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var selected = TvStyles.SelectedItem;
@@ -246,8 +254,6 @@ namespace mpESKD.Base.Styles
             VerticalGridSplitter.Visibility = Visibility.Visible;
             HorizontalGridSplitter.Visibility = Visibility.Visible;
         }
-
-        
     }
     
     /// <summary>

@@ -180,6 +180,12 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
     /// <summary>Описание ручки линии обрыва</summary>
     public class BreakLineGrip : MPCOGrips.MPCOGripData //<-- Там будут определны типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
     {
+        public BreakLineGrip()
+        {
+            // отключение контекстного меню и возможности менять команду
+            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
+            ModeKeywordsDisabled = true;
+        }
         // Экземпляр класса breakline, связанный с этой ручкой
         public BreakLine BreakLine { get; set; }
         // Имя ручки

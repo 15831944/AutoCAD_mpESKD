@@ -38,7 +38,7 @@
                 </Binding>
             </TextBox.Text>
         </TextBox>
-        <RepeatButton Grid.Column="2" Grid.Row="0" Name="Part_UpButton" Background="Transparent" Width="20" 
+        <RepeatButton Grid.Column="2" Grid.Row="0" Name="Part_UpButton" Background="Transparent" Width="16" 
                       Click="Increase_Click" BorderThickness="0" BorderBrush="{StaticResource ValueBorderColor}">
             <Path Fill="{StaticResource MainGrayBrush}" Data="M 0 3 L 6 3 L 3 0 Z"/>
         </RepeatButton>
@@ -46,7 +46,7 @@
                       HorizontalAlignment="Stretch"></GridSplitter>
         <GridSplitter Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" BorderThickness="1,0,0,0" BorderBrush="{StaticResource ValueBorderColor}"
                       VerticalAlignment="Stretch"></GridSplitter>
-        <RepeatButton Grid.Column="2" Grid.Row="2" Name="Part_DownButton" Background="Transparent" Width="20" 
+        <RepeatButton Grid.Column="2" Grid.Row="2" Name="Part_DownButton" Background="Transparent" Width="16" 
                       BorderBrush="{StaticResource ValueBorderColor}"
                       Click="Decrease_Click" BorderThickness="0">
             <Path Fill="{StaticResource MainGrayBrush}" Data="M 0 0 L 3 3 L 6 0 Z"/>
