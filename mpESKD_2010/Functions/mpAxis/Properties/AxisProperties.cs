@@ -156,6 +156,85 @@ namespace mpESKD.Functions.mpAxis.Properties
             DefaultValue = "По умолчанию",
             Description = "Слой примитива"
         };
+
+        #region text
+        // first
+        public static MPCOStringProperty FirstTextPrefixPropertyDescritive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "FirstTextPrefix",
+            DisplayName = "Префикс первого значения:",
+            DefaultValue = string.Empty,
+            Description = "Префикс первого значения"
+        };
+        public static MPCOStringProperty FirstTextSuffixPropertyDescritive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "FirstTextSuffix",
+            DisplayName = "Суффикс первого значения:",
+            DefaultValue = string.Empty,
+            Description = "Суффикс первого значения"
+        };
+        public static MPCOStringProperty FirstTextPropertyDescritive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "FirstText",
+            DisplayName = "Первое значение:",
+            DefaultValue = string.Empty,
+            Description = "Первое значение"
+        };
+        // second
+        public static MPCOStringProperty SecondTextPrefixPropertyDescritive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "SecondTextPrefix",
+            DisplayName = "Префикс второго значения:",
+            DefaultValue = string.Empty,
+            Description = "Префикс второго значения"
+        };
+        public static MPCOStringProperty SecondTextSuffixPropertyDescritive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "SecondTextSuffix",
+            DisplayName = "Суффикс второго значения:",
+            DefaultValue = string.Empty,
+            Description = "Суффикс второго значения"
+        };
+        public static MPCOStringProperty SecondTextPropertyDescritive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "SecondText",
+            DisplayName = "Второе значение:",
+            DefaultValue = string.Empty,
+            Description = "Второе значение"
+        };
+        // third
+        public static MPCOStringProperty ThirdTextPrefixPropertyDescritive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "ThirdTextPrefix",
+            DisplayName = "Префикс третьего значения:",
+            DefaultValue = string.Empty,
+            Description = "Префикс третьего значения"
+        };
+        public static MPCOStringProperty ThirdTextSuffixPropertyDescritive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "ThirdTextSuffix",
+            DisplayName = "Суффикс третьего значения:",
+            DefaultValue = string.Empty,
+            Description = "Суффикс третьего значения"
+        };
+        public static MPCOStringProperty ThirdTextPropertyDescritive = new MPCOStringProperty
+        {
+            PropertyType = MPCOPropertyType.String,
+            Name = "ThirdText",
+            DisplayName = "Третье значение:",
+            DefaultValue = string.Empty,
+            Description = "Третье значение"
+        };
+
+        #endregion
     }
     public static class AxisPropertiesHelpers
     {

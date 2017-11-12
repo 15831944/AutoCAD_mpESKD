@@ -75,7 +75,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     Expander.Header = AxisFunction.MPCOEntDisplayName + " (" + objectIds.Count + ")";
                     _axisSummaryProperties = new AxisSummaryProperties(objectIds, out int maxCount);
-                    ChangeMarkersTypesVisibility(maxCount);
+                    ChangeVisibilityByMarkerCount(maxCount);
                     SetData(_axisSummaryProperties);
                 }
             }
@@ -120,6 +120,24 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _parentPalette.ShowDescription(AxisProperties.TextStylePropertyDescriptive.Description);
             if (fe.Name.Equals("TbTextHeight"))
                 _parentPalette.ShowDescription(AxisProperties.TextHeightPropertyDescriptive.Description);
+            if (fe.Name.Equals("TbFirstTextPrefix"))
+                _parentPalette.ShowDescription(AxisProperties.FirstTextPrefixPropertyDescritive.Description);
+            if (fe.Name.Equals("TbFirstText"))
+                _parentPalette.ShowDescription(AxisProperties.FirstTextPropertyDescritive.Description);
+            if (fe.Name.Equals("TbFirstTextSuffix"))
+                _parentPalette.ShowDescription(AxisProperties.FirstTextSuffixPropertyDescritive.Description);
+            if (fe.Name.Equals("TbSecondTextPrefix"))
+                _parentPalette.ShowDescription(AxisProperties.SecondTextPrefixPropertyDescritive.Description);
+            if (fe.Name.Equals("TbSecondText"))
+                _parentPalette.ShowDescription(AxisProperties.SecondTextPropertyDescritive.Description);
+            if (fe.Name.Equals("TbSecondTextSuffix"))
+                _parentPalette.ShowDescription(AxisProperties.SecondTextSuffixPropertyDescritive.Description);
+            if (fe.Name.Equals("TbThirdTextPrefix"))
+                _parentPalette.ShowDescription(AxisProperties.ThirdTextPrefixPropertyDescritive.Description);
+            if (fe.Name.Equals("TbThirdText"))
+                _parentPalette.ShowDescription(AxisProperties.ThirdTextPropertyDescritive.Description);
+            if (fe.Name.Equals("TbThirdTextSuffix"))
+                _parentPalette.ShowDescription(AxisProperties.ThirdTextSuffixPropertyDescritive.Description);
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)
@@ -157,24 +175,42 @@ namespace mpESKD.Functions.mpAxis.Properties
             }
         }
 
-        private void ChangeMarkersTypesVisibility(int markerCount)
+        private void ChangeVisibilityByMarkerCount(int markerCount)
         {
             switch (markerCount)
             {
                 case 1:
-                    TbFirstMarkerTypeHeader.Visibility = CbFirstMarkerType.Visibility = Visibility.Visible;
                     TbSecondMarkerTypeHeader.Visibility = CbSecondMarkerType.Visibility = Visibility.Collapsed;
                     TbThirdMarkerTypeHeader.Visibility = CbThirdMarkerType.Visibility = Visibility.Collapsed;
+                    // text
+                    TbSecondText.Visibility = Visibility.Collapsed;
+                    TbSecondTextPrefix.Visibility = Visibility.Collapsed;
+                    TbSecondTextSuffix.Visibility = Visibility.Collapsed;
+                    TbThirdText.Visibility = Visibility.Collapsed;
+                    TbThirdTextPrefix.Visibility = Visibility.Collapsed;
+                    TbThirdTextSuffix.Visibility = Visibility.Collapsed;
                     break;
                 case 2:
-                    TbFirstMarkerTypeHeader.Visibility = CbFirstMarkerType.Visibility = Visibility.Visible;
                     TbSecondMarkerTypeHeader.Visibility = CbSecondMarkerType.Visibility = Visibility.Visible;
                     TbThirdMarkerTypeHeader.Visibility = CbThirdMarkerType.Visibility = Visibility.Collapsed;
+                    // text
+                    TbSecondText.Visibility = Visibility.Visible;
+                    TbSecondTextPrefix.Visibility = Visibility.Visible;
+                    TbSecondTextSuffix.Visibility = Visibility.Visible;
+                    TbThirdText.Visibility = Visibility.Collapsed;
+                    TbThirdTextPrefix.Visibility = Visibility.Collapsed;
+                    TbThirdTextSuffix.Visibility = Visibility.Collapsed;
                     break;
                 case 3:
-                    TbFirstMarkerTypeHeader.Visibility = CbFirstMarkerType.Visibility = Visibility.Visible;
                     TbSecondMarkerTypeHeader.Visibility = CbSecondMarkerType.Visibility = Visibility.Visible;
                     TbThirdMarkerTypeHeader.Visibility = CbThirdMarkerType.Visibility = Visibility.Visible;
+                    // text
+                    TbSecondText.Visibility = Visibility.Visible;
+                    TbSecondTextPrefix.Visibility = Visibility.Visible;
+                    TbSecondTextSuffix.Visibility = Visibility.Visible;
+                    TbThirdText.Visibility = Visibility.Visible;
+                    TbThirdTextPrefix.Visibility = Visibility.Visible;
+                    TbThirdTextSuffix.Visibility = Visibility.Visible;
                     break;
             }
         }
@@ -184,7 +220,7 @@ namespace mpESKD.Functions.mpAxis.Properties
             if (sender is IntTextBox itb)
             {
                 if (int.TryParse(itb.Value.ToString(), out int i))
-                    ChangeMarkersTypesVisibility(i);
+                    ChangeVisibilityByMarkerCount(i);
             }
         }
     }

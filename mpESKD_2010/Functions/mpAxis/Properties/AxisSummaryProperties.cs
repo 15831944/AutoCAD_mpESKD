@@ -91,6 +91,92 @@ namespace mpESKD.Functions.mpAxis.Properties
             }
         }
 
+        #region Text
+
+        public string FirstTextPrefix
+        {
+            get => GetStrProp(nameof(FirstTextPrefix));
+            set
+            {
+                SetPropValue(nameof(FirstTextPrefix), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(FirstTextPrefix)));
+            }
+        }
+        public string FirstText
+        {
+            get => GetStrProp(nameof(FirstText));
+            set
+            {
+                SetPropValue(nameof(FirstText), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(FirstText)));
+            }
+        }
+        public string FirstTextSuffix
+        {
+            get => GetStrProp(nameof(FirstTextSuffix));
+            set
+            {
+                SetPropValue(nameof(FirstTextSuffix), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(FirstTextSuffix)));
+            }
+        }
+        public string SecondTextPrefix
+        {
+            get => GetStrProp(nameof(SecondTextPrefix));
+            set
+            {
+                SetPropValue(nameof(SecondTextPrefix), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(SecondTextPrefix)));
+            }
+        }
+        public string SecondText
+        {
+            get => GetStrProp(nameof(SecondText));
+            set
+            {
+                SetPropValue(nameof(SecondText), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(SecondText)));
+            }
+        }
+        public string SecondTextSuffix
+        {
+            get => GetStrProp(nameof(SecondTextSuffix));
+            set
+            {
+                SetPropValue(nameof(SecondTextSuffix), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(SecondTextSuffix)));
+            }
+        }
+        public string ThirdTextPrefix
+        {
+            get => GetStrProp(nameof(ThirdTextPrefix));
+            set
+            {
+                SetPropValue(nameof(ThirdTextPrefix), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(ThirdTextPrefix)));
+            }
+        }
+        public string ThirdText
+        {
+            get => GetStrProp(nameof(ThirdText));
+            set
+            {
+                SetPropValue(nameof(ThirdText), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(ThirdText)));
+            }
+        }
+        public string ThirdTextSuffix
+        {
+            get => GetStrProp(nameof(ThirdTextSuffix));
+            set
+            {
+                SetPropValue(nameof(ThirdTextSuffix), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(ThirdTextSuffix)));
+            }
+        }
+
+        #endregion
+
         #region Типы маркеров
         /// <summary>Тип первого маркера</summary>
         public string FirstMarkerType

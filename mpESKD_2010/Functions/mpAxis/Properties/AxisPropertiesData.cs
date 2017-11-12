@@ -266,6 +266,252 @@ namespace mpESKD.Functions.mpAxis.Properties
             }
         }
 
+        #region Text
+        // first text
+        private string _firstTextPrefix;
+        public string FirstTextPrefix
+        {
+            get => _firstTextPrefix;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.FirstTextPrefix = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private string _firstTextSuffix;
+        public string FirstTextSuffix
+        {
+            get => _firstTextSuffix;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.FirstTextSuffix = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private string _firstText;
+        public string FirstText
+        {
+            get => _firstText;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.FirstText = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+        // second text
+        private string _secondTextPrefix;
+        public string SecondTextPrefix
+        {
+            get => _secondTextPrefix;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.SecondTextPrefix = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private string _secondTextSuffix;
+        public string SecondTextSuffix
+        {
+            get => _secondTextSuffix;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.SecondTextSuffix = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private string _secondText;
+        public string SecondText
+        {
+            get => _secondText;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.SecondText = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+        // third text
+        private string _thirdTextPrefix;
+        public string ThirdTextPrefix
+        {
+            get => _thirdTextPrefix;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.ThirdTextPrefix = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private string _thirdTextSuffix;
+        public string ThirdTextSuffix
+        {
+            get => _thirdTextSuffix;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.ThirdTextSuffix = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private string _thirdText;
+        public string ThirdText
+        {
+            get => _thirdText;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        {
+                            axis.ThirdText = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+        #endregion
+
         #region Типы маркеров
 
         private string _firstMarkerType;
@@ -503,6 +749,20 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _lineTypeScale = axis.LineTypeScale;
                 _textStyle = axis.TextStyle;
                 _textHeight = axis.TextHeight;
+
+                #region text
+
+                _firstTextPrefix = axis.FirstTextPrefix;
+                _firstTextSuffix = axis.FirstTextSuffix;
+                _firstText = axis.FirstText;
+                _secondTextPrefix = axis.SecondTextPrefix;
+                _secondTextSuffix = axis.SecondTextSuffix;
+                _secondText = axis.SecondText;
+                _thirdTextPrefix = axis.ThirdTextPrefix;
+                _thirdTextSuffix = axis.ThirdTextSuffix;
+                _thirdText = axis.ThirdText;
+
+                #endregion
                 AnyPropertyChangedReise();
             }
         }

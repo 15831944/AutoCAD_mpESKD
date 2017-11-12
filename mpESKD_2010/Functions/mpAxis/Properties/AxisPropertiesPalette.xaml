@@ -155,6 +155,15 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Содержимое" Style="{StaticResource HeaderTextBox}"></TextBox>
                 <!--TextStyle-->
@@ -168,8 +177,62 @@
                                      Style="{StaticResource PropertyValueDoubleTextBox}"
                                      Minimum="0.000000001" Maximum="{x:Static sys:Double.MaxValue}"
                                      x:Name="TbTextHeight" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:DoubleTextBox>
-                <!--GridSplitter-->
-                <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" BorderThickness="1,0,1,0"
+                <!-- First text -->
+                <TextBox Grid.Row="3" Grid.Column="0" Text="Префикс первого значения:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="3" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
+                         Name="TbFirstTextPrefix"
+                         Text="{Binding FirstTextPrefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
+                <TextBox Grid.Row="4" Grid.Column="0" Text="Первое значение:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="4" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
+                         Name="TbFirstText"
+                         Text="{Binding FirstText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
+                <TextBox Grid.Row="5" Grid.Column="0" Text="Суффикс первого значения:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="5" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
+                         Name="TbFirstTextSuffix"
+                         Text="{Binding FirstTextSuffix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
+            <!-- Second text -->
+                <TextBox Grid.Row="6" Grid.Column="0" Text="Префикс второго значения:" Style="{StaticResource PropertyNameTextBoxBase}"
+                         Visibility="{Binding ElementName=TbSecondTextPrefix, Path=Visibility}"></TextBox>
+                <TextBox Grid.Row="6" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
+                         Name="TbSecondTextPrefix"
+                         Text="{Binding SecondTextPrefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
+                <TextBox Grid.Row="7" Grid.Column="0" Text="Второе значение:" Style="{StaticResource PropertyNameTextBoxBase}"
+                         Visibility="{Binding ElementName=TbSecondText, Path=Visibility}"></TextBox>
+                <TextBox Grid.Row="7" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
+                         Name="TbSecondText"
+                         Text="{Binding SecondText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
+                <TextBox Grid.Row="8" Grid.Column="0" Text="Суффикс второго значения:" Style="{StaticResource PropertyNameTextBoxBase}"
+                         Visibility="{Binding ElementName=TbSecondTextSuffix, Path=Visibility}"></TextBox>
+                <TextBox Grid.Row="8" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
+                         Name="TbSecondTextSuffix"
+                         Text="{Binding SecondTextSuffix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
+            <!-- Third text -->
+                <TextBox Grid.Row="9" Grid.Column="0" Text="Префикс третьего значения:" Style="{StaticResource PropertyNameTextBoxBase}"
+                         Visibility="{Binding ElementName=TbThirdTextPrefix, Path=Visibility}"></TextBox>
+                <TextBox Grid.Row="9" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
+                         Name="TbThirdTextPrefix"
+                         Text="{Binding ThirdTextPrefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
+                <TextBox Grid.Row="10" Grid.Column="0" Text="Третье значение:" Style="{StaticResource PropertyNameTextBoxBase}"
+                         Visibility="{Binding ElementName=TbThirdText, Path=Visibility}"></TextBox>
+                <TextBox Grid.Row="10" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
+                         Name="TbThirdText"
+                         Text="{Binding ThirdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
+                <TextBox Grid.Row="11" Grid.Column="0" Text="Суффикс третьего значения:" Style="{StaticResource PropertyNameTextBoxBase}"
+                         Visibility="{Binding ElementName=TbThirdTextSuffix, Path=Visibility}"></TextBox>
+                <TextBox Grid.Row="11" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
+                         Name="TbThirdTextSuffix"
+                         Text="{Binding ThirdTextSuffix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
+            <!--GridSplitter-->
+                <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="11" BorderThickness="1,0,1,0"
                               HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
         </Grid>
         </Grid>

@@ -162,8 +162,14 @@ namespace mpESKD.Functions.mpAxis
         public string TextStyle { get; set; } = AxisProperties.TextStylePropertyDescriptive.DefaultValue;
         public double TextHeight { get; set; }
         public string FirstTextPrefix { get; set; } = string.Empty;
-        public string FirstText { get; set; } = "A";
+        public string FirstText { get; set; } = string.Empty;
         public string FirstTextSuffix { get; set; } = string.Empty;
+        public string SecondTextPrefix { get; set; } = string.Empty;
+        public string SecondText { get; set; } = string.Empty;
+        public string SecondTextSuffix { get; set; } = string.Empty;
+        public string ThirdTextPrefix { get; set; } = string.Empty;
+        public string ThirdText { get; set; } = string.Empty;
+        public string ThirdTextSuffix { get; set; } = string.Empty;
 
         #endregion
 
@@ -439,6 +445,44 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
+        private readonly Lazy<DBText> _bottomSecondDBText = new Lazy<DBText>(() => new DBText());
+        public DBText BottomSecondDBText
+        {
+            get
+            {
+                SetPropertiesToDBText(_bottomSecondDBText.Value);
+                return _bottomSecondDBText.Value;
+            }
+        }
+        private readonly Lazy<DBText> _topSecondDBText = new Lazy<DBText>(() => new DBText());
+        public DBText TopSecondDBText
+        {
+            get
+            {
+                SetPropertiesToDBText(_topSecondDBText.Value);
+                return _topSecondDBText.Value;
+            }
+        }
+
+        private readonly Lazy<DBText> _bottomThirdDBText = new Lazy<DBText>(() => new DBText());
+        public DBText BottomThirdDBText
+        {
+            get
+            {
+                SetPropertiesToDBText(_bottomThirdDBText.Value);
+                return _bottomThirdDBText.Value;
+            }
+        }
+        private readonly Lazy<DBText> _topThirdDBText = new Lazy<DBText>(() => new DBText());
+        public DBText TopThirdDBText
+        {
+            get
+            {
+                SetPropertiesToDBText(_topThirdDBText.Value);
+                return _topThirdDBText.Value;
+            }
+        }
+
         #endregion
 
         public override IEnumerable<Entity> Entities
@@ -463,6 +507,11 @@ namespace mpESKD.Functions.mpAxis
                 yield return BottomFractureOffsetLine;
                 yield return TopFractureOffsetLine;
                 yield return BottomFirstDBText;
+                yield return BottomSecondDBText;
+                yield return BottomThirdDBText;
+                yield return TopFirstDBText;
+                yield return TopSecondDBText;
+                yield return TopThirdDBText;
             }
         }
         /// <summary>Обновление (перерисовка) базовых примитивов</summary>
@@ -575,6 +624,15 @@ namespace mpESKD.Functions.mpAxis
                     var secontMarkerCenter = firstMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
                     _bottomSecondMarker.Value.Center = secontMarkerCenter;
                     _bottomSecondMarker.Value.Diameter = MarkersDiameter * scale;
+                    // text
+                    if (string.IsNullOrEmpty(SecondTextPrefix) && string.IsNullOrEmpty(SecondText) &&
+                        string.IsNullOrEmpty(SecondTextSuffix))
+                        BottomSecondDBText.Visible = false;
+                    else
+                    {
+                        BottomSecondDBText.Position = secontMarkerCenter;
+                        BottomSecondDBText.AlignmentPoint = secontMarkerCenter;
+                    }
                     // второй кружок второго маркера
                     if (SecondMarkerType == 1)
                     {
@@ -588,6 +646,15 @@ namespace mpESKD.Functions.mpAxis
                         var thirdMarkerCenter = secontMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
                         _bottomThirdMarker.Value.Center = thirdMarkerCenter;
                         _bottomThirdMarker.Value.Diameter = MarkersDiameter * scale;
+                        // text
+                        if (string.IsNullOrEmpty(ThirdTextPrefix) && string.IsNullOrEmpty(ThirdText) &&
+                            string.IsNullOrEmpty(ThirdTextSuffix))
+                            BottomThirdDBText.Visible = false;
+                        else
+                        {
+                            BottomThirdDBText.Position = thirdMarkerCenter;
+                            BottomThirdDBText.AlignmentPoint = thirdMarkerCenter;
+                        }
                         // второй кружок третьего маркера
                         if (ThirdMarkerType == 1)
                         {
@@ -603,7 +670,6 @@ namespace mpESKD.Functions.mpAxis
                     _bottomSecondMarker.Value.Visible = false;
                     _bottomThirdMarker.Value.Visible = false;
                 }
-
             }
             else
             {
@@ -615,6 +681,9 @@ namespace mpESKD.Functions.mpAxis
                 _bottomThirdMarker.Value.Visible = false;
                 _bottomThirdMarkerType2.Value.Visible = false;
                 _bottomFractureOffsetLine.Value.Visible = false;
+                _bottomFirstDBText.Value.Visible = false;
+                _bottomSecondDBText.Value.Visible = false;
+                _bottomThirdDBText.Value.Visible = false;
             }
             #endregion
             #region Top
@@ -637,6 +706,15 @@ namespace mpESKD.Functions.mpAxis
                 // markers
                 _topFirstMarker.Value.Center = firstMarkerCenter;
                 _topFirstMarker.Value.Diameter = MarkersDiameter * scale;
+                // text
+                if (string.IsNullOrEmpty(FirstTextPrefix) && string.IsNullOrEmpty(FirstText) &&
+                    string.IsNullOrEmpty(FirstTextSuffix))
+                    TopFirstDBText.Visible = false;
+                else
+                {
+                    TopFirstDBText.Position = firstMarkerCenter;
+                    TopFirstDBText.AlignmentPoint = firstMarkerCenter;
+                }
                 // Второй кружок первого маркера
                 if (FirstMarkerType == 1)
                 {
@@ -651,6 +729,15 @@ namespace mpESKD.Functions.mpAxis
                     var secontMarkerCenter = firstMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
                     _topSecondMarker.Value.Center = secontMarkerCenter;
                     _topSecondMarker.Value.Diameter = MarkersDiameter * scale;
+                    // text
+                    if (string.IsNullOrEmpty(SecondTextPrefix) && string.IsNullOrEmpty(SecondText) &&
+                        string.IsNullOrEmpty(SecondTextSuffix))
+                        TopSecondDBText.Visible = false;
+                    else
+                    {
+                        TopSecondDBText.Position = secontMarkerCenter;
+                        TopSecondDBText.AlignmentPoint = secontMarkerCenter;
+                    }
                     // второй кружок второго маркера
                     if (SecondMarkerType == 1)
                     {
@@ -664,6 +751,15 @@ namespace mpESKD.Functions.mpAxis
                         var thirdMarkerCenter = secontMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
                         _topThirdMarker.Value.Center = thirdMarkerCenter;
                         _topThirdMarker.Value.Diameter = MarkersDiameter * scale;
+                        // text
+                        if (string.IsNullOrEmpty(ThirdTextPrefix) && string.IsNullOrEmpty(ThirdText) &&
+                            string.IsNullOrEmpty(ThirdTextSuffix))
+                            TopThirdDBText.Visible = false;
+                        else
+                        {
+                            TopThirdDBText.Position = thirdMarkerCenter;
+                            TopThirdDBText.AlignmentPoint = thirdMarkerCenter;
+                        }
                         // второй кружок третьего маркера
                         if (ThirdMarkerType == 1)
                         {
@@ -690,6 +786,9 @@ namespace mpESKD.Functions.mpAxis
                 _topThirdMarker.Value.Visible = false;
                 _topThirdMarkerType2.Value.Visible = false;
                 _topFractureOffsetLine.Value.Visible = false;
+                _topFirstDBText.Value.Visible = false;
+                _topSecondDBText.Value.Visible = false;
+                _topThirdDBText.Value.Visible = false;
             }
             #endregion
         }
@@ -697,6 +796,11 @@ namespace mpESKD.Functions.mpAxis
         public void UpdateTextEntities()
         {
             BottomFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
+            BottomSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
+            BottomThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
+            TopFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
+            TopSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
+            TopThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
         }
         #endregion
 
@@ -724,6 +828,12 @@ namespace mpESKD.Functions.mpAxis
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstText)); // 4
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstTextPrefix)); // 5
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstTextSuffix)); // 6
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, SecondText)); // 7
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, SecondTextPrefix)); // 8
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, SecondTextSuffix)); // 9
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdText)); // 10
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdTextPrefix)); // 11
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdTextSuffix)); // 12
                 // Целочисленные значения (код 1070)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersDiameter)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Fracture)); // 1
@@ -788,6 +898,18 @@ namespace mpESKD.Functions.mpAxis
                                     FirstTextPrefix = typedValue.Value.ToString();
                                 if (index1000 == 6) // 6 - FirstTextSuffix
                                     FirstTextSuffix = typedValue.Value.ToString();
+                                if (index1000 == 7) // 7 - SecondText
+                                    SecondText = typedValue.Value.ToString();
+                                if (index1000 == 8) // 8 - SecondTextPrefix
+                                    SecondTextPrefix = typedValue.Value.ToString();
+                                if (index1000 == 9) // 9 - SecondTextSuffix
+                                    SecondTextSuffix = typedValue.Value.ToString();
+                                if (index1000 == 10) // 10 - ThirdText
+                                    ThirdText = typedValue.Value.ToString();
+                                if (index1000 == 11) // 11 - ThirdTextPrefix
+                                    ThirdTextPrefix = typedValue.Value.ToString();
+                                if (index1000 == 12) // 12 - ThirdTextSuffix
+                                    ThirdTextSuffix = typedValue.Value.ToString();
                                 // index
                                 index1000++;
                                 break;
