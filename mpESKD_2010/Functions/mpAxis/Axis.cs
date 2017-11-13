@@ -64,17 +64,17 @@ namespace mpESKD.Functions.mpAxis
             {
                 var baseVector = new Vector3d(1.0, 0.0, 0.0);
                 var angleA = baseVector.GetAngleTo(EndPoint - InsertionPoint, Vector3d.ZAxis);
-                var bottomLineLength = Fracture / Math.Cos(BottomLineAngle) * GetScale();
+                var bottomLineLength = Fracture / Math.Cos(BottomLineAngle) * GetScale() * BlockTransform.GetScale();
                 _bottomMarkerPoint = new Point3d(
                     EndPoint.X + bottomLineLength * Math.Cos(angleA + BottomLineAngle),
                     EndPoint.Y + bottomLineLength * Math.Sin(angleA + BottomLineAngle),
                     EndPoint.Z);
-                return _bottomMarkerPoint + (EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetScale();
+                return _bottomMarkerPoint + (EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetScale() * BlockTransform.GetScale();
             }
             set
             {
                 _bottomMarkerPoint = value;
-                BottomLineAngle = (EndPoint - InsertionPoint).GetAngleTo(value - EndPoint - (EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetScale(), Vector3d.ZAxis);
+                BottomLineAngle = (EndPoint - InsertionPoint).GetAngleTo(value - EndPoint - (EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetScale() * BlockTransform.GetScale(), Vector3d.ZAxis);
             }
         }
 
@@ -88,17 +88,17 @@ namespace mpESKD.Functions.mpAxis
             {
                 var baseVector = new Vector3d(1.0, 0.0, 0.0);
                 var angleA = baseVector.GetAngleTo(InsertionPoint - EndPoint, Vector3d.ZAxis);
-                var topLineLength = Fracture / Math.Cos(TopLineAngle) * GetScale();
+                var topLineLength = Fracture / Math.Cos(TopLineAngle) * GetScale() * BlockTransform.GetScale();
                 _topMarkerPoint = new Point3d(
                     InsertionPoint.X + topLineLength * Math.Cos(angleA + TopLineAngle),
                     InsertionPoint.Y + topLineLength * Math.Sin(angleA + TopLineAngle),
                     InsertionPoint.Z);
-                return _topMarkerPoint + (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetScale();
+                return _topMarkerPoint + (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetScale() * BlockTransform.GetScale();
             }
             set
             {
                 _topMarkerPoint = value;
-                TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint - (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetScale(), Vector3d.ZAxis);
+                TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint - (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetScale() * BlockTransform.GetScale(), Vector3d.ZAxis);
             }
         }
         // Получение управляющих точек в системе координат блока для отрисовки содержимого
@@ -663,12 +663,18 @@ namespace mpESKD.Functions.mpAxis
                         }
                         else _bottomThirdMarkerType2.Value.Visible = false;
                     }
-                    else _bottomThirdMarker.Value.Visible = false;
+                    else
+                    {
+                        _bottomThirdMarker.Value.Visible = false;
+                        _bottomThirdMarkerType2.Value.Visible = false;
+                    }
                 }
                 else
                 {
                     _bottomSecondMarker.Value.Visible = false;
+                    _bottomSecondMarkerType2.Value.Visible = false;
                     _bottomThirdMarker.Value.Visible = false;
+                    _bottomThirdMarkerType2.Value.Visible = false;
                 }
             }
             else
@@ -768,12 +774,18 @@ namespace mpESKD.Functions.mpAxis
                         }
                         else _topThirdMarkerType2.Value.Visible = false;
                     }
-                    else _topThirdMarker.Value.Visible = false;
+                    else
+                    {
+                        _topThirdMarker.Value.Visible = false;
+                        _topThirdMarkerType2.Value.Visible = false;
+                    }
                 }
                 else
                 {
-                    _topThirdMarker.Value.Visible = false;
                     _topSecondMarker.Value.Visible = false;
+                    _topSecondMarkerType2.Value.Visible = false;
+                    _topThirdMarker.Value.Visible = false;
+                    _topThirdMarkerType2.Value.Visible = false;
                 }
             }
             else
