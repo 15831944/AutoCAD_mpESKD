@@ -16,6 +16,8 @@ namespace mpESKD.Base.Properties
                 return MPCOPropertyType.Double;
             if (type == "Type")
                 return MPCOPropertyType.Type;
+            if (type == "Bool")
+                return MPCOPropertyType.Bool;
             // or string
             return MPCOPropertyType.String;
         }
@@ -23,12 +25,20 @@ namespace mpESKD.Base.Properties
 
     public class MPCOStringProperty : MPCOBaseProperty
     {
+        public MPCOStringProperty()
+        {
+            PropertyType = MPCOPropertyType.String;
+        }
         public string Value { get; set; }
         public string DefaultValue { get; set; }
     }
 
     public class MPCOIntProperty : MPCOBaseProperty
     {
+        public MPCOIntProperty()
+        {
+            PropertyType = MPCOPropertyType.Int;
+        }
         public int Value { get; set; }
         public int DefaultValue { get; set; }
         public int Minimum { get; set; }
@@ -36,14 +46,32 @@ namespace mpESKD.Base.Properties
     }
     public class MPCODoubleProperty : MPCOBaseProperty
     {
+        public MPCODoubleProperty()
+        {
+            PropertyType = MPCOPropertyType.Double;
+        }
         public double Value { get; set; }
         public double DefaultValue { get; set; }
         public double Minimum { get; set; }
         public double Maximum { get; set; }
     }
 
+    public class MPCOBoolProperty : MPCOBaseProperty
+    {
+        public MPCOBoolProperty()
+        {
+            PropertyType = MPCOPropertyType.Bool;
+        }
+        public bool Value { get; set; }
+        public bool DefaultValue { get; set; }
+    }
+
     public class MPCOTypeProperty<T> : MPCOBaseProperty
     {
+        public MPCOTypeProperty()
+        {
+            PropertyType = MPCOPropertyType.Type;
+        }
         public T Value { get; set; }
         public T DefaultValue { get; set; }
     }
@@ -52,11 +80,13 @@ namespace mpESKD.Base.Properties
     {
         public string ScaleName { get; set; }
     }
+
     public enum MPCOPropertyType
     {
         String = 1,
         Int = 2,
         Double = 3,
-        Type = 4
+        Type = 4,
+        Bool = 5
     }
 }

@@ -25,17 +25,17 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         {
             if (!(sender is FrameworkElement fe)) return;
             if (fe.Name.Equals("TbOverhang"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.OverhangPropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.Overhang.Description);
             if (fe.Name.Equals("TbBreakHeight"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.BreakHeightPropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.BreakHeight.Description);
             if (fe.Name.Equals("TbBreakWidth"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.BreakWidthPropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.BreakWidth.Description);
             if (fe.Name.Equals("CbBreakLineType"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.BreakLineTypePropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.BreakLineType.Description);
             if (fe.Name.Equals("CbScale"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.ScalePropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.Scale.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.LineTypeScalePropertyDescriptive.Description);
+                StyleEditorWork.ShowDescription(BreakLineProperties.LineTypeScale.Description);
             if (fe.Name.Equals("CbLayerName"))
                 StyleEditorWork.ShowDescription(BreakLineProperties.LayerName.Description);
         }

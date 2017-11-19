@@ -38,35 +38,35 @@ namespace mpESKD.Functions.mpAxis.Styles
         {
             // Properties
             Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture),
-                AxisProperties.FracturePropertyDescriptive.DefaultValue);
+                AxisProperties.Fracture.DefaultValue);
             BottomFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(BottomFractureOffset),
-                AxisProperties.BottomFractureOffsetPropertyDescriptive.DefaultValue);
+                AxisProperties.BottomFractureOffset.DefaultValue);
             TopFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(TopFractureOffset),
-                AxisProperties.TopFractureOffsetPropertyDescriptive.DefaultValue);
+                AxisProperties.TopFractureOffset.DefaultValue);
             MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition),
-                AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue);
+                AxisProperties.MarkersPosition.DefaultValue);
             MarkersDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkersDiameter),
-                AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue);
+                AxisProperties.MarkersDiameter.DefaultValue);
             MarkersCount = StyleHelpers.GetPropertyValue(style, nameof(MarkersCount),
-                AxisProperties.MarkersCountPropertyDescriptive.DefaultValue);
+                AxisProperties.MarkersCount.DefaultValue);
             FirstMarkerType = StyleHelpers.GetPropertyValue(style, nameof(FirstMarkerType),
-                AxisProperties.FirstMarkerTypePropertyDescriptive.DefaultValue);
+                AxisProperties.FirstMarkerType.DefaultValue);
             SecondMarkerType = StyleHelpers.GetPropertyValue(style, nameof(SecondMarkerType),
-                AxisProperties.SecondMarkerTypePropertyDescriptive.DefaultValue);
+                AxisProperties.SecondMarkerType.DefaultValue);
             ThirdMarkerType = StyleHelpers.GetPropertyValue(style, nameof(ThirdMarkerType),
-                AxisProperties.ThirdMarkerTypePropertyDescriptive.DefaultValue);
+                AxisProperties.ThirdMarkerType.DefaultValue);
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale),
-                AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue);
+                AxisProperties.LineTypeScale.DefaultValue);
             LineType = StyleHelpers.GetPropertyValue(style, nameof(LineType),
-                AxisProperties.LineTypePropertyDescriptive.DefaultValue);
+                AxisProperties.LineType.DefaultValue);
             TextStyle = StyleHelpers.GetPropertyValue(style, nameof(TextStyle),
-                AxisProperties.TextStylePropertyDescriptive.DefaultValue);
+                AxisProperties.TextStyle.DefaultValue);
             TextHeight = StyleHelpers.GetPropertyValue(style, nameof(TextHeight),
-                AxisProperties.TextHeightPropertyDescriptive.DefaultValue);
+                AxisProperties.TextHeight.DefaultValue);
             LayerName = StyleHelpers.GetPropertyValue(style, nameof(LayerName),
                 AxisProperties.LayerName.DefaultValue);
             Scale = StyleHelpers.GetPropertyValue<AnnotationScale>(style, nameof(Scale),
-                AxisProperties.ScalePropertyDescriptive.DefaultValue);
+                AxisProperties.Scale.DefaultValue);
             LayerXmlData = style.LayerXmlData;
             TextStyleXmlData = ((AxisStyle) style).TextStyleXmlData;
         }
@@ -74,21 +74,21 @@ namespace mpESKD.Functions.mpAxis.Styles
         public AxisStyleForEditor(StyleToBind parent) : base(parent)
         {
             // Properties
-            Fracture = AxisProperties.FracturePropertyDescriptive.DefaultValue;
-            BottomFractureOffset = AxisProperties.BottomFractureOffsetPropertyDescriptive.DefaultValue;
-            TopFractureOffset = AxisProperties.TopFractureOffsetPropertyDescriptive.DefaultValue;
-            MarkersPosition = AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue;
-            MarkersDiameter = AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue;
-            MarkersCount = AxisProperties.MarkersCountPropertyDescriptive.DefaultValue;
-            FirstMarkerType = AxisProperties.FirstMarkerTypePropertyDescriptive.DefaultValue;
-            SecondMarkerType = AxisProperties.SecondMarkerTypePropertyDescriptive.DefaultValue;
-            ThirdMarkerType = AxisProperties.ThirdMarkerTypePropertyDescriptive.DefaultValue;
-            TextStyle = AxisProperties.TextStylePropertyDescriptive.DefaultValue;
-            TextHeight = AxisProperties.TextHeightPropertyDescriptive.DefaultValue;
-            LineTypeScale = AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue;
-            LineType = AxisProperties.LineTypePropertyDescriptive.DefaultValue;
+            Fracture = AxisProperties.Fracture.DefaultValue;
+            BottomFractureOffset = AxisProperties.BottomFractureOffset.DefaultValue;
+            TopFractureOffset = AxisProperties.TopFractureOffset.DefaultValue;
+            MarkersPosition = AxisProperties.MarkersPosition.DefaultValue;
+            MarkersDiameter = AxisProperties.MarkersDiameter.DefaultValue;
+            MarkersCount = AxisProperties.MarkersCount.DefaultValue;
+            FirstMarkerType = AxisProperties.FirstMarkerType.DefaultValue;
+            SecondMarkerType = AxisProperties.SecondMarkerType.DefaultValue;
+            ThirdMarkerType = AxisProperties.ThirdMarkerType.DefaultValue;
+            TextStyle = AxisProperties.TextStyle.DefaultValue;
+            TextHeight = AxisProperties.TextHeight.DefaultValue;
+            LineTypeScale = AxisProperties.LineTypeScale.DefaultValue;
+            LineType = AxisProperties.LineType.DefaultValue;
             LayerName = AxisProperties.LayerName.DefaultValue;
-            Scale = AxisProperties.ScalePropertyDescriptive.DefaultValue;
+            Scale = AxisProperties.Scale.DefaultValue;
         }
         #region Properties
         // Позиция маркеров
@@ -224,50 +224,50 @@ namespace mpESKD.Functions.mpAxis.Styles
                         switch (nameAttr.Value)
                         {
                             case "MarkersPosition":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel,AxisProperties.MarkersPositionPropertyDescriptive,
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel,AxisProperties.MarkersPosition,
                                     AxisPropertiesHelpers.GetAxisMarkersPositionFromString(propXel.Attribute("Value")?.Value)));
                                 break;
                             case "MarkersDiameter":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel,AxisProperties.MarkersDiameterPropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel,AxisProperties.MarkersDiameter));
                                 break;
                             case "MarkersCount":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.MarkersCountPropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.MarkersCount));
                                 break;
                             case "FirstMarkerType":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.FirstMarkerTypePropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.FirstMarkerType));
                                 break;
                             case "SecondMarkerType":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.SecondMarkerTypePropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.SecondMarkerType));
                                 break;
                             case "ThirdMarkerType":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.ThirdMarkerTypePropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.ThirdMarkerType));
                                 break;
                             case "Fracture":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.FracturePropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.Fracture));
                                 break;
                             case "BottomFractureOffset":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.BottomFractureOffsetPropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.BottomFractureOffset));
                                 break;
                             case "TopFractureOffset":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.TopFractureOffsetPropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.TopFractureOffset));
                                 break;
                             case "LineTypeScale":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.LineTypeScalePropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.LineTypeScale));
                                 break;
                             case "LineType":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.LineTypePropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.LineType));
                                 break;
                             case "LayerName":
                                 style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.LayerName));
                                 break;
                             case "TextStyle":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.TextStylePropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.TextStyle));
                                 break;
                             case "TextHeight":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.TextHeightPropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.TextHeight));
                                 break;
                             case "Scale":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.ScalePropertyDescriptive,
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.Scale,
                                     Parsers.AnnotationScaleFromString(propXel.Attribute("Value")?.Value)));
                                 break;
                         }
@@ -356,21 +356,21 @@ namespace mpESKD.Functions.mpAxis.Styles
                 StyleType = MPCOStyleType.System
             };
 
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.MarkersDiameterPropertyDescriptive.DefaultValue, AxisProperties.MarkersDiameterPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.BottomFractureOffsetPropertyDescriptive.DefaultValue, AxisProperties.BottomFractureOffsetPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.TopFractureOffsetPropertyDescriptive.DefaultValue, AxisProperties.TopFractureOffsetPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.MarkersCountPropertyDescriptive.DefaultValue, AxisProperties.MarkersCountPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.FirstMarkerTypePropertyDescriptive.DefaultValue, AxisProperties.FirstMarkerTypePropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.SecondMarkerTypePropertyDescriptive.DefaultValue, AxisProperties.SecondMarkerTypePropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.ThirdMarkerTypePropertyDescriptive.DefaultValue, AxisProperties.ThirdMarkerTypePropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.FracturePropertyDescriptive.DefaultValue, AxisProperties.FracturePropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineTypeScalePropertyDescriptive.DefaultValue, AxisProperties.LineTypeScalePropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineTypePropertyDescriptive.DefaultValue, AxisProperties.LineTypePropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.MarkersDiameter.DefaultValue, AxisProperties.MarkersDiameter));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.BottomFractureOffset.DefaultValue, AxisProperties.BottomFractureOffset));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.TopFractureOffset.DefaultValue, AxisProperties.TopFractureOffset));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.MarkersCount.DefaultValue, AxisProperties.MarkersCount));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.FirstMarkerType.DefaultValue, AxisProperties.FirstMarkerType));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.SecondMarkerType.DefaultValue, AxisProperties.SecondMarkerType));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.ThirdMarkerType.DefaultValue, AxisProperties.ThirdMarkerType));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.Fracture.DefaultValue, AxisProperties.Fracture));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineTypeScale.DefaultValue, AxisProperties.LineTypeScale));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineType.DefaultValue, AxisProperties.LineType));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LayerName.DefaultValue, AxisProperties.LayerName));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.TextStylePropertyDescriptive.DefaultValue, AxisProperties.TextStylePropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.TextHeightPropertyDescriptive.DefaultValue, AxisProperties.TextHeightPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty<AxisMarkersPosition>(AxisProperties.MarkersPositionPropertyDescriptive.DefaultValue, AxisProperties.MarkersPositionPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty<AnnotationScale>(AxisProperties.ScalePropertyDescriptive.DefaultValue, AxisProperties.ScalePropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.TextStyle.DefaultValue, AxisProperties.TextStyle));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.TextHeight.DefaultValue, AxisProperties.TextHeight));
+            style.Properties.Add(StyleHelpers.CreateProperty<AxisMarkersPosition>(AxisProperties.MarkersPosition.DefaultValue, AxisProperties.MarkersPosition));
+            style.Properties.Add(StyleHelpers.CreateProperty<AnnotationScale>(AxisProperties.Scale.DefaultValue, AxisProperties.Scale));
 
             styles.Add(style);
 

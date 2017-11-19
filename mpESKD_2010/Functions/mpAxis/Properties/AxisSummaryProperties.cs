@@ -210,6 +210,70 @@ namespace mpESKD.Functions.mpAxis.Properties
         }
         #endregion
 
+        #region Orient markers
+
+        public int? ArrowSize
+        {
+            get => GetIntProp(nameof(ArrowSize));
+            set
+            {
+                SetPropValue(nameof(ArrowSize), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(ArrowSize)));
+            }
+        }
+
+        public string BottomOrientText
+        {
+            get => GetStrProp(nameof(BottomOrientText));
+            set
+            {
+                SetPropValue(nameof(BottomOrientText), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(BottomOrientText)));
+            }
+        }
+
+        public string TopOrientText
+        {
+            get => GetStrProp(nameof(TopOrientText));
+            set
+            {
+                SetPropValue(nameof(TopOrientText), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(TopOrientText)));
+            }
+        }
+        
+        public bool? BottomOrientMarkerVisible
+        {
+            get => GetBoolProp(nameof(BottomOrientMarkerVisible));
+            set
+            {
+                SetPropValue(nameof(BottomOrientMarkerVisible), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(BottomOrientMarkerVisible)));
+            }
+        }
+
+        public bool? TopOrientMarkerVisible
+        {
+            get => GetBoolProp(nameof(TopOrientMarkerVisible));
+            set
+            {
+                SetPropValue(nameof(TopOrientMarkerVisible), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(TopOrientMarkerVisible)));
+            }
+        }
+
+        public string OrientMarkerType
+        {
+            get => GetStrProp(nameof(OrientMarkerType));
+            set
+            {
+                SetPropValue(nameof(OrientMarkerType), value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(OrientMarkerType)));
+            }
+        }
+
+        #endregion
+
         /// <summary>Тип линии</summary>
         public string LineType
         {

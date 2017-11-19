@@ -7,18 +7,16 @@ namespace mpESKD.Functions.mpAxis.Properties
     public static class AxisProperties
     {
         /// <summary>Поле, описывающее свойство "Тип линии обрыва"</summary>
-        public static MPCOTypeProperty<AxisMarkersPosition> MarkersPositionPropertyDescriptive = new MPCOTypeProperty<AxisMarkersPosition>
+        public static MPCOTypeProperty<AxisMarkersPosition> MarkersPosition = new MPCOTypeProperty<AxisMarkersPosition>
         {
-            PropertyType = MPCOPropertyType.Type,
             Name = "MarkersPosition",
             DisplayName = "Позиция маркеров:",
             DefaultValue = AxisMarkersPosition.Bottom,
             Description = "Позиция маркеров: с двух сторон, сверху или снизу"
         };
         /// <summary>Поле, описывающее свойство "Излом"</summary>
-        public static MPCOIntProperty FracturePropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty Fracture = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "Fracture",
             DisplayName = "Излом:",
             DefaultValue = 10,
@@ -27,9 +25,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             Description = "Высота излома оси"
         };
         /// <summary>Поле, описывающее свойство "Диаметр маркеров"</summary>
-        public static MPCOIntProperty MarkersDiameterPropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty MarkersDiameter = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "MarkersDiameter",
             DisplayName = "Диаметр маркеров:",
             DefaultValue = 10,
@@ -38,9 +35,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             Description = "Диаметр маркеров оси"
         };
         /// <summary>Поле, описывающее свойство "Количество маркеров"</summary>
-        public static MPCOIntProperty MarkersCountPropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty MarkersCount = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "MarkersCount",
             DisplayName = "Количество маркеров:",
             DefaultValue = 1,
@@ -48,9 +44,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             Maximum = 3,
             Description = "Количество маркеров оси"
         };
-        public static MPCOIntProperty FirstMarkerTypePropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty FirstMarkerType = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "FirstMarkerType",
             DisplayName = "Тип первого маркера:",
             DefaultValue = 0,
@@ -58,9 +53,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             Maximum = 1,
             Description = "Тип первого маркера"
         };
-        public static MPCOIntProperty SecondMarkerTypePropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty SecondMarkerType = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "SecondMarkerType",
             DisplayName = "Тип второго маркера:",
             DefaultValue = 0,
@@ -68,9 +62,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             Maximum = 1,
             Description = "Тип второго маркера"
         };
-        public static MPCOIntProperty ThirdMarkerTypePropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty ThirdMarkerType = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "ThirdMarkerType",
             DisplayName = "Тип третьего маркера:",
             DefaultValue = 0,
@@ -79,9 +72,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             Description = "Тип третьего маркера"
         };
         /// <summary>Поле, описывающее свойство "Нижний отступ излома"</summary>
-        public static MPCOIntProperty BottomFractureOffsetPropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty BottomFractureOffset = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "BottomFractureOffset",
             DisplayName = "Нижний отступ излома:",
             DefaultValue = 0,
@@ -90,9 +82,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             Description = "Нижний отступ излома"
         };
         /// <summary>Поле, описывающее свойство "Верхний отступ излома"</summary>
-        public static MPCOIntProperty TopFractureOffsetPropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty TopFractureOffset = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "TopFractureOffset",
             DisplayName = "Верхний отступ излома:",
             DefaultValue = 0,
@@ -100,17 +91,15 @@ namespace mpESKD.Functions.mpAxis.Properties
             Maximum = 30,
             Description = "Верхний отступ излома"
         };
-        public static MPCOStringProperty TextStylePropertyDescriptive = new MPCOStringProperty
+        public static MPCOStringProperty TextStyle = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "TextStyle",
             DisplayName = "Текстовый стиль:",
             DefaultValue = "Standard",
             Description = "Текстовый стиль"
         };
-        public static MPCODoubleProperty TextHeightPropertyDescriptive = new MPCODoubleProperty
+        public static MPCODoubleProperty TextHeight = new MPCODoubleProperty
         {
-            PropertyType = MPCOPropertyType.Double,
             Name = "TextHeight",
             DisplayName = "Высота текста:",
             DefaultValue = 3.5,
@@ -120,18 +109,16 @@ namespace mpESKD.Functions.mpAxis.Properties
         };
         // General
         /// <summary>Поле, описывающее свойство "Масштаб"</summary>
-        public static MPCOTypeProperty<AnnotationScale> ScalePropertyDescriptive = new MPCOTypeProperty<AnnotationScale>
+        public static MPCOTypeProperty<AnnotationScale> Scale = new MPCOTypeProperty<AnnotationScale>
         {
-            PropertyType = MPCOPropertyType.Type,
             Name = "Scale",
             DisplayName = "Масштаб:",
             DefaultValue = new AnnotationScale { Name = "1:1", DrawingUnits = 1.0, PaperUnits = 1.0 },
             Description = "Масштаб линии обрыва"
         };
         /// <summary>Поле, описывающее свойство "Масштаб типа линии"</summary>
-        public static MPCODoubleProperty LineTypeScalePropertyDescriptive = new MPCODoubleProperty
+        public static MPCODoubleProperty LineTypeScale = new MPCODoubleProperty
         {
-            PropertyType = MPCOPropertyType.Double,
             Name = "LineTypeScale",
             DisplayName = "Масштаб типа линий:",
             DefaultValue = 10.0,
@@ -139,9 +126,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             Maximum = double.MaxValue,
             Description = "Масштаб типа линии для заданного в свойствах блока типа линии"
         };
-        public static MPCOStringProperty LineTypePropertyDescriptive = new MPCOStringProperty
+        public static MPCOStringProperty LineType = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "LineType",
             DisplayName = "Тип линии:",
             DefaultValue = "осевая",
@@ -150,7 +136,6 @@ namespace mpESKD.Functions.mpAxis.Properties
         /// <summary>Поле, описывающее слой</summary>
         public static MPCOStringProperty LayerName = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "LayerName",
             DisplayName = "Слой",
             DefaultValue = "По умолчанию",
@@ -159,79 +144,117 @@ namespace mpESKD.Functions.mpAxis.Properties
 
         #region text
         // first
-        public static MPCOStringProperty FirstTextPrefixPropertyDescritive = new MPCOStringProperty
+        public static MPCOStringProperty FirstTextPrefix = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "FirstTextPrefix",
             DisplayName = "Префикс первого значения:",
             DefaultValue = string.Empty,
             Description = "Префикс первого значения"
         };
-        public static MPCOStringProperty FirstTextSuffixPropertyDescritive = new MPCOStringProperty
+        public static MPCOStringProperty FirstTextSuffix = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "FirstTextSuffix",
             DisplayName = "Суффикс первого значения:",
             DefaultValue = string.Empty,
             Description = "Суффикс первого значения"
         };
-        public static MPCOStringProperty FirstTextPropertyDescritive = new MPCOStringProperty
+        public static MPCOStringProperty FirstText = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "FirstText",
             DisplayName = "Первое значение:",
             DefaultValue = string.Empty,
             Description = "Первое значение"
         };
         // second
-        public static MPCOStringProperty SecondTextPrefixPropertyDescritive = new MPCOStringProperty
+        public static MPCOStringProperty SecondTextPrefix = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "SecondTextPrefix",
             DisplayName = "Префикс второго значения:",
             DefaultValue = string.Empty,
             Description = "Префикс второго значения"
         };
-        public static MPCOStringProperty SecondTextSuffixPropertyDescritive = new MPCOStringProperty
+        public static MPCOStringProperty SecondTextSuffix = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "SecondTextSuffix",
             DisplayName = "Суффикс второго значения:",
             DefaultValue = string.Empty,
             Description = "Суффикс второго значения"
         };
-        public static MPCOStringProperty SecondTextPropertyDescritive = new MPCOStringProperty
+        public static MPCOStringProperty SecondText = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "SecondText",
             DisplayName = "Второе значение:",
             DefaultValue = string.Empty,
             Description = "Второе значение"
         };
         // third
-        public static MPCOStringProperty ThirdTextPrefixPropertyDescritive = new MPCOStringProperty
+        public static MPCOStringProperty ThirdTextPrefix = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "ThirdTextPrefix",
             DisplayName = "Префикс третьего значения:",
             DefaultValue = string.Empty,
             Description = "Префикс третьего значения"
         };
-        public static MPCOStringProperty ThirdTextSuffixPropertyDescritive = new MPCOStringProperty
+        public static MPCOStringProperty ThirdTextSuffix = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "ThirdTextSuffix",
             DisplayName = "Суффикс третьего значения:",
             DefaultValue = string.Empty,
             Description = "Суффикс третьего значения"
         };
-        public static MPCOStringProperty ThirdTextPropertyDescritive = new MPCOStringProperty
+        public static MPCOStringProperty ThirdText = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "ThirdText",
             DisplayName = "Третье значение:",
             DefaultValue = string.Empty,
             Description = "Третье значение"
+        };
+        // Orient markers
+        public static MPCOIntProperty ArrowsSize = new MPCOIntProperty
+        {
+            Name = "ArrowsSize",
+            DisplayName = "Размер стрелок:",
+            Minimum = 0,
+            Maximum = 5,
+            DefaultValue = 1,
+            Description = "Размер стрелок"
+        };
+        public static MPCOStringProperty BottomOrientText = new MPCOStringProperty
+        {
+            Name = "BottomOrientText",
+            DisplayName = "Значение нижнего маркера-ориентира:",
+            DefaultValue = string.Empty,
+            Description = "Значение нижнего маркера-ориентира"
+        };
+        public static MPCOStringProperty TopOrientText = new MPCOStringProperty
+        {
+            Name = "TopOrientText",
+            DisplayName = "Значение верхнего маркера-ориентира:",
+            DefaultValue = string.Empty,
+            Description = "Значение верхнего маркера-ориентира"
+        };
+        public static MPCOBoolProperty BottomOrientMarkerVisible = new MPCOBoolProperty
+        {
+            Name = "BottomOrientMarkerVisible",
+            DisplayName = "Нижний маркер-ориентир:",
+            DefaultValue = false,
+            Description = "Видимость нижнего маркера-ориентира"
+        };
+        public static MPCOBoolProperty TopOrientMarkerVisible = new MPCOBoolProperty
+        {
+            Name = "TopOrientMarkerVisible",
+            DisplayName = "Верхний маркер-ориентир:",
+            DefaultValue = false,
+            Description = "Видимость верхнего маркера-ориентира"
+        };
+        public static MPCOIntProperty OrientMarkerType = new MPCOIntProperty
+        {
+            Name = nameof(OrientMarkerType),
+            DisplayName = "Тип маркера-ориентира:",
+            DefaultValue = 0,
+            Minimum = 0,
+            Maximum = 1,
+            Description = "Тип маркера-ориентира"
         };
 
         #endregion

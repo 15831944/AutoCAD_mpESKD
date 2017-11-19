@@ -104,6 +104,29 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             };
                             grips.Add(gp);
                         }
+                        // orient
+                        if (axis.BottomOrientMarkerVisible)
+                        {
+                            gp = new AxisGrip
+                            {
+                                GripType = MPCOGrips.MPCOEntityGripType.Point,
+                                Axis = axis,
+                                GripName = AxisGripName.BottomOrientGrip,
+                                GripPoint = axis.BottomOrientGrip
+                            };
+                            grips.Add(gp);
+                        }
+                        if (axis.TopOrientMarkerVisible)
+                        {
+                            gp = new AxisGrip
+                            {
+                                GripType = MPCOGrips.MPCOEntityGripType.Point,
+                                Axis = axis,
+                                GripName = AxisGripName.TopOrientGrip,
+                                GripPoint = axis.TopOrientGrip
+                            };
+                            grips.Add(gp);
+                        }
                     }
                 }
             }
@@ -188,12 +211,20 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             var mainVector = gripPoint.Axis.EndPoint - gripPoint.Axis.InsertionPoint;
                             var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
                             gripPoint.Axis.BottomMarkerPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
+                            // Меняю также точку маркера-ориентира
+                            //gripPoint.Axis.BottomOrientPoint 
                         }
                         if (gripPoint.GripName == AxisGripName.TopMarkerGrip)
                         {
                             var mainVector = gripPoint.Axis.InsertionPoint - gripPoint.Axis.EndPoint;
                             var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
                             gripPoint.Axis.TopMarkerPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
+                        }
+                        if (gripPoint.GripName == AxisGripName.BottomOrientGrip)
+                        {
+                            var mainVector = gripPoint.Axis.EndPoint - gripPoint.Axis.InsertionPoint;
+                            var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
+                            gripPoint.Axis.BottomOrientPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
                         }
                         // Вот тут происходит перерисовка примитивов внутри блока
                         gripPoint.Axis.UpdateEntities();
@@ -239,6 +270,8 @@ namespace mpESKD.Functions.mpAxis.Overrules
                 case AxisGripName.EndGrip:
                 case AxisGripName.BottomMarkerGrip:
                 case AxisGripName.TopMarkerGrip:
+                case AxisGripName.BottomOrientGrip:
+                case AxisGripName.TopOrientGrip:
                     {
                         return "Растянуть";
                     }
@@ -252,8 +285,9 @@ namespace mpESKD.Functions.mpAxis.Overrules
         private Point3d _endGripTmp;
         // other points
         private Point3d _bottomMarkerGripTmp;
-
         private Point3d _topMarkerGripTmp;
+        private Point3d _bottomOrientGripTmp;
+        private Point3d _topOrientGripTmp;
         // Обработка изменения статуса ручки
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
@@ -272,6 +306,10 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         _bottomMarkerGripTmp = GripPoint;
                     if (GripName == AxisGripName.TopMarkerGrip)
                         _topMarkerGripTmp = GripPoint;
+                    if (GripName == AxisGripName.BottomOrientGrip)
+                        _bottomOrientGripTmp = GripPoint;
+                    if (GripName == AxisGripName.TopOrientGrip)
+                        _topOrientGripTmp = GripPoint;
                     if (GripName == AxisGripName.MiddleGrip)
                     {
                         _startGripTmp = Axis.StartGrip;
@@ -303,6 +341,10 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         Axis.BottomMarkerPoint = GripPoint;
                     if (_topMarkerGripTmp != null && GripName == AxisGripName.TopMarkerGrip)
                         Axis.TopMarkerPoint = GripPoint;
+                    if (_bottomOrientGripTmp != null && GripName == AxisGripName.BottomOrientGrip)
+                        Axis.BottomOrientPoint = GripPoint;
+                    if (_topOrientGripTmp != null && GripName == AxisGripName.TopOrientGrip)
+                        Axis.TopOrientPoint = GripPoint;
                     if (GripName == AxisGripName.MiddleGrip && _startGripTmp != null && _endGripTmp != null)
                     {
                         Axis.InsertionPoint = _startGripTmp;
@@ -324,6 +366,8 @@ namespace mpESKD.Functions.mpAxis.Overrules
         MiddleGrip,
         EndGrip,
         BottomMarkerGrip,
-        TopMarkerGrip
+        TopMarkerGrip,
+        BottomOrientGrip,
+        TopOrientGrip
     }
 }

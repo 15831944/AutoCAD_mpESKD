@@ -90,17 +90,17 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             if (fe.Name.Equals("CbStyle"))
                 _parentPalette.ShowDescription("Стиль интеллектуального примитива");
             if (fe.Name.Equals("TbOverhang"))
-                _parentPalette.ShowDescription(BreakLineProperties.OverhangPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(BreakLineProperties.Overhang.Description);
             if (fe.Name.Equals("TbBreakHeight"))
-                _parentPalette.ShowDescription(BreakLineProperties.BreakHeightPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(BreakLineProperties.BreakHeight.Description);
             if (fe.Name.Equals("TbBreakWidth"))
-                _parentPalette.ShowDescription(BreakLineProperties.BreakWidthPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(BreakLineProperties.BreakWidth.Description);
             if (fe.Name.Equals("CbBreakLineType"))
-                _parentPalette.ShowDescription(BreakLineProperties.BreakLineTypePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(BreakLineProperties.BreakLineType.Description);
             if (fe.Name.Equals("CbScale"))
-                _parentPalette.ShowDescription(BreakLineProperties.ScalePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(BreakLineProperties.Scale.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
-                _parentPalette.ShowDescription(BreakLineProperties.LineTypeScalePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(BreakLineProperties.LineTypeScale.Description);
             if (fe.Name.Equals("CbLayerName"))
                 _parentPalette.ShowDescription(BreakLineProperties.LayerName.Description);
         }

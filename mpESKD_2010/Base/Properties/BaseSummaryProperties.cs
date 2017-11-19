@@ -75,6 +75,12 @@ namespace mpESKD.Base.Properties
             IEnumerable<double> vals = this.Select(data => (double)(data.GetType().GetProperty(propName).GetValue(data, null))).ToArray();
             return GetSummaryDoubleValue(vals);
         }
+
+        protected bool? GetBoolProp(string propName)
+        {
+            IEnumerable<bool> vals = this.Select(data => (bool) (data.GetType().GetProperty(propName).GetValue(data, null))).ToArray();
+            return GetSummaryBoolValue(vals);
+        }
         /// <summary>
         /// Объединение значений свойств типа Double в суммарное
         /// </summary>
@@ -97,6 +103,12 @@ namespace mpESKD.Base.Properties
         {
             if (vals.Distinct().Count() > 1)
                 return "*РАЗЛИЧНЫЕ*";
+            return vals.FirstOrDefault();
+        }
+
+        protected bool? GetSummaryBoolValue(IEnumerable<bool> vals)
+        {
+            if (vals.Distinct().Count() > 1) return null;
             return vals.FirstOrDefault();
         }
         /// <summary>

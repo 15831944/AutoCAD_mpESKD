@@ -36,29 +36,29 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         {
             // Properties
             Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang),
-                BreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
+                BreakLineProperties.Overhang.DefaultValue);
             BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth),
-                BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue);
+                BreakLineProperties.BreakWidth.DefaultValue);
             BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight),
-                BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
+                BreakLineProperties.BreakHeight.DefaultValue);
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale),
-                BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
+                BreakLineProperties.LineTypeScale.DefaultValue);
             LayerName = StyleHelpers.GetPropertyValue(style, nameof(LayerName),
                 BreakLineProperties.LayerName.DefaultValue);
             Scale = StyleHelpers.GetPropertyValue<AnnotationScale>(style, nameof(Scale),
-                BreakLineProperties.ScalePropertyDescriptive.DefaultValue);
+                BreakLineProperties.Scale.DefaultValue);
             LayerXmlData = style.LayerXmlData;
         }
 
         public BreakLineStyleForEditor(StyleToBind parent) : base(parent)
         {
             // Properties
-            Overhang = BreakLineProperties.OverhangPropertyDescriptive.DefaultValue;
-            BreakWidth = BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue;
-            BreakHeight = BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue;
-            LineTypeScale = BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue;
+            Overhang = BreakLineProperties.Overhang.DefaultValue;
+            BreakWidth = BreakLineProperties.BreakWidth.DefaultValue;
+            BreakHeight = BreakLineProperties.BreakHeight.DefaultValue;
+            LineTypeScale = BreakLineProperties.LineTypeScale.DefaultValue;
             LayerName = BreakLineProperties.LayerName.DefaultValue;
-            Scale = BreakLineProperties.ScalePropertyDescriptive.DefaultValue;
+            Scale = BreakLineProperties.Scale.DefaultValue;
         }
 
         #region Properties
@@ -177,22 +177,22 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                         switch (nameAttr.Value)
                         {
                             case "Overhang":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.OverhangPropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.Overhang));
                                 break;
                             case "BreakHeight":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.BreakHeightPropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.BreakHeight));
                                 break;
                             case "BreakWidth":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.BreakWidthPropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.BreakWidth));
                                 break;
                             case "LineTypeScale":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.LineTypeScalePropertyDescriptive));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.LineTypeScale));
                                 break;
                             case "LayerName":
                                 style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.LayerName));
                                 break;
                             case "Scale":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.ScalePropertyDescriptive,
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, BreakLineProperties.Scale,
                                     Parsers.AnnotationScaleFromString(propXel.Attribute("Value")?.Value)));
                                 break;
                         }
@@ -269,13 +269,13 @@ namespace mpESKD.Functions.mpBreakLine.Styles
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
             };
-            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.OverhangPropertyDescriptive.DefaultValue, BreakLineProperties.OverhangPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue, BreakLineProperties.BreakWidthPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue, BreakLineProperties.BreakHeightPropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue, BreakLineProperties.LineTypeScalePropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.Overhang.DefaultValue, BreakLineProperties.Overhang));
+            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.BreakWidth.DefaultValue, BreakLineProperties.BreakWidth));
+            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.BreakHeight.DefaultValue, BreakLineProperties.BreakHeight));
+            style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.LineTypeScale.DefaultValue, BreakLineProperties.LineTypeScale));
             style.Properties.Add(StyleHelpers.CreateProperty(BreakLineProperties.LayerName.DefaultValue, BreakLineProperties.LayerName));
-            style.Properties.Add(StyleHelpers.CreateProperty<BreakLineType>(BreakLineProperties.BreakLineTypePropertyDescriptive.DefaultValue, BreakLineProperties.BreakLineTypePropertyDescriptive));
-            style.Properties.Add(StyleHelpers.CreateProperty<AnnotationScale>(BreakLineProperties.ScalePropertyDescriptive.DefaultValue, BreakLineProperties.ScalePropertyDescriptive));
+            style.Properties.Add(StyleHelpers.CreateProperty<BreakLineType>(BreakLineProperties.BreakLineType.DefaultValue, BreakLineProperties.BreakLineType));
+            style.Properties.Add(StyleHelpers.CreateProperty<AnnotationScale>(BreakLineProperties.Scale.DefaultValue, BreakLineProperties.Scale));
 
             styles.Add(style);
 

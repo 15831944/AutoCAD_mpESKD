@@ -34,6 +34,7 @@ namespace mpESKD.Functions.mpAxis.Properties
             CbFirstMarkerType.ItemsSource = markerTypes;
             CbSecondMarkerType.ItemsSource = markerTypes;
             CbThirdMarkerType.ItemsSource = markerTypes;
+            CbOrientMarkerType.ItemsSource = markerTypes;
             // get data
             if (AcadHelpers.Document != null)
             {
@@ -91,53 +92,65 @@ namespace mpESKD.Functions.mpAxis.Properties
             if (fe.Name.Equals("CbStyle"))
                 _parentPalette.ShowDescription("Стиль интеллектуального примитива");
             if (fe.Name.Equals("TbMarkersCount"))
-                _parentPalette.ShowDescription(AxisProperties.MarkersCountPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.MarkersCount.Description);
             if (fe.Name.Equals("TbMarkersDiameter"))
-                _parentPalette.ShowDescription(AxisProperties.MarkersDiameterPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.MarkersDiameter.Description);
             if (fe.Name.Equals("TbFracture"))
-                _parentPalette.ShowDescription(AxisProperties.FracturePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.Fracture.Description);
             if (fe.Name.Equals("TbBottomFractureOffset"))
-                _parentPalette.ShowDescription(AxisProperties.BottomFractureOffsetPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.BottomFractureOffset.Description);
             if (fe.Name.Equals("TbTopFractureOffset"))
-                _parentPalette.ShowDescription(AxisProperties.TopFractureOffsetPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.TopFractureOffset.Description);
             if (fe.Name.Equals("CbMarkersPosition"))
-                _parentPalette.ShowDescription(AxisProperties.MarkersPositionPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.MarkersPosition.Description);
             if (fe.Name.Equals("CbFirstMarkerType"))
-                _parentPalette.ShowDescription(AxisProperties.FirstMarkerTypePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.FirstMarkerType.Description);
             if (fe.Name.Equals("CbSecondMarkerType"))
-                _parentPalette.ShowDescription(AxisProperties.SecondMarkerTypePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.SecondMarkerType.Description);
             if (fe.Name.Equals("CbThirdMarkerType"))
-                _parentPalette.ShowDescription(AxisProperties.ThirdMarkerTypePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.ThirdMarkerType.Description);
             if (fe.Name.Equals("CbScale"))
-                _parentPalette.ShowDescription(AxisProperties.ScalePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.Scale.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
-                _parentPalette.ShowDescription(AxisProperties.LineTypeScalePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.LineTypeScale.Description);
             if (fe.Name.Equals("TbLineType"))
-                _parentPalette.ShowDescription(AxisProperties.LineTypePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.LineType.Description);
             if (fe.Name.Equals("CbLayerName"))
                 _parentPalette.ShowDescription(AxisProperties.LayerName.Description);
             if (fe.Name.Equals("CbTextStyle"))
-                _parentPalette.ShowDescription(AxisProperties.TextStylePropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.TextStyle.Description);
             if (fe.Name.Equals("TbTextHeight"))
-                _parentPalette.ShowDescription(AxisProperties.TextHeightPropertyDescriptive.Description);
+                _parentPalette.ShowDescription(AxisProperties.TextHeight.Description);
             if (fe.Name.Equals("TbFirstTextPrefix"))
-                _parentPalette.ShowDescription(AxisProperties.FirstTextPrefixPropertyDescritive.Description);
+                _parentPalette.ShowDescription(AxisProperties.FirstTextPrefix.Description);
             if (fe.Name.Equals("TbFirstText"))
-                _parentPalette.ShowDescription(AxisProperties.FirstTextPropertyDescritive.Description);
+                _parentPalette.ShowDescription(AxisProperties.FirstText.Description);
             if (fe.Name.Equals("TbFirstTextSuffix"))
-                _parentPalette.ShowDescription(AxisProperties.FirstTextSuffixPropertyDescritive.Description);
+                _parentPalette.ShowDescription(AxisProperties.FirstTextSuffix.Description);
             if (fe.Name.Equals("TbSecondTextPrefix"))
-                _parentPalette.ShowDescription(AxisProperties.SecondTextPrefixPropertyDescritive.Description);
+                _parentPalette.ShowDescription(AxisProperties.SecondTextPrefix.Description);
             if (fe.Name.Equals("TbSecondText"))
-                _parentPalette.ShowDescription(AxisProperties.SecondTextPropertyDescritive.Description);
+                _parentPalette.ShowDescription(AxisProperties.SecondText.Description);
             if (fe.Name.Equals("TbSecondTextSuffix"))
-                _parentPalette.ShowDescription(AxisProperties.SecondTextSuffixPropertyDescritive.Description);
+                _parentPalette.ShowDescription(AxisProperties.SecondTextSuffix.Description);
             if (fe.Name.Equals("TbThirdTextPrefix"))
-                _parentPalette.ShowDescription(AxisProperties.ThirdTextPrefixPropertyDescritive.Description);
+                _parentPalette.ShowDescription(AxisProperties.ThirdTextPrefix.Description);
             if (fe.Name.Equals("TbThirdText"))
-                _parentPalette.ShowDescription(AxisProperties.ThirdTextPropertyDescritive.Description);
+                _parentPalette.ShowDescription(AxisProperties.ThirdText.Description);
             if (fe.Name.Equals("TbThirdTextSuffix"))
-                _parentPalette.ShowDescription(AxisProperties.ThirdTextSuffixPropertyDescritive.Description);
+                _parentPalette.ShowDescription(AxisProperties.ThirdTextSuffix.Description);
+            if (fe.Name.Equals("TbArrowsSize"))
+                _parentPalette.ShowDescription(AxisProperties.ArrowsSize.Description);
+            if (fe.Name.Equals("ChkBottomOrientMarkerVisible"))
+                _parentPalette.ShowDescription(AxisProperties.BottomOrientMarkerVisible.Description);
+            if (fe.Name.Equals("ChkTopOrientMarkerVisible"))
+                _parentPalette.ShowDescription(AxisProperties.TopOrientMarkerVisible.Description);
+            if (fe.Name.Equals("ChkOrientMarkerType"))
+                _parentPalette.ShowDescription(AxisProperties.OrientMarkerType.Description);
+            if (fe.Name.Equals("TbBottomOrientText"))
+                _parentPalette.ShowDescription(AxisProperties.BottomOrientText.Description);
+            if (fe.Name.Equals("TbTopOrientText"))
+                _parentPalette.ShowDescription(AxisProperties.TopOrientText.Description);
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)

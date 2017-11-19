@@ -67,8 +67,8 @@ namespace mpESKD.Functions.mpAxis
                 // set layer
                 AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
                 // set linetype
-                var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineTypePropertyDescriptive.Name,
-                    AxisProperties.LineTypePropertyDescriptive.DefaultValue);
+                var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name,
+                    AxisProperties.LineType.DefaultValue);
                 AcadHelpers.SetLineType(blockReference.ObjectId, lineType);
                 
 

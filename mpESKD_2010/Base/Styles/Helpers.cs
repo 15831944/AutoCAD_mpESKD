@@ -7,13 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Data;
 using System.Xml.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 using mpESKD.Base.Properties;
-using ModPlusAPI.Windows;
 
 namespace mpESKD.Base.Styles
 {

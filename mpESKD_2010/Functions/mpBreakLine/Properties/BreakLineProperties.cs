@@ -13,18 +13,16 @@ namespace mpESKD.Functions.mpBreakLine.Properties
     public static class BreakLineProperties
     {
         /// <summary>Поле, описывающее свойство "Тип линии обрыва"</summary>
-        public static MPCOTypeProperty<BreakLineType> BreakLineTypePropertyDescriptive = new MPCOTypeProperty<BreakLineType>
+        public static MPCOTypeProperty<BreakLineType> BreakLineType = new MPCOTypeProperty<BreakLineType>
         {
-            PropertyType = MPCOPropertyType.Type,
             Name = "BreakLineType",
             DisplayName = "Тип линии:",
-            DefaultValue = BreakLineType.Linear,
+            DefaultValue = Properties.BreakLineType.Linear,
             Description = "Тип линии: линейный, криволинейный или цилиндрический"
         };
         /// <summary>Поле, описывающее свойство "Выступы за объект"</summary>
-        public static MPCOIntProperty OverhangPropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty Overhang = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "Overhang",
             DisplayName = "Выступы за объект:",
             DefaultValue = 2,
@@ -33,9 +31,8 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             Description = "Для линейного обрыва значение выступа задается в мм. Для криволинейного обрыва значение выступа задается в % от длины между основными точками. Для цилиндрического обрыва значение выступа не используется"
         };
         /// <summary>Поле, описывающее свойство "Высота обрыва"</summary>
-        public static MPCOIntProperty BreakHeightPropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty BreakHeight = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "BreakHeight",
             DisplayName = "Ширина разрыва:",
             DefaultValue = 10,
@@ -44,9 +41,8 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             Description = "Ширина разрыва в мм. Только для линии обрыва линейного типа"
         };
         /// <summary>Поле, описывающее свойство "Ширина обрыва"</summary>
-        public static MPCOIntProperty BreakWidthPropertyDescriptive = new MPCOIntProperty
+        public static MPCOIntProperty BreakWidth = new MPCOIntProperty
         {
-            PropertyType = MPCOPropertyType.Int,
             Name = "BreakWidth",
             DisplayName = "Высота разрыва:",
             DefaultValue = 5,
@@ -55,18 +51,16 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             Description = "Высота разрыва в мм. Только для линии обрыва линейного типа"
         };
         /// <summary>Поле, описывающее свойство "Масштаб"</summary>
-        public static MPCOTypeProperty<AnnotationScale> ScalePropertyDescriptive = new MPCOTypeProperty<AnnotationScale>
+        public static MPCOTypeProperty<AnnotationScale> Scale = new MPCOTypeProperty<AnnotationScale>
         {
-            PropertyType = MPCOPropertyType.Type,
             Name = "Scale",
             DisplayName = "Масштаб:",
             DefaultValue = new AnnotationScale { Name = "1:1", DrawingUnits = 1.0, PaperUnits = 1.0 },
             Description = "Масштаб линии обрыва"
         };
         /// <summary>Поле, описывающее свойство "Масштаб типа линии"</summary>
-        public static MPCODoubleProperty LineTypeScalePropertyDescriptive = new MPCODoubleProperty
+        public static MPCODoubleProperty LineTypeScale = new MPCODoubleProperty
         {
-            PropertyType = MPCOPropertyType.Double,
             Name = "LineTypeScale",
             DisplayName = "Масштаб типа линий:",
             DefaultValue = 1.0, Minimum = 0, Maximum = double.MaxValue,
@@ -74,7 +68,6 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         };
         public static MPCOStringProperty LayerName = new MPCOStringProperty
         {
-            PropertyType = MPCOPropertyType.String,
             Name = "LayerName",
             DisplayName = "Слой",
             DefaultValue = "По умолчанию",

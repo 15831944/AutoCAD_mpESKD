@@ -76,13 +76,13 @@ namespace mpESKD.Functions.mpBreakLine
         #endregion
 
         /// <summary>Выступ линии обрыва за граници "обрываемого" объекта</summary>
-        public int Overhang { get; set; } = BreakLineProperties.OverhangPropertyDescriptive.DefaultValue;
+        public int Overhang { get; set; } = BreakLineProperties.Overhang.DefaultValue;
         /// <summary>Ширина Обрыва для линейного обрыва</summary>
-        public int BreakWidth { get; set; } = BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue;
+        public int BreakWidth { get; set; } = BreakLineProperties.BreakWidth.DefaultValue;
         /// <summary>Длина обрыва для линейного обрыва</summary>
-        public int BreakHeight { get; set; } = BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue;
+        public int BreakHeight { get; set; } = BreakLineProperties.BreakHeight.DefaultValue;
         /// <summary>Тип линии обрыва: линейный, криволинейный, цилиндрический</summary>
-        public BreakLineType BreakLineType { get; set; } = BreakLineProperties.BreakLineTypePropertyDescriptive.DefaultValue;
+        public BreakLineType BreakLineType { get; set; } = BreakLineProperties.BreakLineType.DefaultValue;
 
         #region Базовые примитивы СПДС объекта
         private Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
@@ -324,13 +324,13 @@ namespace mpESKD.Functions.mpBreakLine
         public void ApplyStyle(BreakLineStyle style)
         {
             // apply settings from style
-            Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.OverhangPropertyDescriptive.DefaultValue);
-            BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), BreakLineProperties.BreakHeightPropertyDescriptive.DefaultValue);
-            BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), BreakLineProperties.BreakWidthPropertyDescriptive.DefaultValue);
+            Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.Overhang.DefaultValue);
+            BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), BreakLineProperties.BreakHeight.DefaultValue);
+            BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), BreakLineProperties.BreakWidth.DefaultValue);
             Scale = MainStaticSettings.Settings.UseScaleFromStyle 
-                ? StyleHelpers.GetPropertyValue(style, nameof(Scale), BreakLineProperties.ScalePropertyDescriptive.DefaultValue) 
+                ? StyleHelpers.GetPropertyValue(style, nameof(Scale), BreakLineProperties.Scale.DefaultValue) 
                 : AcadHelpers.Database.Cannoscale;
-            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), BreakLineProperties.LineTypeScalePropertyDescriptive.DefaultValue);
+            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), BreakLineProperties.LineTypeScale.DefaultValue);
             // set layer
             var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,
                 BreakLineProperties.LayerName.DefaultValue);
