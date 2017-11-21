@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using System;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using mpESKD.Base.Helpers;
 using mpESKD.Base.Overrules;
@@ -6,6 +7,7 @@ using ModPlusAPI.Windows;
 using Autodesk.AutoCAD.Runtime;
 using mpESKD.Functions.mpAxis.Properties;
 using ModPlus.Helpers;
+using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 // ReSharper disable InconsistentNaming
 
@@ -22,6 +24,9 @@ namespace mpESKD.Functions.mpAxis.Overrules
             _axisGripPointOverrule.SetXDataFilter(AxisFunction.MPCOEntName);
             return _axisGripPointOverrule;
         }
+        private Point3d InitEndPoint;
+        private Point3d InitInsertionPoint;
+        private Point3d InitBottomOrientPoint;
         /// <summary>Получение ручек для примитива</summary>
         public override void GetGripPoints(Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir,
             GetGripPointsFlags bitFlags)
@@ -61,6 +66,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             GripPoint = axis.StartGrip // вот эта точка из экземпляра класса axis
                         };
                         grips.Add(gp);
+                        InitInsertionPoint = axis.InsertionPoint;
                         // получаем среднюю ручку
                         gp = new AxisGrip
                         {
@@ -79,6 +85,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             GripPoint = axis.EndGrip
                         };
                         grips.Add(gp);
+                        InitEndPoint = axis.EndPoint;
                         if (axis.MarkersPosition == AxisMarkersPosition.Both ||
                             axis.MarkersPosition == AxisMarkersPosition.Bottom)
                         {
@@ -115,6 +122,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                                 GripPoint = axis.BottomOrientGrip
                             };
                             grips.Add(gp);
+                            InitBottomOrientPoint = axis.BottomOrientPoint;
                         }
                         if (axis.TopOrientMarkerVisible)
                         {
@@ -200,11 +208,39 @@ namespace mpESKD.Functions.mpAxis.Overrules
                                 var scale = gripPoint.Axis.GetScale();
                                 gripPoint.Axis.EndPoint = new Point3d(
                                     ((BlockReference)entity).Position.X,
-                                    ((BlockReference)entity).Position.Y - gripPoint.Axis.AxisMinLength * scale * gripPoint.Axis.BlockTransform.GetScale(),
+                                    ((BlockReference)entity).Position.Y - gripPoint.Axis.AxisMinLength * scale *
+                                    gripPoint.Axis.BlockTransform.GetScale(),
                                     ((BlockReference)entity).Position.Z);
                             }
                             // С конечной точкой все просто
-                            else gripPoint.Axis.EndPoint = gripPoint.GripPoint + offset;
+                            else
+                            {
+                                gripPoint.Axis.EndPoint = gripPoint.GripPoint + offset;
+
+                                //var angle = (gripPoint.GripPoint + offset - InitInsertionPoint).GetAngleTo(
+                                //    InitEndPoint - InitInsertionPoint);
+                                //var tmpP = new Point3d(
+                                //    InitBottomOrientPoint.X - InitInsertionPoint.X,
+                                //    InitBottomOrientPoint.Y - InitInsertionPoint.Y,
+                                //    InitBottomOrientPoint.Z) + (gripPoint.GripPoint + offset - InitEndPoint);
+                                //var newBottomOrientPoint = new Point3d(
+                                //    tmpP.X * Math.Cos(angle) - tmpP.Y * Math.Sin(angle) + InitInsertionPoint.X,
+                                //    tmpP.X * Math.Sin(angle) + tmpP.Y * Math.Cos(angle) + InitInsertionPoint.Y,
+                                //    InitBottomOrientPoint.Z
+                                //    );
+                                //gripPoint.Axis.BottomOrientPoint = newBottomOrientPoint;
+                                var vecNew = (gripPoint.GripPoint + offset - InitInsertionPoint);
+                                var angle = vecNew.GetAngleTo(
+                                    InitEndPoint - InitInsertionPoint, new Vector3d(1.0, 0.0, 0.0));
+                                var scale = vecNew.Length / (InitEndPoint - InitInsertionPoint).Length;
+                                var matRot = Matrix2d.Rotation(angle, GeometryHelpers.ConvertPoint3dToPoint2d(InitInsertionPoint));
+                                var matScale = Matrix2d.Scaling(scale, GeometryHelpers.ConvertPoint3dToPoint2d(InitInsertionPoint));
+                                var p = GeometryHelpers.ConvertPoint3dToPoint2d(InitBottomOrientPoint);
+                                p = p.TransformBy(matRot);
+                                p = p.TransformBy(matScale);
+                                
+                                gripPoint.Axis.BottomOrientPoint = GeometryHelpers.ConvertPoint2DToPoint3D(p);
+                            }
                         }
                         if (gripPoint.GripName == AxisGripName.BottomMarkerGrip)
                         {
