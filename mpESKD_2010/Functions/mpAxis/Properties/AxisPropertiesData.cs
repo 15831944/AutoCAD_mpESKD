@@ -142,7 +142,11 @@ namespace mpESKD.Functions.mpAxis.Properties
                     {
                         using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
                         {
+                            var oldFracture = axis.BottomFractureOffset;
                             axis.BottomFractureOffset = value;
+                            // нужно сместить зависимые точки
+                            var vecNorm = (axis.EndPoint - axis.InsertionPoint).GetNormal() * (value - oldFracture) * axis.GetScale();
+                            axis.BottomOrientPoint = axis.BottomOrientPoint + vecNorm;
                             axis.UpdateEntities();
                             axis.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = axis.GetParametersForXData())

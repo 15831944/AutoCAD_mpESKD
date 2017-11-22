@@ -203,44 +203,31 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         if (gripPoint.GripName == AxisGripName.EndGrip)
                         {
                             var newPt = gripPoint.GripPoint + offset;
+                            Point3d newEnedPoint;
                             if (newPt.Equals(((BlockReference)entity).Position))
                             {
                                 var scale = gripPoint.Axis.GetScale();
-                                gripPoint.Axis.EndPoint = new Point3d(
+                                newEnedPoint = new Point3d(
                                     ((BlockReference)entity).Position.X,
                                     ((BlockReference)entity).Position.Y - gripPoint.Axis.AxisMinLength * scale *
                                     gripPoint.Axis.BlockTransform.GetScale(),
                                     ((BlockReference)entity).Position.Z);
+                                gripPoint.Axis.EndPoint = newEnedPoint;
+
+
                             }
-                            // С конечной точкой все просто
                             else
                             {
                                 gripPoint.Axis.EndPoint = gripPoint.GripPoint + offset;
-
-                                //var angle = (gripPoint.GripPoint + offset - InitInsertionPoint).GetAngleTo(
-                                //    InitEndPoint - InitInsertionPoint);
-                                //var tmpP = new Point3d(
-                                //    InitBottomOrientPoint.X - InitInsertionPoint.X,
-                                //    InitBottomOrientPoint.Y - InitInsertionPoint.Y,
-                                //    InitBottomOrientPoint.Z) + (gripPoint.GripPoint + offset - InitEndPoint);
-                                //var newBottomOrientPoint = new Point3d(
-                                //    tmpP.X * Math.Cos(angle) - tmpP.Y * Math.Sin(angle) + InitInsertionPoint.X,
-                                //    tmpP.X * Math.Sin(angle) + tmpP.Y * Math.Cos(angle) + InitInsertionPoint.Y,
-                                //    InitBottomOrientPoint.Z
-                                //    );
-                                //gripPoint.Axis.BottomOrientPoint = newBottomOrientPoint;
-                                var vecNew = (gripPoint.GripPoint + offset - InitInsertionPoint);
-                                var angle = vecNew.GetAngleTo(
-                                    InitEndPoint - InitInsertionPoint, new Vector3d(1.0, 0.0, 0.0));
-                                var scale = vecNew.Length / (InitEndPoint - InitInsertionPoint).Length;
-                                var matRot = Matrix2d.Rotation(angle, GeometryHelpers.ConvertPoint3dToPoint2d(InitInsertionPoint));
-                                var matScale = Matrix2d.Scaling(scale, GeometryHelpers.ConvertPoint3dToPoint2d(InitInsertionPoint));
-                                var p = GeometryHelpers.ConvertPoint3dToPoint2d(InitBottomOrientPoint);
-                                p = p.TransformBy(matRot);
-                                p = p.TransformBy(matScale);
-                                
-                                gripPoint.Axis.BottomOrientPoint = GeometryHelpers.ConvertPoint2DToPoint3D(p);
+                                newEnedPoint = gripPoint.GripPoint + offset;
                             }
+                            // change bottom orient point
+                            gripPoint.Axis.BottomOrientPoint = GetSavePositionPoint(
+                                    InitInsertionPoint,
+                                    gripPoint.GripPoint,
+                                    newEnedPoint,
+                                    InitBottomOrientPoint
+                                    );
                         }
                         if (gripPoint.GripName == AxisGripName.BottomMarkerGrip)
                         {
@@ -248,7 +235,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
                             gripPoint.Axis.BottomMarkerPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
                             // Меняю также точку маркера-ориентира
-                            //gripPoint.Axis.BottomOrientPoint 
+                            gripPoint.Axis.BottomOrientPoint = InitBottomOrientPoint + offset.DotProduct(v) * v;
                         }
                         if (gripPoint.GripName == AxisGripName.TopMarkerGrip)
                         {
@@ -280,6 +267,36 @@ namespace mpESKD.Functions.mpAxis.Overrules
         {
             return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisFunction.MPCOEntName);
         }
+
+        #region Helpers
+        /// <summary>Получение нового значения точки, которая должна сохранить свое положение
+        /// относительно передвигаемой точки</summary>
+        /// <param name="basePoint">Базовая точка - точка, относительно которой все двигается</param>
+        /// <param name="oldMovedpoint">Начальное значение передвигаемой точки</param>
+        /// <param name="newMovedPoint">Новое значение передвигаемой точки</param>
+        /// <param name="oldSavePositionPoint">Начальное значение точки, положение которой должно сохранится
+        /// относительно передвигаемой точки</param>
+        /// <returns></returns>
+        private static Point3d GetSavePositionPoint(Point3d basePoint, Point3d oldMovedpoint, Point3d newMovedPoint, Point3d oldSavePositionPoint)
+        {
+            var vectorOld = oldMovedpoint - basePoint;
+            var vectorNew = newMovedPoint - basePoint;
+            var l = vectorNew.Length - vectorOld.Length;
+            var h = l * vectorOld.GetNormal();
+            var angle = vectorOld.GetAngleTo(vectorNew, Vector3d.ZAxis);
+
+            var tmpP = new Point3d(
+                oldSavePositionPoint.X - basePoint.X,
+                oldSavePositionPoint.Y - basePoint.Y,
+                oldSavePositionPoint.Z) + h;
+            return new Point3d(
+                tmpP.X * Math.Cos(angle) - tmpP.Y * Math.Sin(angle) + basePoint.X,
+                tmpP.X * Math.Sin(angle) + tmpP.Y * Math.Cos(angle) + basePoint.Y,
+                oldSavePositionPoint.Z
+            );
+        }
+
+        #endregion
     }
     /* Так как у линии обрыва все точки одинаковы, то достаточно создать одно переопределени
      * Если есть сильная разница, то можно создавать несколько GripData. Однако нужны тесты
@@ -329,32 +346,19 @@ namespace mpESKD.Functions.mpAxis.Overrules
         {
             try
             {
-                //AcadHelpers.Editor.WriteMessage("\n OnGripStatusChanged in GripData entity id: " + entity.ObjectId);
-                // При начале перемещения запоминаем первоначальное положение ручки
                 // Запоминаем начальные значения
                 if (newStatus == Status.GripStart)
                 {
-                    if (GripName == AxisGripName.StartGrip)
-                        _startGripTmp = GripPoint;
-                    if (GripName == AxisGripName.EndGrip)
-                        _endGripTmp = GripPoint;
-                    if (GripName == AxisGripName.BottomMarkerGrip)
-                        _bottomMarkerGripTmp = GripPoint;
-                    if (GripName == AxisGripName.TopMarkerGrip)
-                        _topMarkerGripTmp = GripPoint;
-                    if (GripName == AxisGripName.BottomOrientGrip)
-                        _bottomOrientGripTmp = GripPoint;
-                    if (GripName == AxisGripName.TopOrientGrip)
-                        _topOrientGripTmp = GripPoint;
-                    if (GripName == AxisGripName.MiddleGrip)
-                    {
-                        _startGripTmp = Axis.StartGrip;
-                        _endGripTmp = Axis.EndGrip;
-                    }
+                    _startGripTmp = Axis.StartGrip;
+                    _endGripTmp = Axis.EndGrip;
+                    _bottomMarkerGripTmp = Axis.BottomMarkerGrip;
+                    _topMarkerGripTmp = Axis.TopMarkerGrip;
+                    _bottomOrientGripTmp = Axis.BottomOrientGrip;
+                    _topOrientGripTmp = Axis.TopOrientGrip;
                 }
 
                 // При удачном перемещении ручки записываем новые значения в расширенные данные
-                // По этим данным я потом получаю экземпляр класса breakline
+                // По этим данным я потом получаю экземпляр класса axis
                 if (newStatus == Status.GripEnd)
                 {
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
@@ -371,21 +375,12 @@ namespace mpESKD.Functions.mpAxis.Overrules
                 // При отмене перемещения возвращаем временные значения
                 if (newStatus == Status.GripAbort)
                 {
-                    if (_startGripTmp != null && GripName == AxisGripName.StartGrip)
-                        Axis.EndPoint = GripPoint;
-                    if (_bottomMarkerGripTmp != null && GripName == AxisGripName.BottomMarkerGrip)
-                        Axis.BottomMarkerPoint = GripPoint;
-                    if (_topMarkerGripTmp != null && GripName == AxisGripName.TopMarkerGrip)
-                        Axis.TopMarkerPoint = GripPoint;
-                    if (_bottomOrientGripTmp != null && GripName == AxisGripName.BottomOrientGrip)
-                        Axis.BottomOrientPoint = GripPoint;
-                    if (_topOrientGripTmp != null && GripName == AxisGripName.TopOrientGrip)
-                        Axis.TopOrientPoint = GripPoint;
-                    if (GripName == AxisGripName.MiddleGrip && _startGripTmp != null && _endGripTmp != null)
-                    {
-                        Axis.InsertionPoint = _startGripTmp;
-                        Axis.EndPoint = _endGripTmp;
-                    }
+                    Axis.InsertionPoint = _startGripTmp;
+                    Axis.EndPoint = _endGripTmp;
+                    Axis.BottomMarkerPoint = _bottomMarkerGripTmp;
+                    Axis.TopMarkerPoint = _topMarkerGripTmp;
+                    Axis.BottomOrientPoint = _bottomOrientGripTmp;
+                    Axis.TopOrientPoint = _topOrientGripTmp;
                 }
                 base.OnGripStatusChanged(entityId, newStatus);
             }
