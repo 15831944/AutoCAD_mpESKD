@@ -109,29 +109,42 @@ namespace mpESKD.Functions.mpAxis
                 var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
                 if (double.IsNaN(BottomOrientMarkerOffset))
                     BottomOrientMarkerOffset = MarkersDiameter + 10.0;
-                AcadHelpers.WriteMessageInDebug("\nBottom orient offset: " + BottomOrientMarkerOffset);
                 return BottomMarkerPoint + mainLineVectorNormal * BottomOrientMarkerOffset * GetScale();
             }
             set
             {
-                AcadHelpers.WriteMessageInDebug("\nBottomMarkerPoint: " + BottomMarkerPoint);
-                AcadHelpers.WriteMessageInDebug("\nvalue: " + value);
-                BottomOrientMarkerOffset = (value - BottomMarkerPoint).Length / GetScale();
+                var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
+                var vector = value - BottomMarkerPoint;
+                BottomOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale();
             }
         }
 
         /// <summary>Верхняя точка маркера ориентации</summary>
-        public Point3d TopOrientPoint { get; set; }
+        public Point3d TopOrientPoint
+        {
+            get
+            {
+                var mainLineVectorNormal = (InsertionPoint - EndPoint).GetPerpendicularVector().GetNormal();
+                if (double.IsNaN(TopOrientMarkerOffset))
+                    TopOrientMarkerOffset = MarkersDiameter + 10.0;
+                return TopMarkerPoint + mainLineVectorNormal * TopOrientMarkerOffset * GetScale();
+            }
+            set
+            {
+                var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
+                var vector = value - TopMarkerPoint;
+                TopOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale();
+            }
+        }
 
         // Получение управляющих точек в системе координат блока для отрисовки содержимого
         private Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
         private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
         private Point3d BottomMarkerPointOCS => BottomMarkerPoint.TransformBy(BlockTransform.Inverse());
         private Point3d TopMarkerPointOCS => TopMarkerPoint.TransformBy(BlockTransform.Inverse());
-        //private Point3d? BottomOrientPointOCS => BottomOrientPoint?.TransformBy(BlockTransform.Inverse());
         private Point3d BottomOrientPointOCS => BottomOrientPoint.TransformBy(BlockTransform.Inverse());
-
         private Point3d TopOrientPointOCS => TopOrientPoint.TransformBy(BlockTransform.Inverse());
+
         #region Grips
         /* Можно создать коллекцию ручек и логически получать их из коллекции по индексу
          * Но я сделаю отдельно каждую ручку, таким образом я буду работать с конкретной 
@@ -204,8 +217,9 @@ namespace mpESKD.Functions.mpAxis
         public bool BottomOrientMarkerVisible { get; set; } = false;
         /// <summary>Видимость верхнего бокового кружка</summary>
         public bool TopOrientMarkerVisible { get; set; } = false;
-
+        // Отступы маркеров-ориентиров
         private double BottomOrientMarkerOffset { get; set; } = double.NaN;
+        private double TopOrientMarkerOffset { get; set; } = double.NaN;
 
         #endregion
 
@@ -249,7 +263,7 @@ namespace mpESKD.Functions.mpAxis
         #region Entities
         /// <summary>Установка свойств для примитивов, которые не меняются</summary>
         /// <param name="entity">Примитив автокада</param>
-        private void SetPropertiesToCadEntity(Entity entity)
+        private static void SetPropertiesToCadEntity(Entity entity)
         {
             entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
             entity.LineWeight = LineWeight.ByBlock;
@@ -830,6 +844,7 @@ namespace mpESKD.Functions.mpAxis
 
                 if (BottomOrientMarkerVisible)
                 {
+                    _bottomOrientLine.Value.Visible = true;
                     var bottomOrientMarkerCenter = BottomOrientPointOCS + mainVector.GetNormal() * MarkersDiameter / 2.0 * scale;
                     _bottomOrientMarker.Value.Center = bottomOrientMarkerCenter;
                     _bottomOrientMarker.Value.Diameter = MarkersDiameter * scale;
@@ -837,11 +852,14 @@ namespace mpESKD.Functions.mpAxis
                     var _bottomOrientLineStartPoint = GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, bottomOrientMarkerCenter, firstMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
+                    AcadHelpers.WriteMessageInDebug("\n_bottomOrientLineStartPoint: " + _bottomOrientLineStartPoint);
                     var _bottomOrientLineEndPoint = GeometryHelpers.Point3dAtDirection(
                         bottomOrientMarkerCenter, firstMarkerCenter, bottomOrientMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
+                    AcadHelpers.WriteMessageInDebug("\n_bottomOrientLineEndPoint: " + _bottomOrientLineEndPoint);
                     if (_bottomOrientLineEndPoint.IsEqualTo(_bottomOrientLineStartPoint, Tolerance.Global))
                     {
+                        AcadHelpers.WriteMessageInDebug("\n first IF");
                         _bottomOrientLine.Value.Visible = false;
                         // arrow false
                     }
@@ -858,6 +876,14 @@ namespace mpESKD.Functions.mpAxis
                         {
                             // arrow draw
                         }
+                    }
+                    // text
+                    if (string.IsNullOrEmpty(BottomOrientText))
+                        BottomOrientDBText.Visible = false;
+                    else
+                    {
+                        BottomOrientDBText.Position = bottomOrientMarkerCenter;
+                        BottomOrientDBText.AlignmentPoint = bottomOrientMarkerCenter;
                     }
                     // type2
                     if (OrientMarkerType == 1)
@@ -1041,17 +1067,10 @@ namespace mpESKD.Functions.mpAxis
                 // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
                 var vector = EndPointOCS - InsertionPointOCS;
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z))); //0
-                //if (BottomOrientPointOCS != null)
-                //    resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, BottomOrientPointOCS.Value)); //1
-                //else resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, Point3d.Origin)); //1
                 // Текстовые значения (код 1000)
-                // Стиль
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
-                // Позиция маркеров
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, MarkersPosition.ToString())); // 1
-                // scale
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 2
-                // text style
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TextStyle)); // 3
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstText)); // 4
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstTextPrefix)); // 5
@@ -1082,6 +1101,7 @@ namespace mpESKD.Functions.mpAxis
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopLineAngle)); // 2
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TextHeight)); // 3
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomOrientMarkerOffset)); // 4
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopOrientMarkerOffset)); // 5
 
                 return resBuf;
             }
@@ -1101,7 +1121,6 @@ namespace mpESKD.Functions.mpAxis
                  * Для каждого значения с повторяющимся кодом назначен свой индекc (см. метод GetParametersForXData)
                  */
                 var index1000 = 0;
-                var index1010 = 0;
                 var index1070 = 0;
                 var index1040 = 0;
                 foreach (TypedValue typedValue in resBufArr)
@@ -1110,22 +1129,10 @@ namespace mpESKD.Functions.mpAxis
                     {
                         case DxfCode.ExtendedDataXCoordinate:
                             {
-                                if (index1010 == 0)
-                                {
-                                    // Получаем вектор от последней точки до первой в системе координат блока
-                                    var vectorFromEndToInsertion = ((Point3d)typedValue.Value).GetAsVector();
-                                    // получаем конечную точку в мировой системе координат
-                                    EndPoint =
-                                        (InsertionPointOCS + vectorFromEndToInsertion).TransformBy(BlockTransform);
-                                }
-                                if (index1010 == 1)
-                                {
-                                    //var bOrientPoint = (Point3d)typedValue.Value;
-                                    //if (bOrientPoint == Point3d.Origin)
-                                    //    BottomOrientPoint = null;
-                                    //else BottomOrientPoint = bOrientPoint.TransformBy(BlockTransform);
-                                }
-                                index1010++;
+                                // Получаем вектор от последней точки до первой в системе координат блока
+                                var vectorFromEndToInsertion = ((Point3d)typedValue.Value).GetAsVector();
+                                // получаем конечную точку в мировой системе координат
+                                EndPoint = (InsertionPointOCS + vectorFromEndToInsertion).TransformBy(BlockTransform);
                                 break;
                             }
                         case DxfCode.ExtendedDataAsciiString:
@@ -1204,6 +1211,8 @@ namespace mpESKD.Functions.mpAxis
                                     TextHeight = (double)typedValue.Value;
                                 if (index1040 == 4)
                                     BottomOrientMarkerOffset = (double)typedValue.Value;
+                                if (index1040 == 5)
+                                    TopOrientMarkerOffset = (double)typedValue.Value;
                                 index1040++;
                                 break;
                             }

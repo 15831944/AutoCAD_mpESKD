@@ -37,15 +37,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="acdbmgd">
-      <HintPath>..\..\_Acad dlls\2011\acdbmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2011\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>..\..\_Acad dlls\2011\acmgd.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2011\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AdWindows">
-      <HintPath>..\..\_Acad dlls\2011\AdWindows.dll</HintPath>
+      <HintPath>..\..\..\_Acad dlls\2011\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro">

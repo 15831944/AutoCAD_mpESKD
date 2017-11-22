@@ -112,6 +112,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             grips.Add(gp);
                         }
                         // orient
+                        if(axis.MarkersPosition == AxisMarkersPosition.Both || axis.MarkersPosition == AxisMarkersPosition.Bottom)
                         if (axis.BottomOrientMarkerVisible)
                         {
                             gp = new AxisGrip
@@ -124,7 +125,8 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             grips.Add(gp);
                             InitBottomOrientPoint = axis.BottomOrientPoint;
                         }
-                        if (axis.TopOrientMarkerVisible)
+                        if(axis.MarkersPosition == AxisMarkersPosition.Both || axis.MarkersPosition == AxisMarkersPosition.Top)
+                        if (axis.TopOrientMarkerVisible )
                         {
                             gp = new AxisGrip
                             {
@@ -235,6 +237,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
                             gripPoint.Axis.BottomMarkerPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
                             // Меняю также точку маркера-ориентира
+                            if(InitBottomOrientPoint != Point3d.Origin)
                             gripPoint.Axis.BottomOrientPoint = InitBottomOrientPoint + offset.DotProduct(v) * v;
                         }
                         if (gripPoint.GripName == AxisGripName.TopMarkerGrip)
@@ -247,7 +250,10 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         {
                             var mainVector = gripPoint.Axis.EndPoint - gripPoint.Axis.InsertionPoint;
                             var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
-                            gripPoint.Axis.BottomOrientPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
+                            var newPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
+                            if(Math.Abs((newPoint - gripPoint.Axis.BottomMarkerPoint).Length) > 
+                                gripPoint.Axis.MarkersDiameter*gripPoint.Axis.GetScale()* gripPoint.Axis.BlockTransform.GetScale())
+                                gripPoint.Axis.BottomOrientPoint = newPoint;
                         }
                         // Вот тут происходит перерисовка примитивов внутри блока
                         gripPoint.Axis.UpdateEntities();
