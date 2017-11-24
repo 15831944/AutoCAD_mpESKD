@@ -32,9 +32,9 @@
                 </Rectangle.OpacityMask>
             </Rectangle>
         </Button>
-        <StackPanel Grid.Row="1" Orientation="Vertical" Name="StackPanelProperties">
-
-        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Orientation="Vertical" Name="StackPanelProperties"></StackPanel>
+        </ScrollViewer>
         <GridSplitter Grid.Row="2" BorderBrush="{StaticResource MainGrayBrush}" BorderThickness="0,2,0,0"
                       Margin="0,2,0,2"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>

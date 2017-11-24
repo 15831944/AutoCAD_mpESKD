@@ -215,8 +215,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             Name = "ArrowsSize",
             DisplayName = "Размер стрелок:",
             Minimum = 0,
-            Maximum = 5,
-            DefaultValue = 1,
+            Maximum = 10,
+            DefaultValue = 3,
             Description = "Размер стрелок"
         };
         public static MPCOStringProperty BottomOrientText = new MPCOStringProperty

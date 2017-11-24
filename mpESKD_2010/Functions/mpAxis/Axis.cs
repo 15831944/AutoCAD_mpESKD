@@ -109,13 +109,13 @@ namespace mpESKD.Functions.mpAxis
                 var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
                 if (double.IsNaN(BottomOrientMarkerOffset))
                     BottomOrientMarkerOffset = MarkersDiameter + 10.0;
-                return BottomMarkerPoint + mainLineVectorNormal * BottomOrientMarkerOffset * GetScale();
+                return BottomMarkerPoint + mainLineVectorNormal * BottomOrientMarkerOffset * GetScale() * BlockTransform.GetScale();
             }
             set
             {
                 var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
                 var vector = value - BottomMarkerPoint;
-                BottomOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale();
+                BottomOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale()/ BlockTransform.GetScale();
             }
         }
 
@@ -212,7 +212,7 @@ namespace mpESKD.Functions.mpAxis
         public string TopOrientText { get; set; } = string.Empty;
         // Orient markers
         /// <summary>Размер стрелок</summary>
-        public int ArrowsSize { get; set; } = 1;
+        public int ArrowsSize { get; set; } = 3;
         /// <summary>Видимость нижнего бокового кружка</summary>
         public bool BottomOrientMarkerVisible { get; set; } = false;
         /// <summary>Видимость верхнего бокового кружка</summary>
@@ -316,25 +316,25 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        //private readonly Lazy<Polyline> _bottomOrientArrow = new Lazy<Polyline>(() => new Polyline());
-        //public Polyline BottomOrientArrow
-        //{
-        //    get
-        //    {
-        //        SetPropertiesToCadEntity(_bottomOrientArrow.Value);
-        //        return _bottomOrientArrow.Value;
-        //    }
-        //}
+        private readonly Lazy<Polyline> _bottomOrientArrow = new Lazy<Polyline>(() => new Polyline());
+        public Polyline BottomOrientArrow
+        {
+            get
+            {
+                SetPropertiesToCadEntity(_bottomOrientArrow.Value);
+                return _bottomOrientArrow.Value;
+            }
+        }
 
-        //private readonly Lazy<Polyline> _topOrientArrow = new Lazy<Polyline>(() => new Polyline());
-        //public Polyline TopOrientArrow
-        //{
-        //    get
-        //    {
-        //        SetPropertiesToCadEntity(_topOrientArrow.Value);
-        //        return _topOrientArrow.Value;
-        //    }
-        //}
+        private readonly Lazy<Polyline> _topOrientArrow = new Lazy<Polyline>(() => new Polyline());
+        public Polyline TopOrientArrow
+        {
+            get
+            {
+                SetPropertiesToCadEntity(_topOrientArrow.Value);
+                return _topOrientArrow.Value;
+            }
+        }
 
         #region Fractures
 
@@ -665,12 +665,12 @@ namespace mpESKD.Functions.mpAxis
                 yield return TopFirstDBText;
                 yield return TopSecondDBText;
                 yield return TopThirdDBText;
-                //yield return BottomOrientArrow;
+                yield return BottomOrientArrow;
                 yield return BottomOrientCircle;
                 yield return BottomOrientCircleType2;
                 yield return BottomOrientDBText;
                 yield return BottomOrientLine;
-                //yield return TopOrientArrow;
+                yield return TopOrientArrow;
                 yield return TopOrientCircle;
                 yield return TopOrientCircleType2;
                 yield return TopOrientDBText;
@@ -852,29 +852,53 @@ namespace mpESKD.Functions.mpAxis
                     var _bottomOrientLineStartPoint = GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, bottomOrientMarkerCenter, firstMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    AcadHelpers.WriteMessageInDebug("\n_bottomOrientLineStartPoint: " + _bottomOrientLineStartPoint);
                     var _bottomOrientLineEndPoint = GeometryHelpers.Point3dAtDirection(
                         bottomOrientMarkerCenter, firstMarkerCenter, bottomOrientMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    AcadHelpers.WriteMessageInDebug("\n_bottomOrientLineEndPoint: " + _bottomOrientLineEndPoint);
                     if (_bottomOrientLineEndPoint.IsEqualTo(_bottomOrientLineStartPoint, Tolerance.Global))
                     {
-                        AcadHelpers.WriteMessageInDebug("\n first IF");
                         _bottomOrientLine.Value.Visible = false;
                         // arrow false
+                        _bottomOrientArrow.Value.Visible = false;
                     }
                     else
                     {
                         _bottomOrientLine.Value.StartPoint = _bottomOrientLineStartPoint;
                         _bottomOrientLine.Value.EndPoint = _bottomOrientLineEndPoint;
                         // arrow
-                        if (Math.Abs((_bottomOrientLineEndPoint - _bottomOrientLineStartPoint).Length) < 1.0)
+                        if (Math.Abs((_bottomOrientLineEndPoint - _bottomOrientLineStartPoint).Length) < ArrowsSize * scale ||
+                            ArrowsSize == 0)
                         {
                             //arrow false
+                            _bottomOrientArrow.Value.Visible = false;
                         }
                         else
                         {
+                            _bottomOrientArrow.Value.Visible = true;
                             // arrow draw
+                            var arrowStartPoint = GeometryHelpers.Point3dAtDirection(_bottomOrientLineEndPoint,
+                                _bottomOrientLineStartPoint,
+                                _bottomOrientLineEndPoint, ArrowsSize * scale);
+                            if (_bottomOrientArrow.Value.NumberOfVertices == 2)
+                            {
+                                AcadHelpers.WriteMessageInDebug("\n Polyline exist");
+                                _bottomOrientArrow.Value.SetPointAt(0,
+                                    GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint));
+                                _bottomOrientArrow.Value.SetBulgeAt(0, 0.0);
+                                _bottomOrientArrow.Value.SetPointAt(1,
+                                    GeometryHelpers.ConvertPoint3dToPoint2d(_bottomOrientLineEndPoint));
+                                _bottomOrientArrow.Value.SetBulgeAt(1, 0.0);
+                                _bottomOrientArrow.Value.SetStartWidthAt(0, ArrowsSize * scale * 1 / 3);
+                            }
+                            else
+                            {
+                                _bottomOrientArrow.Value.AddVertexAt(0,
+                                    GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint),
+                                    0.0, ArrowsSize * scale * 1 / 3, 0.0);
+                                _bottomOrientArrow.Value.AddVertexAt(1,
+                                    GeometryHelpers.ConvertPoint3dToPoint2d(_bottomOrientLineEndPoint),
+                                    0.0, 0.0, 0.0);
+                            }
                         }
                     }
                     // text
@@ -1095,6 +1119,7 @@ namespace mpESKD.Functions.mpAxis
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, SecondMarkerType)); // 6
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, ThirdMarkerType)); // 7
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, OrientMarkerType)); // 8
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, ArrowsSize)); // 9
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomLineAngle)); // 1
@@ -1137,82 +1162,126 @@ namespace mpESKD.Functions.mpAxis
                             }
                         case DxfCode.ExtendedDataAsciiString:
                             {
-                                if (index1000 == 0) // 0 - это идентификатор стиля
-                                    StyleGuid = typedValue.Value.ToString();
-                                if (index1000 == 1) // 1 - breakline type
-                                    MarkersPosition = AxisPropertiesHelpers.GetAxisMarkersPositionFromString(typedValue.Value.ToString());
-                                if (index1000 == 2) // 2 - scale
-                                    Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
-                                if (index1000 == 3) // 3 - TextStyle
-                                    TextStyle = typedValue.Value.ToString();
-                                if (index1000 == 4) // 4 - FirstText
-                                    FirstText = typedValue.Value.ToString();
-                                if (index1000 == 5) // 5 - FirstTextPrefix
-                                    FirstTextPrefix = typedValue.Value.ToString();
-                                if (index1000 == 6) // 6 - FirstTextSuffix
-                                    FirstTextSuffix = typedValue.Value.ToString();
-                                if (index1000 == 7) // 7 - SecondText
-                                    SecondText = typedValue.Value.ToString();
-                                if (index1000 == 8) // 8 - SecondTextPrefix
-                                    SecondTextPrefix = typedValue.Value.ToString();
-                                if (index1000 == 9) // 9 - SecondTextSuffix
-                                    SecondTextSuffix = typedValue.Value.ToString();
-                                if (index1000 == 10) // 10 - ThirdText
-                                    ThirdText = typedValue.Value.ToString();
-                                if (index1000 == 11) // 11 - ThirdTextPrefix
-                                    ThirdTextPrefix = typedValue.Value.ToString();
-                                if (index1000 == 12) // 12 - ThirdTextSuffix
-                                    ThirdTextSuffix = typedValue.Value.ToString();
-                                if (index1000 == 13)
-                                    BottomOrientText = typedValue.Value.ToString();
-                                if (index1000 == 14)
-                                    TopOrientText = typedValue.Value.ToString();
-                                if (index1000 == 15)
-                                    BottomOrientMarkerVisible = bool.TryParse(typedValue.Value.ToString(), out var b) && b;// false
-                                if (index1000 == 16)
-                                    TopOrientMarkerVisible = bool.TryParse(typedValue.Value.ToString(), out var b) && b;//false
+                                switch (index1000)
+                                {
+                                    case 0:
+                                        StyleGuid = typedValue.Value.ToString();
+                                        break;
+                                    case 1:
+                                        MarkersPosition = AxisPropertiesHelpers.GetAxisMarkersPositionFromString(typedValue.Value.ToString());
+                                        break;
+                                    case 2:
+                                        Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
+                                        break;
+                                    case 3:
+                                        TextStyle = typedValue.Value.ToString();
+                                        break;
+                                    case 4:
+                                        FirstText = typedValue.Value.ToString();
+                                        break;
+                                    case 5:
+                                        FirstTextPrefix = typedValue.Value.ToString();
+                                        break;
+                                    case 6:
+                                        FirstTextSuffix = typedValue.Value.ToString();
+                                        break;
+                                    case 7:
+                                        SecondText = typedValue.Value.ToString();
+                                        break;
+                                    case 8:
+                                        SecondTextPrefix = typedValue.Value.ToString();
+                                        break;
+                                    case 9:
+                                        SecondTextSuffix = typedValue.Value.ToString();
+                                        break;
+                                    case 10:
+                                        ThirdText = typedValue.Value.ToString();
+                                        break;
+                                    case 11:
+                                        ThirdTextPrefix = typedValue.Value.ToString();
+                                        break;
+                                    case 12:
+                                        ThirdTextSuffix = typedValue.Value.ToString();
+                                        break;
+                                    case 13:
+                                        BottomOrientText = typedValue.Value.ToString();
+                                        break;
+                                    case 14:
+                                        TopOrientText = typedValue.Value.ToString();
+                                        break;
+                                    case 15:
+                                        BottomOrientMarkerVisible = bool.TryParse(typedValue.Value.ToString(), out var b) && b;// false
+                                        break;
+                                    case 16:
+                                        TopOrientMarkerVisible = bool.TryParse(typedValue.Value.ToString(), out b) && b;//false
+                                        break;
+                                }
                                 // index
                                 index1000++;
                                 break;
                             }
                         case DxfCode.ExtendedDataInteger16:
                             {
-                                if (index1070 == 0) // 0 - MarkersDiameter
-                                    MarkersDiameter = (Int16)typedValue.Value;
-                                if (index1070 == 1) // 1- Fracture
-                                    Fracture = (Int16)typedValue.Value;
-                                if (index1070 == 2) // 2 - MarkersCount
-                                    MarkersCount = (Int16)typedValue.Value;
-                                if (index1070 == 3) // 3 - BottomFractureOffset
-                                    BottomFractureOffset = (Int16)typedValue.Value;
-                                if (index1070 == 4) // 4 - TopFractureOffset
-                                    TopFractureOffset = (Int16)typedValue.Value;
-                                if (index1070 == 5) // 5 - FirstMarkerType
-                                    FirstMarkerType = (Int16)typedValue.Value;
-                                if (index1070 == 6) // 6 - SecondMarkerType
-                                    SecondMarkerType = (Int16)typedValue.Value;
-                                if (index1070 == 7) // 7 - ThirdMarkerType
-                                    ThirdMarkerType = (Int16)typedValue.Value;
-                                if (index1070 == 8)
-                                    OrientMarkerType = (Int16)typedValue.Value;
+                                switch (index1070)
+                                {
+                                    case 0:
+                                        MarkersDiameter = (Int16)typedValue.Value;
+                                        break;
+                                    case 1:
+                                        Fracture = (Int16)typedValue.Value;
+                                        break;
+                                    case 2:
+                                        MarkersCount = (Int16)typedValue.Value;
+                                        break;
+                                    case 3:
+                                        BottomFractureOffset = (Int16)typedValue.Value;
+                                        break;
+                                    case 4:
+                                        TopFractureOffset = (Int16)typedValue.Value;
+                                        break;
+                                    case 5:
+                                        FirstMarkerType = (Int16)typedValue.Value;
+                                        break;
+                                    case 6:
+                                        SecondMarkerType = (Int16)typedValue.Value;
+                                        break;
+                                    case 7:
+                                        ThirdMarkerType = (Int16)typedValue.Value;
+                                        break;
+                                    case 8:
+                                        OrientMarkerType = (Int16)typedValue.Value;
+                                        break;
+                                    case 9:
+                                        ArrowsSize = (Int16)typedValue.Value;
+                                        break;
+                                }
                                 //index
                                 index1070++;
                                 break;
                             }
                         case DxfCode.ExtendedDataReal:
                             {
-                                if (index1040 == 0) // 0 - LineTypeScale
-                                    LineTypeScale = (double)typedValue.Value;
-                                if (index1040 == 1) // 1 - BottomLineAngle
-                                    BottomLineAngle = (double)typedValue.Value;
-                                if (index1040 == 2) // 2 - TopLineAngle
-                                    TopLineAngle = (double)typedValue.Value;
-                                if (index1040 == 3) // 3 - TextHeight
-                                    TextHeight = (double)typedValue.Value;
-                                if (index1040 == 4)
-                                    BottomOrientMarkerOffset = (double)typedValue.Value;
-                                if (index1040 == 5)
-                                    TopOrientMarkerOffset = (double)typedValue.Value;
+                                switch (index1040)
+                                {
+                                    case 0:
+                                        LineTypeScale = (double)typedValue.Value;
+                                        break;
+                                    case 1:
+                                        BottomLineAngle = (double)typedValue.Value;
+                                        break;
+                                    case 2:
+                                        TopLineAngle = (double)typedValue.Value;
+                                        break;
+                                    case 3:
+                                        TextHeight = (double)typedValue.Value;
+                                        break;
+                                    case 4:
+                                        BottomOrientMarkerOffset = (double)typedValue.Value;
+                                        break;
+                                    case 5:
+                                        TopOrientMarkerOffset = (double)typedValue.Value;
+                                        break;
+                                }
                                 index1040++;
                                 break;
                             }

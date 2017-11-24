@@ -397,24 +397,36 @@ namespace mpESKD.Functions.mpBreakLine
                             }
                         case DxfCode.ExtendedDataAsciiString:
                             {
-                                if (index1000 == 0) // 0 - это идентификатор стиля
-                                    StyleGuid = typedValue.Value.ToString();
-                                if (index1000 == 1) // 1 - breakline type
-                                    BreakLineType = BreakLinePropertiesHelpers.GetBreakLineTypeFromString(typedValue.Value.ToString());
-                                if (index1000 == 2) // 2 - scale
-                                    Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
+                                switch (index1000)
+                                {
+                                    case 0:
+                                        StyleGuid = typedValue.Value.ToString();
+                                        break;
+                                    case 1:
+                                        BreakLineType = BreakLinePropertiesHelpers.GetBreakLineTypeFromString(typedValue.Value.ToString());
+                                        break;
+                                    case 2:
+                                        Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
+                                        break;
+                                }
                                 // index
                                 index1000++;
                                 break;
                             }
                         case DxfCode.ExtendedDataInteger16:
                             {
-                                if (index1070 == 0) // 0 - Overhang
-                                    Overhang = (Int16)typedValue.Value;
-                                if (index1070 == 1) // 1- breakHeight
-                                    BreakHeight = (Int16)typedValue.Value;
-                                if (index1070 == 2) // 2 - breakWidth
-                                    BreakWidth = (Int16)typedValue.Value;
+                                switch (index1070)
+                                {
+                                    case 0:
+                                        Overhang = (Int16)typedValue.Value;
+                                        break;
+                                    case 1:
+                                        BreakHeight = (Int16)typedValue.Value;
+                                        break;
+                                    case 2:
+                                        BreakWidth = (Int16)typedValue.Value;
+                                        break;
+                                }
                                 //index
                                 index1070++;
                                 break;

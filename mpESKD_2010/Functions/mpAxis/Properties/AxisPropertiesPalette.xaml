@@ -5,16 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ctrls="clr-namespace:mpESKD.Base.Properties.Controls"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:properties="clr-namespace:mpESKD.Properties"
+             xmlns:converters="clr-namespace:mpESKD.Base.Properties.Converters"
              Unloaded="AxisPropertiesPalette_OnUnloaded">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../../Base/Properties/Controls/ControlStyles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <converters:ColumnWidthConverter x:Key="ColumnWidthConverter"></converters:ColumnWidthConverter>
         </ResourceDictionary>
     </UserControl.Resources>
     <Expander Header="Прямая ось" IsExpanded="True" Name="Expander">
-        <Grid IsSharedSizeScope="True">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -23,9 +26,11 @@
             <!--Main-->
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" SharedSizeGroup="Names"></ColumnDefinition>
+                    <ColumnDefinition Width="{Binding Source={x:Static properties:Settings.Default}, Path=GridColumnWidth,
+                        Converter={StaticResource ColumnWidthConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      MinWidth="50"></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*" ></ColumnDefinition>
+                    <ColumnDefinition Width="*" MinWidth="50"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
@@ -73,9 +78,11 @@
             <!--Geometry-->
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" SharedSizeGroup="Names"></ColumnDefinition>
+                    <ColumnDefinition Width="{Binding Source={x:Static properties:Settings.Default}, Path=GridColumnWidth,
+                        Converter={StaticResource ColumnWidthConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      MinWidth="50"></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*" ></ColumnDefinition>
+                    <ColumnDefinition Width="*" MinWidth="50"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
@@ -147,9 +154,8 @@
                 <!--ArrowSize-->
                 <TextBox Grid.Row="10" Grid.Column="0" Text="Размер стрелок:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="10" Grid.Column="2" Value="{Binding ArrowSize}" Style="{StaticResource PropertyValueIntTextBox}"
-                                  x:Name="TbArrowSize" Minimum="0" Maximum="5" GotFocus="FrameworkElement_OnGotFocus" 
-                                  LostFocus="FrameworkElement_OnLostFocus" 
-                                  TextBox.TextChanged="TbMarkersCount_OnTextChanged"></ctrls:IntTextBox>
+                                  x:Name="TbArrowSize" Minimum="0" Maximum="10" GotFocus="FrameworkElement_OnGotFocus" 
+                                  LostFocus="FrameworkElement_OnLostFocus" ></ctrls:IntTextBox>
                 <!--BottomOrientMarkerVisible-->
                 <TextBox Grid.Row="11" Grid.Column="0" Text="Нижний маркер-ориентир:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <Border Grid.Row="11" Grid.Column="2" Style="{StaticResource BorderForValueCheckBox}">
@@ -176,9 +182,11 @@
             <!---->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" SharedSizeGroup="Names"></ColumnDefinition>
+                    <ColumnDefinition Width="{Binding Source={x:Static properties:Settings.Default}, Path=GridColumnWidth,
+                        Converter={StaticResource ColumnWidthConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      MinWidth="50"></ColumnDefinition>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*" ></ColumnDefinition>
+                    <ColumnDefinition Width="*" MinWidth="50"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace mpESKD.Base.Properties.Converters
@@ -27,6 +28,7 @@ namespace mpESKD.Base.Properties.Converters
             throw new NotImplementedException();
         }
     }
+    /// <inheritdoc />
     /// <summary>
     /// Вспомогательное преобразование числового значения в строковое
     /// для использования во вспомогательном текстовом окне.
@@ -55,6 +57,25 @@ namespace mpESKD.Base.Properties.Converters
             (object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+    }
+    /// <inheritdoc />
+    /// <summary>Конвертер ширины колонки у Grid для использования в одновременном изменении
+    /// ширины колонок у всех UserControl в палитре</summary>
+    public class ColumnWidthConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string str && !str.Equals("*"))
+                return new GridLength(double.Parse(str));
+            return new GridLength(1, GridUnitType.Star);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is GridLength gridLength)
+                return gridLength.Value.ToString(CultureInfo.InvariantCulture);
+            return "*";
         }
     }
 }
