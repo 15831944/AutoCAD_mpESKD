@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using mpESKD.Base.Helpers;
+using mpESKD.Functions.mpAxis.Properties;
 using ModPlusAPI.Windows;
 // ReSharper disable InconsistentNaming
 
@@ -33,8 +34,20 @@ namespace mpESKD.Functions.mpAxis.Overrules
                     {
                         snapPoints.Add(axis.InsertionPoint);
                         snapPoints.Add(axis.EndPoint);
-                        snapPoints.Add(axis.BottomMarkerPoint);
-                        snapPoints.Add(axis.TopMarkerPoint);
+                        if (axis.MarkersPosition == AxisMarkersPosition.Both ||
+                            axis.MarkersPosition == AxisMarkersPosition.Bottom)
+                        {
+                            snapPoints.Add(axis.BottomMarkerPoint);
+                            if (axis.BottomOrientMarkerVisible)
+                                snapPoints.Add(axis.BottomOrientPoint);
+                        }
+                        if (axis.MarkersPosition == AxisMarkersPosition.Both ||
+                            axis.MarkersPosition == AxisMarkersPosition.Top)
+                        {
+                            snapPoints.Add(axis.TopMarkerPoint);
+                            if (axis.TopOrientMarkerVisible)
+                                snapPoints.Add(axis.TopOrientPoint);
+                        }
                     }
                 }
                 catch (Autodesk.AutoCAD.Runtime.Exception exception)

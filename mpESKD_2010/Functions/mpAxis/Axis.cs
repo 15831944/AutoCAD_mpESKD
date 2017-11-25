@@ -115,7 +115,7 @@ namespace mpESKD.Functions.mpAxis
             {
                 var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
                 var vector = value - BottomMarkerPoint;
-                BottomOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale()/ BlockTransform.GetScale();
+                BottomOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale() / BlockTransform.GetScale();
             }
         }
 
@@ -127,13 +127,13 @@ namespace mpESKD.Functions.mpAxis
                 var mainLineVectorNormal = (InsertionPoint - EndPoint).GetPerpendicularVector().GetNormal();
                 if (double.IsNaN(TopOrientMarkerOffset))
                     TopOrientMarkerOffset = MarkersDiameter + 10.0;
-                return TopMarkerPoint + mainLineVectorNormal * TopOrientMarkerOffset * GetScale();
+                return TopMarkerPoint - mainLineVectorNormal * TopOrientMarkerOffset * GetScale() * BlockTransform.GetScale();
             }
             set
             {
                 var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
                 var vector = value - TopMarkerPoint;
-                TopOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale();
+                TopOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale() / BlockTransform.GetScale();
             }
         }
 
@@ -316,7 +316,14 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        private readonly Lazy<Polyline> _bottomOrientArrow = new Lazy<Polyline>(() => new Polyline());
+        private readonly Lazy<Polyline> _bottomOrientArrow = new Lazy<Polyline>(() =>
+        {
+            // Это нужно, чтобы не выводилось сообщение в командную строку
+            var p = new Polyline();
+            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
+            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
+            return p;
+        });
         public Polyline BottomOrientArrow
         {
             get
@@ -326,7 +333,14 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        private readonly Lazy<Polyline> _topOrientArrow = new Lazy<Polyline>(() => new Polyline());
+        private readonly Lazy<Polyline> _topOrientArrow = new Lazy<Polyline>(() =>
+        {
+            // Это нужно, чтобы не выводилось сообщение в командную строку
+            var p = new Polyline();
+            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
+            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
+            return p;
+        });
         public Polyline TopOrientArrow
         {
             get
@@ -919,7 +933,7 @@ namespace mpESKD.Functions.mpAxis
                 }
                 else
                 {
-                    //_bottomOrientArrow.Value.Visible = false;
+                    _bottomOrientArrow.Value.Visible = false;
                     _bottomOrientDBText.Value.Visible = false;
                     _bottomOrientLine.Value.Visible = false;
                     _bottomOrientMarker.Value.Visible = false;
@@ -941,7 +955,7 @@ namespace mpESKD.Functions.mpAxis
                 _bottomFirstDBText.Value.Visible = false;
                 _bottomSecondDBText.Value.Visible = false;
                 _bottomThirdDBText.Value.Visible = false;
-                //_bottomOrientArrow.Value.Visible = false;
+                _bottomOrientArrow.Value.Visible = false;
                 _bottomOrientDBText.Value.Visible = false;
                 _bottomOrientLine.Value.Visible = false;
                 _bottomOrientMarker.Value.Visible = false;
@@ -1043,6 +1057,93 @@ namespace mpESKD.Functions.mpAxis
                     _topThirdMarker.Value.Visible = false;
                     _topThirdMarkerType2.Value.Visible = false;
                 }
+
+                #region Orient marker
+
+                if (TopOrientMarkerVisible)
+                {
+                    _topOrientLine.Value.Visible = true;
+                    var topOrientMarkerCenter = TopOrientPointOCS - mainVector.GetNormal() * MarkersDiameter / 2.0 * scale;
+                    _topOrientMarker.Value.Center = topOrientMarkerCenter;
+                    _topOrientMarker.Value.Diameter = MarkersDiameter * scale;
+                    // line
+                    var _topOrientLineStartPoint = GeometryHelpers.Point3dAtDirection(
+                        firstMarkerCenter, topOrientMarkerCenter, firstMarkerCenter,
+                        MarkersDiameter / 2.0 * scale);
+                    var _topOrientLineEndPoint = GeometryHelpers.Point3dAtDirection(
+                        topOrientMarkerCenter, firstMarkerCenter, topOrientMarkerCenter,
+                        MarkersDiameter / 2.0 * scale);
+                    if (_topOrientLineEndPoint.IsEqualTo(_topOrientLineStartPoint, Tolerance.Global))
+                    {
+                        _topOrientLine.Value.Visible = false;
+                        // arrow false
+                        _topOrientArrow.Value.Visible = false;
+                    }
+                    else
+                    {
+                        _topOrientLine.Value.StartPoint = _topOrientLineStartPoint;
+                        _topOrientLine.Value.EndPoint = _topOrientLineEndPoint;
+                        // arrow
+                        if (Math.Abs((_topOrientLineEndPoint - _topOrientLineStartPoint).Length) < ArrowsSize * scale ||
+                            ArrowsSize == 0)
+                        {
+                            //arrow false
+                            _topOrientArrow.Value.Visible = false;
+                        }
+                        else
+                        {
+                            _topOrientArrow.Value.Visible = true;
+                            // arrow draw
+                            var arrowStartPoint = GeometryHelpers.Point3dAtDirection(_topOrientLineEndPoint,
+                                _topOrientLineStartPoint,
+                                _topOrientLineEndPoint, ArrowsSize * scale);
+                            if (_topOrientArrow.Value.NumberOfVertices == 2)
+                            {
+                                _topOrientArrow.Value.SetPointAt(0,
+                                    GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint));
+                                _topOrientArrow.Value.SetBulgeAt(0, 0.0);
+                                _topOrientArrow.Value.SetPointAt(1,
+                                    GeometryHelpers.ConvertPoint3dToPoint2d(_topOrientLineEndPoint));
+                                _topOrientArrow.Value.SetBulgeAt(1, 0.0);
+                                _topOrientArrow.Value.SetStartWidthAt(0, ArrowsSize * scale * 1 / 3);
+                            }
+                            else
+                            {
+                                _topOrientArrow.Value.AddVertexAt(0,
+                                    GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint),
+                                    0.0, ArrowsSize * scale * 1 / 3, 0.0);
+                                _topOrientArrow.Value.AddVertexAt(1,
+                                    GeometryHelpers.ConvertPoint3dToPoint2d(_topOrientLineEndPoint),
+                                    0.0, 0.0, 0.0);
+                            }
+                        }
+                    }
+                    // text
+                    if (string.IsNullOrEmpty(TopOrientText))
+                        TopOrientDBText.Visible = false;
+                    else
+                    {
+                        TopOrientDBText.Position = topOrientMarkerCenter;
+                        TopOrientDBText.AlignmentPoint = topOrientMarkerCenter;
+                    }
+                    // type2
+                    if (OrientMarkerType == 1)
+                    {
+                        _topOrientMarkerType2.Value.Center = topOrientMarkerCenter;
+                        _topOrientMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                    }
+                    else _topOrientMarkerType2.Value.Visible = false;
+                }
+                else
+                {
+                    _topOrientArrow.Value.Visible = false;
+                    _topOrientDBText.Value.Visible = false;
+                    _topOrientLine.Value.Visible = false;
+                    _topOrientMarker.Value.Visible = false;
+                    _topOrientMarkerType2.Value.Visible = false;
+                }
+
+                #endregion
             }
             else
             {
@@ -1057,7 +1158,7 @@ namespace mpESKD.Functions.mpAxis
                 _topFirstDBText.Value.Visible = false;
                 _topSecondDBText.Value.Visible = false;
                 _topThirdDBText.Value.Visible = false;
-                //_topOrientArrow.Value.Visible = false;
+                _topOrientArrow.Value.Visible = false;
                 _topOrientDBText.Value.Visible = false;
                 _topOrientLine.Value.Visible = false;
                 _topOrientMarker.Value.Visible = false;
@@ -1294,7 +1395,7 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        enum UpdateVariant
+        private enum UpdateVariant
         {
             SetInsertionPoint,
             SetEndPointMinLength

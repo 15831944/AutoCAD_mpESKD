@@ -27,6 +27,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
         private Point3d InitEndPoint;
         private Point3d InitInsertionPoint;
         private Point3d InitBottomOrientPoint;
+        private Point3d InitTopOrientPoint;
         /// <summary>Получение ручек для примитива</summary>
         public override void GetGripPoints(Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir,
             GetGripPointsFlags bitFlags)
@@ -136,6 +137,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                                     GripPoint = axis.TopOrientGrip
                                 };
                                 grips.Add(gp);
+                                InitTopOrientPoint = axis.TopOrientGrip;
                             }
                     }
                 }
@@ -242,12 +244,14 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             var mainVector = gripPoint.Axis.InsertionPoint - gripPoint.Axis.EndPoint;
                             var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
                             gripPoint.Axis.TopMarkerPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
+                            // Меняю также точку маркера-ориентира
+                            if (InitTopOrientPoint != Point3d.Origin)
+                                gripPoint.Axis.TopOrientPoint = InitTopOrientPoint + offset.DotProduct(v) * v;
                         }
                         if (gripPoint.GripName == AxisGripName.BottomOrientGrip)
                         {
                             var mainVector = gripPoint.Axis.EndPoint - gripPoint.Axis.InsertionPoint;
                             Vector3d v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
-                            AcadHelpers.WriteMessageInDebug("\nv: " + v);
                             var newPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
 
                             if (Math.Abs((newPoint - gripPoint.Axis.BottomMarkerPoint).Length) >
@@ -262,6 +266,27 @@ namespace mpESKD.Functions.mpAxis.Overrules
                                 else gripPoint.Axis.BottomOrientPoint =
                                     gripPoint.Axis.BottomMarkerPoint + v * gripPoint.Axis.MarkersDiameter *
                                     GetFullScale(gripPoint);
+                            }
+                        }
+                        if (gripPoint.GripName == AxisGripName.TopOrientGrip)
+                        {
+                            var mainVector = gripPoint.Axis.InsertionPoint - gripPoint.Axis.EndPoint;
+                            Vector3d v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
+                            var newPoint = gripPoint.GripPoint + offset.DotProduct(v) * v;
+
+                            if (Math.Abs((newPoint - gripPoint.Axis.TopMarkerPoint).Length) >
+                                gripPoint.Axis.MarkersDiameter * GetFullScale(gripPoint))
+                                gripPoint.Axis.TopOrientPoint = newPoint;
+                            else
+                            {
+                                if (newPoint.X >= gripPoint.Axis.TopMarkerPoint.X)
+                                    gripPoint.Axis.TopOrientPoint =
+                                        gripPoint.Axis.TopMarkerPoint + v * -1 * gripPoint.Axis.MarkersDiameter *
+                                        GetFullScale(gripPoint);
+                                else
+                                    gripPoint.Axis.TopOrientPoint =
+                                        gripPoint.Axis.TopMarkerPoint + v * gripPoint.Axis.MarkersDiameter *
+                                        GetFullScale(gripPoint);
                             }
                         }
                         // Вот тут происходит перерисовка примитивов внутри блока

@@ -85,7 +85,14 @@ namespace mpESKD.Functions.mpBreakLine
         public BreakLineType BreakLineType { get; set; } = BreakLineProperties.BreakLineType.DefaultValue;
 
         #region Базовые примитивы СПДС объекта
-        private Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
+        private Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() =>
+        {
+            // Это нужно, чтобы не выводилось сообщение в командную строку
+            var p = new Polyline();
+            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
+            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
+            return p;
+        });
         public Polyline MainPolyline
         {
             get
@@ -447,7 +454,7 @@ namespace mpESKD.Functions.mpBreakLine
             }
         }
 
-        enum UpdateVariant
+        private enum UpdateVariant
         {
             SetInsertionPoint,
             SetEndPointMinLength
