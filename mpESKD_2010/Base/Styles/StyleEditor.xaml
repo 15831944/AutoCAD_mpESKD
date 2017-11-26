@@ -448,6 +448,7 @@
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
                                     </Grid.RowDefinitions>
                                     <CheckBox Grid.Row="0" Margin="2" Content="Менять масштаб типа линии пропорционально масштабу примитива"
                                               IsChecked="{Binding Path=AxisLineTypeScaleProportionScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -455,6 +456,14 @@
                                         <CheckBox.ToolTip>
                                             <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
                                                        Text="Масштаб типа линии, который устанавливается для оси, будет меняться пропорционально основному масштабу оси. Например, если был установлен масштаб оси равный 1:1 и масштаб типа линии равный 2, то при установке масштаба оси равному 1:100 масштаб типа линии станет равным 200"></TextBlock>
+                                        </CheckBox.ToolTip>
+                                    </CheckBox>
+                                    <CheckBox Grid.Row="1" Margin="2" Content="Сохранять значения последних созданных осей и продолжать значения создаваемых осей"
+                                              IsChecked="{Binding Path=AxisSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="15000">
+                                        <CheckBox.ToolTip>
+                                            <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
+                                                       Text="При создании осей значение первого маркера будет запоминаться в текущем документе и автоматически продолжаться для каждой новой оси"></TextBlock>
                                         </CheckBox.ToolTip>
                                     </CheckBox>
                                 </Grid>

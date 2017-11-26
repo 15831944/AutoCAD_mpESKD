@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
@@ -36,6 +37,11 @@ namespace mpESKD.Functions.mpAxis
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance());
         }
+        public static List<string> AxisRusAlphabet = new List<string>
+        {
+            "А","Б","В","Г","Д","Е","Ж","И","К","Л","М","Н","П","Р","С","Т","У","Ф","Ш","Э","Ю","Я",
+            "АА","ББ","ВВ","ГГ","ДД","ЕЕ","ЖЖ","ИИ","КК","ЛЛ","ММ","НН","ПП","РР","СС","ТТ","УУ","ФФ","ШШ","ЭЭ","ЮЮ","ЯЯ"
+        };
     }
 
     public class AxisCommands
@@ -62,7 +68,14 @@ namespace mpESKD.Functions.mpAxis
                 var style = AxisStyleManager.GetCurrentStyle();
                 var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name,
                     AxisProperties.LayerName.DefaultValue);
-                var axis = new Axis(style);
+                var axisLastHorizontalValue = string.Empty;
+                var axisLastVerticalValue = string.Empty;
+                if (MainStaticSettings.Settings.AxisSaveLastTextAndContinueNew)
+                {
+                    axisLastHorizontalValue = ModPlus.Helpers.XDataHelpers.GetStringXData("AxisLastValueForHorizontal");
+                    axisLastVerticalValue = ModPlus.Helpers.XDataHelpers.GetStringXData("AxisLastValueForVertical");
+                }
+                var axis = new Axis(style, axisLastHorizontalValue, axisLastVerticalValue);
                 var blockReference = CreateAxisBlock(ref axis);
                 // set layer
                 AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
@@ -70,7 +83,7 @@ namespace mpESKD.Functions.mpAxis
                 var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name,
                     AxisProperties.LineType.DefaultValue);
                 AcadHelpers.SetLineType(blockReference.ObjectId, lineType);
-                
+
 
                 var breakLoop = false;
                 while (!breakLoop)
@@ -121,6 +134,13 @@ namespace mpESKD.Functions.mpAxis
                         ent.XData = axis.GetParametersForXData();
                         tr.Commit();
                     }
+                    // save first marker value to doc
+                    var v = (axis.EndPoint - axis.InsertionPoint).GetNormal();
+                    if ((v.X > 0.5 || v.X < -0.5) && (v.Y < 0.5 || v.Y > -0.5))
+                        ModPlus.Helpers.XDataHelpers.SetStringXData("AxisLastValueForHorizontal", axis.FirstText);
+                    else
+                        ModPlus.Helpers.XDataHelpers.SetStringXData("AxisLastValueForVertical", axis.FirstText);
+
                 }
             }
             catch (Exception exception)

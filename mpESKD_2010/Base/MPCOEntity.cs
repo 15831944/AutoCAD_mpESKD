@@ -108,11 +108,19 @@ namespace mpESKD.Base
                     {
                         //Debug.Print("Value not created");
                         var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
-                        foreach (var ent in Entities)
+                        foreach (var entity in Entities)
                         {
-                            var transformedCopy = ent.GetTransformedCopy(matrix3D);
-                            _blockRecord.AppendEntity(transformedCopy);
+                            if (entity.Visible)
+                            {
+                                var transformedCopy = entity.GetTransformedCopy(matrix3D);
+                                _blockRecord.AppendEntity(transformedCopy);
+                            }
                         }
+                        //foreach (var ent in Entities)
+                        //{
+                        //    var transformedCopy = ent.GetTransformedCopy(matrix3D);
+                        //    _blockRecord.AppendEntity(transformedCopy);
+                        //}
                         IsValueCreated = true;
                     }
                 }

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.Geometry;
 using mpESKD.Base;
 using mpESKD.Base.Helpers;
-using mpESKD.Base.Properties;
 using mpESKD.Base.Styles;
 using mpESKD.Functions.mpAxis.Properties;
 using mpESKD.Functions.mpAxis.Styles;
@@ -27,7 +25,7 @@ namespace mpESKD.Functions.mpAxis
             BlockId = objectId;
         }
         /// <summary>Инициализация экземпляра класса для BreakLine для создания</summary>
-        public Axis(AxisStyle style)
+        public Axis(AxisStyle style, string lastHorizontalValue, string lastVerticalValue)
         {
             var blockTableRecord = new BlockTableRecord
             {
@@ -38,6 +36,9 @@ namespace mpESKD.Functions.mpAxis
             StyleGuid = style.Guid;
             // Применяем текущий стиль к СПДС примитиву
             ApplyStyle(style);
+            // last values
+            LastHorizontalValue = lastHorizontalValue;
+            LastVerticalValue = lastVerticalValue;
         }
         #endregion
 
@@ -220,7 +221,9 @@ namespace mpESKD.Functions.mpAxis
         // Отступы маркеров-ориентиров
         private double BottomOrientMarkerOffset { get; set; } = double.NaN;
         private double TopOrientMarkerOffset { get; set; } = double.NaN;
-
+        // last values
+        private string LastHorizontalValue = string.Empty;
+        private string LastVerticalValue = string.Empty;
         #endregion
 
         #region Style
@@ -784,6 +787,7 @@ namespace mpESKD.Functions.mpAxis
                     BottomFirstDBText.Visible = false;
                 else
                 {
+                    BottomFirstDBText.Visible = true;
                     BottomFirstDBText.Position = firstMarkerCenter;
                     BottomFirstDBText.AlignmentPoint = firstMarkerCenter;
                 }
@@ -807,6 +811,7 @@ namespace mpESKD.Functions.mpAxis
                         BottomSecondDBText.Visible = false;
                     else
                     {
+                        BottomSecondDBText.Visible = true;
                         BottomSecondDBText.Position = secontMarkerCenter;
                         BottomSecondDBText.AlignmentPoint = secontMarkerCenter;
                     }
@@ -829,6 +834,7 @@ namespace mpESKD.Functions.mpAxis
                             BottomThirdDBText.Visible = false;
                         else
                         {
+                            BottomThirdDBText.Visible = true;
                             BottomThirdDBText.Position = thirdMarkerCenter;
                             BottomThirdDBText.AlignmentPoint = thirdMarkerCenter;
                         }
@@ -920,6 +926,7 @@ namespace mpESKD.Functions.mpAxis
                         BottomOrientDBText.Visible = false;
                     else
                     {
+                        BottomOrientDBText.Visible = true;
                         BottomOrientDBText.Position = bottomOrientMarkerCenter;
                         BottomOrientDBText.AlignmentPoint = bottomOrientMarkerCenter;
                     }
@@ -988,6 +995,7 @@ namespace mpESKD.Functions.mpAxis
                     TopFirstDBText.Visible = false;
                 else
                 {
+                    TopFirstDBText.Visible = true;
                     TopFirstDBText.Position = firstMarkerCenter;
                     TopFirstDBText.AlignmentPoint = firstMarkerCenter;
                 }
@@ -1011,6 +1019,7 @@ namespace mpESKD.Functions.mpAxis
                         TopSecondDBText.Visible = false;
                     else
                     {
+                        TopSecondDBText.Visible = true;
                         TopSecondDBText.Position = secontMarkerCenter;
                         TopSecondDBText.AlignmentPoint = secontMarkerCenter;
                     }
@@ -1033,6 +1042,7 @@ namespace mpESKD.Functions.mpAxis
                             TopThirdDBText.Visible = false;
                         else
                         {
+                            TopThirdDBText.Visible = true;
                             TopThirdDBText.Position = thirdMarkerCenter;
                             TopThirdDBText.AlignmentPoint = thirdMarkerCenter;
                         }
@@ -1123,6 +1133,7 @@ namespace mpESKD.Functions.mpAxis
                         TopOrientDBText.Visible = false;
                     else
                     {
+                        TopOrientDBText.Visible = true;
                         TopOrientDBText.Position = topOrientMarkerCenter;
                         TopOrientDBText.AlignmentPoint = topOrientMarkerCenter;
                     }
@@ -1167,8 +1178,9 @@ namespace mpESKD.Functions.mpAxis
             #endregion
         }
 
-        public void UpdateTextEntities()
+        private void UpdateTextEntities()
         {
+            SetFirstTextOnCreation();
             BottomFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
             BottomSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
             BottomThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
@@ -1177,6 +1189,87 @@ namespace mpESKD.Functions.mpAxis
             TopThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
             BottomOrientDBText.TextString = BottomOrientText;
             TopOrientDBText.TextString = TopOrientText;
+        }
+
+        private void SetFirstTextOnCreation()
+        {
+            if (EndPointOCS == Point3d.Origin) return;
+            if (IsValueCreated)
+            {
+                var v = (EndPointOCS - InsertionPointOCS).GetNormal();
+                if ((v.X > 0.5 || v.X < -0.5) && (v.Y < 0.5 || v.Y > -0.5))
+                    FirstText = GetFirstTextValueByLastAxis("Horizontal");
+                else
+                    FirstText = GetFirstTextValueByLastAxis("Vertical");
+            }
+        }
+        // Чтобы не вычислять каждый раз заново создам переменные
+        private string _newVerticalMarkValue = string.Empty;
+        private string _newHorizontalMarkValue = string.Empty;
+
+        private string GetFirstTextValueByLastAxis(string direction)
+        {
+            if (direction.Equals("Horizontal"))
+            {
+                if (!string.IsNullOrEmpty(LastHorizontalValue))
+                {
+                    if (string.IsNullOrEmpty(_newHorizontalMarkValue))
+                    {
+                        if (int.TryParse(LastHorizontalValue, out int i))
+                        {
+                            _newHorizontalMarkValue = (i + 1).ToString();
+                            return _newHorizontalMarkValue;
+                        }
+                        if (AxisFunction.AxisRusAlphabet.Contains(LastHorizontalValue))
+                        {
+                            var index = AxisFunction.AxisRusAlphabet.IndexOf(LastHorizontalValue);
+                            if (index == AxisFunction.AxisRusAlphabet.Count - 1)
+                            {
+                                _newHorizontalMarkValue = AxisFunction.AxisRusAlphabet[0];
+                                return _newHorizontalMarkValue;
+                            }
+                            _newHorizontalMarkValue = AxisFunction.AxisRusAlphabet[index + 1];
+                            return _newHorizontalMarkValue;
+                        }
+                        _newHorizontalMarkValue = "А";
+                        return _newHorizontalMarkValue;
+                    }
+                    return _newHorizontalMarkValue;
+                }
+                _newHorizontalMarkValue = "А";
+                return _newHorizontalMarkValue;
+            }
+            if (direction.Equals("Vertical"))
+            {
+                if (!string.IsNullOrEmpty(LastVerticalValue))
+                {
+                    if (string.IsNullOrEmpty(_newVerticalMarkValue))
+                    {
+                        if (int.TryParse(LastVerticalValue, out int i))
+                        {
+                            _newVerticalMarkValue = (i + 1).ToString();
+                            return _newVerticalMarkValue;
+                        }
+                        if (AxisFunction.AxisRusAlphabet.Contains(LastVerticalValue))
+                        {
+                            var index = AxisFunction.AxisRusAlphabet.IndexOf(LastVerticalValue);
+                            if (index == AxisFunction.AxisRusAlphabet.Count - 1)
+                            {
+                                _newVerticalMarkValue = AxisFunction.AxisRusAlphabet[0];
+                                return _newVerticalMarkValue;
+                            }
+                            _newVerticalMarkValue = AxisFunction.AxisRusAlphabet[index + 1];
+                            return _newVerticalMarkValue;
+                        }
+                        _newVerticalMarkValue = "1";
+                        return _newVerticalMarkValue;
+                    }
+                    return _newVerticalMarkValue;
+                }
+                _newVerticalMarkValue = "1";
+                return _newVerticalMarkValue;
+            }
+            return string.Empty;
         }
         #endregion
 

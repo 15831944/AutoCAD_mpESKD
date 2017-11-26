@@ -69,6 +69,22 @@ namespace mpESKD
             }
         }
 
+        private bool _axisSaveLastTextAndContinueNew;
+        /// <summary>Сохранять значения последних созданных осей и продолжать значения создаваемых осей</summary>
+        public bool AxisSaveLastTextAndContinueNew
+        {
+            get => !bool.TryParse(
+                UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD",
+                    nameof(AxisSaveLastTextAndContinueNew)),
+                out _axisSaveLastTextAndContinueNew) || _axisSaveLastTextAndContinueNew; // true
+            set
+            {
+                _axisSaveLastTextAndContinueNew = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings,"mpESKD", nameof(AxisSaveLastTextAndContinueNew), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
         private bool _useTextStyleFromStyle;
         /// <summary>Использовать текстовый стиль из стиля</summary>
         public bool UseTextStyleFromStyle
