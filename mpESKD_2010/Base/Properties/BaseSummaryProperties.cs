@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
@@ -50,7 +49,7 @@ namespace mpESKD.Base.Properties
 
         protected string GetStrProp(string propName)
         {
-            IEnumerable<string> vals = this.Select(data => (string)data.GetType().GetProperty(propName).GetValue(data, null)).ToArray();
+            var vals = this.Select(data => (string)data.GetType().GetProperty(propName).GetValue(data, null)).ToArray();
             return GetSummaryStrValue(vals);
         }
         /// <summary>
@@ -61,7 +60,7 @@ namespace mpESKD.Base.Properties
         /// <returns></returns>
         protected int? GetIntProp(string propName)
         {
-            IEnumerable<int> vals = this.Select(data => (int)data.GetType().GetProperty(propName).GetValue(data, null)).ToArray();
+            var vals = this.Select(data => (int)data.GetType().GetProperty(propName).GetValue(data, null)).ToArray();
             return GetSummaryIntValue(vals);
         }
         /// <summary>
@@ -72,13 +71,13 @@ namespace mpESKD.Base.Properties
         /// <returns></returns>
         protected double? GetDoubleProp(string propName)
         {
-            IEnumerable<double> vals = this.Select(data => (double)(data.GetType().GetProperty(propName).GetValue(data, null))).ToArray();
+            var vals = this.Select(data => (double)(data.GetType().GetProperty(propName).GetValue(data, null))).ToArray();
             return GetSummaryDoubleValue(vals);
         }
 
         protected bool? GetBoolProp(string propName)
         {
-            IEnumerable<bool> vals = this.Select(data => (bool) (data.GetType().GetProperty(propName).GetValue(data, null))).ToArray();
+            var vals = this.Select(data => (bool) data.GetType().GetProperty(propName).GetValue(data, null)).ToArray();
             return GetSummaryBoolValue(vals);
         }
         /// <summary>
@@ -86,27 +85,27 @@ namespace mpESKD.Base.Properties
         /// </summary>
         /// <param name="vals"></param>
         /// <returns></returns>
-        protected int? GetSummaryIntValue(IEnumerable<int> vals)
+        protected int? GetSummaryIntValue(int[] vals)
         {
             if (vals.Distinct().Count() > 1)
                 return null;
             return vals.FirstOrDefault();
         }
-        protected double? GetSummaryDoubleValue(IEnumerable<double> vals)
+        protected double? GetSummaryDoubleValue(double[] vals)
         {
             if (vals.Distinct(new DoubleEqComparer(0.00001)).Count() > 1)
                 return null;
             return vals.FirstOrDefault();
         }
 
-        protected string GetSummaryStrValue(IEnumerable<string> vals)
+        protected string GetSummaryStrValue(string[] vals)
         {
             if (vals.Distinct().Count() > 1)
                 return "*РАЗЛИЧНЫЕ*";
             return vals.FirstOrDefault();
         }
 
-        protected bool? GetSummaryBoolValue(IEnumerable<bool> vals)
+        protected bool? GetSummaryBoolValue(bool[] vals)
         {
             if (vals.Distinct().Count() > 1) return null;
             return vals.FirstOrDefault();
@@ -120,7 +119,7 @@ namespace mpESKD.Base.Properties
         {
             foreach (var data in this)
             {
-                data.GetType().GetProperty(propName).SetValue(data, value, null);
+                data.GetType().GetProperty(propName)?.SetValue(data, value, null);
             }
         }
     }

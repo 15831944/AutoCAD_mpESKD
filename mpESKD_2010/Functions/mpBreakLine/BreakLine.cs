@@ -85,14 +85,7 @@ namespace mpESKD.Functions.mpBreakLine
         public BreakLineType BreakLineType { get; set; } = BreakLineProperties.BreakLineType.DefaultValue;
 
         #region Базовые примитивы СПДС объекта
-        private Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() =>
-        {
-            // Это нужно, чтобы не выводилось сообщение в командную строку
-            var p = new Polyline();
-            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
-            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
-            return p;
-        });
+        private readonly Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
         public Polyline MainPolyline
         {
             get
@@ -304,14 +297,14 @@ namespace mpESKD.Functions.mpBreakLine
         /// <param name="bulges">Список выпуклостей</param>
         private void FillMainPolylineWithPoints(Point2dCollection pts, IList<double> bulges)
         {
-            if (_mainPolyline == null) _mainPolyline = new Lazy<Polyline>(() => new Polyline());
             // Если количество точек совпадает, тогда просто их меняем
             if (pts.Count == MainPolyline.NumberOfVertices)
+            {
                 for (var i = 0; i < pts.Count; i++)
                 {
                     MainPolyline.SetPointAt(i, pts[i]);
                     MainPolyline.SetBulgeAt(i, bulges[i]);
-                }
+                }}
             else // иначе создаем заново
             {
                 for (var i = 0; i < MainPolyline.NumberOfVertices; i++)

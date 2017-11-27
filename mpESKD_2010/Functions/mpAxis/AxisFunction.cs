@@ -1,5 +1,11 @@
-﻿using System.Collections.Generic;
+﻿#if ac2010
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
+#elif ac2013
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+#endif
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
@@ -30,7 +36,44 @@ namespace mpESKD.Functions.mpAxis
             Overrule.Overruling = true;
             //// создание файла хранения стилей, если отсутсвует
             AxisStyleManager.CheckStylesFile();
+            //
+            AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
         }
+
+        private static void AcApp_BeginDoubleClick(object sender, Autodesk.AutoCAD.ApplicationServices.BeginDoubleClickEventArgs e)
+        {
+            PromptSelectionResult psr = AcadHelpers.Editor.SelectAtPickBox(e.Location);
+            if (psr.Status != PromptStatus.OK) return;
+            ObjectId[] ids = psr.Value.GetObjectIds();
+            if (ids.Length == 1)
+            {
+                var location = e.Location;
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (Transaction tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                    {
+                        var obj = tr.GetObject(ids[0], OpenMode.ForWrite);
+                        if (obj is BlockReference blockReference)
+                        {
+                            var axis = AxisXDataHelper.GetAxisFromEntity(blockReference);
+                            axis.UpdateEntities();
+                            var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
+                            AcadHelpers.WriteMessageInDebug("\nLocation:");
+                            AcadHelpers.WriteMessageInDebug("\nStandard: " + location);
+                            AcadHelpers.WriteMessageInDebug("\nTransform: " + location.TransformBy(axis.BlockTransform));
+                            AcadHelpers.WriteMessageInDebug("\nTransform inverse: " + location.TransformBy(axis.BlockTransform.Inverse()));
+                            AcadHelpers.WriteMessageInDebug("\nTexr point:");
+                            AcadHelpers.WriteMessageInDebug("\nStandard:" + axis.BottomFirstDBText.Position);
+                            AcadHelpers.WriteMessageInDebug("\nTransform:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform));
+                            AcadHelpers.WriteMessageInDebug("\nTransform inverse:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform.Inverse()));
+                            AcadHelpers.WriteMessageInDebug("\n" + (v - location).Length.ToString(CultureInfo.InvariantCulture));
+                        }
+                        tr.Commit();
+                    }
+                }
+            }
+        }
+
         public static void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance());
@@ -152,6 +195,7 @@ namespace mpESKD.Functions.mpAxis
                 Overrule.Overruling = true;
             }
         }
+
         private static BlockReference CreateAxisBlock(ref Axis axis)
         {
             BlockReference blockReference;

@@ -1,20 +1,20 @@
-﻿#if ac2010
+﻿
+using System;
+#if ac2010
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Application;
 #elif ac2013
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 #endif
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Xml.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
-using mpESKD.Base.Properties;
-using mpESKD.Base.Styles;
 using ModPlusAPI.Windows;
+using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 namespace mpESKD.Base.Helpers
 {
@@ -22,12 +22,16 @@ namespace mpESKD.Base.Helpers
     {
         /// <summary>БД активного документа</summary>
         public static Database Database => HostApplicationServices.WorkingDatabase;
+
         /// <summary>Коллекция документов</summary>
         public static DocumentCollection Documents => AcApp.DocumentManager;
+
         /// <summary>Активный документ</summary>
         public static Document Document => AcApp.DocumentManager.MdiActiveDocument;
+
         /// <summary>Редактор активного документа</summary>
         public static Editor Editor => AcApp.DocumentManager.MdiActiveDocument.Editor;
+
         /// <summary>Список слоёв текущей базы данных</summary>
         public static List<string> Layers
         {
@@ -51,6 +55,7 @@ namespace mpESKD.Base.Helpers
                 return layers;
             }
         }
+
         /// <summary>Список масштабов текущего чертежа</summary>
         public static List<string> Scales
         {
@@ -69,6 +74,7 @@ namespace mpESKD.Base.Helpers
                 return scales;
             }
         }
+
         /// <summary>Текстовые стили текущего чертежа</summary>
         public static List<string> TextStyles
         {
@@ -83,7 +89,7 @@ namespace mpESKD.Base.Helpers
                         foreach (ObjectId objectId in txtstbl)
                         {
                             var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
-                            if(!textStyles.Contains(txtStl.Name))
+                            if (!textStyles.Contains(txtStl.Name))
                                 textStyles.Add(txtStl.Name);
                         }
                     }
@@ -105,6 +111,7 @@ namespace mpESKD.Base.Helpers
         {
             return (T)(objectId.GetObject(0, openErased, forceOpenOnLockedLayer) as T);
         }
+
         /// <summary>
         /// Открыть объект для записи
         /// </summary>
@@ -118,6 +125,7 @@ namespace mpESKD.Base.Helpers
         {
             return (T)(objectId.GetObject(OpenMode.ForWrite, openErased, forceOpenOnLockedLayer) as T);
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -143,9 +151,13 @@ namespace mpESKD.Base.Helpers
                 {
                     using (BlockTable blockTable = Database.BlockTableId.Write<BlockTable>(false, true))
                     {
-                        using (BlockReference blockReference = new BlockReference(point, blockTable.Add(blockTableRecord)))
+                        using (BlockReference blockReference =
+                            new BlockReference(point, blockTable.Add(blockTableRecord)))
                         {
-                            ObjectId item = blockTable[BlockTableRecord.ModelSpace];//&&&&&&&&?????????????????????????????????????????????????paperspace
+                            ObjectId
+                                item = blockTable[
+                                    BlockTableRecord
+                                        .ModelSpace]; //&&&&&&&&?????????????????????????????????????????????????paperspace
                             using (BlockTableRecord btr = item.Write<BlockTableRecord>(false, true))
                             {
                                 objectId = btr.AppendEntity(blockReference);
@@ -159,6 +171,7 @@ namespace mpESKD.Base.Helpers
             }
             return objectId;
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -177,6 +190,7 @@ namespace mpESKD.Base.Helpers
             }
             return new BlockReference(point, blockTableRecord.ObjectId);
         }
+
         /// <summary>Получение аннотативного масштаба по имени из текущего чертежа</summary>
         /// <param name="name">Имя масштаба</param>
         /// <returns>Аннотативный масштаб с таким именем или текущий масштаб в БД</returns>
@@ -203,7 +217,7 @@ namespace mpESKD.Base.Helpers
         public static void SetLayerByName(ObjectId blkRefObjectId, string layerName, XElement layerXmlData)
         {
             //var mainSettings = new MainSettings();
-            if(blkRefObjectId == ObjectId.Null) return;
+            if (blkRefObjectId == ObjectId.Null) return;
             if (MainStaticSettings.Settings.UseLayerFromStyle)
             {
                 if (!layerName.Equals("По умолчанию"))
@@ -229,7 +243,8 @@ namespace mpESKD.Base.Helpers
                                 {
                                     using (Transaction tr = Database.TransactionManager.StartTransaction())
                                     {
-                                        var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                                        var blockReference =
+                                            tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
                                         if (blockReference != null) blockReference.Layer = layerName;
                                         tr.Commit();
                                     }
@@ -257,6 +272,7 @@ namespace mpESKD.Base.Helpers
             Editor.WriteMessage("\n" + message);
 #endif
         }
+
         /// <summary>Получить имя типа линии по ObjectId</summary>
         /// <param name="ltid">ObjectId</param>
         /// <returns></returns>
@@ -277,6 +293,7 @@ namespace mpESKD.Base.Helpers
             }
             return lt;
         }
+
         /// <summary>Получить ObjectId типа линии по имени в текущем документе</summary>
         /// <param name="ltname">Имя типа линии</param>
         /// <returns></returns>
@@ -321,10 +338,11 @@ namespace mpESKD.Base.Helpers
             }
             return ltid;
         }
+
         /// <summary>Установка типа линии для блока согласно стиля</summary>
         public static void SetLineType(ObjectId blkRefObjectId, string lineTypeName)
         {
-            if(blkRefObjectId == ObjectId.Null) return;
+            if (blkRefObjectId == ObjectId.Null) return;
             using (Document.LockDocument())
             {
                 using (var tr = Document.TransactionManager.StartTransaction())
@@ -336,7 +354,7 @@ namespace mpESKD.Base.Helpers
                             blockReference.Linetype = lineTypeName;
                         else
                         {
-                            if(LoadLineType(lineTypeName))
+                            if (LoadLineType(lineTypeName))
                                 blockReference.Linetype = lineTypeName;
                         }
                     }
@@ -344,6 +362,7 @@ namespace mpESKD.Base.Helpers
                 }
             }
         }
+
         /// <summary>Проверка наличия типа линии в документе</summary>
         private static bool HasLineType(string lineTypeName, Transaction tr)
         {
@@ -352,6 +371,7 @@ namespace mpESKD.Base.Helpers
                 return (lttbl.Has(lineTypeName));
             return false;
         }
+
         /// <summary>Загрузка типа линии в файл</summary>
         /// <param name="lineTypeName">Имя типа линии</param>
         /// <param name="fileNames">Файлы, в которых искать тип линии. Если не указаны, то из стандартного</param>
@@ -407,6 +427,7 @@ namespace mpESKD.Base.Helpers
             return ObjectId.Null;
         }
     }
+
     /// <summary>Вспомогательные методы работы с расширенными данными
     /// Есть аналогичные в MpCadHelpers. Некоторые будут совпадать
     /// но все-равно делаю отдельно</summary>
@@ -420,7 +441,8 @@ namespace mpESKD.Base.Helpers
         {
             using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
             {
-                RegAppTable rat = (RegAppTable)tr.GetObject(AcadHelpers.Database.RegAppTableId, OpenMode.ForRead, false);
+                RegAppTable rat =
+                    (RegAppTable)tr.GetObject(AcadHelpers.Database.RegAppTableId, OpenMode.ForRead, false);
                 if (!rat.Has(appName))
                 {
                     rat.UpgradeOpen();
@@ -462,10 +484,89 @@ namespace mpESKD.Base.Helpers
             ResultBuffer rb = blkRef.GetXDataForApplication(appName);
             return rb != null;
         }
+
         public static bool IsMPCOentity(DBObject dbObject, string appName)
         {
             ResultBuffer rb = dbObject.GetXDataForApplication(appName);
             return rb != null;
         }
     }
+
+    public static class EditorSelectionExtension
+    {
+        // http://drive-cad-with-code.blogspot.ru/2013/03/update-custom-double-click-action-using.html
+        public static PromptSelectionResult SelectAtPickBox(this Editor ed, Point3d pickBoxCentre)
+        {
+#if ac2013
+            //Get pick box's size on screen
+            System.Windows.Point screenPt = AcadHelpers.Editor.PointToScreen(pickBoxCentre, 1);
+
+            //Get pickbox's size. Note, the number obtained from
+            //system variable "PICKBOX" is actually the half of
+            //pickbox's width/height
+            object pBox = AcApp.GetSystemVariable("PICKBOX");
+
+            int pSize = Convert.ToInt32(pBox);
+
+            //Define a Point3dCollection for CrossingWindow selecting
+            Point3dCollection points = new Point3dCollection();
+
+            System.Windows.Point p;
+            Point3d pt;
+
+            p = new System.Windows.Point(screenPt.X - pSize, screenPt.Y - pSize);
+            pt = ed.PointToWorld(p, 1);
+            points.Add(pt);
+
+            p = new System.Windows.Point(screenPt.X + pSize, screenPt.Y - pSize);
+            pt = ed.PointToWorld(p, 1);
+            points.Add(pt);
+
+            p = new System.Windows.Point(screenPt.X + pSize, screenPt.Y + pSize);
+            pt = ed.PointToWorld(p, 1);
+            points.Add(pt);
+
+            p = new System.Windows.Point(screenPt.X - pSize, screenPt.Y + pSize);
+            pt = ed.PointToWorld(p, 1);
+            points.Add(pt);
+
+            return ed.SelectCrossingPolygon(points);
+#else
+            //Get pick box's size on screen
+            System.Drawing.Point screenPt = AcadHelpers.Editor.PointToScreen(pickBoxCentre, 1);
+
+            //Get pickbox's size. Note, the number obtained from
+            //system variable "PICKBOX" is actually the half of
+            //pickbox's width/height
+            object pBox = AcApp.GetSystemVariable("PICKBOX");
+
+            int pSize = Convert.ToInt32(pBox);
+
+            //Define a Point3dCollection for CrossingWindow selecting
+            Point3dCollection points = new Point3dCollection();
+
+            System.Drawing.Point p;
+            Point3d pt;
+
+            p = new System.Drawing.Point(screenPt.X - pSize, screenPt.Y - pSize);
+            pt = ed.PointToWorld(p, 1);
+            points.Add(pt);
+
+            p = new System.Drawing.Point(screenPt.X + pSize, screenPt.Y - pSize);
+            pt = ed.PointToWorld(p, 1);
+            points.Add(pt);
+
+            p = new System.Drawing.Point(screenPt.X + pSize, screenPt.Y + pSize);
+            pt = ed.PointToWorld(p, 1);
+            points.Add(pt);
+
+            p = new System.Drawing.Point(screenPt.X - pSize, screenPt.Y + pSize);
+            pt = ed.PointToWorld(p, 1);
+            points.Add(pt);
+
+            return ed.SelectCrossingPolygon(points);
+#endif
+        }
+    }
+
 }

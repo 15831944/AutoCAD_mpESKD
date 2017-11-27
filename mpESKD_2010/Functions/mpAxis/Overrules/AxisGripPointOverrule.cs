@@ -281,11 +281,11 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             {
                                 if (newPoint.X >= gripPoint.Axis.TopMarkerPoint.X)
                                     gripPoint.Axis.TopOrientPoint =
-                                        gripPoint.Axis.TopMarkerPoint + v * -1 * gripPoint.Axis.MarkersDiameter *
+                                        gripPoint.Axis.TopMarkerPoint + v * gripPoint.Axis.MarkersDiameter *
                                         GetFullScale(gripPoint);
                                 else
                                     gripPoint.Axis.TopOrientPoint =
-                                        gripPoint.Axis.TopMarkerPoint + v * gripPoint.Axis.MarkersDiameter *
+                                        gripPoint.Axis.TopMarkerPoint + v * -1 * gripPoint.Axis.MarkersDiameter *
                                         GetFullScale(gripPoint);
                             }
                         }
