@@ -11,6 +11,7 @@ using mpESKD.Base.Helpers;
 using ModPlus;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using Visibility = System.Windows.Visibility;
 
 namespace mpESKD.Base.Properties
 {
@@ -19,6 +20,7 @@ namespace mpESKD.Base.Properties
         public PropertiesPalette()
         {
             InitializeComponent();
+            StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
             AcadHelpers.Documents.DocumentCreated += Documents_DocumentCreated;
             AcadHelpers.Documents.DocumentActivated += Documents_DocumentActivated;
             foreach (Document document in AcadHelpers.Documents)
@@ -63,43 +65,55 @@ namespace mpESKD.Base.Properties
                     StackPanelProperties.Children.Clear();
                 // Очищаем панель описания
                 ShowDescription(String.Empty);
+                // hide message
+                StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
             }
             else
             {
-                foreach (SelectedObject selectedObject in psr.Value)
+                if (MainStaticSettings.Settings.MaxSelectedObjects == 0 ||
+                    MainStaticSettings.Settings.MaxSelectedObjects >= psr.Value.Count)
                 {
-                    using (OpenCloseTransaction tr = new OpenCloseTransaction())
+                    StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
+                    foreach (SelectedObject selectedObject in psr.Value)
                     {
-                        var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
-                        if (obj is BlockReference)
+                        using (OpenCloseTransaction tr = new OpenCloseTransaction())
                         {
-                            // mpBreakLine
-                            if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpBreakLine.BreakLineFunction.MPCOEntName, true))
+                            var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
+                            if (obj is BlockReference)
                             {
-                                if (!HasPropertyControl(Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
+                                // mpBreakLine
+                                if (ExtendedDataHelpers.IsApplicable(obj,
+                                    Functions.mpBreakLine.BreakLineFunction.MPCOEntName, true))
                                 {
-                                    var mpBreakLineProperties = new Functions.mpBreakLine.Properties.BreakLinePropertiesPalette(this)
+                                    if (!HasPropertyControl(Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
                                     {
-                                        Name = Functions.mpBreakLine.BreakLineFunction.MPCOEntName
-                                    };
-                                    StackPanelProperties.Children.Add(mpBreakLineProperties);
+                                        var mpBreakLineProperties =
+                                            new Functions.mpBreakLine.Properties.BreakLinePropertiesPalette(this)
+                                            {
+                                                Name = Functions.mpBreakLine.BreakLineFunction.MPCOEntName
+                                            };
+                                        StackPanelProperties.Children.Add(mpBreakLineProperties);
+                                    }
                                 }
-                            }
-                            // mpAxis
-                            if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpAxis.AxisFunction.MPCOEntName, true))
-                            {
-                                if (!HasPropertyControl(Functions.mpAxis.AxisFunction.MPCOEntName))
+                                // mpAxis
+                                if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpAxis.AxisFunction.MPCOEntName,
+                                    true))
                                 {
-                                    var mpAxisProperties = new Functions.mpAxis.Properties.AxisPropertiesPalette(this)
+                                    if (!HasPropertyControl(Functions.mpAxis.AxisFunction.MPCOEntName))
                                     {
-                                        Name = Functions.mpAxis.AxisFunction.MPCOEntName
-                                    };
-                                    StackPanelProperties.Children.Add(mpAxisProperties);
+                                        var mpAxisProperties =
+                                            new Functions.mpAxis.Properties.AxisPropertiesPalette(this)
+                                            {
+                                                Name = Functions.mpAxis.AxisFunction.MPCOEntName
+                                            };
+                                        StackPanelProperties.Children.Add(mpAxisProperties);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                else StckMaxObjectsSelectedMessage.Visibility = Visibility.Visible;
             }
         }
         public void ShowDescription(string description)
@@ -133,6 +147,12 @@ namespace mpESKD.Base.Properties
             {
                 MainFunction.AddToMpPalette(true);
             }
+        }
+        // open settings
+        private void OpenSettings_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (AcadHelpers.Document != null)
+                AcadHelpers.Document.SendStringToExecute("mpStyleEditor ", true, false, false);
         }
     }
 

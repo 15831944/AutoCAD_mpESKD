@@ -1,0 +1,116 @@
+﻿<controls:MetroWindow x:Class="mpESKD.Functions.mpAxis.AxisValueEditor"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                      xmlns:local="clr-namespace:mpESKD.Functions.mpAxis"
+                      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      ShowTitleBar="False" ShowMaxRestoreButton="False" ShowMinButton="False"
+                      Loaded="AxisValueEditor_OnLoaded" SizeToContent="WidthAndHeight"
+                      ShowCloseButton="True" PreviewKeyDown="AxisValueEditor_OnPreviewKeyDown"
+                      WindowStartupLocation="CenterScreen" Topmost="True">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Ellipse Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="1" Grid.RowSpan="3"
+                 Width="100" Height="100" Stroke="{DynamicResource BlackBrush}" StrokeThickness="2"></Ellipse>
+        <Ellipse Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="4" Grid.RowSpan="3" Name="SecondEllipse"
+                 Width="100" Height="100" Stroke="{DynamicResource BlackBrush}" StrokeThickness="2"></Ellipse>
+        <Ellipse Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="7" Grid.RowSpan="3" Name="ThirdEllipse"
+                 Width="100" Height="100" Stroke="{DynamicResource BlackBrush}" StrokeThickness="2"></Ellipse>
+        <Ellipse Grid.Column="6" Grid.ColumnSpan="3" Grid.Row="1" Grid.RowSpan="3" Name="OrientEllipse"
+                 Width="100" Height="100" Stroke="{DynamicResource BlackBrush}" StrokeThickness="2"></Ellipse>
+        <Line Grid.Row="2" Grid.Column="5" X1="0" X2="50"  Y1="0" Y2="0" Stroke="{DynamicResource BlackBrush}"
+              VerticalAlignment="Center" StrokeThickness="2" Name="OrientLine" Margin="0,0,5,0"></Line>
+        <Polygon Grid.Row="2" Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center"
+                 Fill="{DynamicResource BlackBrush}" Points="0,0 15,5, 0,10" Name="OrientArrow"></Polygon>
+        <Line Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" X1="50" Y1="50" X2="50" Y2="00" Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="2" StrokeDashArray="10"></Line>
+        <!-- first value -->
+        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Name="TbFirstPrefix" controls:TextBoxHelper.SelectAllOnFocus="True"
+                     FontSize="10" VerticalAlignment="Bottom" MinHeight="20" MaxLength="3"></TextBox>
+            <TextBox Grid.Column="1" Name="TbFirstText" MaxLength="2"
+                     FontSize="14" MinHeight="20" controls:TextBoxHelper.SelectAllOnFocus="True"></TextBox>
+            <TextBox Grid.Column="2" Name="TbFirstSuffix" controls:TextBoxHelper.SelectAllOnFocus="True"
+                     FontSize="10" VerticalAlignment="Bottom" MinHeight="20" MaxLength="3"></TextBox>
+        </Grid>
+        <!-- second value -->
+        <TextBox Grid.Row="5" Grid.Column="1" Name="TbSecondPrefix" controls:TextBoxHelper.SelectAllOnFocus="True"
+                 FontSize="10" VerticalAlignment="Bottom" MinHeight="20" MaxLength="3"></TextBox>
+        <TextBox Grid.Row="5" Grid.Column="2" Name="TbSecondText" controls:TextBoxHelper.SelectAllOnFocus="True"
+                 FontSize="14" MinHeight="20" MaxLength="2"></TextBox>
+        <TextBox Grid.Row="5" Grid.Column="3" Name="TbSecondSuffix" FontSize="10" VerticalAlignment="Bottom"
+                 controls:TextBoxHelper.SelectAllOnFocus="True" MinHeight="20" MaxLength="3"></TextBox>
+        <!-- third value -->
+        <TextBox Grid.Row="8" Grid.Column="1" Name="TbThirdPrefix" VerticalAlignment="Bottom" MaxLength="3"
+                 controls:TextBoxHelper.SelectAllOnFocus="True" MinHeight="20" FontSize="10"></TextBox>
+        <TextBox Grid.Row="8" Grid.Column="2" Name="TbThirdText" MaxLength="2"
+                 controls:TextBoxHelper.SelectAllOnFocus="True" MinHeight="20" FontSize="14"></TextBox>
+        <TextBox Grid.Row="8" Grid.Column="3" Name="TbThirdSuffix" MinHeight="20" VerticalAlignment="Bottom"
+                 controls:TextBoxHelper.SelectAllOnFocus="True" FontSize="10" MaxLength="3"></TextBox>
+        <!-- Orient value -->
+        <Grid Grid.Column="7" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBlock Text="верх:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" 
+                       Visibility="{Binding ElementName=TbTopOrientText, Path=Visibility}"></TextBlock>
+            <TextBlock Text="низ:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"
+                       Visibility ="{Binding ElementName=TbBottomOrientText, Path=Visibility}"></TextBlock>
+            <TextBox Grid.Column="1" Grid.Row="0" Name="TbTopOrientText" MaxLength="2"
+                     controls:TextBoxHelper.SelectAllOnFocus="True" MinHeight="20"></TextBox>
+            <TextBox Grid.Column="1" Grid.Row="1" Name="TbBottomOrientText" MaxLength="2"
+                 controls:TextBoxHelper.SelectAllOnFocus="True" MinHeight="20"></TextBox>
+        </Grid>
+        <!-- accept -->
+        <Button Grid.Column="6" Grid.Row="8" Grid.ColumnSpan="3" Grid.RowSpan="2"
+                VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                Margin="2" Content="Принять" Name="BtAccept" Click="BtAccept_OnClick"></Button>
+    </Grid>
+</controls:MetroWindow>
+

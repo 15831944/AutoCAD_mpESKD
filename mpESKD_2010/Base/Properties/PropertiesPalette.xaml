@@ -33,8 +33,25 @@
             </Rectangle>
         </Button>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel Orientation="Vertical" Name="StackPanelProperties"></StackPanel>
+            <StackPanel Orientation="Vertical" Name="StackPanelProperties">
+            </StackPanel>
         </ScrollViewer>
+        <StackPanel Grid.Row="1" Orientation="Vertical" Name="StckMaxObjectsSelectedMessage">
+            <TextBlock FontSize="14" Margin="5" TextAlignment="Center">
+                <Run Text="Превышен предельный максимум"></Run>
+                <LineBreak></LineBreak>
+                <Run Text="выбранных объектов"></Run>
+                <LineBreak></LineBreak>
+                <Run Text="Работа палитры остановлена"></Run>
+            </TextBlock>
+            <TextBlock FontSize="10" Margin="5" TextAlignment="Center">
+                <Run Text="Предельный максимум выбранных объектов"></Run>
+                <LineBreak></LineBreak>
+                <Run Text="можно изменить в"></Run>
+                <Hyperlink Name="OpenSettings" Click="OpenSettings_OnClick">настройках</Hyperlink>
+                <Run Text=" функции"></Run>
+            </TextBlock>
+        </StackPanel>
         <GridSplitter Grid.Row="2" BorderBrush="{StaticResource MainGrayBrush}" BorderThickness="0,2,0,0"
                       Margin="0,2,0,2"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>

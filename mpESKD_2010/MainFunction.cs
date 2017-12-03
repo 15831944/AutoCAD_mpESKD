@@ -8,13 +8,15 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows;
+using mpESKD.Base.Helpers;
 using mpESKD.Base.Properties;
 using ModPlus;
 using ModPlusAPI;
-using MessageBox = ModPlusAPI.Windows.MessageBox;
-using MessageBoxIcon = ModPlusAPI.Windows.MessageBoxIcon;
 
 namespace mpESKD
 {
@@ -96,6 +98,7 @@ namespace mpESKD
             return null;
         }
         #endregion
+
         public void Initialize()
         {
             StartUpInitialize();
@@ -117,13 +120,17 @@ namespace mpESKD
             {
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             }
+            // bedit watcher
+            BeditCommandWatcher.Initialize();
+            AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
         }
 
         public void Terminate()
         {
             Functions.mpBreakLine.BreakLineFunction.Terminate();
         }
-        static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
+
+        private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
         {
             //now one Ribbon item is initialized, but the Ribbon control
             //may not be available yet, so check if before
@@ -152,10 +159,56 @@ namespace mpESKD
             }
             else
             {
-                MessageBox.Show(
+                ModPlusAPI.Windows.MessageBox.Show(
                     "Ошибка получения данных из реестра! Запустите Конфигуратор для обновления данных в реестре",
-                    MessageBoxIcon.Close);
+                    ModPlusAPI.Windows.MessageBoxIcon.Close);
             }
+        }
+        /// <summary>Обработка двойного клика по блоку</summary>
+        private static void AcApp_BeginDoubleClick(object sender, Autodesk.AutoCAD.ApplicationServices.BeginDoubleClickEventArgs e)
+        {
+            PromptSelectionResult allSelected = AcadHelpers.Editor.SelectImplied();
+            PromptSelectionResult psr = AcadHelpers.Editor.SelectAtPickBox(e.Location);
+            if (psr.Status != PromptStatus.OK) return;
+            ObjectId[] ids = psr.Value.GetObjectIds();
+            if (allSelected.Value.Count == 1)
+            {
+                Point3d location = e.Location;
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (Transaction tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                    {
+                        var obj = tr.GetObject(ids[0], OpenMode.ForWrite);
+                        // if axis
+                        if (obj is BlockReference blockReference && ExtendedDataHelpers.IsMPCOentity(blockReference, Functions.mpAxis.AxisFunction.MPCOEntName))
+                        {
+                            BeditCommandWatcher.UseBedit = false;
+                            Functions.mpAxis.AxisFunction.DoubleClickEdit(blockReference, location);
+                        }
+                        else BeditCommandWatcher.UseBedit = true;
+                        tr.Commit();
+                    }
+                }
+            }
+        }
+    }
+    /// <summary>Слежение за командой "редактор блоков" автокада</summary>
+    public class BeditCommandWatcher
+    {
+        /// <summary>True - использовать редактор блоков. False - не использовать</summary>
+        public static bool UseBedit;
+
+        public static void Initialize()
+        {
+            AcApp.DocumentManager.DocumentLockModeChanged += DocumentManager_DocumentLockModeChanged;
+        }
+        private static void DocumentManager_DocumentLockModeChanged(object sender, Autodesk.AutoCAD.ApplicationServices.DocumentLockModeChangedEventArgs e)
+        {
+            if (!UseBedit)
+                if (e.GlobalCommandName == "BEDIT")
+                {
+                    e.Veto();
+                }
         }
     }
 }

@@ -5,6 +5,7 @@
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:local="clr-namespace:mpESKD"
+                      xmlns:sys="clr-namespace:System;assembly=mscorlib"
                       mc:Ignorable="d" SizeToContent="WidthAndHeight" 
                       ShowIconOnTitleBar="False" ShowTitleBar="False" ShowMinButton="False"
                       ShowMaxRestoreButton="False" SaveWindowPosition="True"
@@ -21,7 +22,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
             <!--Images-->
@@ -356,6 +357,7 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
                         <!--Use scale from style-->
                         <CheckBox Grid.Row="0" Margin="2"
@@ -437,6 +439,23 @@
                                 </ComboBoxItem>
                             </ComboBox>
                         </Grid>
+                        <!-- Maximum of selected objects -->
+                        <Grid Grid.Row="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.ToolTip>
+                                <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
+                                           Text="Предельный максимум выбранных объектов при котором палитра свойств перестает работать. Данная настройка нужна для ускорения работы в среде AutoCAD путем отключения чтения свойств объектов. Например, если вам нужно выбрать 1000 объектов для копирования в другой чертеж, то обрабатывать свойства всех этих объектов не обязательно"
+                                ></TextBlock>
+                            </Grid.ToolTip>
+                            <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="Предельный максимум выбранных объектов (0 - всегда работать):" Margin="2"></TextBlock>
+                            <controls:NumericUpDown Grid.Column="1" Margin="2" Minimum="0"
+                                                    Interval="50" HasDecimals="False"
+                                                    Value="{Binding Path=MaxSelectedObjects, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            </controls:NumericUpDown>
+                        </Grid>
                     </Grid>
                     <TextBlock Grid.Row="2" HorizontalAlignment="Center" FontSize="16" Margin="2"
                                Text="НАСТРОЙКИ ПРИМИТИВОВ" Foreground="{DynamicResource AccentBaseColorBrush}"></TextBlock>
@@ -447,6 +466,7 @@
                             <Border BorderThickness="1" BorderBrush="{DynamicResource AccentColorBrush}">
                                 <Grid>
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
                                         <RowDefinition Height="Auto"></RowDefinition>
                                         <RowDefinition Height="Auto"></RowDefinition>
                                     </Grid.RowDefinitions>
@@ -466,12 +486,17 @@
                                                        Text="При создании осей значение первого маркера будет запоминаться в текущем документе и автоматически продолжаться для каждой новой оси"></TextBlock>
                                         </CheckBox.ToolTip>
                                     </CheckBox>
+                                    <CheckBox Grid.Row="2" Margin="2" Content="Для редактирования значений оси по двойному клику использовать встроенный редактор"
+                                              IsChecked="{Binding Path=AxisUsePluginTextEditor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="15000">
+                                        <CheckBox.ToolTip>
+                                            <TextBlock Margin="5" MaxWidth="350" TextWrapping="Wrap"
+                                                       Text="При двойном клике левой кнопкой мышки по оси будет использован встроенный редактор значений плагина ModPlus. Инчае будет использоваться стандартный текстовый редактор AutoCAD"></TextBlock>
+                                        </CheckBox.ToolTip>
+                                    </CheckBox>
                                 </Grid>
                             </Border>
                         </controls:MetroTabItem>
-                        <controls:MetroTabItem Header="Прямая ось2" controls:ControlsHelper.HeaderFontSize="14"></controls:MetroTabItem>
-                        <controls:MetroTabItem Header="Прямая ось2" controls:ControlsHelper.HeaderFontSize="14"></controls:MetroTabItem>
-                        <controls:MetroTabItem Header="Прямая ось2" controls:ControlsHelper.HeaderFontSize="14"></controls:MetroTabItem>
                     </controls:MetroAnimatedTabControl>
                 </Grid>
             </controls:MetroTabItem>

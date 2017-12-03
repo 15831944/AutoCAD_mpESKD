@@ -6,6 +6,8 @@ namespace mpESKD
 {
     public class MainSettings : INotifyPropertyChanged
     {
+        #region Main
+
         private bool _useScaleFromStyle;
         /// <summary>Использовать масштаб из стиля</summary>
         public bool UseScaleFromStyle
@@ -53,6 +55,59 @@ namespace mpESKD
             }
         }
 
+        private bool _useTextStyleFromStyle;
+        /// <summary>Использовать текстовый стиль из стиля</summary>
+        public bool UseTextStyleFromStyle
+        {
+            get => bool.TryParse(
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseTextStyleFromStyle)),
+                       out _useTextStyleFromStyle) && _useTextStyleFromStyle; // false
+            set
+            {
+                _useTextStyleFromStyle = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseTextStyleFromStyle), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        private int _ifNoTextStyle;
+        /// <summary>Поведение при отсутствии текстового стиля: 0 - применить текущий, 1 - создать новый</summary>
+        public int IfNoTextStyle
+        {
+            get => int.TryParse(
+                UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(IfNoTextStyle)),
+                out _ifNoTextStyle)
+                ? _ifNoTextStyle
+                : 0;
+            set
+            {
+                _ifNoTextStyle = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(IfNoTextStyle), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        private int _maxSelectedObject;
+        /// <summary>Предельное количество выбранных объектов для работы палитры</summary>
+        public int MaxSelectedObjects
+        {
+            get => int.TryParse(
+                UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(MaxSelectedObjects)),
+                out _maxSelectedObject)
+                ? _maxSelectedObject
+                : 100;
+            set
+            {
+                _maxSelectedObject = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(MaxSelectedObjects), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Axis
+
         private bool _axisLineTypeScaleProportionScale;
         /// <summary>Менять масштаб типа линии прямой оси пропорционально масштабу примитива</summary>
         public bool AxisLineTypeScaleProportionScale
@@ -74,47 +129,33 @@ namespace mpESKD
         public bool AxisSaveLastTextAndContinueNew
         {
             get => !bool.TryParse(
-                UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD",
-                    nameof(AxisSaveLastTextAndContinueNew)),
-                out _axisSaveLastTextAndContinueNew) || _axisSaveLastTextAndContinueNew; // true
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD",
+                           nameof(AxisSaveLastTextAndContinueNew)),
+                       out _axisSaveLastTextAndContinueNew) || _axisSaveLastTextAndContinueNew; // true
             set
             {
                 _axisSaveLastTextAndContinueNew = value;
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings,"mpESKD", nameof(AxisSaveLastTextAndContinueNew), value.ToString(), true);
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(AxisSaveLastTextAndContinueNew), value.ToString(), true);
                 OnPropertyChanged();
             }
         }
 
-        private bool _useTextStyleFromStyle;
-        /// <summary>Использовать текстовый стиль из стиля</summary>
-        public bool UseTextStyleFromStyle
+        private bool _axisUsePluginTextEditor;
+        /// <summary>Использовать редактор значений оси из плагина</summary>
+        public bool AxisUsePluginTextEditor
         {
-            get => bool.TryParse(
-                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseTextStyleFromStyle)),
-                       out _useTextStyleFromStyle) && _useTextStyleFromStyle; // false
+            get => !bool.TryParse(
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD",
+                           nameof(AxisUsePluginTextEditor)),
+                       out _axisUsePluginTextEditor) || _axisUsePluginTextEditor; // true
             set
             {
-                _useTextStyleFromStyle = value;
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(UseTextStyleFromStyle), value.ToString(), true);
+                _axisUsePluginTextEditor = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(AxisUsePluginTextEditor), value.ToString(), true);
                 OnPropertyChanged();
             }
         }
-        private int _ifNoTextStyle;
-        /// <summary>Поведение при отсутствии текстового стиля: 0 - применить текущий, 1 - создать новый</summary>
-        public int IfNoTextStyle
-        {
-            get => int.TryParse(
-                UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(IfNoTextStyle)),
-                out _ifNoTextStyle)
-                ? _ifNoTextStyle
-                : 0;
-            set
-            {
-                _ifNoTextStyle = value;
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(IfNoTextStyle), value.ToString(), true);
-                OnPropertyChanged();
-            }
-        }
+        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

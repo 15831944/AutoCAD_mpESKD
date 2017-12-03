@@ -36,44 +36,50 @@ namespace mpESKD.Functions.mpAxis
             Overrule.Overruling = true;
             //// создание файла хранения стилей, если отсутсвует
             AxisStyleManager.CheckStylesFile();
-            //
-            AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
         }
 
-        private static void AcApp_BeginDoubleClick(object sender, Autodesk.AutoCAD.ApplicationServices.BeginDoubleClickEventArgs e)
+        public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location)
         {
-            PromptSelectionResult psr = AcadHelpers.Editor.SelectAtPickBox(e.Location);
-            if (psr.Status != PromptStatus.OK) return;
-            ObjectId[] ids = psr.Value.GetObjectIds();
-            if (ids.Length == 1)
+            BeditCommandWatcher.UseBedit = false;
+            var axis = AxisXDataHelper.GetAxisFromEntity(blockReference);
+            axis.UpdateEntities();
+            bool saveBack = false;
+            if (MainStaticSettings.Settings.AxisUsePluginTextEditor)
             {
-                var location = e.Location;
-                using (AcadHelpers.Document.LockDocument())
+                AxisValueEditor axisValueEditor = new AxisValueEditor { Axis = axis };
+                if (axisValueEditor.ShowDialog() == true)
+                    saveBack = true;
+            }
+            else
+            {
+                var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
+                AcadHelpers.WriteMessageInDebug("\nLocation:");
+                AcadHelpers.WriteMessageInDebug("\nStandard: " + location);
+                AcadHelpers.WriteMessageInDebug(
+                    "\nTransform: " + location.TransformBy(axis.BlockTransform));
+                AcadHelpers.WriteMessageInDebug(
+                    "\nTransform inverse: " + location.TransformBy(axis.BlockTransform.Inverse()));
+                AcadHelpers.WriteMessageInDebug("\nTexr point:");
+                AcadHelpers.WriteMessageInDebug("\nStandard:" + axis.BottomFirstDBText.Position);
+                AcadHelpers.WriteMessageInDebug(
+                    "\nTransform:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform));
+                AcadHelpers.WriteMessageInDebug(
+                    "\nTransform inverse:" +
+                    axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform.Inverse()));
+                AcadHelpers.WriteMessageInDebug(
+                    "\n" + (v - location).Length.ToString(CultureInfo.InvariantCulture));
+            }
+            if (saveBack)
+            {
+                using (var resBuf = axis.GetParametersForXData())
                 {
-                    using (Transaction tr = AcadHelpers.Database.TransactionManager.StartTransaction())
-                    {
-                        var obj = tr.GetObject(ids[0], OpenMode.ForWrite);
-                        if (obj is BlockReference blockReference)
-                        {
-                            var axis = AxisXDataHelper.GetAxisFromEntity(blockReference);
-                            axis.UpdateEntities();
-                            var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
-                            AcadHelpers.WriteMessageInDebug("\nLocation:");
-                            AcadHelpers.WriteMessageInDebug("\nStandard: " + location);
-                            AcadHelpers.WriteMessageInDebug("\nTransform: " + location.TransformBy(axis.BlockTransform));
-                            AcadHelpers.WriteMessageInDebug("\nTransform inverse: " + location.TransformBy(axis.BlockTransform.Inverse()));
-                            AcadHelpers.WriteMessageInDebug("\nTexr point:");
-                            AcadHelpers.WriteMessageInDebug("\nStandard:" + axis.BottomFirstDBText.Position);
-                            AcadHelpers.WriteMessageInDebug("\nTransform:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform));
-                            AcadHelpers.WriteMessageInDebug("\nTransform inverse:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform.Inverse()));
-                            AcadHelpers.WriteMessageInDebug("\n" + (v - location).Length.ToString(CultureInfo.InvariantCulture));
-                        }
-                        tr.Commit();
-                    }
+                    blockReference.XData = resBuf;
                 }
+                axis.UpdateEntities();
+                axis.BlockRecord.UpdateAnonymousBlocks();
             }
         }
-
+        
         public static void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance());
