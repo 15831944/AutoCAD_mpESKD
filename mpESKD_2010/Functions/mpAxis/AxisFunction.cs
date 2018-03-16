@@ -6,8 +6,10 @@ using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using mpESKD.Base.Helpers;
 using mpESKD.Functions.mpAxis.Properties;
@@ -22,13 +24,15 @@ namespace mpESKD.Functions.mpAxis
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class AxisFunction
     {
+        private const string LangItem = "mpESKD";
         /// <summary>Имя примитива, помещаемое в XData</summary>
         public const string MPCOEntName = "mpAxis";
         /// <summary>Отображаемое имя примитива</summary>
-        public const string MPCOEntDisplayName = "Прямая ось";
+        public static string MPCOEntDisplayName = "Прямая ось";
 
         public static void Initialize()
         {
+            MPCOEntDisplayName = Language.GetItem(LangItem, "h41");
             // Включение работы переопределения ручек (нужна регенерация в конце метода (?))
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance(), true);
@@ -38,7 +42,7 @@ namespace mpESKD.Functions.mpAxis
             AxisStyleManager.CheckStylesFile();
         }
 
-        public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location)
+        public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location, Transaction tr)
         {
             BeditCommandWatcher.UseBedit = false;
             var axis = AxisXDataHelper.GetAxisFromEntity(blockReference);
@@ -52,22 +56,48 @@ namespace mpESKD.Functions.mpAxis
             }
             else
             {
-                var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
-                AcadHelpers.WriteMessageInDebug("\nLocation:");
-                AcadHelpers.WriteMessageInDebug("\nStandard: " + location);
-                AcadHelpers.WriteMessageInDebug(
-                    "\nTransform: " + location.TransformBy(axis.BlockTransform));
-                AcadHelpers.WriteMessageInDebug(
-                    "\nTransform inverse: " + location.TransformBy(axis.BlockTransform.Inverse()));
-                AcadHelpers.WriteMessageInDebug("\nTexr point:");
-                AcadHelpers.WriteMessageInDebug("\nStandard:" + axis.BottomFirstDBText.Position);
-                AcadHelpers.WriteMessageInDebug(
-                    "\nTransform:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform));
-                AcadHelpers.WriteMessageInDebug(
-                    "\nTransform inverse:" +
-                    axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform.Inverse()));
-                AcadHelpers.WriteMessageInDebug(
-                    "\n" + (v - location).Length.ToString(CultureInfo.InvariantCulture));
+#if !NoInplaceTextEditor
+                MessageBox.Show(Language.GetItem(LangItem, "msg4"));
+                //var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
+                //AcadHelpers.WriteMessageInDebug("\nLocation:");
+
+                //// точка двойного клика:
+                //AcadHelpers.WriteMessageInDebug("\nStandard: " + location); 
+                ////AcadHelpers.WriteMessageInDebug("\nTransform: " + location.TransformBy(axis.BlockTransform));
+                ////AcadHelpers.WriteMessageInDebug("\nTransform inverse: " + location.TransformBy(axis.BlockTransform.Inverse()));
+                //AcadHelpers.WriteMessageInDebug("\nTexr point:");
+                //AcadHelpers.WriteMessageInDebug("\nStandard:" + axis.BottomFirstDBText.Position);
+
+                //// точка текста, трансформируемая в координаты блока
+                //AcadHelpers.WriteMessageInDebug("\nTransform:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform));
+                ////AcadHelpers.WriteMessageInDebug("\n" + (v - location).Length.ToString(CultureInfo.InvariantCulture));
+
+                //var displMat = Matrix3d.Displacement(blockReference.Position - Point3d.Origin);
+                //var btr = (BlockTableRecord)tr.GetObject(blockReference.BlockTableRecord, OpenMode.ForWrite);
+                //foreach (ObjectId objectId in btr)
+                //{
+                //    var ent = tr.GetObject(objectId, OpenMode.ForWrite);
+                //    if (ent is DBText text && text.Visible)
+                //    {
+                //        AcadHelpers.WriteMessageInDebug("text position: " + text.Position);
+                //        //var text = axis.BottomFirstDBText;
+                //        text.Visible = false;
+                //        blockReference.RecordGraphicsModified(true);
+                //        AcadHelpers.Document.TransactionManager.FlushGraphics();
+                //        text.TransformBy(displMat);
+                //        ObjectId[] ids = new ObjectId[0];
+                //        InplaceTextEditor.Invoke(text, ref ids);
+                //        if (text.IsModified)
+                //        {
+                //            // 
+                //        }
+                //        text.TransformBy(displMat.Inverse());
+                //        text.Visible = true;
+                //        blockReference.RecordGraphicsModified(true);
+                //        AcadHelpers.Document.TransactionManager.FlushGraphics();
+                //    }
+                //}
+#endif
             }
             if (saveBack)
             {
@@ -91,6 +121,20 @@ namespace mpESKD.Functions.mpAxis
             "А","Б","В","Г","Д","Е","Ж","И","К","Л","М","Н","П","Р","С","Т","У","Ф","Ш","Э","Ю","Я",
             "АА","ББ","ВВ","ГГ","ДД","ЕЕ","ЖЖ","ИИ","КК","ЛЛ","ММ","НН","ПП","РР","СС","ТТ","УУ","ФФ","ШШ","ЭЭ","ЮЮ","ЯЯ"
         };
+        /// <summary>Создание текстового стиля из стиля оси, согласно настройкам плагина</summary>
+        public static void CreateTextStyleFromStyle(AxisStyle style)
+        {
+            if (MainStaticSettings.Settings.UseTextStyleFromStyle)
+            {
+                var textStyleName = StyleHelpers.GetPropertyValue(style, AxisProperties.TextStyle.Name,
+                    AxisProperties.TextStyle.DefaultValue);
+                if (!TextStyleHelper.HasTextStyle(textStyleName) &&
+                    MainStaticSettings.Settings.IfNoTextStyle == 1)
+                {
+                    TextStyleHelper.CreateTextStyle(style.TextStyleXmlData);
+                }
+            }
+        }
     }
 
     public class AxisCommands
@@ -115,6 +159,8 @@ namespace mpESKD.Functions.mpAxis
                 ExtendedDataHelpers.AddRegAppTableRecord(AxisFunction.MPCOEntName);
                 // add layer from style
                 var style = AxisStyleManager.GetCurrentStyle();
+                // создание текстового стиля в документе нужно произвести до создания примитива
+                AxisFunction.CreateTextStyleFromStyle(style);
                 var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name,
                     AxisProperties.LayerName.DefaultValue);
                 var axisLastHorizontalValue = string.Empty;
@@ -132,7 +178,7 @@ namespace mpESKD.Functions.mpAxis
                 var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name,
                     AxisProperties.LineType.DefaultValue);
                 AcadHelpers.SetLineType(blockReference.ObjectId, lineType);
-
+                
 
                 var breakLoop = false;
                 while (!breakLoop)

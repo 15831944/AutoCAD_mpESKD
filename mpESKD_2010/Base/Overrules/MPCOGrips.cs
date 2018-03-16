@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
+// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Base.Overrules
 {

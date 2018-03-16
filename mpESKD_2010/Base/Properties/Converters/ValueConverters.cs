@@ -2,11 +2,13 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using ModPlusAPI;
 
 namespace mpESKD.Base.Properties.Converters
 {
     public class IntValueConverter : IValueConverter
     {
+        private const string LangItem = "mpESKD";
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             // Если преобразовываем в строку
@@ -14,9 +16,9 @@ namespace mpESKD.Base.Properties.Converters
                 && (value == null || value is int))
             {
                 if (value == null)
-                    return "*РАЗЛИЧНЫЕ*";
+                    return "*" + Language.GetItem(LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
                 if (double.IsNaN((int) value))
-                    return "*НЕ ОПРЕДЕЛЕНО*";
+                    return "*" + Language.GetItem(LangItem, "vc2") + "*"; // НЕ ОПРЕДЕЛЕНО
                 return string.Empty;
             }
 
@@ -36,6 +38,7 @@ namespace mpESKD.Base.Properties.Converters
     /// </summary>
     public class DoubleValueConverter : IValueConverter
     {
+        private const string LangItem = "mpESKD";
         public object Convert
             (object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -44,9 +47,9 @@ namespace mpESKD.Base.Properties.Converters
                 && (value == null || value is double))
             {
                 if (value == null)
-                    return "*РАЗЛИЧНЫЕ*";
+                    return "*" + Language.GetItem(LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
                 if (double.IsNaN((double) value))
-                    return "*НЕ ОПРЕДЕЛЕНО*";
+                    return "*" + Language.GetItem(LangItem, "vc2") + "*"; // НЕ ОПРЕДЕЛЕНО
                 return string.Empty;
             }
 

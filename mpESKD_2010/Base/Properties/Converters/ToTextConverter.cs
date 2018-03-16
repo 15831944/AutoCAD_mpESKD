@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
+using ModPlusAPI;
 
 namespace mpESKD.Base.Properties.Converters
 {
     public class IntToTextConverter : IValueConverter
     {
+        private const string LangItem = "mpESKD";
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             // Если целевой тип - строка
@@ -34,7 +36,7 @@ namespace mpESKD.Base.Properties.Converters
                 // Если значение пустое - исключение
                 if (string.IsNullOrEmpty((string)value))
                 {
-                    throw new ApplicationException("Значение не может быть пустым!");
+                    throw new ApplicationException(Language.GetItem(LangItem, "err3")); // Значение не может быть пустым!
                 }
                 // Иначе
                 else
@@ -50,7 +52,7 @@ namespace mpESKD.Base.Properties.Converters
                     // Иначе - исключение
                     else
                     {
-                        throw new ApplicationException("Недопустимое значение! Введите число!");
+                        throw new ApplicationException(Language.GetItem(LangItem, "err4")); // Недопустимое значение! Введите число!
                     }
                 }
             }
@@ -59,11 +61,12 @@ namespace mpESKD.Base.Properties.Converters
                 throw new NotImplementedException();
         }
     }
-    /// <summary>
-    /// Конвертер для отображения значения в основном поле ввода
-    /// </summary>
+    /// <inheritdoc />
+    /// <summary>Конвертер для отображения значения в основном поле ввода</summary>
     public class DoubleToTextConverter : IValueConverter
     {
+        private const string LangItem = "mpESKD";
+        /// <inheritdoc />
         /// <summary>
         /// Преобразование значения для отображения в поле ввода
         /// </summary>
@@ -117,7 +120,7 @@ namespace mpESKD.Base.Properties.Converters
                 // Если значение пустое - исключение
                 if (string.IsNullOrEmpty((string)value))
                 {
-                    throw new ApplicationException("Значение не может быть пустым!");
+                    throw new ApplicationException(Language.GetItem(LangItem, "err3")); // Значение не может быть пустым!
                 }
                 // Иначе
                 else
@@ -133,7 +136,7 @@ namespace mpESKD.Base.Properties.Converters
                     // Иначе - исключение
                     else
                     {
-                        throw new ApplicationException("Недопустимое значение! Введите число!");
+                        throw new ApplicationException(Language.GetItem(LangItem, "err4")); // Недопустимое значение! Введите число!
                     }
                 }
             }

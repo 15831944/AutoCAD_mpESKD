@@ -10,19 +10,29 @@ using Autodesk.AutoCAD.Windows;
 using mpESKD.Base.Helpers;
 using mpESKD.Base.Properties;
 using mpESKD.Base.Properties.Controls;
+using mpESKD.Functions.mpAxis.Styles;
 using Visibility = System.Windows.Visibility;
 
 namespace mpESKD.Functions.mpAxis.Properties
 {
     public partial class AxisPropertiesPalette
     {
+        private const string LangItem = "mpESKD";
         private readonly PropertiesPalette _parentPalette;
 
         public AxisPropertiesPalette(PropertiesPalette palette)
         {
             _parentPalette = palette;
             InitializeComponent();
-            CbMarkersPosition.ItemsSource = AxisPropertiesHelpers.BreakLineTypeLocalNames;
+            // styles
+            var sNames = new List<string>();
+            foreach (var style in AxisStyleManager.Styles)
+            {
+                sNames.Add(style.Name);
+            }
+            CbStyle.ItemsSource = sNames;
+            // markers positions
+            CbMarkersPosition.ItemsSource = AxisPropertiesHelpers.AxisMarkersTypeLocalNames;
             // get list of scales
             CbScale.ItemsSource = AcadHelpers.Scales;
             // fill layers
@@ -30,7 +40,11 @@ namespace mpESKD.Functions.mpAxis.Properties
             // fill text styles
             CbTextStyle.ItemsSource = AcadHelpers.TextStyles;
             // marker types
-            var markerTypes = new List<string> { "Тип 1", "Тип 2" };
+            var markerTypes = new List<string>
+            {
+                ModPlusAPI.Language.GetItem(LangItem, "type1"), // "Тип 1",
+                ModPlusAPI.Language.GetItem(LangItem, "type2") //"Тип 2"
+            };
             CbFirstMarkerType.ItemsSource = markerTypes;
             CbSecondMarkerType.ItemsSource = markerTypes;
             CbThirdMarkerType.ItemsSource = markerTypes;
@@ -90,7 +104,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             if (!(sender is FrameworkElement fe)) return;
             if (fe.Name.Equals("CbStyle"))
-                _parentPalette.ShowDescription("Стиль интеллектуального примитива");
+                _parentPalette.ShowDescription(ModPlusAPI.Language.GetItem(LangItem, "h52")); // "Стиль интеллектуального примитива"
             if (fe.Name.Equals("TbMarkersCount"))
                 _parentPalette.ShowDescription(AxisProperties.MarkersCount.Description);
             if (fe.Name.Equals("TbMarkersDiameter"))
@@ -109,6 +123,8 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _parentPalette.ShowDescription(AxisProperties.SecondMarkerType.Description);
             if (fe.Name.Equals("CbThirdMarkerType"))
                 _parentPalette.ShowDescription(AxisProperties.ThirdMarkerType.Description);
+            if (fe.Name.Equals("TbArrowSize"))
+                _parentPalette.ShowDescription(AxisProperties.ArrowsSize.Description);
             if (fe.Name.Equals("CbScale"))
                 _parentPalette.ShowDescription(AxisProperties.Scale.Description);
             if (fe.Name.Equals("TbLineTypeScale"))
@@ -145,7 +161,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _parentPalette.ShowDescription(AxisProperties.BottomOrientMarkerVisible.Description);
             if (fe.Name.Equals("ChkTopOrientMarkerVisible"))
                 _parentPalette.ShowDescription(AxisProperties.TopOrientMarkerVisible.Description);
-            if (fe.Name.Equals("ChkOrientMarkerType"))
+            if (fe.Name.Equals("CbOrientMarkerType"))
                 _parentPalette.ShowDescription(AxisProperties.OrientMarkerType.Description);
             if (fe.Name.Equals("TbBottomOrientText"))
                 _parentPalette.ShowDescription(AxisProperties.BottomOrientText.Description);

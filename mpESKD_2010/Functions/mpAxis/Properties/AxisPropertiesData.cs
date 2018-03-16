@@ -3,6 +3,7 @@ using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Helpers;
 using mpESKD.Functions.mpAxis.Styles;
+using ModPlusAPI;
 
 // ReSharper disable InconsistentNaming
 #pragma warning disable CS0618
@@ -11,6 +12,7 @@ namespace mpESKD.Functions.mpAxis.Properties
 {
     public class AxisPropertiesData
     {
+        private const string LangItem = "mpESKD";
         private ObjectId _blkRefObjectId;
 
         private string _style;
@@ -530,7 +532,8 @@ namespace mpESKD.Functions.mpAxis.Properties
                     {
                         using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
                         {
-                            axis.FirstMarkerType = value.Equals("Тип 1") ? 0 : 1;
+                            axis.FirstMarkerType = value.Equals(Language.GetItem(LangItem, "type1")) // "Тип 1"
+                                ? 0 : 1;
                             axis.UpdateEntities();
                             axis.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = axis.GetParametersForXData())
@@ -557,7 +560,8 @@ namespace mpESKD.Functions.mpAxis.Properties
                     {
                         using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
                         {
-                            axis.SecondMarkerType = value.Equals("Тип 1") ? 0 : 1;
+                            axis.SecondMarkerType = value.Equals(Language.GetItem(LangItem, "type1")) // "Тип 1"
+                                ? 0 : 1;
                             axis.UpdateEntities();
                             axis.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = axis.GetParametersForXData())
@@ -584,7 +588,8 @@ namespace mpESKD.Functions.mpAxis.Properties
                     {
                         using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
                         {
-                            axis.ThirdMarkerType = value.Equals("Тип 1") ? 0 : 1;
+                            axis.ThirdMarkerType = value.Equals(Language.GetItem(LangItem, "type1")) // "Тип 1"
+                                ? 0 : 1;
                             axis.UpdateEntities();
                             axis.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = axis.GetParametersForXData())
@@ -749,7 +754,8 @@ namespace mpESKD.Functions.mpAxis.Properties
                     {
                         using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
                         {
-                            axis.OrientMarkerType = value.Equals("Тип 1") ? 0 : 1;
+                            axis.OrientMarkerType = value.Equals(Language.GetItem(LangItem, "type1")) // "Тип 1"
+                                ? 0 : 1;
                             axis.UpdateEntities();
                             axis.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = axis.GetParametersForXData())
@@ -893,7 +899,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 Update(blkRef);
         }
 
-        void Update(BlockReference blkReference)
+        private void Update(BlockReference blkReference)
         {
             if (blkReference == null)
             {
@@ -906,9 +912,15 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _style = AxisStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(axis.StyleGuid))?.Name;
                 _markersCount = axis.MarkersCount;
                 _markersDiameter = axis.MarkersDiameter;
-                _firstMarkerType = axis.FirstMarkerType == 0 ? "Тип 1" : "Тип 2";
-                _secondMarkerType = axis.SecondMarkerType == 0 ? "Тип 1" : "Тип 2";
-                _thirdMarkerType = axis.ThirdMarkerType == 0 ? "Тип 1" : "Тип 2";
+                _firstMarkerType = axis.FirstMarkerType == 0
+                    ? Language.GetItem(LangItem, "type1") // "Тип 1" 
+                    : Language.GetItem(LangItem, "type2"); // "Тип 2";
+                _secondMarkerType = axis.SecondMarkerType == 0
+                    ? Language.GetItem(LangItem, "type1") //"Тип 1" 
+                    : Language.GetItem(LangItem, "type2"); //"Тип 2";
+                _thirdMarkerType = axis.ThirdMarkerType == 0
+                    ? Language.GetItem(LangItem, "type1") // "Тип 1"
+                    : Language.GetItem(LangItem, "type2"); // "Тип 2";
                 _fracture = axis.Fracture;
                 _bottomFractureOffset = axis.BottomFractureOffset;
                 _topFractureOffset = axis.TopFractureOffset;
@@ -941,7 +953,9 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _topOrientText = axis.TopOrientText;
                 _bottomOrientMarkerVisible = axis.BottomOrientMarkerVisible;
                 _topOrientMarkerVisible = axis.TopOrientMarkerVisible;
-                _orientMarkerType = axis.OrientMarkerType == 0? "Тип 1" : "Тип 2";
+                _orientMarkerType = axis.OrientMarkerType == 0
+                    ? Language.GetItem(LangItem, "type1") // "Тип 1"
+                    : Language.GetItem(LangItem, "type2"); // "Тип 2";
 
                 #endregion
 
@@ -949,7 +963,7 @@ namespace mpESKD.Functions.mpAxis.Properties
             }
         }
 
-        static bool Verify(ObjectId breakLineObjectId)
+        private static bool Verify(ObjectId breakLineObjectId)
         {
             return !breakLineObjectId.IsNull &&
                    breakLineObjectId.IsValid &

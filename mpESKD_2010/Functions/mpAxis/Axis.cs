@@ -244,6 +244,8 @@ namespace mpESKD.Functions.mpAxis
             SecondMarkerType = StyleHelpers.GetPropertyValue(style, nameof(SecondMarkerType), AxisProperties.SecondMarkerType.DefaultValue);
             ThirdMarkerType = StyleHelpers.GetPropertyValue(style, nameof(ThirdMarkerType), AxisProperties.ThirdMarkerType.DefaultValue);
             TopFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(TopFractureOffset), AxisProperties.TopFractureOffset.DefaultValue);
+            OrientMarkerType = StyleHelpers.GetPropertyValue(style, nameof(OrientMarkerType), AxisProperties.OrientMarkerType.DefaultValue);
+            ArrowsSize = StyleHelpers.GetPropertyValue(style, nameof(ArrowsSize), AxisProperties.ArrowsSize.DefaultValue);
             TextHeight = StyleHelpers.GetPropertyValue(style, nameof(TextHeight), AxisProperties.TextHeight.DefaultValue);
             Scale = MainStaticSettings.Settings.UseScaleFromStyle
                 ? StyleHelpers.GetPropertyValue(style, nameof(Scale), AxisProperties.Scale.DefaultValue)
@@ -256,9 +258,19 @@ namespace mpESKD.Functions.mpAxis
             var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name, AxisProperties.LineType.DefaultValue);
             AcadHelpers.SetLineType(BlockId, lineType);
             // set text style
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if (MainStaticSettings.Settings.UseTextStyleFromStyle)
+            {
+                var textStyleName = StyleHelpers.GetPropertyValue(style, AxisProperties.TextStyle.Name,
+                    AxisProperties.TextStyle.DefaultValue);
+                if (TextStyleHelper.HasTextStyle(textStyleName))
+                    TextStyle = textStyleName;
+                else
+                {
+                    if (MainStaticSettings.Settings.IfNoTextStyle == 1 &&
+                        TextStyleHelper.CreateTextStyle(style.TextStyleXmlData))
+                        TextStyle = textStyleName;
+                }
+            }
         }
 
         #endregion
@@ -901,7 +913,6 @@ namespace mpESKD.Functions.mpAxis
                                 _bottomOrientLineEndPoint, ArrowsSize * scale);
                             if (_bottomOrientArrow.Value.NumberOfVertices == 2)
                             {
-                                AcadHelpers.WriteMessageInDebug("\n Polyline exist");
                                 _bottomOrientArrow.Value.SetPointAt(0,
                                     GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint));
                                 _bottomOrientArrow.Value.SetBulgeAt(0, 0.0);

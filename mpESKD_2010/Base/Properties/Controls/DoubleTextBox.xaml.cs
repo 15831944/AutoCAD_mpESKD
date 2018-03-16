@@ -8,10 +8,7 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Base.Properties.Controls
 {
-    /// <summary>
-    /// Логика взаимодействия для DoubleTextBox.xaml
-    /// </summary>
-    public partial class DoubleTextBox : UserControl
+    public partial class DoubleTextBox
     {
         /// <summary>
         /// Свойство зависимостей для свойства Value
@@ -35,8 +32,8 @@ namespace mpESKD.Base.Properties.Controls
         /// </summary>
         public double Maximum
         {
-            get { return (double)GetValue(MaximumProperty); }
-            set { SetValue(MaximumProperty, value); }
+            get => (double)GetValue(MaximumProperty);
+            set => SetValue(MaximumProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for Maximum.  This enables animation, styling, binding, etc...
@@ -118,8 +115,7 @@ namespace mpESKD.Base.Properties.Controls
 
         private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            var tb = sender as TextBox;
-            if(tb != null)
+            if(sender is TextBox tb)
             if (double.TryParse(tb.Text, out double num))
             {
                 if (num < Minimum) tb.Text = Minimum.ToString(CultureInfo.InvariantCulture);
@@ -138,16 +134,13 @@ namespace mpESKD.Base.Properties.Controls
         
         private void SelectAddress(object sender, RoutedEventArgs e)
         {
-            TextBox tb = (sender as TextBox);
-            if (tb != null)
-            {
-                tb.SelectAll();
-            }
+            TextBox tb = ((TextBox) sender);
+            tb?.SelectAll();
         }
 
         private void SelectivelyIgnoreMouseButton(object sender,MouseButtonEventArgs e)
         {
-            TextBox tb = (sender as TextBox);
+            TextBox tb = ((TextBox) sender);
             if (tb != null)
             {
                 if (!tb.IsKeyboardFocusWithin)

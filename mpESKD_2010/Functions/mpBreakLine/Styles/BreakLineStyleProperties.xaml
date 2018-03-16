@@ -1,7 +1,7 @@
 ﻿<UserControl x:Class="mpESKD.Functions.mpBreakLine.Styles.BreakLineStyleProperties"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:behaviors="clr-namespace:mpESKD.Base.Styles.Behaviors"
              xmlns:styleHelpers="clr-namespace:mpESKD.Base.Styles"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity">
@@ -14,6 +14,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -24,10 +25,10 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="Название стиля" Margin="2"></TextBlock>
+        <TextBlock Grid.Row="0" Text="{Binding Source={StaticResource Lang}, XPath=h54}" Margin="2"></TextBlock>
         <TextBox Grid.Row="1" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  IsEnabled="{Binding CanEdit}" Margin="2" MaxLength="80"></TextBox>
-        <TextBlock Grid.Row="2" Text="Описание стиля" Margin="2"></TextBlock>
+        <TextBlock Grid.Row="2" Text="{Binding Source={StaticResource Lang}, XPath=h55}" Margin="2"></TextBlock>
         <TextBox Grid.Row="3" Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  IsEnabled="{Binding CanEdit}" Margin="2" TextWrapping="Wrap"></TextBox>
         <!--Properties-->
@@ -50,24 +51,27 @@
             <Grid.Resources>
                 <styleHelpers:AnnotationScaleValueConverter x:Key="AnnotationScaleValueConverter"></styleHelpers:AnnotationScaleValueConverter>
             </Grid.Resources>
-            <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Основные" 
+            <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h49}" 
                      Style="{StaticResource HeaderTextBoxForStyleEditor}"
                      Background="{DynamicResource AccentColorBrush4}"></TextBox>
             <!--Layer-->
-            <TextBox Grid.Row="1" Grid.Column="0" Text="Слой:"  Margin="15,0,0,0"></TextBox>
+            <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p7}"  
+                     Margin="15,0,0,0"></TextBox>
             <ComboBox Grid.Row="1" Grid.Column="2" x:Name="CbLayerName" Margin="0,0,2,0"
                       SelectedItem="{Binding LayerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       IsEnabled="{Binding CanEdit}"
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
             <!--Scale-->
-            <TextBox Grid.Row="2" Grid.Column="0" Text="Масштаб:"  Margin="15,0,0,0"></TextBox>
+            <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p5}"
+                     Margin="15,0,0,0"></TextBox>
             <ComboBox Grid.Row="2" Grid.Column="2" x:Name="CbScale" Margin="0,0,2,0"
                       SelectedItem="{Binding Scale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource AnnotationScaleValueConverter}}" 
                       IsEnabled="{Binding CanEdit}" 
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
             ></ComboBox>
             <!--LinetypeScale-->
-            <TextBox Grid.Row="3" Grid.Column="0" Text="Масштаб типа линий:" Margin="15,0,0,0"></TextBox>
+            <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p6}"
+                     Margin="15,0,0,0"></TextBox>
             <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding LineTypeScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                      x:Name="TbLineTypeScale" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
                      IsEnabled="{Binding CanEdit}" Margin="0,0,2,0" >
@@ -79,25 +83,25 @@
             <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="3" BorderThickness="1,0,1,0"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="{DynamicResource MainGrayBrush}"></GridSplitter>
             <!--Geometry-->
-            <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="Геометрия" 
+            <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h51}" 
                      Style="{StaticResource HeaderTextBoxForStyleEditor}"
                      Background="{DynamicResource AccentColorBrush4}"></TextBox>
             <!--Overhang-->
-            <TextBox Grid.Row="5" Grid.Column="0" Text="Выступы за объект (a):" Margin="15,0,0,0"></TextBox>
-            <controls:NumericUpDown Grid.Row="5" Grid.Column="2" Value="{Binding Overhang, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p2-1}" Margin="15,0,0,0"></TextBox>
+            <mah:NumericUpDown Grid.Row="5" Grid.Column="2" Value="{Binding Overhang, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                     x:Name="TbOverhang" Minimum="0" Maximum="10" Margin="0,0,2,0"
                                     GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
-                                    IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></controls:NumericUpDown>
-            <TextBox Grid.Row="6" Grid.Column="0" Text="Высота разрыва (h):" Margin="15,0,0,0"></TextBox>
-            <controls:NumericUpDown Grid.Row="6" Grid.Column="2" Value="{Binding BreakHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></mah:NumericUpDown>
+            <TextBox Grid.Row="6" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p4-1}" Margin="15,0,0,0"></TextBox>
+            <mah:NumericUpDown Grid.Row="6" Grid.Column="2" Value="{Binding BreakHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                     x:Name="TbBreakHeight" Minimum="1" Maximum="20" Margin="0,0,2,0"
                                     GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
-                                    IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></controls:NumericUpDown>
-            <TextBox Grid.Row="7" Grid.Column="0" Text="Ширина разрыва (w):" Margin="15,0,0,0"></TextBox>
-            <controls:NumericUpDown Grid.Row="7" Grid.Column="2" Value="{Binding BreakWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></mah:NumericUpDown>
+            <TextBox Grid.Row="7" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p3-1}" Margin="15,0,0,0"></TextBox>
+            <mah:NumericUpDown Grid.Row="7" Grid.Column="2" Value="{Binding BreakWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                     x:Name="TbBreakWidth" Minimum="1" Maximum="13" Margin="0,0,2,0"
                                     GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
-                                    IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></controls:NumericUpDown>
+                                    IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></mah:NumericUpDown>
             <GridSplitter Grid.Column="1" Grid.Row="5" Grid.RowSpan="3" BorderThickness="1,0,1,0"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
         </Grid>

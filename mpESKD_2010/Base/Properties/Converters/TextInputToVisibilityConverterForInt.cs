@@ -36,9 +36,8 @@ namespace mpESKD.Base.Properties.Converters
             throw new NotImplementedException();
         }
     }
-    /// <summary>
-    /// Конвертер для определения: отображать ли текст с подсказкой в поле ввода
-    /// </summary>
+    /// <inheritdoc />
+    /// <summary>Конвертер для определения: отображать ли текст с подсказкой в поле ввода</summary>
     public class TextInputToVisibilityConverterForDouble : IMultiValueConverter
     {
         /// <summary>

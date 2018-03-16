@@ -15,13 +15,15 @@ namespace mpESKD.Functions.mpBreakLine
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class BreakLineFunction
     {
+        private const string LangItem = "mpESKD";
         /// <summary>Имя примитива, помещаемое в XData</summary>
         public const string MPCOEntName = "mpBreakLine";
         /// <summary>Отображаемое имя примитива</summary>
-        public const string MPCOEntDisplayName = "Линия обрыва";
-        
+        public static string MPCOEntDisplayName = "Линия обрыва";
+
         public static void Initialize()
         {
+            MPCOEntDisplayName = Language.GetItem(LangItem, "h48");
             // Включение работы переопределения ручек (нужна регенерация в конце метода (?))
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);

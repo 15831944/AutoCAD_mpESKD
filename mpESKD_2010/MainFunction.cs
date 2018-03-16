@@ -22,8 +22,9 @@ namespace mpESKD
 {
     public class MainFunction : IExtensionApplication
     {
+        private const string LangItem = "mpESKD";
         #region Properties palette
-        
+
         public static void AddToMpPalette(bool show)
         {
             PaletteSet mpPaletteSet = MpPalette.MpPaletteSet;
@@ -32,7 +33,7 @@ namespace mpESKD
                 bool flag = false;
                 foreach (Palette palette in mpPaletteSet)
                 {
-                    if (palette.Name.Equals("Свойства примитивов ModPlus"))
+                    if (palette.Name.Equals(Language.GetItem(LangItem, "h11"))) // Свойства примитивов ModPlus
                     {
                         flag = true;
                     }
@@ -40,7 +41,7 @@ namespace mpESKD
                 if (!flag)
                 {
                     PropertiesPalette lmPalette = new PropertiesPalette();
-                    mpPaletteSet.Add("Свойства примитивов ModPlus", new ElementHost
+                    mpPaletteSet.Add(Language.GetItem(LangItem, "h11"), new ElementHost
                     {
                         AutoSize = true,
                         Dock = DockStyle.Fill,
@@ -52,9 +53,9 @@ namespace mpESKD
                     }
                 }
             }
-            if (PropertiesFunction._paletteSet != null)
+            if (PropertiesFunction.PaletteSet != null)
             {
-                PropertiesFunction._paletteSet.Visible = false;
+                PropertiesFunction.PaletteSet.Visible = false;
             }
         }
         public static void RemoveFromMpPalette(bool fromSettings)
@@ -65,7 +66,7 @@ namespace mpESKD
                 int num = 0;
                 while (num < mpPaletteSet.Count)
                 {
-                    if (!mpPaletteSet[num].Name.Equals("Свойства примитивов ModPlus"))
+                    if (!mpPaletteSet[num].Name.Equals(Language.GetItem(LangItem, "h11")))
                     {
                         num++;
                     }
@@ -76,9 +77,9 @@ namespace mpESKD
                     }
                 }
             }
-            if (PropertiesFunction._paletteSet != null)
+            if (PropertiesFunction.PaletteSet != null)
             {
-                PropertiesFunction._paletteSet.Visible = true;
+                PropertiesFunction.PaletteSet.Visible = true;
             }
             else if (fromSettings)
             {
@@ -160,30 +161,34 @@ namespace mpESKD
             else
             {
                 ModPlusAPI.Windows.MessageBox.Show(
-                    "Ошибка получения данных из реестра! Запустите Конфигуратор для обновления данных в реестре",
+                    Language.GetItem(LangItem, "err5"),
                     ModPlusAPI.Windows.MessageBoxIcon.Close);
             }
         }
+
         /// <summary>Обработка двойного клика по блоку</summary>
         private static void AcApp_BeginDoubleClick(object sender, Autodesk.AutoCAD.ApplicationServices.BeginDoubleClickEventArgs e)
         {
-            PromptSelectionResult allSelected = AcadHelpers.Editor.SelectImplied();
-            PromptSelectionResult psr = AcadHelpers.Editor.SelectAtPickBox(e.Location);
+            //PromptSelectionResult allSelected = AcadHelpers.Editor.SelectImplied();
+            var pt = e.Location;
+            //PromptSelectionResult psr = AcadHelpers.Editor.SelectAtPickBox(pt);
+            PromptSelectionResult psr = AcadHelpers.Editor.SelectImplied();
             if (psr.Status != PromptStatus.OK) return;
             ObjectId[] ids = psr.Value.GetObjectIds();
-            if (allSelected.Value.Count == 1)
+            //if (allSelected.Value.Count == 1)
+            if (ids.Length == 1)
             {
-                Point3d location = e.Location;
+                Point3d location = pt;
                 using (AcadHelpers.Document.LockDocument())
                 {
-                    using (Transaction tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                    using (Transaction tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                     {
                         var obj = tr.GetObject(ids[0], OpenMode.ForWrite);
                         // if axis
                         if (obj is BlockReference blockReference && ExtendedDataHelpers.IsMPCOentity(blockReference, Functions.mpAxis.AxisFunction.MPCOEntName))
                         {
                             BeditCommandWatcher.UseBedit = false;
-                            Functions.mpAxis.AxisFunction.DoubleClickEdit(blockReference, location);
+                            Functions.mpAxis.AxisFunction.DoubleClickEdit(blockReference, location, tr);
                         }
                         else BeditCommandWatcher.UseBedit = true;
                         tr.Commit();

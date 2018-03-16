@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Xml.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Helpers;
@@ -73,6 +74,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
 
     public static class BreakLineStylesManager
     {
+        private const string LangItem = "mpESKD";
         private const string StylesFileName = "BreakLineStyles.xml";
         private static string _currentStyleGuid;
         /// <summary>Guid текущего стиля</summary>
@@ -263,9 +265,9 @@ namespace mpESKD.Functions.mpBreakLine.Styles
             var styles = new List<BreakLineStyle>();
             var style = new BreakLineStyle
             {
-                Name = "Линия обрыва",
+                Name = Language.GetItem(LangItem, "h48") , // "Линия обрыва"
                 FunctionName = BreakLineFunction.MPCOEntName,
-                Description = "Базовый стиль для линии обрыва",
+                Description = Language.GetItem(LangItem, "h53"), // "Базовый стиль для линии обрыва"
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
             };

@@ -2,8 +2,6 @@
 using System.Xml.Linq;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Runtime;
-using ModPlusAPI.Windows;
 
 namespace mpESKD.Base.Helpers
 {
@@ -120,10 +118,7 @@ namespace mpESKD.Base.Helpers
                 // linetype
                 layerTblR.LinetypeObjectId = AcadHelpers.GetLineTypeObjectId(layerXElement.Attribute("Linetype")?.Value);
                 //LineWeight
-                layerTblR.LineWeight =
-                    Enum.TryParse(layerXElement.Attribute("LineWeight")?.Value, out LineWeight lw)
-                        ? lw
-                        : LineWeight.ByLineWeightDefault;
+                layerTblR.LineWeight = Enum.TryParse(layerXElement.Attribute("LineWeight")?.Value, out LineWeight lw) ? lw : LineWeight.ByLineWeightDefault;
 
                 return layerTblR;
             }

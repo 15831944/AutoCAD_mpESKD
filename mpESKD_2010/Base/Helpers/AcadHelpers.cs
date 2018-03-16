@@ -13,6 +13,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using ModPlusAPI;
 using ModPlusAPI.Windows;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
@@ -20,6 +21,7 @@ namespace mpESKD.Base.Helpers
 {
     public static class AcadHelpers
     {
+        private const string LangItem = "mpESKD";
         /// <summary>БД активного документа</summary>
         public static Database Database => HostApplicationServices.WorkingDatabase;
 
@@ -220,7 +222,7 @@ namespace mpESKD.Base.Helpers
             if (blkRefObjectId == ObjectId.Null) return;
             if (MainStaticSettings.Settings.UseLayerFromStyle)
             {
-                if (!layerName.Equals("По умолчанию"))
+                if (!layerName.Equals(Language.GetItem(LangItem, "defl"))) // "По умолчанию"
                 {
                     if (LayerHelper.HasLayer(layerName))
                     {
@@ -325,12 +327,12 @@ namespace mpESKD.Base.Helpers
                             catch (Exception exception)
                             {
                                 if (exception.ErrorStatus == ErrorStatus.FilerError)
-                                    MessageBox.Show("Не удалось найти файл: " + filename, MessageBoxIcon.Close);
+                                    MessageBox.Show(Language.GetItem(LangItem, "err1") + ": " + filename, MessageBoxIcon.Close); // Не удалось найти файл
                                 else if (exception.ErrorStatus == ErrorStatus.DuplicateRecordName)
                                 {
                                     // ignore
                                 }
-                                else MessageBox.Show("Не удалось загрузить тип линий: " + ltname, MessageBoxIcon.Close);
+                                else MessageBox.Show(Language.GetItem(LangItem, "err2") + ": " + ltname, MessageBoxIcon.Close); //Не удалось загрузить тип линий
                             }
                         }
                     tr.Commit();
@@ -533,7 +535,7 @@ namespace mpESKD.Base.Helpers
             return ed.SelectCrossingPolygon(points);
 #else
             //Get pick box's size on screen
-            System.Drawing.Point screenPt = AcadHelpers.Editor.PointToScreen(pickBoxCentre, 1);
+            System.Drawing.Point screenPt = AcadHelpers.Editor.PointToScreen( pickBoxCentre, 1);
 
             //Get pickbox's size. Note, the number obtained from
             //system variable "PICKBOX" is actually the half of

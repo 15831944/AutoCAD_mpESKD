@@ -8,10 +8,7 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Base.Properties.Controls
 {
-    /// <summary>
-    /// Логика взаимодействия для IntTextBox.xaml
-    /// </summary>
-    public partial class IntTextBox : UserControl
+    public partial class IntTextBox 
     {
         /// <summary>
         /// Свойство зависимостей для свойства Value
@@ -25,16 +22,16 @@ namespace mpESKD.Base.Properties.Controls
         /// </summary>
         public int? Value
         {
-            get { return (int?)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
+            get => (int?)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
         }
         /// <summary>
         /// Maximum value for the Numeric Up Down control
         /// </summary>
         public int Maximum
         {
-            get { return (int)GetValue(MaximumProperty); }
-            set { SetValue(MaximumProperty, value); }
+            get => (int)GetValue(MaximumProperty);
+            set => SetValue(MaximumProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for Maximum.  This enables animation, styling, binding, etc...
@@ -46,8 +43,8 @@ namespace mpESKD.Base.Properties.Controls
         /// </summary>
         public int Minimum
         {
-            get { return (int)GetValue(MinimumProperty); }
-            set { SetValue(MinimumProperty, value); }
+            get => (int)GetValue(MinimumProperty);
+            set => SetValue(MinimumProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for Minimum.  This enables animation, styling, binding, etc...
@@ -119,8 +116,7 @@ namespace mpESKD.Base.Properties.Controls
         }
         private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            var tb = sender as TextBox;
-            if (tb != null)
+            if (sender is TextBox tb)
                 if (int.TryParse(tb.Text, out int num))
                 {
                     if (num < Minimum) tb.Text = Minimum.ToString(CultureInfo.InvariantCulture);
@@ -166,10 +162,7 @@ namespace mpESKD.Base.Properties.Controls
         private void SelectAddress(object sender, RoutedEventArgs e)
         {
             TextBox tb = (TextBox) sender;
-            if (tb != null)
-            {
-                tb.SelectAll();
-            }
+            tb?.SelectAll();
         }
 
         private void SelectivelyIgnoreMouseButton(object sender, MouseButtonEventArgs e)

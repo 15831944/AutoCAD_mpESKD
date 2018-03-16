@@ -1,59 +1,37 @@
-﻿<controls:MetroWindow xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-                      x:Class="mpESKD.Base.Properties.PaletteSettings"
-                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen"
-                      ShowTitleBar="False" ShowMinButton="False" ShowMaxRestoreButton="False"
-                      KeyDown="LmSettings_OnKeyDown" ResizeMode="NoResize">
-    <controls:MetroWindow.Resources>
+﻿<mpc:BaseMetroWindow x:Class="mpESKD.Base.Properties.PaletteSettings"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mpc="clr-namespace:ModPlusAPI.Windows.Mpc;assembly=ModPlusAPI"
+                     SizeToContent="WidthAndHeight" KeyDown="LmSettings_OnKeyDown" ResizeMode="NoResize">
+    <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
         </ResourceDictionary>
-    </controls:MetroWindow.Resources>
-    <Grid Margin="5">
+    </Window.Resources>
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Label FontSize="16"
-                 Grid.Row="0"
-                 Content="НАСТРОЙКИ ПАЛИТРЫ"/>
-        <Grid Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <CheckBox Name="ChkAutoLoad"
-                     Grid.Row="0"
-                     VerticalAlignment="Center"
-                     Margin="2"
-                     Content="Автозапуск вместе с AutoCad"
-                     Checked="ChkAutoLoad_OnChecked_OnUnchecked"
-                     Unchecked="ChkAutoLoad_OnChecked_OnUnchecked"/>
-            <CheckBox Name="ChkAddToMpPalette"
-                     Grid.Row="1"
-                     VerticalAlignment="Center"
-                     Margin="2"
-                     Content="Подключаться к палитре ModPlus"
-                     Checked="ChkAddToMpPalette_OnChecked_OnUnchecked"
-                     Unchecked="ChkAddToMpPalette_OnChecked_OnUnchecked"/>
-            <Button Name="BtClose"
-                     Grid.Row="5"
-                     HorizontalAlignment="Center"
-                     Content="Закрыть"
-                     Click="BtClose_OnClick"/>
-        </Grid>
+        <CheckBox Name="ChkAutoLoad" Grid.Row="0" VerticalAlignment="Center"
+                  Content="{Binding Source={StaticResource Lang}, XPath=h2}"
+                  Checked="ChkAutoLoad_OnChecked_OnUnchecked"
+                  Unchecked="ChkAutoLoad_OnChecked_OnUnchecked"/>
+        <CheckBox Name="ChkAddToMpPalette" Grid.Row="1" VerticalAlignment="Center"
+                  Content="{Binding Source={StaticResource Lang}, XPath=h3}"
+                  Checked="ChkAddToMpPalette_OnChecked_OnUnchecked"
+                  Unchecked="ChkAddToMpPalette_OnChecked_OnUnchecked"/>
+        <Button Name="BtClose" Grid.Row="5"
+                HorizontalAlignment="Center"
+                Content="{Binding Source={StaticResource Lang}, XPath=close}"
+                Click="BtClose_OnClick"/>
     </Grid>
-</controls:MetroWindow>
+</mpc:BaseMetroWindow>
+

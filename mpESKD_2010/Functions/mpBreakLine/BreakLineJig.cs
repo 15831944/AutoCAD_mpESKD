@@ -4,11 +4,13 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using mpESKD.Base.Helpers;
+using ModPlusAPI;
 
 namespace mpESKD.Functions.mpBreakLine
 {
     public class BreakLineJig : EntityJig
     {
+        private const string LangItem = "mpESKD";
         public BreakLineJigState JigState { get; set; } = BreakLineJigState.PromptInsertPoint;
         private readonly BreakLine _breakLine;
         private readonly PointSampler _insertionPoint = new PointSampler(Point3d.Origin);
@@ -26,12 +28,12 @@ namespace mpESKD.Functions.mpBreakLine
                 switch (JigState)
                 {
                     case BreakLineJigState.PromptInsertPoint:
-                        return _insertionPoint.Acquire(prompts, "\nВведите точку вставки:", value =>
+                        return _insertionPoint.Acquire(prompts, "\n" + Language.GetItem(LangItem, "msg1"), value =>
                         {
                             _breakLine.InsertionPoint = value;
                         });
                     case BreakLineJigState.PromptEndPoint:
-                        return _endPoint.Acquire(prompts, "\nВведите конечную точку:", _insertionPoint.Value, value =>
+                        return _endPoint.Acquire(prompts, "\n" + Language.GetItem(LangItem, "msg2"), _insertionPoint.Value, value =>
                         {
                             _breakLine.EndPoint = value;
                         });

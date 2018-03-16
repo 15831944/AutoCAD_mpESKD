@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Windows.Data;
 using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Properties;
+using ModPlusAPI;
 
 // ReSharper disable InconsistentNaming
 
@@ -12,87 +13,94 @@ namespace mpESKD.Functions.mpBreakLine.Properties
     // ReSharper disable once InconsistentNaming
     public static class BreakLineProperties
     {
+        private const string LangItem = "mpESKD";
         /// <summary>Поле, описывающее свойство "Тип линии обрыва"</summary>
         public static MPCOTypeProperty<BreakLineType> BreakLineType = new MPCOTypeProperty<BreakLineType>
         {
             Name = "BreakLineType",
-            DisplayName = "Тип линии:",
+            DisplayName = Language.GetItem(LangItem, "p1"), // Тип линии
             DefaultValue = Properties.BreakLineType.Linear,
-            Description = "Тип линии: линейный, криволинейный или цилиндрический"
+            Description = Language.GetItem(LangItem, "d1")
         };
         /// <summary>Поле, описывающее свойство "Выступы за объект"</summary>
         public static MPCOIntProperty Overhang = new MPCOIntProperty
         {
             Name = "Overhang",
-            DisplayName = "Выступы за объект:",
+            DisplayName = Language.GetItem(LangItem, "p2"), // Выступы за объект
             DefaultValue = 2,
             Minimum = 0,
             Maximum = 10,
-            Description = "Для линейного обрыва значение выступа задается в мм. Для криволинейного обрыва значение выступа задается в % от длины между основными точками. Для цилиндрического обрыва значение выступа не используется"
+            Description = Language.GetItem(LangItem, "d2")
         };
         /// <summary>Поле, описывающее свойство "Высота обрыва"</summary>
         public static MPCOIntProperty BreakHeight = new MPCOIntProperty
         {
             Name = "BreakHeight",
-            DisplayName = "Ширина разрыва:",
+            DisplayName = Language.GetItem(LangItem, "p4"), // Высота разрыва
             DefaultValue = 10,
             Minimum = 1,
             Maximum = 13,
-            Description = "Ширина разрыва в мм. Только для линии обрыва линейного типа"
+            Description = Language.GetItem(LangItem, "d4")
         };
         /// <summary>Поле, описывающее свойство "Ширина обрыва"</summary>
         public static MPCOIntProperty BreakWidth = new MPCOIntProperty
         {
             Name = "BreakWidth",
-            DisplayName = "Высота разрыва:",
+            DisplayName = Language.GetItem(LangItem, "p3"), // Ширина разрыва
             DefaultValue = 5,
             Minimum = 1,
             Maximum = 20,
-            Description = "Высота разрыва в мм. Только для линии обрыва линейного типа"
+            Description = Language.GetItem(LangItem, "d3")
         };
         /// <summary>Поле, описывающее свойство "Масштаб"</summary>
         public static MPCOTypeProperty<AnnotationScale> Scale = new MPCOTypeProperty<AnnotationScale>
         {
             Name = "Scale",
-            DisplayName = "Масштаб:",
+            DisplayName = Language.GetItem(LangItem, "p5"), // Масштаб:
             DefaultValue = new AnnotationScale { Name = "1:1", DrawingUnits = 1.0, PaperUnits = 1.0 },
-            Description = "Масштаб линии обрыва"
+            Description = Language.GetItem(LangItem, "d5")
         };
         /// <summary>Поле, описывающее свойство "Масштаб типа линии"</summary>
         public static MPCODoubleProperty LineTypeScale = new MPCODoubleProperty
         {
             Name = "LineTypeScale",
-            DisplayName = "Масштаб типа линий:",
+            DisplayName = Language.GetItem(LangItem, "p6"), // Масштаб типа линий
             DefaultValue = 1.0, Minimum = 0, Maximum = double.MaxValue,
-            Description = "Масштаб типа линии для заданного в свойствах блока типа линии"
+            Description = Language.GetItem(LangItem, "d6")
         };
         public static MPCOStringProperty LayerName = new MPCOStringProperty
         {
             Name = "LayerName",
-            DisplayName = "Слой",
-            DefaultValue = "По умолчанию",
-            Description = "Слой примитива"
+            DisplayName = Language.GetItem(LangItem, "p7"), // Слой
+            DefaultValue = Language.GetItem(LangItem, "defl"), // По умолчанию
+            Description = Language.GetItem(LangItem, "d7") // Слой примитива
         };
     }
     public static class BreakLinePropertiesHelpers
     {
-        public static List<string> BreakLineTypeLocalNames = new List<string> { "Линейный", "Криволинейный", "Цилиндрический" };
+        private const string LangItem = "mpESKD";
+        public static List<string> BreakLineTypeLocalNames = new List<string>
+        {
+            Language.GetItem(LangItem, "blt1"), // "Линейный",
+            Language.GetItem(LangItem, "blt2"), //"Криволинейный",
+            Language.GetItem(LangItem, "blt3") //"Цилиндрический"
+        };
         #region Methods
 
         public static BreakLineType GetBreakLineTypeByLocalName(string local)
         {
-            if (local == "Линейный") return BreakLineType.Linear;
-            if (local == "Криволинейный") return BreakLineType.Curvilinear;
-            if (local == "Цилиндрический") return BreakLineType.Cylindrical;
+            if (local == Language.GetItem(LangItem, "blt1")) return BreakLineType.Linear;
+            if (local == Language.GetItem(LangItem, "blt2")) return BreakLineType.Curvilinear;
+            if (local == Language.GetItem(LangItem, "blt3")) return BreakLineType.Cylindrical;
             return BreakLineType.Linear;
         }
 
         public static string GetLocalBreakLineTypeName(BreakLineType breakLineType)
         {
-            if (breakLineType == BreakLineType.Linear) return "Линейный";
-            if (breakLineType == BreakLineType.Curvilinear) return "Криволинейный";
-            if (breakLineType == BreakLineType.Cylindrical) return "Цилиндрический";
-            return "Линейный";
+            if (breakLineType == BreakLineType.Linear) return Language.GetItem(LangItem, "blt1");
+            if (breakLineType == BreakLineType.Curvilinear) return Language.GetItem(LangItem, "blt2");
+            if (breakLineType == BreakLineType.Cylindrical) return Language.GetItem(LangItem, "blt3");
+            return Language.GetItem(LangItem, "blt1");
         }
 
         public static BreakLineType GetBreakLineTypeFromString(string str)

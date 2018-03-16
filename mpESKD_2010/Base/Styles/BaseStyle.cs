@@ -25,6 +25,7 @@ namespace mpESKD.Base.Styles
     /// <summary>Базовый класс презентора стиля для работы в редакторе стилей</summary>
     public class MPCOStyleForEditor : INotifyPropertyChanged
     {
+        private const string LangItem = "mpESKD";
         /// <summary>Базовый конструктор</summary>
         /// <param name="style"></param>
         /// <param name="currentStyleGuid"></param>
@@ -35,7 +36,7 @@ namespace mpESKD.Base.Styles
             if (style.StyleType == MPCOStyleType.System)
             {
                 CanEdit = false;
-                Name = style.Name + " (Системный)";
+                Name = style.Name + " (" + Language.GetItem(LangItem, "h12") + ")"; // Системный
             }
             else
             {
@@ -51,7 +52,7 @@ namespace mpESKD.Base.Styles
         public MPCOStyleForEditor(StyleToBind parent)
         {
             Parent = parent;
-            Name = "Новый пользовательский стиль";
+            Name = Language.GetItem(LangItem, "h13"); // Новый пользовательский стиль
             Description = string.Empty;
             FunctionName = parent.FunctionLocalName;
             CanEdit = true;
@@ -72,16 +73,15 @@ namespace mpESKD.Base.Styles
 
         private bool _isCurrent;
         /// <summary>Является ли стиль текущем</summary>
-        public bool IsCurrent {
+        public bool IsCurrent
+        {
             get => _isCurrent;
             set
             {
                 FontWeight = value ? FontWeights.SemiBold : FontWeights.Normal;
                 _isCurrent = value;
-                if(value)
-                    UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpBreakLine", "CurrentStyleGuid", Guid, true);
                 OnPropertyChanged(nameof(IsCurrent));
-            } 
+            }
         }
 
         private string _name;

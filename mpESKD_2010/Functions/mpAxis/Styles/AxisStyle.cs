@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Xml.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Helpers;
@@ -55,6 +54,8 @@ namespace mpESKD.Functions.mpAxis.Styles
                 AxisProperties.SecondMarkerType.DefaultValue);
             ThirdMarkerType = StyleHelpers.GetPropertyValue(style, nameof(ThirdMarkerType),
                 AxisProperties.ThirdMarkerType.DefaultValue);
+            ArrowsSize = StyleHelpers.GetPropertyValue(style, nameof(ArrowsSize),
+                AxisProperties.ArrowsSize.DefaultValue);
             LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale),
                 AxisProperties.LineTypeScale.DefaultValue);
             LineType = StyleHelpers.GetPropertyValue(style, nameof(LineType),
@@ -68,7 +69,7 @@ namespace mpESKD.Functions.mpAxis.Styles
             Scale = StyleHelpers.GetPropertyValue<AnnotationScale>(style, nameof(Scale),
                 AxisProperties.Scale.DefaultValue);
             LayerXmlData = style.LayerXmlData;
-            TextStyleXmlData = ((AxisStyle) style).TextStyleXmlData;
+            TextStyleXmlData = ((AxisStyle)style).TextStyleXmlData;
         }
 
         public AxisStyleForEditor(StyleToBind parent) : base(parent)
@@ -80,6 +81,7 @@ namespace mpESKD.Functions.mpAxis.Styles
             MarkersPosition = AxisProperties.MarkersPosition.DefaultValue;
             MarkersDiameter = AxisProperties.MarkersDiameter.DefaultValue;
             MarkersCount = AxisProperties.MarkersCount.DefaultValue;
+            ArrowsSize = AxisProperties.ArrowsSize.DefaultValue;
             FirstMarkerType = AxisProperties.FirstMarkerType.DefaultValue;
             SecondMarkerType = AxisProperties.SecondMarkerType.DefaultValue;
             ThirdMarkerType = AxisProperties.ThirdMarkerType.DefaultValue;
@@ -101,11 +103,14 @@ namespace mpESKD.Functions.mpAxis.Styles
         public int FirstMarkerType { get; set; }
         public int SecondMarkerType { get; set; }
         public int ThirdMarkerType { get; set; }
+        public int OrientMarkerType { get; set; }
         // Излом
         public int Fracture { get; set; }
         // Отступы излома
         public int BottomFractureOffset { get; set; }
         public int TopFractureOffset { get; set; }
+        // Arrow size
+        public int ArrowsSize { get; set; }
         // Text
         public string TextStyle { get; set; }
         public double TextHeight { get; set; }
@@ -119,6 +124,7 @@ namespace mpESKD.Functions.mpAxis.Styles
     }
     public class AxisStyleManager
     {
+        private const string LangItem = "mpESKD";
         private const string StylesFileName = "AxisStyles.xml";
         private static string _currentStyleGuid;
         /// <summary>Guid текущего стиля</summary>
@@ -140,7 +146,7 @@ namespace mpESKD.Functions.mpAxis.Styles
             set
             {
                 _currentStyleGuid = value;
-                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpBreakLine", "CurrentStyleGuid", value, true);
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpAxis", "CurrentStyleGuid", value, true);
             }
         }
         /// <summary>Коллекция стилей</summary>
@@ -220,15 +226,14 @@ namespace mpESKD.Functions.mpAxis.Styles
                     var nameAttr = propXel.Attribute("Name");
                     if (nameAttr != null)
                     {
-                        int i;
                         switch (nameAttr.Value)
                         {
                             case "MarkersPosition":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel,AxisProperties.MarkersPosition,
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.MarkersPosition,
                                     AxisPropertiesHelpers.GetAxisMarkersPositionFromString(propXel.Attribute("Value")?.Value)));
                                 break;
                             case "MarkersDiameter":
-                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel,AxisProperties.MarkersDiameter));
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.MarkersDiameter));
                                 break;
                             case "MarkersCount":
                                 style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.MarkersCount));
@@ -242,6 +247,9 @@ namespace mpESKD.Functions.mpAxis.Styles
                             case "ThirdMarkerType":
                                 style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.ThirdMarkerType));
                                 break;
+                            case "OrientMarkerType":
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.OrientMarkerType));
+                                break;
                             case "Fracture":
                                 style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.Fracture));
                                 break;
@@ -250,6 +258,9 @@ namespace mpESKD.Functions.mpAxis.Styles
                                 break;
                             case "TopFractureOffset":
                                 style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.TopFractureOffset));
+                                break;
+                            case "ArrowsSize":
+                                style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.ArrowsSize));
                                 break;
                             case "LineTypeScale":
                                 style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, AxisProperties.LineTypeScale));
@@ -276,6 +287,9 @@ namespace mpESKD.Functions.mpAxis.Styles
                 // get layer
                 var layerData = styleXel.Element("LayerTableRecord");
                 style.LayerXmlData = layerData ?? null;
+                // get text style
+                var textStyleData = styleXel.Element("TextStyleTableRecord");
+                style.TextStyleXmlData = textStyleData ?? null;
                 // add style
                 Styles.Add(style);
             }
@@ -307,8 +321,10 @@ namespace mpESKD.Functions.mpAxis.Styles
                         {nameof(style.FirstMarkerType), style.FirstMarkerType },
                         {nameof(style.SecondMarkerType), style.SecondMarkerType },
                         {nameof(style.ThirdMarkerType), style.ThirdMarkerType },
+                        {nameof(style.OrientMarkerType), style.OrientMarkerType },
                         {nameof(style.BottomFractureOffset), style.BottomFractureOffset },
                         {nameof(style.TopFractureOffset), style.TopFractureOffset },
+                        {nameof(style.ArrowsSize), style.ArrowsSize },
                         {nameof(style.Fracture), style.Fracture },
                         {nameof(style.TextStyle), style.TextStyle },
                         {nameof(style.TextHeight), style.TextHeight },
@@ -329,8 +345,12 @@ namespace mpESKD.Functions.mpAxis.Styles
                     if (LayerHelper.HasLayer(style.LayerName))
                         styleXel.Add(LayerHelper.SetLayerXml(LayerHelper.GetLayerTableRecordByLayerName(style.LayerName)));
                     else if (style.LayerXmlData != null) styleXel.Add(style.LayerXmlData);
-                    fXel.Add(styleXel);
                     // add text style
+                    if(TextStyleHelper.HasTextStyle(style.TextStyle))
+                        styleXel.Add(TextStyleHelper.SetTextStyleTableRecordXElement(TextStyleHelper.GetTextStyleTableRecordByName(style.TextStyle)));
+                    else if (style.TextStyleXmlData != null) styleXel.Add(style.TextStyleXmlData);
+
+                    fXel.Add(styleXel);
                 }
                 fXel.Save(stylesFile);
                 // reload styles
@@ -341,7 +361,7 @@ namespace mpESKD.Functions.mpAxis.Styles
                 ExceptionBox.Show(exception);
             }
         }
-        
+
         /// <summary>Создание системных (стандартных) стилей. Их может быть несколько</summary>
         /// <returns></returns>
         public static List<AxisStyle> CreateSystemStyles()
@@ -349,13 +369,13 @@ namespace mpESKD.Functions.mpAxis.Styles
             var styles = new List<AxisStyle>();
             var style = new AxisStyle
             {
-                Name = "Прямая ось",
+                Name = Language.GetItem(LangItem, "h41"), // "Прямая ось",
                 FunctionName = AxisFunction.MPCOEntName,
-                Description = "Базовый стиль для прямой оси",
+                Description = Language.GetItem(LangItem, "h68"), // "Базовый стиль для прямой оси",
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
             };
-
+            
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.MarkersDiameter.DefaultValue, AxisProperties.MarkersDiameter));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.BottomFractureOffset.DefaultValue, AxisProperties.BottomFractureOffset));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.TopFractureOffset.DefaultValue, AxisProperties.TopFractureOffset));
@@ -363,7 +383,9 @@ namespace mpESKD.Functions.mpAxis.Styles
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.FirstMarkerType.DefaultValue, AxisProperties.FirstMarkerType));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.SecondMarkerType.DefaultValue, AxisProperties.SecondMarkerType));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.ThirdMarkerType.DefaultValue, AxisProperties.ThirdMarkerType));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.OrientMarkerType.DefaultValue, AxisProperties.OrientMarkerType));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.Fracture.DefaultValue, AxisProperties.Fracture));
+            style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.ArrowsSize.DefaultValue, AxisProperties.ArrowsSize));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineTypeScale.DefaultValue, AxisProperties.LineTypeScale));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LineType.DefaultValue, AxisProperties.LineType));
             style.Properties.Add(StyleHelpers.CreateProperty(AxisProperties.LayerName.DefaultValue, AxisProperties.LayerName));

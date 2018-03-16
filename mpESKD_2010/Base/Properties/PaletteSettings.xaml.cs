@@ -1,16 +1,16 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using ModPlusAPI;
-using ModPlusAPI.Windows.Helpers;
 
 namespace mpESKD.Base.Properties
 {
     public partial class PaletteSettings
     {
+        private const string LangItem = "mpESKD";
         public PaletteSettings()
         {
             InitializeComponent();
-            this.OnWindowStartUp();
+            Title = ModPlusAPI.Language.GetItem(LangItem, "h1");
             Loaded += LmSettings_Loaded;
         }
         private void LmSettings_Loaded(object sender, RoutedEventArgs e)

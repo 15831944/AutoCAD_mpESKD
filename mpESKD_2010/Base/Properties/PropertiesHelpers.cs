@@ -10,7 +10,7 @@ namespace mpESKD.Base.Properties
     /// </summary>
     public class DoubleEqComparer : IEqualityComparer<double>
     {
-        double _precission;
+        readonly double _precission;
 
         /// <summary>
         /// Создание объекта с точностью сравнения 0,000001
@@ -29,6 +29,7 @@ namespace mpESKD.Base.Properties
             _precission = precission;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Сравнение объектов типа Double
         /// </summary>
@@ -43,8 +44,8 @@ namespace mpESKD.Base.Properties
             return Math.Abs(x - y) <= _precission;
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
@@ -68,7 +69,7 @@ namespace mpESKD.Base.Properties
                 var scale = new AnnotationScale
                 {
                     Name = str,
-                    PaperUnits = double.TryParse(splitted[0], out double d) ? d : 1.0,
+                    PaperUnits = double.TryParse(splitted[0], out var d) ? d : 1.0,
                     DrawingUnits = double.TryParse(splitted[1], out d) ? d : 1.0
                 };
                 return scale;

@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using mpESKD.Base.Helpers;
-using mpESKD.Base.Properties;
 using mpESKD.Base.Styles;
 using mpESKD.Functions.mpBreakLine.Properties;
 
@@ -8,6 +7,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
 {
     public partial class BreakLineStyleProperties
     {
+        private const string LangItem = "mpESKD";
         public BreakLineStyleProperties(string layerNameFromStyle)
         {
             InitializeComponent();
@@ -16,8 +16,8 @@ namespace mpESKD.Functions.mpBreakLine.Styles
             CbScale.ItemsSource = AcadHelpers.Scales;
             // layers
             var layers = AcadHelpers.Layers;
-            layers.Insert(0, "По умолчанию");
-            if(!layers.Contains(layerNameFromStyle))
+            layers.Insert(0, ModPlusAPI.Language.GetItem(LangItem, "defl")); // "По умолчанию"
+            if (!layers.Contains(layerNameFromStyle))
                 layers.Insert(1, layerNameFromStyle);
             CbLayerName.ItemsSource = layers;
         }

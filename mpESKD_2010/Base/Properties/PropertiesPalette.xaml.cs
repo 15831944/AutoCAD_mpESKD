@@ -158,7 +158,8 @@ namespace mpESKD.Base.Properties
 
     public static class PropertiesFunction
     {
-        public static PaletteSet _paletteSet;
+        private const string LangItem = "mpESKD";
+        public static PaletteSet PaletteSet;
         private static PropertiesPalette _propertiesPalette;
         [CommandMethod("ModPlus", "mpPropertiesPalette", CommandFlags.Modal)]
         public static void Start()
@@ -170,16 +171,18 @@ namespace mpESKD.Base.Properties
                           out bool b) | b))
                 {
                     MainFunction.RemoveFromMpPalette(false);
-                    if (_paletteSet != null)
+                    if (PaletteSet != null)
                     {
-                        _paletteSet.Visible = true;
+                        PaletteSet.Visible = true;
                     }
                     else
                     {
-                        _paletteSet = new PaletteSet("Свойства примитивов ModPlus", "mpPropertiesPalette",
+                        PaletteSet = new PaletteSet(
+                            Language.GetItem(LangItem, "h11"), // Свойства примитивов ModPlus
+                            "mpPropertiesPalette",
                             new Guid("1c0dc0f7-0d06-49df-a2d3-bcea4241e036"));
-                        _paletteSet.Load += _paletteSet_Load;
-                        _paletteSet.Save += _paletteSet_Save;
+                        PaletteSet.Load += _paletteSet_Load;
+                        PaletteSet.Save += _paletteSet_Save;
                         _propertiesPalette = new PropertiesPalette();
                         ElementHost elementHost = new ElementHost()
                         {
@@ -187,19 +190,21 @@ namespace mpESKD.Base.Properties
                             Dock = DockStyle.Fill,
                             Child = _propertiesPalette
                         };
-                        _paletteSet.Add("Свойства примитивов ModPlus", elementHost);
-                        _paletteSet.Style = PaletteSetStyles.ShowCloseButton | PaletteSetStyles.ShowPropertiesMenu |
+                        PaletteSet.Add(
+                            Language.GetItem(LangItem, "h11"), // Свойства примитивов ModPlus
+                            elementHost);
+                        PaletteSet.Style = PaletteSetStyles.ShowCloseButton | PaletteSetStyles.ShowPropertiesMenu |
                                             PaletteSetStyles.ShowAutoHideButton;
-                        _paletteSet.MinimumSize = new System.Drawing.Size(100, 300);
-                        _paletteSet.DockEnabled = DockSides.Right | DockSides.Left;
-                        _paletteSet.Visible = true;
+                        PaletteSet.MinimumSize = new System.Drawing.Size(100, 300);
+                        PaletteSet.DockEnabled = DockSides.Right | DockSides.Left;
+                        PaletteSet.Visible = true;
                     }
                 }
                 else
                 {
-                    if (_paletteSet != null)
+                    if (PaletteSet != null)
                     {
-                        _paletteSet.Visible = false;
+                        PaletteSet.Visible = false;
                     }
                     MainFunction.AddToMpPalette(true);
                 }

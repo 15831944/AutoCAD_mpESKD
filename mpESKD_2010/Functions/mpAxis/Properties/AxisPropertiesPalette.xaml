@@ -13,10 +13,11 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../../Base/Properties/Controls/ControlStyles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
             <converters:ColumnWidthConverter x:Key="ColumnWidthConverter"></converters:ColumnWidthConverter>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Expander Header="Прямая ось" IsExpanded="True" Name="Expander">
+    <Expander Header="{Binding Source={StaticResource Lang}, XPath=h41}" IsExpanded="True" Name="Expander">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -40,37 +41,44 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Основные" Style="{StaticResource HeaderTextBox}"></TextBox>
+                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h49}"
+                         Style="{StaticResource HeaderTextBox}"></TextBox>
                 <!--Style-->
-                <TextBox Grid.Row="1" Grid.Column="0" Text="Стиль:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h50}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ComboBox Grid.Row="1" Grid.Column="2" x:Name="CbStyle" Text="{Binding Style}"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
                 </ComboBox>
                 <!--Layer-->
-                <TextBox Grid.Row="2" Grid.Column="0" Text="Слой:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p7}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ComboBox Grid.Row="2" Grid.Column="2" Text="{Binding LayerName}" x:Name="CbLayerName"
                       Style="{StaticResource PropertyValueComboBox}"
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
                 </ComboBox>
                 <!--Scale-->
-                <TextBox Grid.Row="3" Grid.Column="0" Text="Масштаб:"  Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p5}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ComboBox Grid.Row="3" Grid.Column="2" x:Name="CbScale" Text="{Binding Scale}" Style="{StaticResource PropertyValueComboBox}"
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
                       ></ComboBox>
                 <!--LineType-->
-                <TextBox Grid.Row="4" Grid.Column="0" Text="Тип линии оси:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p19}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding LineType}" x:Name="TbLineType"
                          Style="{StaticResource PropertyValueTextBox}" IsReadOnly="True"
                          PreviewMouseDown="TbLineType_OnPreviewMouseDown" Cursor="Hand"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
                 </TextBox>
                 <!--LinetypeScale-->
-                <TextBox Grid.Row="5" Grid.Column="0" Text="Масштаб типа линий:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p6}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:DoubleTextBox Grid.Row="5" Grid.Column="2" Value="{Binding LineTypeScale}" 
-                                 Style="{StaticResource PropertyValueDoubleTextBox}"
-                                 Minimum="0" Maximum="{x:Static sys:Double.MaxValue}"
-                                 x:Name="TbLineTypeScale" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:DoubleTextBox>
+                                     Style="{StaticResource PropertyValueDoubleTextBox}"
+                                     Minimum="0" Maximum="{x:Static sys:Double.MaxValue}"
+                                     x:Name="TbLineTypeScale" GotFocus="FrameworkElement_OnGotFocus" 
+                                     LostFocus="FrameworkElement_OnLostFocus"></ctrls:DoubleTextBox>
                 <!--GridSplitter-->
                 <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" BorderThickness="1,0,1,0"
                           HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="#FF696969"></GridSplitter>
@@ -100,78 +108,92 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Геометрия" Style="{StaticResource HeaderTextBox}"></TextBox>
+                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h51}"
+                         Style="{StaticResource HeaderTextBox}"></TextBox>
                 <!--MarkersPosition-->
-                <TextBox Grid.Row="1" Grid.Column="0" Text="Позиция маркеров:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p8}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ComboBox Grid.Row="1" Grid.Column="2" Text="{Binding MarkersPosition}" x:Name="CbMarkersPosition"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
                 </ComboBox>
                 <!--Fracture-->
-                <TextBox Grid.Row="2" Grid.Column="0" Text="Излом:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p9}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="2" Grid.Column="2" Value="{Binding Fracture}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbFracture" Minimum="1" Maximum="20" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--BottomFractureOffset-->
-                <TextBox Grid.Row="3" Grid.Column="0" Text="Нижний отступ излома:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p15}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="3" Grid.Column="2" Value="{Binding BottomFractureOffset}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbBottomFractureOffset" Minimum="0" Maximum="30" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--TopFractureOffset-->
-                <TextBox Grid.Row="4" Grid.Column="0" Text="Верхний отступ излома:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p16}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="4" Grid.Column="2" Value="{Binding TopFractureOffset}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbTopFractureOffset" Minimum="0" Maximum="30" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--MarkersDiameter-->
-                <TextBox Grid.Row="5" Grid.Column="0" Text="Диаметр маркеров:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p10}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="5" Grid.Column="2" Value="{Binding MarkersDiameter}" Style="{StaticResource PropertyValueIntTextBox}"
-                                  x:Name="TbMarkerDiameter" Minimum="6" Maximum="12" GotFocus="FrameworkElement_OnGotFocus" 
+                                  x:Name="TbMarkersDiameter" Minimum="6" Maximum="12" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--MarkersCount-->
-                <TextBox Grid.Row="6" Grid.Column="0" Text="Количество маркеров:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="6" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p11}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="6" Grid.Column="2" Value="{Binding MarkersCount}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbMarkersCount" Minimum="1" Maximum="3" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus" 
                                   TextBox.TextChanged="TbMarkersCount_OnTextChanged"></ctrls:IntTextBox>
                 <!--FirstMarkerType-->
-                <TextBox Grid.Row="7" Grid.Column="0" Text="Тип первого маркера:" Style="{StaticResource PropertyNameTextBoxBase}"
+                <TextBox Grid.Row="7" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p12}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"
                          x:Name="TbFirstMarkerTypeHeader"></TextBox>
                 <ComboBox Grid.Row="7" Grid.Column="2" Text="{Binding FirstMarkerType}" x:Name="CbFirstMarkerType"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
                 <!--SecondMarkerType-->
-                <TextBox Grid.Row="8" Grid.Column="0" Text="Тип второго маркера:" Style="{StaticResource PropertyNameTextBoxBase}"
+                <TextBox Grid.Row="8" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p13}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"
                          x:Name="TbSecondMarkerTypeHeader"></TextBox>
                 <ComboBox Grid.Row="8" Grid.Column="2" Text="{Binding SecondMarkerType}" x:Name="CbSecondMarkerType"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
                 <!--ThirdMarkerType-->
-                <TextBox Grid.Row="9" Grid.Column="0" Text="Тип третьего маркера:" Style="{StaticResource PropertyNameTextBoxBase}"
+                <TextBox Grid.Row="9" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p14}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"
                          x:Name="TbThirdMarkerTypeHeader"></TextBox>
                 <ComboBox Grid.Row="9" Grid.Column="2" Text="{Binding ThirdMarkerType}" x:Name="CbThirdMarkerType"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
                 <!--ArrowSize-->
-                <TextBox Grid.Row="10" Grid.Column="0" Text="Размер стрелок:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="10" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p29}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="10" Grid.Column="2" Value="{Binding ArrowSize}" Style="{StaticResource PropertyValueIntTextBox}"
-                                  x:Name="TbArrowSize" Minimum="0" Maximum="10" GotFocus="FrameworkElement_OnGotFocus" 
+                                  x:Name="TbArrowsSize" Minimum="0" Maximum="10" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus" ></ctrls:IntTextBox>
                 <!--BottomOrientMarkerVisible-->
-                <TextBox Grid.Row="11" Grid.Column="0" Text="Нижний маркер-ориентир:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="11" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p32}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <Border Grid.Row="11" Grid.Column="2" Style="{StaticResource BorderForValueCheckBox}">
                     <CheckBox  IsChecked="{Binding BottomOrientMarkerVisible}"
                                Style="{StaticResource PropertyValueCheckBox}" x:Name="ChkBottomOrientMarkerVisible"
                                GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></CheckBox>
                 </Border>
                 <!--TopOrientMarkerVisible-->
-                <TextBox Grid.Row="12" Grid.Column="0" Text="Верхний маркер-ориентир:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="12" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p33}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <Border Grid.Row="12" Grid.Column="2" Style="{StaticResource BorderForValueCheckBox}">
                     <CheckBox IsChecked="{Binding TopOrientMarkerVisible}"
                               Style="{StaticResource PropertyValueCheckBox}" x:Name="ChkTopOrientMarkerVisible"
                               GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></CheckBox>
                 </Border>
                 <!--OrientMarkerType-->
-                <TextBox Grid.Row="13" Grid.Column="0" Text="Тип маркера-ориентира:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="13" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p34}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ComboBox Grid.Row="13" Grid.Column="2" Text="{Binding OrientMarkerType}" x:Name="CbOrientMarkerType"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
@@ -204,80 +226,94 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Содержимое" Style="{StaticResource HeaderTextBox}"></TextBox>
+                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h64}"
+                         Style="{StaticResource HeaderTextBox}"></TextBox>
                 <!--TextStyle-->
-            <TextBox Grid.Row="1" Grid.Column="0" Text="Текстовый стиль:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p17}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
             <ComboBox Grid.Row="1" Grid.Column="2" Text="{Binding TextStyle}" x:Name="CbTextStyle"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
             <!--TextHeight-->
-            <TextBox Grid.Row="2" Grid.Column="0" Text="Высота текста:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p18}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
             <ctrls:DoubleTextBox Grid.Row="2" Grid.Column="2" Value="{Binding TextHeight}" 
                                      Style="{StaticResource PropertyValueDoubleTextBox}"
                                      Minimum="0.000000001" Maximum="{x:Static sys:Double.MaxValue}"
                                      x:Name="TbTextHeight" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:DoubleTextBox>
             <!-- First text -->
-            <TextBox Grid.Row="3" Grid.Column="0" Text="Префикс первого значения:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p20}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
             <TextBox Grid.Row="3" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbFirstTextPrefix"
                          Text="{Binding FirstTextPrefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
-            <TextBox Grid.Row="4" Grid.Column="0" Text="Первое значение:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p22}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
             <TextBox Grid.Row="4" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbFirstText"
                          Text="{Binding FirstText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
-            <TextBox Grid.Row="5" Grid.Column="0" Text="Суффикс первого значения:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p21}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
             <TextBox Grid.Row="5" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbFirstTextSuffix"
                          Text="{Binding FirstTextSuffix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
             <!-- Second text -->
-            <TextBox Grid.Row="6" Grid.Column="0" Text="Префикс второго значения:" Style="{StaticResource PropertyNameTextBoxBase}"
+            <TextBox Grid.Row="6" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p23}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"
                          Visibility="{Binding ElementName=TbSecondTextPrefix, Path=Visibility}"></TextBox>
             <TextBox Grid.Row="6" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbSecondTextPrefix"
                          Text="{Binding SecondTextPrefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
-            <TextBox Grid.Row="7" Grid.Column="0" Text="Второе значение:" Style="{StaticResource PropertyNameTextBoxBase}"
+            <TextBox Grid.Row="7" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p25}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"
                          Visibility="{Binding ElementName=TbSecondText, Path=Visibility}"></TextBox>
             <TextBox Grid.Row="7" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbSecondText"
                          Text="{Binding SecondText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
-            <TextBox Grid.Row="8" Grid.Column="0" Text="Суффикс второго значения:" Style="{StaticResource PropertyNameTextBoxBase}"
+            <TextBox Grid.Row="8" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p24}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"
                          Visibility="{Binding ElementName=TbSecondTextSuffix, Path=Visibility}"></TextBox>
             <TextBox Grid.Row="8" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbSecondTextSuffix"
                          Text="{Binding SecondTextSuffix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
             <!-- Third text -->
-            <TextBox Grid.Row="9" Grid.Column="0" Text="Префикс третьего значения:" Style="{StaticResource PropertyNameTextBoxBase}"
+            <TextBox Grid.Row="9" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p26}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"
                          Visibility="{Binding ElementName=TbThirdTextPrefix, Path=Visibility}"></TextBox>
             <TextBox Grid.Row="9" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbThirdTextPrefix"
                          Text="{Binding ThirdTextPrefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
-            <TextBox Grid.Row="10" Grid.Column="0" Text="Третье значение:" Style="{StaticResource PropertyNameTextBoxBase}"
+            <TextBox Grid.Row="10" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p28}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"
                          Visibility="{Binding ElementName=TbThirdText, Path=Visibility}"></TextBox>
             <TextBox Grid.Row="10" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbThirdText"
                          Text="{Binding ThirdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
-            <TextBox Grid.Row="11" Grid.Column="0" Text="Суффикс третьего значения:" Style="{StaticResource PropertyNameTextBoxBase}"
+            <TextBox Grid.Row="11" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p27}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"
                          Visibility="{Binding ElementName=TbThirdTextSuffix, Path=Visibility}"></TextBox>
             <TextBox Grid.Row="11" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbThirdTextSuffix"
                          Text="{Binding ThirdTextSuffix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
                 <!--BottomOrientText-->
-                <TextBox Grid.Row="12" Grid.Column="0" Text="Значение нижнего маркера-ориентира:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <TextBox Grid.Row="12" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p30}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <TextBox Grid.Row="12" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbBottomOrientText"
                          Text="{Binding BottomOrientText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></TextBox>
             <!--TopOrientText-->
-                <TextBox Grid.Row="13" Grid.Column="0" Text="Значение верхнего маркера-ориентира:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+            <TextBox Grid.Row="13" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p31}"
+                     Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <TextBox Grid.Row="13" Grid.Column="2" Style="{StaticResource PropertyValueTextBox}"
                          Name="TbTopOrientText"
                          Text="{Binding TopOrientText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

@@ -1,27 +1,24 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using mpESKD.Functions.mpAxis.Properties;
-using ModPlusAPI.Windows.Helpers;
 
 namespace mpESKD.Functions.mpAxis
 {
     public partial class AxisValueEditor
     {
+        private const string LangItem = "mpESKD";
         public Axis Axis;
 
         public AxisValueEditor()
         {
             InitializeComponent();
-            this.OnWindowStartUp();
-
+            Title = ModPlusAPI.Language.GetItem(LangItem, "h67");
         }
 
         private void AxisValueEditor_OnLoaded(object sender, RoutedEventArgs e)
         {
             // visibility
-            if (Axis.TopOrientMarkerVisible || Axis.BottomOrientMarkerVisible)
-                ChangeOrientVisibility(true);
-            else ChangeOrientVisibility(false);
+            ChangeOrientVisibility();
             if (Axis.MarkersCount > 1)
             {
                 ChangeSecondVisibility(true);
@@ -79,20 +76,8 @@ namespace mpESKD.Functions.mpAxis
 
         #region Visibility
 
-        void ChangeOrientVisibility(bool show)
+        void ChangeOrientVisibility()
         {
-            if (show)
-            {
-                OrientEllipse.Visibility = OrientLine.Visibility =
-                OrientArrow.Visibility = 
-                Visibility.Visible;
-            }
-            else
-            {
-                OrientEllipse.Visibility = OrientLine.Visibility =
-                    OrientArrow.Visibility = 
-                    Visibility.Collapsed;
-            }
             if (Axis.MarkersPosition == AxisMarkersPosition.Both || Axis.MarkersPosition == AxisMarkersPosition.Top)
                 TbTopOrientText.Visibility = Axis.TopOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
             else TbTopOrientText.Visibility = Visibility.Collapsed;
@@ -107,30 +92,22 @@ namespace mpESKD.Functions.mpAxis
         {
             if (show)
             {
-                SecondEllipse.Visibility = TbSecondPrefix.Visibility =
-                TbSecondText.Visibility = TbSecondSuffix.Visibility =
-                Visibility.Visible;
+                TbSecondPrefix.Visibility = TbSecondText.Visibility = TbSecondSuffix.Visibility = Visibility.Visible;
             }
             else
             {
-                SecondEllipse.Visibility = TbSecondPrefix.Visibility =
-                    TbSecondText.Visibility = TbSecondSuffix.Visibility =
-                        Visibility.Collapsed;
+                TbSecondPrefix.Visibility = TbSecondText.Visibility = TbSecondSuffix.Visibility = Visibility.Collapsed;
             }
         }
         void ChangeThirdVisibility(bool show)
         {
             if (show)
             {
-                ThirdEllipse.Visibility = TbThirdPrefix.Visibility =
-                    TbThirdText.Visibility = TbThirdSuffix.Visibility =
-                    Visibility.Visible;
+                TbThirdPrefix.Visibility = TbThirdText.Visibility = TbThirdSuffix.Visibility = Visibility.Visible;
             }
             else
             {
-                ThirdEllipse.Visibility = TbThirdPrefix.Visibility =
-                    TbThirdText.Visibility = TbThirdSuffix.Visibility =
-                        Visibility.Collapsed;
+                TbThirdPrefix.Visibility = TbThirdText.Visibility = TbThirdSuffix.Visibility = Visibility.Collapsed;
             }
         }
 

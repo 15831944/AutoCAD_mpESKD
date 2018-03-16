@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\..\..\..\ModPlus\Functions\mpESKD\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ac2010</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;ac2010,NoInplaceTextEditor</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="Base\Helpers\AcadHelpers.cs" />
     <Compile Include="Base\Helpers\LayerHelper.cs" />
+    <Compile Include="Base\Helpers\TextStyleHelper.cs" />
     <Compile Include="Base\MPCOEntity.cs" />
     <Compile Include="Base\Overrules\MPCOGrips.cs" />
     <Compile Include="Base\Properties\BaseProperties.cs" />
@@ -108,6 +109,9 @@
     <Compile Include="Functions\mpAxis\AxisFunction.cs" />
     <Compile Include="Functions\mpAxis\AxisInterface.cs" />
     <Compile Include="Functions\mpAxis\AxisJig.cs" />
+    <Compile Include="Functions\mpAxis\AxisValueEditor.xaml.cs">
+      <DependentUpon>AxisValueEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Functions\mpAxis\Overrules\AxisGripPointOverrule.cs" />
     <Compile Include="Functions\mpAxis\Overrules\AxisObjectOverrule.cs" />
     <Compile Include="Functions\mpAxis\Overrules\AxisOsnapOverrule.cs" />
@@ -118,6 +122,9 @@
     </Compile>
     <Compile Include="Functions\mpAxis\Properties\AxisSummaryProperties.cs" />
     <Compile Include="Functions\mpAxis\Styles\AxisStyle.cs" />
+    <Compile Include="Functions\mpAxis\Styles\AxisStyleProperties.xaml.cs">
+      <DependentUpon>AxisStyleProperties.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Functions\mpBreakLine\Properties\BreakLineProperties.cs" />
     <Compile Include="Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs">
       <DependentUpon>BreakLinePropertiesPalette.xaml</DependentUpon>
@@ -175,7 +182,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Functions\mpAxis\AxisValueEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Functions\mpAxis\Properties\AxisPropertiesPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Functions\mpAxis\Styles\AxisStyleProperties.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

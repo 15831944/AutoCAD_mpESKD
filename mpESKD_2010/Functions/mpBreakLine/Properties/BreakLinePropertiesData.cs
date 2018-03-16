@@ -45,6 +45,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
             }
         }
+
         private int _overgang;
         public int Overhang
         {
@@ -257,7 +258,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 Update(blkRef);
         }
 
-        void Update(BlockReference blkReference)
+        private void Update(BlockReference blkReference)
         {
             if (blkReference == null)
             {
@@ -279,7 +280,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             }
         }
 
-        static bool Verify(ObjectId breakLineObjectId)
+        private static bool Verify(ObjectId breakLineObjectId)
         {
             return !breakLineObjectId.IsNull &&
                    breakLineObjectId.IsValid &

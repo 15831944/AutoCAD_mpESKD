@@ -14,6 +14,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
 {
     public partial class BreakLinePropertiesPalette
     {
+        private const string LangItem = "mpESKD";
         private readonly PropertiesPalette _parentPalette;
 
         public BreakLinePropertiesPalette(PropertiesPalette palette)
@@ -88,7 +89,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         {
             if(!(sender is FrameworkElement fe)) return;
             if (fe.Name.Equals("CbStyle"))
-                _parentPalette.ShowDescription("Стиль интеллектуального примитива");
+                _parentPalette.ShowDescription(ModPlusAPI.Language.GetItem(LangItem, "h52"));
             if (fe.Name.Equals("TbOverhang"))
                 _parentPalette.ShowDescription(BreakLineProperties.Overhang.Description);
             if (fe.Name.Equals("TbBreakHeight"))

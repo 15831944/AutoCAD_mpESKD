@@ -11,10 +11,11 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../../Base/Properties/Controls/ControlStyles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            <converters:ColumnWidthConverter x:Key="ColumnWidthConverter"></converters:ColumnWidthConverter>
+            <converters:ColumnWidthConverter x:Key="ColumnWidthConverter"/>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Expander Header="Линия обрыва" IsExpanded="True" Name="Expander">
+    <Expander Header="{Binding Source={StaticResource Lang}, XPath=h48}" IsExpanded="True" Name="Expander">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -36,26 +37,31 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Основные" Style="{StaticResource HeaderTextBox}"></TextBox>
+                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h49}"
+                         Style="{StaticResource HeaderTextBox}"></TextBox>
                 <!--Style-->
-                <TextBox Grid.Row="1" Grid.Column="0" Text="Стиль:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h50}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ComboBox Grid.Row="1" Grid.Column="2" x:Name="CbStyle" Text="{Binding Style}"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
                 </ComboBox>
                 <!--Layer-->
-                <TextBox Grid.Row="2" Grid.Column="0" Text="Слой:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p7}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ComboBox Grid.Row="2" Grid.Column="2" Text="{Binding LayerName}" x:Name="CbLayerName"
                       Style="{StaticResource PropertyValueComboBox}"
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
                 </ComboBox>
                 <!--Scale-->
-                <TextBox Grid.Row="3" Grid.Column="0" Text="Масштаб:"  Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p5}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ComboBox Grid.Row="3" Grid.Column="2" x:Name="CbScale" Text="{Binding Scale}" Style="{StaticResource PropertyValueComboBox}"
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
                       ></ComboBox>
                 <!--LinetypeScale-->
-                <TextBox Grid.Row="4" Grid.Column="0" Text="Масштаб типа линий:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p6}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:DoubleTextBox Grid.Row="4" Grid.Column="2" Value="{Binding LineTypeScale}" 
                                  Style="{StaticResource PropertyValueDoubleTextBox}"
                                  Minimum="0" Maximum="{x:Static sys:Double.MaxValue}"
@@ -80,23 +86,28 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Геометрия" Style="{StaticResource HeaderTextBox}"></TextBox>
+                <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h51}"
+                         Style="{StaticResource HeaderTextBox}"></TextBox>
                 <!--BreakLineType-->
-                <TextBox Grid.Row="1" Grid.Column="0" Text="Тип линии обрыва:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p1}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ComboBox Grid.Row="1" Grid.Column="2" Text="{Binding BreakLineType}" x:Name="CbBreakLineType"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
                 </ComboBox>
                 <!--Overhang-->
-                <TextBox Grid.Row="2" Grid.Column="0" Text="Выступы за объект:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p2}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="2" Grid.Column="2" Value="{Binding Overhang}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbOverhang" Minimum="0" Maximum="10" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--BreakHeight-->
-                <TextBox Grid.Row="3" Grid.Column="0" Text="Высота разрыва:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p4}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="3" Grid.Column="2" Value="{Binding BreakHeight}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbBreakHeight" Minimum="1" Maximum="20" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--BreakWidth-->
-                <TextBox Grid.Row="4" Grid.Column="0" Text="Ширина разрыва:" Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
+                <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p3}"
+                         Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
                 <ctrls:IntTextBox Grid.Row="4" Grid.Column="2" Value="{Binding BreakWidth}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbBreakWidth" Minimum="1" Maximum="13" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--splitter-->

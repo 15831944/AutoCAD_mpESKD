@@ -51,7 +51,7 @@ namespace mpESKD.Base.Styles.Behaviors
             }
         }
 
-        void OnPreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !IsValid(e.Text, false);
         }

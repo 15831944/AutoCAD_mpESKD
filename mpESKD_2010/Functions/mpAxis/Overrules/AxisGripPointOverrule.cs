@@ -7,6 +7,7 @@ using ModPlusAPI.Windows;
 using Autodesk.AutoCAD.Runtime;
 using mpESKD.Functions.mpAxis.Properties;
 using ModPlus.Helpers;
+using ModPlusAPI;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 // ReSharper disable InconsistentNaming
@@ -351,6 +352,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
     /// <summary>Описание ручки линии обрыва</summary>
     public class AxisGrip : MPCOGrips.MPCOGripData //<-- Там будут определны типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
     {
+        private const string LangItem = "mpESKD";
         public AxisGrip()
         {
             // отключение контекстного меню и возможности менять команду
@@ -373,9 +375,9 @@ namespace mpESKD.Functions.mpAxis.Overrules
                 case AxisGripName.BottomOrientGrip:
                 case AxisGripName.TopOrientGrip:
                     {
-                        return "Растянуть";
+                        return Language.GetItem(LangItem, "gp1"); // stretch
                     }
-                case AxisGripName.MiddleGrip: return "Переместить";
+                case AxisGripName.MiddleGrip: return Language.GetItem(LangItem, "gp2"); // move
             }
             return base.GetTooltip();
         }

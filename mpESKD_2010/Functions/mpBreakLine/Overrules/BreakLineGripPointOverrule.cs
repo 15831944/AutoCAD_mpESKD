@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.Runtime;
 using ModPlus.Helpers;
 using mpESKD.Base.Helpers;
 using mpESKD.Base.Overrules;
+using ModPlusAPI;
 using ModPlusAPI.Windows;
 // ReSharper disable InconsistentNaming
 
@@ -180,6 +181,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
     /// <summary>Описание ручки линии обрыва</summary>
     public class BreakLineGrip : MPCOGrips.MPCOGripData //<-- Там будут определны типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
     {
+        private const string LangItem = "mpESKD";
         public BreakLineGrip()
         {
             // отключение контекстного меню и возможности менять команду
@@ -198,9 +200,9 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                 case BreakLineGripName.StartGrip:
                 case BreakLineGripName.EndGrip:
                     {
-                        return "Растянуть";
+                        return Language.GetItem(LangItem, "gp1"); // stretch
                     }
-                case BreakLineGripName.MiddleGrip: return "Переместить";
+                case BreakLineGripName.MiddleGrip: return Language.GetItem(LangItem, "gp2"); // move
             }
             return base.GetTooltip();
         }

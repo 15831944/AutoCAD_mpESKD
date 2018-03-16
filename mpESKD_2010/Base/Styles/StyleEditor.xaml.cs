@@ -6,23 +6,33 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using mpESKD.Base.Helpers;
+using mpESKD.Functions.mpAxis;
+using mpESKD.Functions.mpAxis.Styles;
 using mpESKD.Functions.mpBreakLine;
 using mpESKD.Functions.mpBreakLine.Styles;
+using ModPlusAPI;
 using ModPlusAPI.Windows;
-using ModPlusAPI.Windows.Helpers;
+using Visibility = System.Windows.Visibility;
 
 namespace mpESKD.Base.Styles
 {
     public partial class StyleEditor
     {
+        private const string LangItem = "mpESKD";
         public StyleEditor()
         {
             InitializeComponent();
-            this.OnWindowStartUp();
+            Title = ModPlusAPI.Language.GetItem(LangItem, "tab4");
             Loaded += StyleEditor_OnLoaded;
             MouseLeftButtonDown += StyleEditor_OnMouseLeftButtonDown;
             PreviewKeyDown += StyleEditor_OnPreviewKeyDown;
             ContentRendered += StyleEditor_ContentRendered;
+            // check style files
+            BreakLineStylesManager.CheckStylesFile();
+            AxisStyleManager.CheckStylesFile();
         }
 
         #region Window work
@@ -77,6 +87,22 @@ namespace mpESKD.Base.Styles
             }
             _styles.Add(styleToBind);
             #endregion
+
+            #region Axis
+
+            styleToBind = new StyleToBind
+            {
+                FunctionLocalName = AxisFunction.MPCOEntDisplayName,
+                FunctionName = AxisFunction.MPCOEntName
+            };
+            var axisStyles = AxisStyleManager.GetStylesForEditor();
+            foreach (AxisStyleForEditor style in axisStyles)
+            {
+                style.Parent = styleToBind;
+                styleToBind.Styles.Add(style);
+            }
+            _styles.Add(styleToBind);
+            #endregion
         }
 
         private void TvStyles_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -96,11 +122,17 @@ namespace mpESKD.Base.Styles
             {
                 BtRemoveStyle.IsEnabled = styleForEditor.CanEdit;
                 BtSetCurrentStyle.IsEnabled = !styleForEditor.IsCurrent;
-
+                // break line
                 if (styleForEditor is BreakLineStyleForEditor breakLineStyle)
                 {
                     BorderProperties.Child = new BreakLineStyleProperties(breakLineStyle.LayerName) { DataContext = item };
                     SetImage(BreakLineFunction.MPCOEntName);
+                }
+                // axis
+                if (styleForEditor is AxisStyleForEditor axisStyle)
+                {
+                    BorderProperties.Child = new AxisStyleProperties(axisStyle.LayerName) { DataContext = item };
+                    SetImage(AxisFunction.MPCOEntName);
                 }
             }
             else SetImage(string.Empty);
@@ -112,12 +144,20 @@ namespace mpESKD.Base.Styles
             if (selected == null) return;
             if (selected is StyleToBind styleToBind)
             {
-                if (styleToBind.FunctionLocalName == BreakLineFunction.MPCOEntDisplayName)
+                if (styleToBind.FunctionName == BreakLineFunction.MPCOEntName)
                     styleToBind.Styles.Add(new BreakLineStyleForEditor(styleToBind));
+                if(styleToBind.FunctionName == AxisFunction.MPCOEntName)
+                    styleToBind.Styles.Add(new AxisStyleForEditor(styleToBind));
             }
+            // break line
             if (selected is BreakLineStyleForEditor breakLineStyleForEditor)
             {
                 breakLineStyleForEditor.Parent.Styles.Add(new BreakLineStyleForEditor(breakLineStyleForEditor.Parent));
+            }
+            // axis
+            if (selected is AxisStyleForEditor axisStyleForEditor)
+            {
+                axisStyleForEditor.Parent.Styles.Add(new AxisStyleForEditor(axisStyleForEditor.Parent));
             }
         }
 
@@ -136,7 +176,7 @@ namespace mpESKD.Base.Styles
             var selected = TvStyles.SelectedItem;
             if (selected == null) return;
             if (selected is MPCOStyleForEditor style && style.CanEdit)
-                if (ModPlusAPI.Windows.MessageBox.ShowYesNo("Выбранный стиль будет удален безвозратно! Продолжить?", MessageBoxIcon.Question))
+                if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(LangItem, "h69"), MessageBoxIcon.Question))
                 {
                     if (style.IsCurrent)
                     {
@@ -159,11 +199,6 @@ namespace mpESKD.Base.Styles
                 SetCurrentStyle(style);
                 BtSetCurrentStyle.IsEnabled = false;
             }
-        }
-        // create style from ent
-        private void BtCreateStyleFromEntity_OnClick(object sender, RoutedEventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         private void TvStyles_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -191,14 +226,15 @@ namespace mpESKD.Base.Styles
                 var styleNames = new List<string>();
                 foreach (var style in styleToBind.Styles)
                 {
-                    if(!styleNames.Contains(style.Name))
+                    if (!styleNames.Contains(style.Name))
                         styleNames.Add(style.Name);
                     else
                     {
-                        ModPlusAPI.Windows.MessageBox.Show("Группа стилей \"" + styleToBind.FunctionLocalName +
-                                                           "\" содержит стили с одинаковым именем \"" + style.Name +
-                                                           "\"!" + Environment.NewLine +
-                                                           "Переименуйте стили так, чтобы не было одинаковых названий", MessageBoxIcon.Alert);
+                        ModPlusAPI.Windows.MessageBox.Show(
+                            ModPlusAPI.Language.GetItem(LangItem, "h70") + " \"" + styleToBind.FunctionLocalName +
+                            "\" " + ModPlusAPI.Language.GetItem(LangItem, "h71") + " \"" + style.Name +
+                            "\"!" + Environment.NewLine +
+                            ModPlusAPI.Language.GetItem(LangItem, "h72"), MessageBoxIcon.Alert);
                         e.Cancel = true;
                         return;
                     }
@@ -210,11 +246,31 @@ namespace mpESKD.Base.Styles
         {
             // reload static settings
             MainStaticSettings.ReloadSettings();
+            // save styles IsCurrent
+            foreach (StyleToBind styleToBind in _styles)
+            {
+                if (styleToBind.FunctionName == BreakLineFunction.MPCOEntName)
+                {
+                    var currentStyle = styleToBind.Styles.FirstOrDefault(s => s.IsCurrent);
+                    if (currentStyle != null)
+                        UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpBreakLine", "CurrentStyleGuid", currentStyle.Guid, true);
+                }
+                if (styleToBind.FunctionName == AxisFunction.MPCOEntName)
+                {
+                    var currentStyle = styleToBind.Styles.FirstOrDefault(s => s.IsCurrent);
+                    if (currentStyle != null)
+                        UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpAxis", "CurrentStyleGuid", currentStyle.Guid, true);
+                }
+            }
             // save styles
             // break line style
             BreakLineStylesManager.SaveStylesToXml(
-                _styles.Single(s => s.FunctionLocalName == BreakLineFunction.MPCOEntDisplayName)
+                _styles.Single(s => s.FunctionName == BreakLineFunction.MPCOEntName)
                 .Styles.Where(s => s.CanEdit).Cast<BreakLineStyleForEditor>().ToList());
+            // axis styles
+            AxisStyleManager.SaveStylesToXml(
+                _styles.Single(s => s.FunctionName == AxisFunction.MPCOEntName)
+                .Styles.Where(s => s.CanEdit).Cast<AxisStyleForEditor>().ToList());
         }
 
         private void BtExpandCollapseImage_OnMouseEnter(object sender, MouseEventArgs e)
@@ -254,8 +310,150 @@ namespace mpESKD.Base.Styles
             VerticalGridSplitter.Visibility = Visibility.Visible;
             HorizontalGridSplitter.Visibility = Visibility.Visible;
         }
+
+        #region Create styles from entities
+
+        private void BtCreateStyleFromEntity_OnClick(object sender, RoutedEventArgs e)
+        {
+            /* Созданный стиль нужно еще найти в TreeView и выбрать его, раскрыв дерево
+             * для этого можно искать по гуиду, а сам поиск взять в плагине mpDwgBase
+             */
+            try
+            {
+                Hide();
+                PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n" + ModPlusAPI.Language.GetItem(LangItem, "msg3"));
+                promptEntityOptions.SetRejectMessage("\nWrong entity");
+                promptEntityOptions.AllowNone = false;
+                promptEntityOptions.AddAllowedClass(typeof(BlockReference), true);
+                promptEntityOptions.AllowObjectOnLockedLayer = true;
+                var selectionResult = AcadHelpers.Document.Editor.GetEntity(promptEntityOptions);
+                if (selectionResult.Status == PromptStatus.OK)
+                {
+                    var newStyleGuid = string.Empty;
+                    using (OpenCloseTransaction tr = new OpenCloseTransaction())
+                    {
+                        var obj = tr.GetObject(selectionResult.ObjectId, OpenMode.ForRead);
+                        if (obj is BlockReference blockReference)
+                        {
+                            // mpBreakLine
+                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineFunction.MPCOEntName, true))
+                               newStyleGuid = AddStyleFromBreakLine(blockReference);
+                            // mpAxis
+                            if (ExtendedDataHelpers.IsApplicable(obj, AxisFunction.MPCOEntName, true))
+                                newStyleGuid = AddStyleFromAxis(blockReference);
+                        }
+                    }
+                    if(!string.IsNullOrEmpty(newStyleGuid))
+                        SearchInTreeViewByGuid(newStyleGuid);
+                }
+            }
+            catch (Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
+            finally { Show(); }
+        }
+        /// <summary>Создание нового стиля из BreakLine</summary>
+        /// <param name="blkReference">Блок, представляющий BreakLine</param>
+        /// <returns>Guid нового стиля</returns>
+        private string AddStyleFromBreakLine(BlockReference blkReference)
+        {
+            var styleGuid = string.Empty;
+            var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkReference);
+            if (breakLine != null)
+            {
+                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == BreakLineFunction.MPCOEntName);
+                if (styleToBind != null)
+                {
+                    var styleForEditor = new BreakLineStyleForEditor(styleToBind)
+                    {
+                        // general
+                        LayerName = blkReference.Layer,
+                        Overhang = breakLine.Overhang,
+                        Scale = breakLine.Scale,
+                        //
+                        BreakHeight = breakLine.BreakHeight,
+                        BreakWidth = breakLine.BreakWidth,
+                        LineTypeScale = breakLine.LineTypeScale
+                    };
+                    styleGuid = styleForEditor.Guid;
+                    styleToBind.Styles.Add(styleForEditor);
+                }
+            }
+            return styleGuid;
+        }
+        /// <summary>Создание нового стиля из Axis</summary>
+        /// <param name="blkReference">Блок, представляющий BreakLine</param>
+        /// <returns>Guid нового стиля</returns>
+        private string AddStyleFromAxis(BlockReference blkReference)
+        {
+            var styleGuid = string.Empty;
+            var axis = AxisXDataHelper.GetAxisFromEntity(blkReference);
+            if (axis != null)
+            {
+                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == AxisFunction.MPCOEntName);
+                if (styleToBind != null)
+                {
+                    var styleForEditor = new AxisStyleForEditor(styleToBind)
+                    {
+                        // general
+                        LayerName = blkReference.Layer,
+                        LineTypeScale = axis.LineTypeScale,
+                        Scale = axis.Scale,
+                        //
+                        LineType = blkReference.Linetype,
+                        //
+                        MarkersPosition = axis.MarkersPosition,
+                        MarkersDiameter = axis.MarkersDiameter,
+                        MarkersCount = axis.MarkersCount,
+                        FirstMarkerType = axis.FirstMarkerType,
+                        SecondMarkerType = axis.SecondMarkerType,
+                        ThirdMarkerType = axis.ThirdMarkerType,
+                        OrientMarkerType = axis.OrientMarkerType,
+                        Fracture = axis.Fracture,
+                        BottomFractureOffset = axis.BottomFractureOffset,
+                        TopFractureOffset = axis.TopFractureOffset,
+                        ArrowsSize = axis.ArrowsSize,
+                        TextStyle = axis.TextStyle,
+                        TextHeight = axis.TextHeight
+                    };
+                    styleGuid = styleForEditor.Guid;
+                    styleToBind.Styles.Add(styleForEditor);
+                }
+            }
+            return styleGuid;
+        }
+        /// <summary>Поиск и выбор в TreeView стиля по Guid</summary>
+        private void SearchInTreeViewByGuid(string styleGuid)
+        {
+            foreach (object item in TvStyles.Items)
+            {
+                if (item is StyleToBind styleToBind)
+                {
+                    var collapseIt = true;
+                    foreach (var style in styleToBind.Styles)
+                    {
+                        if (style.Guid == styleGuid)
+                        {
+                            if (TvStyles.ItemContainerGenerator.ContainerFromItem(item) is TreeViewItem treeViewItem)
+                            {
+                                treeViewItem.IsExpanded = true;
+                                treeViewItem.UpdateLayout();
+                                if (treeViewItem.ItemContainerGenerator.ContainerFromIndex(treeViewItem.Items.Count-1) is TreeViewItem tvi)
+                                    tvi.IsSelected = true;
+                                collapseIt = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (collapseIt && TvStyles.ItemContainerGenerator.ContainerFromItem(item) is TreeViewItem tvItem)
+                        tvItem.IsExpanded = false;
+                }
+            }
+        }
+        #endregion
     }
-    
+
     /// <summary>
     /// Класс, описывающий Стиль (группу стилей для каждого примитива) для использования в биндинге
     /// </summary>
