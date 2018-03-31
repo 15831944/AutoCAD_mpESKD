@@ -109,7 +109,8 @@ namespace mpESKD.LoadHelpers
                 Functions.mpAxis.AxisInterface.FullDescription,
                 GetHelpImageForFunction(Functions.mpAxis.AxisInterface.Name, Functions.mpAxis.AxisInterface.ToolTipHelpImage)
                 );
-            ribRowPanel.Items.Add(ribBtn);
+            if (ribBtn != null) ribRowPanel.Items.Add(ribBtn);
+
             #endregion
             if (ribRowPanel.Items.Any())
             {
@@ -149,8 +150,11 @@ namespace mpESKD.LoadHelpers
                 Functions.mpBreakLine.BreakLineInterface.FullDescription,
                 GetHelpImageForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.ToolTipHelpImage)
                 );
-            risSplitBtn.Items.Add(ribBtn);
-            risSplitBtn.Current = ribBtn;
+            if (ribBtn != null)
+            {
+                risSplitBtn.Items.Add(ribBtn);
+                risSplitBtn.Current = ribBtn;
+            }
             // Затем добавляем подфункции
             for (int i = 0; i < Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames.Count; i++)
             {

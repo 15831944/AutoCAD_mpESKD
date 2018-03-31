@@ -19,6 +19,7 @@ namespace mpESKD.Functions.mpAxis.Styles
         public AxisStyleProperties(string layerNameFromStyle)
         {
             InitializeComponent();
+            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
             ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(this.Resources, false);
             // markers positions
             CbMarkersPosition.ItemsSource = AxisPropertiesHelpers.AxisMarkersTypeLocalNames;
