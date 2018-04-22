@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\..\..\..\ModPlus\Functions\mpESKD\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ac2013</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -25,25 +25,25 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\..\..\..\ModPlus\Functions\mpESKD\</OutputPath>
-    <DefineConstants>TRACE;ac2013</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="accoremgd">
-      <HintPath>..\..\..\_Acad dlls\2016\accoremgd.dll</HintPath>
+      <HintPath>C:\_Acad dlls\2016\accoremgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>..\..\..\_Acad dlls\2016\acdbmgd.dll</HintPath>
+      <HintPath>C:\_Acad dlls\2016\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
-      <HintPath>..\..\..\_Acad dlls\2016\acmgd.dll</HintPath>
+      <HintPath>C:\_Acad dlls\2016\acmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AdWindows">
-      <HintPath>..\..\..\_Acad dlls\2016\AdWindows.dll</HintPath>
+      <HintPath>C:\_Acad dlls\2016\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro">
@@ -81,172 +81,172 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\mpESKD_2010\Base\Helpers\AcadHelpers.cs">
+    <Compile Include="..\mpESKD_2013\Base\Helpers\AcadHelpers.cs">
       <Link>Base\Helpers\AcadHelpers.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Helpers\LayerHelper.cs">
+    <Compile Include="..\mpESKD_2013\Base\Helpers\LayerHelper.cs">
       <Link>Base\Helpers\LayerHelper.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Helpers\TextStyleHelper.cs">
+    <Compile Include="..\mpESKD_2013\Base\Helpers\TextStyleHelper.cs">
       <Link>Base\Helpers\TextStyleHelper.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\MPCOEntity.cs">
+    <Compile Include="..\mpESKD_2013\Base\MPCOEntity.cs">
       <Link>Base\MPCOEntity.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Overrules\MPCOGrips.cs">
+    <Compile Include="..\mpESKD_2013\Base\Overrules\MPCOGrips.cs">
       <Link>Base\Overrules\MPCOGrips.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\BaseProperties.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\BaseProperties.cs">
       <Link>Base\Properties\BaseProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\BaseSummaryProperties.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\BaseSummaryProperties.cs">
       <Link>Base\Properties\BaseSummaryProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\Controls\ControlStyles.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\Controls\ControlStyles.xaml.cs">
       <Link>Base\Properties\Controls\ControlStyles.xaml.cs</Link>
       <DependentUpon>ControlStyles.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\Controls\ControlStylesForEditor.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\Controls\ControlStylesForEditor.xaml.cs">
       <Link>Base\Properties\Controls\ControlStylesForEditor.xaml.cs</Link>
       <DependentUpon>ControlStylesForEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\Controls\DoubleTextBox.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\Controls\DoubleTextBox.xaml.cs">
       <Link>Base\Properties\Controls\DoubleTextBox.xaml.cs</Link>
       <DependentUpon>DoubleTextBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\Controls\IntTextBox.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\Controls\IntTextBox.xaml.cs">
       <Link>Base\Properties\Controls\IntTextBox.xaml.cs</Link>
       <DependentUpon>IntTextBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\Converters\TextInputToVisibilityConverterForInt.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\Converters\TextInputToVisibilityConverterForInt.cs">
       <Link>Base\Properties\Converters\TextInputToVisibilityConverterForInt.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\Converters\ToTextConverter.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\Converters\ToTextConverter.cs">
       <Link>Base\Properties\Converters\ToTextConverter.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\Converters\ValidationRules.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\Converters\ValidationRules.cs">
       <Link>Base\Properties\Converters\ValidationRules.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\Converters\ValueConverters.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\Converters\ValueConverters.cs">
       <Link>Base\Properties\Converters\ValueConverters.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\PaletteSettings.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\PaletteSettings.xaml.cs">
       <Link>Base\Properties\PaletteSettings.xaml.cs</Link>
       <DependentUpon>PaletteSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\PropertiesHelpers.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\PropertiesHelpers.cs">
       <Link>Base\Properties\PropertiesHelpers.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Properties\PropertiesPalette.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Base\Properties\PropertiesPalette.xaml.cs">
       <Link>Base\Properties\PropertiesPalette.xaml.cs</Link>
       <DependentUpon>PropertiesPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Styles\BaseStyle.cs">
+    <Compile Include="..\mpESKD_2013\Base\Styles\BaseStyle.cs">
       <Link>Base\Styles\BaseStyle.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs">
+    <Compile Include="..\mpESKD_2013\Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs">
       <Link>Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Styles\Helpers.cs">
+    <Compile Include="..\mpESKD_2013\Base\Styles\Helpers.cs">
       <Link>Base\Styles\Helpers.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Base\Styles\StyleEditor.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Base\Styles\StyleEditor.xaml.cs">
       <Link>Base\Styles\StyleEditor.xaml.cs</Link>
       <DependentUpon>StyleEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Axis.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Axis.cs">
       <Link>Functions\mpAxis\Axis.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\AxisFunction.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisFunction.cs">
       <Link>Functions\mpAxis\AxisFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\AxisInterface.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisInterface.cs">
       <Link>Functions\mpAxis\AxisInterface.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\AxisJig.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisJig.cs">
       <Link>Functions\mpAxis\AxisJig.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\AxisValueEditor.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisValueEditor.xaml.cs">
       <Link>Functions\mpAxis\AxisValueEditor.xaml.cs</Link>
       <DependentUpon>AxisValueEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Overrules\AxisGripPointOverrule.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Overrules\AxisGripPointOverrule.cs">
       <Link>Functions\mpAxis\Overrules\AxisGripPointOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Overrules\AxisObjectOverrule.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Overrules\AxisObjectOverrule.cs">
       <Link>Functions\mpAxis\Overrules\AxisObjectOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Overrules\AxisOsnapOverrule.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Overrules\AxisOsnapOverrule.cs">
       <Link>Functions\mpAxis\Overrules\AxisOsnapOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisProperties.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisProperties.cs">
       <Link>Functions\mpAxis\Properties\AxisProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisPropertiesData.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisPropertiesData.cs">
       <Link>Functions\mpAxis\Properties\AxisPropertiesData.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs">
       <Link>Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs</Link>
       <DependentUpon>AxisPropertiesPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisSummaryProperties.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisSummaryProperties.cs">
       <Link>Functions\mpAxis\Properties\AxisSummaryProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Styles\AxisStyle.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Styles\AxisStyle.cs">
       <Link>Functions\mpAxis\Styles\AxisStyle.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpAxis\Styles\AxisStyleProperties.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Styles\AxisStyleProperties.xaml.cs">
       <Link>Functions\mpAxis\Styles\AxisStyleProperties.xaml.cs</Link>
       <DependentUpon>AxisStyleProperties.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\BreakLine.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLine.cs">
       <Link>Functions\mpBreakLine\BreakLine.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\BreakLineFunction.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineFunction.cs">
       <Link>Functions\mpBreakLine\BreakLineFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\BreakLineInterface.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineInterface.cs">
       <Link>Functions\mpBreakLine\BreakLineInterface.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\BreakLineJig.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineJig.cs">
       <Link>Functions\mpBreakLine\BreakLineJig.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLineProperties.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLineProperties.cs">
       <Link>Functions\mpBreakLine\Properties\BreakLineProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs">
       <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs">
       <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs</Link>
       <DependentUpon>BreakLinePropertiesPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs">
       <Link>Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Styles\BreakLineStyle.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Styles\BreakLineStyle.cs">
       <Link>Functions\mpBreakLine\Styles\BreakLineStyle.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml.cs">
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml.cs">
       <Link>Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml.cs</Link>
       <DependentUpon>BreakLineStyleProperties.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2010\LoadHelpers\RibbonBuilder.cs">
+    <Compile Include="..\mpESKD_2013\LoadHelpers\RibbonBuilder.cs">
       <Link>LoadHelpers\RibbonBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\MainFunction.cs">
+    <Compile Include="..\mpESKD_2013\MainFunction.cs">
       <Link>MainFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2010\MainSettings.cs">
+    <Compile Include="..\mpESKD_2013\MainSettings.cs">
       <Link>MainSettings.cs</Link>
     </Compile>
     <Compile Include="Interface.cs" />
@@ -258,111 +258,111 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\mpESKD_2010\Base\Properties\Controls\ControlStyles.xaml">
+    <Page Include="..\mpESKD_2013\Base\Properties\Controls\ControlStyles.xaml">
       <Link>Base\Properties\Controls\ControlStyles.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Base\Properties\Controls\ControlStylesForEditor.xaml">
+    <Page Include="..\mpESKD_2013\Base\Properties\Controls\ControlStylesForEditor.xaml">
       <Link>Base\Properties\Controls\ControlStylesForEditor.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Base\Properties\Controls\DoubleTextBox.xaml">
+    <Page Include="..\mpESKD_2013\Base\Properties\Controls\DoubleTextBox.xaml">
       <Link>Base\Properties\Controls\DoubleTextBox.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Base\Properties\Controls\IntTextBox.xaml">
+    <Page Include="..\mpESKD_2013\Base\Properties\Controls\IntTextBox.xaml">
       <Link>Base\Properties\Controls\IntTextBox.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Base\Properties\PaletteSettings.xaml">
+    <Page Include="..\mpESKD_2013\Base\Properties\PaletteSettings.xaml">
       <Link>Base\Properties\PaletteSettings.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Base\Properties\PropertiesPalette.xaml">
+    <Page Include="..\mpESKD_2013\Base\Properties\PropertiesPalette.xaml">
       <Link>Base\Properties\PropertiesPalette.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Base\Styles\StyleEditor.xaml">
+    <Page Include="..\mpESKD_2013\Base\Styles\StyleEditor.xaml">
       <Link>Base\Styles\StyleEditor.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Functions\mpAxis\AxisValueEditor.xaml">
+    <Page Include="..\mpESKD_2013\Functions\mpAxis\AxisValueEditor.xaml">
       <Link>Functions\mpAxis\AxisValueEditor.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml">
+    <Page Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml">
       <Link>Functions\mpAxis\Properties\AxisPropertiesPalette.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Functions\mpAxis\Styles\AxisStyleProperties.xaml">
+    <Page Include="..\mpESKD_2013\Functions\mpAxis\Styles\AxisStyleProperties.xaml">
       <Link>Functions\mpAxis\Styles\AxisStyleProperties.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml">
+    <Page Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml">
       <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2010\Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml">
+    <Page Include="..\mpESKD_2013\Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml">
       <Link>Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\mpESKD_2010\Functions\mpBreakLine\Help\Curvilinear.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Help\Curvilinear.png">
       <Link>Functions\mpBreakLine\Help\Curvilinear.png</Link>
     </Resource>
-    <Resource Include="..\mpESKD_2010\Functions\mpBreakLine\Help\Cylindrical.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Help\Cylindrical.png">
       <Link>Functions\mpBreakLine\Help\Cylindrical.png</Link>
     </Resource>
-    <Resource Include="..\mpESKD_2010\Functions\mpBreakLine\Help\Linear.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Help\Linear.png">
       <Link>Functions\mpBreakLine\Help\Linear.png</Link>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\mpESKD_2010\Functions\mpBreakLine\Icons\mpBreakLineCurve_16x16.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCurve_16x16.png">
       <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_16x16.png</Link>
     </Resource>
-    <Resource Include="..\mpESKD_2010\Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png">
       <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png</Link>
     </Resource>
-    <Resource Include="..\mpESKD_2010\Functions\mpBreakLine\Icons\mpBreakLineCylinder_16x16.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCylinder_16x16.png">
       <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_16x16.png</Link>
     </Resource>
-    <Resource Include="..\mpESKD_2010\Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png">
       <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png</Link>
     </Resource>
-    <Resource Include="..\mpESKD_2010\Functions\mpBreakLine\Icons\mpBreakLine_16x16.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLine_16x16.png">
       <Link>Functions\mpBreakLine\Icons\mpBreakLine_16x16.png</Link>
     </Resource>
-    <Resource Include="..\mpESKD_2010\Functions\mpBreakLine\Icons\mpBreakLine_32x32.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLine_32x32.png">
       <Link>Functions\mpBreakLine\Icons\mpBreakLine_32x32.png</Link>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\mpESKD_2010\Resources\mpESKD_32x32.png">
+    <Resource Include="..\mpESKD_2013\Resources\mpESKD_32x32.png">
       <Link>Resources\mpESKD_32x32.png</Link>
     </Resource>
-    <Resource Include="..\mpESKD_2010\Resources\Properties_32x32.png">
+    <Resource Include="..\mpESKD_2013\Resources\Properties_32x32.png">
       <Link>Resources\Properties_32x32.png</Link>
     </Resource>
-    <Resource Include="..\mpESKD_2010\Resources\StyleEditor_32x32.png">
+    <Resource Include="..\mpESKD_2013\Resources\StyleEditor_32x32.png">
       <Link>Resources\StyleEditor_32x32.png</Link>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\mpESKD_2010\Functions\mpAxis\Icons\mpAxis_32x32.png">
+    <Resource Include="..\mpESKD_2013\Functions\mpAxis\Icons\mpAxis_32x32.png">
       <Link>Functions\mpAxis\Icons\mpAxis_32x32.png</Link>
     </Resource>
   </ItemGroup>
