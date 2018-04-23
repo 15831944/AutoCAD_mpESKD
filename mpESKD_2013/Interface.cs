@@ -8,7 +8,7 @@ namespace mpESKD
     {
         public SupportedProduct SupportedProduct => SupportedProduct.AutoCAD;
         public string Name => "mpESKD";
-        public string AvailProductExternalVersion => "2010";
+        public string AvailProductExternalVersion => "2013";
         public string FullClassName => string.Empty;
         public string AppFullClassName => string.Empty;
         public Guid AddInId => Guid.Empty;
@@ -29,7 +29,7 @@ namespace mpESKD
     }
     public class MpVersionData
     {
-        public const string CurCadVers = "2010";
+        public const string CurCadVers = "2013";
         public const string CurCadInternalVersion = "18.0";
     }
 }
