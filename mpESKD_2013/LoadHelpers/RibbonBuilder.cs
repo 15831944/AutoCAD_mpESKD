@@ -19,8 +19,10 @@ namespace mpESKD.LoadHelpers
         {
             if (!IsLoaded())
             {
+                GetColorTheme();
                 CreateRibbon();
-                AcApp.SystemVariableChanged += acadApp_SystemVariableChanged;
+                AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
+                AcApp.SystemVariableChanged += AcadApp_SystemVariableChanged;
             }
         }
         private static bool IsLoaded()
@@ -30,11 +32,24 @@ namespace mpESKD.LoadHelpers
             var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
             foreach (var tab in ribCntrl.Tabs)
             {
-                if (tab.Id.Equals("ModPlus_ESKD") & tab.Title.Equals(tabName))
+                if (tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName))
+                {
                     loaded = true;
-                else loaded = false;
+                    break;
+                }
             }
             return loaded;
+        }
+        private static bool IsActive()
+        {
+            var ribCntrl = ComponentManager.Ribbon;
+            var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
+            foreach (var tab in ribCntrl.Tabs)
+            {
+                if (tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName))
+                    return tab.IsActive;
+            }
+            return false;
         }
         public static void RemoveRibbon()
         {
@@ -45,10 +60,10 @@ namespace mpESKD.LoadHelpers
                     var ribCntrl = ComponentManager.Ribbon;
                     var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
                     foreach (var tab in ribCntrl.Tabs.Where(
-                        tab => tab.Id.Equals("ModPlus_ESKD") & tab.Title.Equals(tabName)))
+                        tab => tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName)))
                     {
                         ribCntrl.Tabs.Remove(tab);
-                        AcApp.SystemVariableChanged -= acadApp_SystemVariableChanged;
+                        AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
                         break;
                     }
                 }
@@ -58,10 +73,29 @@ namespace mpESKD.LoadHelpers
                 ExceptionBox.Show(exception);
             }
         }
-        static void acadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
+        private static bool _wasActive = false;
+
+        private static void AcadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
         {
             if (e.Name.Equals("WSCURRENT")) BuildRibbon();
+            if (e.Name.Equals("COLORTHEME"))
+            {
+                _wasActive = IsActive();
+                RemoveRibbon();
+                BuildRibbon();
+            }
         }
+
+        private static int _colorTheme = 1;
+
+        private static void GetColorTheme()
+        {
+            var sv = AcApp.GetSystemVariable("COLORTHEME").ToString();
+            if (int.TryParse(sv, out int i))
+                _colorTheme = i;
+            else _colorTheme = 1; // light
+        }
+
         private static void CreateRibbon()
         {
             try
@@ -78,6 +112,8 @@ namespace mpESKD.LoadHelpers
                 AddSettingsPanel(ribTab);
                 ////////////////////////
                 ribCntrl.UpdateLayout();
+                if (_wasActive)
+                    ribTab.IsActive = true;
             }
             catch (Exception exception)
             {
@@ -189,14 +225,18 @@ namespace mpESKD.LoadHelpers
                 RibbonHelpers.AddBigButton(
                     "mpStyleEditor",
                     Language.GetItem(LangItem, "tab4"),
-                    "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32.png",
+                    _colorTheme == 1 // 1 - light
+                    ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32.png"
+                    : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32_dark.png",
                     Language.GetItem(LangItem, "tab5"), Orientation.Vertical, "", ""
                 ));
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpPropertiesPalette",
                     ConvertLName(Language.GetItem(LangItem, "tab6")),
-                    "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32.png",
+                    _colorTheme == 1 // 1 - light
+                    ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32.png"
+                    : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32_dark.png",
                     Language.GetItem(LangItem, "tab7"), Orientation.Vertical, "", ""
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
@@ -204,13 +244,19 @@ namespace mpESKD.LoadHelpers
 
         private static string GetBigIconForFunction(string functionName, string subFunctionName)
         {
-            return "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
-                   functionName + "/Icons/" + subFunctionName + "_32x32.png";
+            return _colorTheme == 1
+                ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
+                  functionName + "/Icons/" + subFunctionName + "_32x32.png"
+                : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
+                  functionName + "/Icons/" + subFunctionName + "_32x32_dark.png";
         }
         private static string GetSmallIconForFunction(string functionName, string subFunctionName)
         {
-            return "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
-                   functionName + "/Icons/" + subFunctionName + "_16x16.png";
+            return _colorTheme == 1
+                ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
+                   functionName + "/Icons/" + subFunctionName + "_16x16.png"
+                : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
+                  functionName + "/Icons/" + subFunctionName + "_16x16_dark.png";
         }
 
         private static string GetHelpImageForFunction(string functionName, string imgName)

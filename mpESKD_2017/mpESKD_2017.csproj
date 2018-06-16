@@ -331,26 +331,6 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCurve_16x16.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_16x16.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCylinder_16x16.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_16x16.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLine_16x16.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLine_16x16.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLine_32x32.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLine_32x32.png</Link>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="..\mpESKD_2013\Resources\mpESKD_32x32.png">
       <Link>Resources\mpESKD_32x32.png</Link>
     </Resource>
@@ -372,6 +352,37 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32_dark.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32_dark.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLine_32x32.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLine_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpAxis\Icons\mpAxis_32x32_dark.png">
+      <Link>Functions\mpAxis\Icons\mpAxis_32x32_dark.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Resources\Properties_32x32_dark.png">
+      <Link>Resources\Properties_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpESKD_2013\Resources\StyleEditor_32x32_dark.png">
+      <Link>Resources\StyleEditor_32x32_dark.png</Link>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -145,10 +145,7 @@ namespace mpESKD
             var curDir = Constants.CurrentDirectory;
             if (!string.IsNullOrEmpty(curDir))
             {
-                var mpcoPath = Path.Combine(curDir, "UserData");
-                if (!Directory.Exists(mpcoPath))
-                    Directory.CreateDirectory(mpcoPath);
-                var mpcoStylesPath = Path.Combine(mpcoPath, "Styles");
+                var mpcoStylesPath = Path.Combine(Constants.UserDataDirectory, "Styles");
                 if (!Directory.Exists(mpcoStylesPath))
                     Directory.CreateDirectory(mpcoStylesPath);
                 // set public parameter

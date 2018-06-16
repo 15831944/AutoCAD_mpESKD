@@ -216,14 +216,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_16x16.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_16x16.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_16x16.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Functions\mpBreakLine\Help\Curvilinear.png" />
     <Resource Include="Functions\mpBreakLine\Help\Cylindrical.png" />
     <Resource Include="Functions\mpBreakLine\Help\Linear.png" />
@@ -246,6 +238,19 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32_dark.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
+    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png" />
+    <Resource Include="Functions\mpAxis\Icons\mpAxis_32x32_dark.png" />
+    <Resource Include="Resources\Properties_32x32_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\StyleEditor_32x32_dark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
