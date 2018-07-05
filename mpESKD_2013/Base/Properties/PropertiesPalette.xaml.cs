@@ -81,8 +81,7 @@ namespace mpESKD.Base.Properties
                             if (obj is BlockReference)
                             {
                                 // mpBreakLine
-                                if (ExtendedDataHelpers.IsApplicable(obj,
-                                    Functions.mpBreakLine.BreakLineFunction.MPCOEntName, true))
+                                if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
                                 {
                                     if (!HasPropertyControl(Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
                                     {
@@ -95,8 +94,7 @@ namespace mpESKD.Base.Properties
                                     }
                                 }
                                 // mpAxis
-                                if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpAxis.AxisFunction.MPCOEntName,
-                                    true))
+                                if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpAxis.AxisFunction.MPCOEntName))
                                 {
                                     if (!HasPropertyControl(Functions.mpAxis.AxisFunction.MPCOEntName))
                                     {

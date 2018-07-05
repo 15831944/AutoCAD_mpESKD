@@ -94,73 +94,81 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         {
             try
             {
-                // Проходим по коллекции ручек
-                foreach (GripData gripData in grips)
+                if (IsApplicable(entity))
                 {
-                    // Приводим ручку к моему классу
-                    var gripPoint = gripData as BreakLineGrip;
-                    // Проверяем, что это та ручка, что мне нужна. 
-                    if (gripPoint != null)
+                    // Проходим по коллекции ручек
+                    foreach (GripData gripData in grips)
                     {
-                        // Далее, в зависимости от имени ручки произвожу действия
-                        if (gripPoint.GripName == BreakLineGripName.StartGrip)
+                        // Приводим ручку к моему классу
+                        var gripPoint = gripData as BreakLineGrip;
+                        // Проверяем, что это та ручка, что мне нужна. 
+                        if (gripPoint != null)
                         {
-                            // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
-                            // Все точки всегда совпадают (+ ручка)
-                            var newPt = gripPoint.GripPoint + offset;
-                            var length = gripPoint.BreakLine.EndPoint.DistanceTo(newPt);
-                            var scale = gripPoint.BreakLine.GetScale();
-                            if (length < gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale())
+                            // Далее, в зависимости от имени ручки произвожу действия
+                            if (gripPoint.GripName == BreakLineGripName.StartGrip)
                             {
-                                /* Если новая точка получается на расстоянии меньше минимального, то
-                                 * переносим ее в направлении между двумя точками на минимальное расстояние
-                                 */
-                                var tmpInsertionPoint = GeometryHelpers.Point3dAtDirection(
-                                    gripPoint.BreakLine.EndPoint, newPt, gripPoint.BreakLine.EndPoint,
-                                    gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale());
-
-                                if (gripPoint.BreakLine.EndPoint.Equals(newPt))
-                                {
-                                    // Если точки совпали, то задаем минимальное значение
-                                    tmpInsertionPoint = new Point3d(gripPoint.BreakLine.EndPoint.X + gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale(), gripPoint.BreakLine.EndPoint.Y, gripPoint.BreakLine.EndPoint.Z);
-                                }
-
-                                ((BlockReference)entity).Position = tmpInsertionPoint;
-                                gripPoint.BreakLine.InsertionPoint = tmpInsertionPoint;
-                            }
-                            else
-                            {
-                                ((BlockReference)entity).Position = gripPoint.GripPoint + offset;
-                                gripPoint.BreakLine.InsertionPoint = gripPoint.GripPoint + offset;
-                            }
-                        }
-                        if (gripPoint.GripName == BreakLineGripName.MiddleGrip)
-                        {
-                            // Т.к. средняя точка нужна для переноса примитива, но не соответсвует точки вставки блока
-                            // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
-                            // точку вставки
-                            var lenghtVector = (gripPoint.BreakLine.InsertionPoint - gripPoint.BreakLine.EndPoint) / 2;
-                            ((BlockReference)entity).Position = gripPoint.GripPoint + offset + lenghtVector;
-                        }
-                        if (gripPoint.GripName == BreakLineGripName.EndGrip)
-                        {
-                            var newPt = gripPoint.GripPoint + offset;
-                            if (newPt.Equals(((BlockReference)entity).Position))
-                            {
+                                // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
+                                // Все точки всегда совпадают (+ ручка)
+                                var newPt = gripPoint.GripPoint + offset;
+                                var length = gripPoint.BreakLine.EndPoint.DistanceTo(newPt);
                                 var scale = gripPoint.BreakLine.GetScale();
-                                gripPoint.BreakLine.EndPoint = new Point3d(
-                                    ((BlockReference)entity).Position.X + gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale(),
-                                    ((BlockReference)entity).Position.Y, ((BlockReference)entity).Position.Z);
+                                if (length < gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale())
+                                {
+                                    /* Если новая точка получается на расстоянии меньше минимального, то
+                                     * переносим ее в направлении между двумя точками на минимальное расстояние
+                                     */
+                                    var tmpInsertionPoint = GeometryHelpers.Point3dAtDirection(
+                                        gripPoint.BreakLine.EndPoint, newPt, gripPoint.BreakLine.EndPoint,
+                                        gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale());
+
+                                    if (gripPoint.BreakLine.EndPoint.Equals(newPt))
+                                    {
+                                        // Если точки совпали, то задаем минимальное значение
+                                        tmpInsertionPoint = new Point3d(gripPoint.BreakLine.EndPoint.X + gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale(),
+                                            gripPoint.BreakLine.EndPoint.Y, gripPoint.BreakLine.EndPoint.Z);
+                                    }
+
+                                    ((BlockReference)entity).Position = tmpInsertionPoint;
+                                    gripPoint.BreakLine.InsertionPoint = tmpInsertionPoint;
+                                }
+                                else
+                                {
+                                    ((BlockReference)entity).Position = gripPoint.GripPoint + offset;
+                                    gripPoint.BreakLine.InsertionPoint = gripPoint.GripPoint + offset;
+                                }
                             }
-                            // С конечной точкой все просто
-                            else gripPoint.BreakLine.EndPoint = gripPoint.GripPoint + offset;
+
+                            if (gripPoint.GripName == BreakLineGripName.MiddleGrip)
+                            {
+                                // Т.к. средняя точка нужна для переноса примитива, но не соответсвует точки вставки блока
+                                // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
+                                // точку вставки
+                                var lenghtVector = (gripPoint.BreakLine.InsertionPoint - gripPoint.BreakLine.EndPoint) / 2;
+                                ((BlockReference)entity).Position = gripPoint.GripPoint + offset + lenghtVector;
+                            }
+
+                            if (gripPoint.GripName == BreakLineGripName.EndGrip)
+                            {
+                                var newPt = gripPoint.GripPoint + offset;
+                                if (newPt.Equals(((BlockReference)entity).Position))
+                                {
+                                    var scale = gripPoint.BreakLine.GetScale();
+                                    gripPoint.BreakLine.EndPoint = new Point3d(
+                                        ((BlockReference)entity).Position.X + gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale(),
+                                        ((BlockReference)entity).Position.Y, ((BlockReference)entity).Position.Z);
+                                }
+                                // С конечной точкой все просто
+                                else gripPoint.BreakLine.EndPoint = gripPoint.GripPoint + offset;
+                            }
+
+                            // Вот тут происходит перерисовка примитивов внутри блока
+                            gripPoint.BreakLine.UpdateEntities();
+                            gripPoint.BreakLine.BlockRecord.UpdateAnonymousBlocks();
                         }
-                        // Вот тут происходит перерисовка примитивов внутри блока
-                        gripPoint.BreakLine.UpdateEntities();
-                        gripPoint.BreakLine.BlockRecord.UpdateAnonymousBlocks();
+                        else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
                     }
-                    else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
                 }
+                else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
             }
             catch (Exception exception)
             {

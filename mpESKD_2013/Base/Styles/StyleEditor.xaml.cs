@@ -336,10 +336,10 @@ namespace mpESKD.Base.Styles
                         if (obj is BlockReference blockReference)
                         {
                             // mpBreakLine
-                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineFunction.MPCOEntName, true))
+                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineFunction.MPCOEntName))
                                newStyleGuid = AddStyleFromBreakLine(blockReference);
                             // mpAxis
-                            if (ExtendedDataHelpers.IsApplicable(obj, AxisFunction.MPCOEntName, true))
+                            if (ExtendedDataHelpers.IsApplicable(obj, AxisFunction.MPCOEntName))
                                 newStyleGuid = AddStyleFromAxis(blockReference);
                         }
                     }

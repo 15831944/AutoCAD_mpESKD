@@ -66,7 +66,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                         var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference)
                         {
-                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineFunction.MPCOEntName, true))
+                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineFunction.MPCOEntName))
                             {
                                 objectIds.Add(selectedObject.ObjectId);
                             }

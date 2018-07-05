@@ -80,7 +80,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                         var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference)
                         {
-                            if (ExtendedDataHelpers.IsApplicable(obj, AxisFunction.MPCOEntName, true))
+                            if (ExtendedDataHelpers.IsApplicable(obj, AxisFunction.MPCOEntName))
                             {
                                 objectIds.Add(selectedObject.ObjectId);
                             }
