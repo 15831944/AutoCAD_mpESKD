@@ -7,7 +7,6 @@ namespace mpESKD.Base.Properties.Converters
 {
     public class IntToTextConverter : IValueConverter
     {
-        private const string LangItem = "mpESKD";
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             // Если целевой тип - строка
@@ -36,7 +35,7 @@ namespace mpESKD.Base.Properties.Converters
                 // Если значение пустое - исключение
                 if (string.IsNullOrEmpty((string)value))
                 {
-                    throw new ApplicationException(Language.GetItem(LangItem, "err3")); // Значение не может быть пустым!
+                    throw new ApplicationException(Language.GetItem(MainFunction.LangItem, "err3")); // Значение не может быть пустым!
                 }
                 // Иначе
                 else
@@ -52,7 +51,7 @@ namespace mpESKD.Base.Properties.Converters
                     // Иначе - исключение
                     else
                     {
-                        throw new ApplicationException(Language.GetItem(LangItem, "err4")); // Недопустимое значение! Введите число!
+                        throw new ApplicationException(Language.GetItem(MainFunction.LangItem, "err4")); // Недопустимое значение! Введите число!
                     }
                 }
             }

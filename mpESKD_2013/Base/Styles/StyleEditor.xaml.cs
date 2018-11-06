@@ -21,11 +21,10 @@ namespace mpESKD.Base.Styles
 {
     public partial class StyleEditor
     {
-        private const string LangItem = "mpESKD";
         public StyleEditor()
         {
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(LangItem, "tab4");
+            Title = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "tab4");
             Loaded += StyleEditor_OnLoaded;
             MouseLeftButtonDown += StyleEditor_OnMouseLeftButtonDown;
             PreviewKeyDown += StyleEditor_OnPreviewKeyDown;
@@ -176,7 +175,7 @@ namespace mpESKD.Base.Styles
             var selected = TvStyles.SelectedItem;
             if (selected == null) return;
             if (selected is MPCOStyleForEditor style && style.CanEdit)
-                if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(LangItem, "h69"), MessageBoxIcon.Question))
+                if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h69"), MessageBoxIcon.Question))
                 {
                     if (style.IsCurrent)
                     {
@@ -231,10 +230,10 @@ namespace mpESKD.Base.Styles
                     else
                     {
                         ModPlusAPI.Windows.MessageBox.Show(
-                            ModPlusAPI.Language.GetItem(LangItem, "h70") + " \"" + styleToBind.FunctionLocalName +
-                            "\" " + ModPlusAPI.Language.GetItem(LangItem, "h71") + " \"" + style.Name +
+                            ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h70") + " \"" + styleToBind.FunctionLocalName +
+                            "\" " + ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h71") + " \"" + style.Name +
                             "\"!" + Environment.NewLine +
-                            ModPlusAPI.Language.GetItem(LangItem, "h72"), MessageBoxIcon.Alert);
+                            ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h72"), MessageBoxIcon.Alert);
                         e.Cancel = true;
                         return;
                     }
@@ -321,7 +320,8 @@ namespace mpESKD.Base.Styles
             try
             {
                 Hide();
-                PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n" + ModPlusAPI.Language.GetItem(LangItem, "msg3"));
+                PromptEntityOptions promptEntityOptions =
+                    new PromptEntityOptions("\n" + ModPlusAPI.Language.GetItem(MainFunction.LangItem, "msg3"));
                 promptEntityOptions.SetRejectMessage("\nWrong entity");
                 promptEntityOptions.AllowNone = false;
                 promptEntityOptions.AddAllowedClass(typeof(BlockReference), true);

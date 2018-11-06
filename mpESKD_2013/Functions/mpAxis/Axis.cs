@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Colors;
-using Autodesk.AutoCAD.Geometry;
-using mpESKD.Base;
-using mpESKD.Base.Helpers;
-using mpESKD.Base.Styles;
-using mpESKD.Functions.mpAxis.Properties;
-using mpESKD.Functions.mpAxis.Styles;
-using ModPlus.Helpers;
-using ModPlusAPI.Windows;
-// ReSharper disable InconsistentNaming
-
-namespace mpESKD.Functions.mpAxis
+﻿namespace mpESKD.Functions.mpAxis
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Colors;
+    using Autodesk.AutoCAD.Geometry;
+    using Base;
+    using Base.Helpers;
+    using mpESKD.Base.Styles;
+    using Properties;
+    using Styles;
+    using ModPlus.Helpers;
+    using ModPlusAPI.Windows;
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class Axis : MPCOEntity
     {
         #region Constructors
@@ -34,7 +35,7 @@ namespace mpESKD.Functions.mpAxis
             };
             BlockRecord = blockTableRecord;
             StyleGuid = style.Guid;
-            // Применяем текущий стиль к СПДС примитиву
+            // Применяем текущий стиль к ЕСКД примитиву
             ApplyStyle(style);
             // last values
             LastHorizontalValue = lastHorizontalValue;
@@ -276,6 +277,7 @@ namespace mpESKD.Functions.mpAxis
         #endregion
 
         #region Entities
+        
         /// <summary>Установка свойств для примитивов, которые не меняются</summary>
         /// <param name="entity">Примитив автокада</param>
         private static void SetPropertiesToCadEntity(Entity entity)
@@ -285,6 +287,7 @@ namespace mpESKD.Functions.mpAxis
             entity.Linetype = "Continuous";
             entity.LinetypeScale = 1.0;
         }
+        
         /// <summary>Установка свойств для однострочного текста</summary>
         /// <param name="dbText"></param>
         private void SetPropertiesToDBText(DBText dbText)
@@ -298,6 +301,7 @@ namespace mpESKD.Functions.mpAxis
             dbText.TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
         }
         private readonly Lazy<Line> _mainLine = new Lazy<Line>(() => new Line());
+        
         /// <summary>Средняя (основная) линия оси</summary>
         public Line MainLine
         {
@@ -706,8 +710,9 @@ namespace mpESKD.Functions.mpAxis
                 yield return TopOrientLine;
             }
         }
-        /// <summary>Обновление (перерисовка) базовых примитивов</summary>
-        public void UpdateEntities()
+
+        /// <inheritdoc />
+        public override void UpdateEntities()
         {
             try
             {
@@ -716,17 +721,17 @@ namespace mpESKD.Functions.mpAxis
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки (т.е. второй точки еще нет)
-                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint);
+                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
                 else if (length < AxisMinLength * scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength);
+                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
                 }
                 else
                 {
                     // Задание второй точки
-                    SetEntitiesPoints(InsertionPointOCS, EndPointOCS, BottomMarkerPointOCS, TopMarkerPointOCS);
+                    SetEntitiesPoints(InsertionPointOCS, EndPointOCS, BottomMarkerPointOCS, TopMarkerPointOCS, scale);
                 }
                 UpdateTextEntities();
             }
@@ -735,13 +740,13 @@ namespace mpESKD.Functions.mpAxis
                 ExceptionBox.Show(exception);
             }
         }
+        
         /// <summary>
-        /// Построение "базового" простого варианта СПДС примитива
+        /// Построение "базового" простого варианта ЕСКД примитива
         /// Тот вид, который висит на мышке при создании и указании точки вставки
         /// </summary>
-        private void MakeSimplyEntity(UpdateVariant variant)
+        private void MakeSimplyEntity(UpdateVariant variant, double scale)
         {
-            var scale = GetScale();
             // Создание вершин полилинии
             if (variant == UpdateVariant.SetInsertionPoint)
             {
@@ -752,7 +757,7 @@ namespace mpESKD.Functions.mpAxis
                 var tmpBottomMarkerPoint = new Point3d(tmpEndPoint.X, tmpEndPoint.Y - Fracture * scale, tmpEndPoint.Z);
                 var tmpTopMarkerPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y + Fracture * scale, InsertionPointOCS.Z);
 
-                SetEntitiesPoints(InsertionPointOCS, tmpEndPoint, tmpBottomMarkerPoint, tmpTopMarkerPoint);
+                SetEntitiesPoints(InsertionPointOCS, tmpEndPoint, tmpBottomMarkerPoint, tmpTopMarkerPoint, scale);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) // изменение вершин полилинии
             {
@@ -760,15 +765,14 @@ namespace mpESKD.Functions.mpAxis
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
                 var tmpEndPoint = GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, AxisMinLength * scale);
-                SetEntitiesPoints(InsertionPointOCS, tmpEndPoint, BottomMarkerPointOCS, TopMarkerPointOCS);
+                SetEntitiesPoints(InsertionPointOCS, tmpEndPoint, BottomMarkerPointOCS, TopMarkerPointOCS, scale);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
         }
+        
         /// <summary>Изменение примитивов по точкам</summary>
-        private void SetEntitiesPoints(Point3d insertionPoint, Point3d endPoint,
-            Point3d bottomMarkerPoint, Point3d topMarkerPoint)
+        private void SetEntitiesPoints(Point3d insertionPoint, Point3d endPoint, Point3d bottomMarkerPoint, Point3d topMarkerPoint, double scale)
         {
-            var scale = GetScale();
             // main line
             _mainLine.Value.StartPoint = insertionPoint;
             _mainLine.Value.EndPoint = endPoint;
@@ -1297,7 +1301,7 @@ namespace mpESKD.Functions.mpAxis
         }
         #endregion
 
-        public ResultBuffer GetParametersForXData()
+        public override ResultBuffer GetParametersForXData()
         {
             try
             {
@@ -1355,7 +1359,7 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        public void GetParametersFromResBuf(ResultBuffer resBuf)
+        public override void GetParametersFromResBuf(ResultBuffer resBuf)
         {
             try
             {
@@ -1512,7 +1516,7 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        private enum UpdateVariant
+        internal enum UpdateVariant
         {
             SetInsertionPoint,
             SetEndPointMinLength
@@ -1540,7 +1544,7 @@ namespace mpESKD.Functions.mpAxis
                 return false;
             }
         }
-        /// <summary>Создание экземпляра СПДС примитива по данным блока</summary>
+        /// <summary>Создание экземпляра ЕСКД примитива по данным блока</summary>
         /// <param name="ent">блок (примитив автокада)</param>
         /// <returns></returns>
         public static Axis GetAxisFromEntity(Entity ent)

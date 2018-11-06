@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\ModPlus\Functions\mpESKD\</OutputPath>
+    <OutputPath>..\..\..\..\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\ModPlus\Functions\mpESKD\</OutputPath>
+    <OutputPath>..\..\..\..\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -89,6 +89,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Helpers\TextStyleHelper.cs">
       <Link>Base\Helpers\TextStyleHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\IMPCOEntityFunction.cs">
+      <Link>Base\IMPCOEntityFunction.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\MPCOEntity.cs">
       <Link>Base\MPCOEntity.cs</Link>
@@ -240,6 +243,18 @@
       <Link>Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml.cs</Link>
       <DependentUpon>BreakLineStyleProperties.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\GroundLine.cs">
+      <Link>Functions\mpGroundLine\GroundLine.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\GroundLineFunction.cs">
+      <Link>Functions\mpGroundLine\GroundLineFunction.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\GroundLineInterface.cs">
+      <Link>Functions\mpGroundLine\GroundLineInterface.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Styles\GroundLineStyle.cs">
+      <Link>Functions\mpGroundLine\Styles\GroundLineStyle.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\LoadHelpers\RibbonBuilder.cs">
       <Link>LoadHelpers\RibbonBuilder.cs</Link>
     </Compile>
@@ -248,6 +263,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\MainSettings.cs">
       <Link>MainSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Properties\AssemblyInfoCommon.cs">
+      <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
     <Compile Include="Interface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -383,6 +401,11 @@
     <Resource Include="..\mpESKD_2013\Resources\StyleEditor_32x32_dark.png">
       <Link>Resources\StyleEditor_32x32_dark.png</Link>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Functions\mpGroundLine\Icons\" />
+    <Folder Include="Functions\mpGroundLine\Overrules\" />
+    <Folder Include="Functions\mpGroundLine\Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

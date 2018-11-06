@@ -1,38 +1,40 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using mpESKD.Functions.mpBreakLine.Overrules;
-using mpESKD.Base.Helpers;
-using mpESKD.Base.Styles;
-using mpESKD.Functions.mpBreakLine.Properties;
-using mpESKD.Functions.mpBreakLine.Styles;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-
-namespace mpESKD.Functions.mpBreakLine
+﻿namespace mpESKD.Functions.mpBreakLine
 {
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static class BreakLineFunction
-    {
-        private const string LangItem = "mpESKD";
-        /// <summary>Имя примитива, помещаемое в XData</summary>
-        public const string MPCOEntName = "mpBreakLine";
-        /// <summary>Отображаемое имя примитива</summary>
-        public static string MPCOEntDisplayName = "Линия обрыва";
+    using System.Diagnostics.CodeAnalysis;
+    using Autodesk.AutoCAD.Runtime;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Base;
+    using Overrules;
+    using Base.Helpers;
+    using mpESKD.Base.Styles;
+    using Properties;
+    using Styles;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
 
-        public static void Initialize()
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public class BreakLineFunction : IMPCOEntityFunction
+    {
+        /// <summary>Имя примитива, помещаемое в XData</summary>
+        public static string MPCOEntName = BreakLineInterface.Name; // "mpBreakLine";
+        
+        /// <summary>Отображаемое имя примитива</summary>
+        public static string MPCOEntDisplayName = BreakLineInterface.LName; // "Линия обрыва";
+
+        public void Initialize()
         {
-            MPCOEntDisplayName = Language.GetItem(LangItem, "h48");
             // Включение работы переопределения ручек (нужна регенерация в конце метода (?))
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance(), true);
             Overrule.Overruling = true;
-            // создание файла хранения стилей, если отсутсвует
+
+            // создание файла хранения стилей, если отсутствует
             BreakLineStylesManager.CheckStylesFile();
         }
-        public static void Terminate()
+        public void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance());
@@ -65,7 +67,7 @@ namespace mpESKD.Functions.mpBreakLine
             try
             {
                 Overrule.Overruling = false;
-                /* Регистрация СПДС приложения должна запускаться при запуске
+                /* Регистрация ЕСКД приложения должна запускаться при запуске
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
@@ -78,7 +80,8 @@ namespace mpESKD.Functions.mpBreakLine
                 {
                     BreakLineType = breakLineType
                 };
-                var blockReference = CreateBreakLineBlock(ref breakLine);
+                var blockReference = MainFunction.CreateBlock(breakLine);
+                
                 // set layer
                 AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
 
@@ -141,32 +144,6 @@ namespace mpESKD.Functions.mpBreakLine
             {
                 Overrule.Overruling = true;
             }
-        }
-        private static BlockReference CreateBreakLineBlock(ref BreakLine breakLine)
-        {
-            BlockReference blockReference;
-            using (AcadHelpers.Document.LockDocument())
-            {
-                ObjectId objectId;
-                using (var transaction = AcadHelpers.Document.TransactionManager.StartTransaction())
-                {
-                    using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
-                    {
-                        var blockTableRecordObjectId = blockTable.Add(breakLine.BlockRecord);
-                        blockReference = new BlockReference(breakLine.InsertionPoint, blockTableRecordObjectId);
-                        using (var blockTableRecord = AcadHelpers.Database.CurrentSpaceId.Write<BlockTableRecord>())
-                        {
-                            blockTableRecord.BlockScaling = BlockScaling.Uniform;
-                            objectId = blockTableRecord.AppendEntity(blockReference);
-                        }
-                        transaction.AddNewlyCreatedDBObject(blockReference, true);
-                        transaction.AddNewlyCreatedDBObject(breakLine.BlockRecord, true);
-                    }
-                    transaction.Commit();
-                }
-                breakLine.BlockId = objectId;
-            }
-            return blockReference;
         }
     }
 

@@ -189,7 +189,6 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
     /// <summary>Описание ручки линии обрыва</summary>
     public class BreakLineGrip : MPCOGrips.MPCOGripData //<-- Там будут определны типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
     {
-        private const string LangItem = "mpESKD";
         public BreakLineGrip()
         {
             // отключение контекстного меню и возможности менять команду
@@ -208,9 +207,9 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                 case BreakLineGripName.StartGrip:
                 case BreakLineGripName.EndGrip:
                     {
-                        return Language.GetItem(LangItem, "gp1"); // stretch
+                        return Language.GetItem(MainFunction.LangItem, "gp1"); // stretch
                     }
-                case BreakLineGripName.MiddleGrip: return Language.GetItem(LangItem, "gp2"); // move
+                case BreakLineGripName.MiddleGrip: return Language.GetItem(MainFunction.LangItem, "gp2"); // move
             }
             return base.GetTooltip();
         }

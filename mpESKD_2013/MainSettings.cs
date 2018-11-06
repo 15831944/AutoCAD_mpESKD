@@ -1,9 +1,9 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using ModPlusAPI;
-
-namespace mpESKD
+﻿namespace mpESKD
 {
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
+    using ModPlusAPI;
+
     public class MainSettings : INotifyPropertyChanged
     {
         #region Main

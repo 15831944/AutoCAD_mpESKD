@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\ModPlus\Functions\mpESKD\</OutputPath>
+    <OutputPath>..\..\..\..\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,7 +24,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\ModPlus\Functions\mpESKD\</OutputPath>
+    <OutputPath>..\..\..\..\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -90,6 +90,9 @@
     <Compile Include="..\mpESKD_2013\Base\Helpers\TextStyleHelper.cs">
       <Link>Base\Helpers\TextStyleHelper.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\IMPCOEntityFunction.cs">
+      <Link>Base\IMPCOEntityFunction.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\MPCOEntity.cs">
       <Link>Base\MPCOEntity.cs</Link>
     </Compile>
@@ -154,91 +157,103 @@
       <Link>Base\Styles\StyleEditor.xaml.cs</Link>
       <DependentUpon>StyleEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Axis.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\Axis.cs">
       <Link>Functions\mpAxis\Axis.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisFunction.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\AxisFunction.cs">
       <Link>Functions\mpAxis\AxisFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisInterface.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\AxisInterface.cs">
       <Link>Functions\mpAxis\AxisInterface.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisJig.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\AxisJig.cs">
       <Link>Functions\mpAxis\AxisJig.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisValueEditor.xaml.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\AxisValueEditor.xaml.cs">
       <Link>Functions\mpAxis\AxisValueEditor.xaml.cs</Link>
       <DependentUpon>AxisValueEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Overrules\AxisGripPointOverrule.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\overrules\AxisGripPointOverrule.cs">
       <Link>Functions\mpAxis\Overrules\AxisGripPointOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Overrules\AxisObjectOverrule.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\overrules\AxisObjectOverrule.cs">
       <Link>Functions\mpAxis\Overrules\AxisObjectOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Overrules\AxisOsnapOverrule.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\overrules\AxisOsnapOverrule.cs">
       <Link>Functions\mpAxis\Overrules\AxisOsnapOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisProperties.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\properties\AxisProperties.cs">
       <Link>Functions\mpAxis\Properties\AxisProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisPropertiesData.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\properties\AxisPropertiesData.cs">
       <Link>Functions\mpAxis\Properties\AxisPropertiesData.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\properties\AxisPropertiesPalette.xaml.cs">
       <Link>Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs</Link>
       <DependentUpon>AxisPropertiesPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisSummaryProperties.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\properties\AxisSummaryProperties.cs">
       <Link>Functions\mpAxis\Properties\AxisSummaryProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Styles\AxisStyle.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\styles\AxisStyle.cs">
       <Link>Functions\mpAxis\Styles\AxisStyle.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Styles\AxisStyleProperties.xaml.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\styles\AxisStyleProperties.xaml.cs">
       <Link>Functions\mpAxis\Styles\AxisStyleProperties.xaml.cs</Link>
       <DependentUpon>AxisStyleProperties.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLine.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\BreakLine.cs">
       <Link>Functions\mpBreakLine\BreakLine.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineFunction.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\BreakLineFunction.cs">
       <Link>Functions\mpBreakLine\BreakLineFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineInterface.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\BreakLineInterface.cs">
       <Link>Functions\mpBreakLine\BreakLineInterface.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineJig.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\BreakLineJig.cs">
       <Link>Functions\mpBreakLine\BreakLineJig.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\overrules\BreakLineGripPointOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\overrules\BreakLineObjectOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\overrules\BreakLineOsnapOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLineProperties.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\properties\BreakLineProperties.cs">
       <Link>Functions\mpBreakLine\Properties\BreakLineProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\properties\BreakLinePropertiesData.cs">
       <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\properties\BreakLinePropertiesPalette.xaml.cs">
       <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs</Link>
       <DependentUpon>BreakLinePropertiesPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\properties\BreakLineSummaryProperties.cs">
       <Link>Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Styles\BreakLineStyle.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\styles\BreakLineStyle.cs">
       <Link>Functions\mpBreakLine\Styles\BreakLineStyle.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\styles\BreakLineStyleProperties.xaml.cs">
       <Link>Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml.cs</Link>
       <DependentUpon>BreakLineStyleProperties.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLine.cs">
+      <Link>Functions\mpGroundLine\GroundLine.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLineFunction.cs">
+      <Link>Functions\mpGroundLine\GroundLineFunction.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLineInterface.cs">
+      <Link>Functions\mpGroundLine\GroundLineInterface.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Styles\GroundLineStyle.cs">
+      <Link>Functions\mpGroundLine\Styles\GroundLineStyle.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\LoadHelpers\RibbonBuilder.cs">
       <Link>LoadHelpers\RibbonBuilder.cs</Link>
@@ -248,6 +263,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\MainSettings.cs">
       <Link>MainSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Properties\AssemblyInfoCommon.cs">
+      <Link>Properties\AssemblyInfoCommon.cs</Link>
     </Compile>
     <Compile Include="Interface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -293,42 +311,31 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2013\Functions\mpAxis\AxisValueEditor.xaml">
+    <Page Include="..\mpeskd_2013\functions\mpaxis\AxisValueEditor.xaml">
       <Link>Functions\mpAxis\AxisValueEditor.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml">
+    <Page Include="..\mpeskd_2013\functions\mpaxis\properties\AxisPropertiesPalette.xaml">
       <Link>Functions\mpAxis\Properties\AxisPropertiesPalette.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2013\Functions\mpAxis\Styles\AxisStyleProperties.xaml">
+    <Page Include="..\mpeskd_2013\functions\mpaxis\styles\AxisStyleProperties.xaml">
       <Link>Functions\mpAxis\Styles\AxisStyleProperties.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml">
+    <Page Include="..\mpeskd_2013\functions\mpbreakline\properties\BreakLinePropertiesPalette.xaml">
       <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2013\Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml">
+    <Page Include="..\mpeskd_2013\functions\mpbreakline\styles\BreakLineStyleProperties.xaml">
       <Link>Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Help\Curvilinear.png">
-      <Link>Functions\mpBreakLine\Help\Curvilinear.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Help\Cylindrical.png">
-      <Link>Functions\mpBreakLine\Help\Cylindrical.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Help\Linear.png">
-      <Link>Functions\mpBreakLine\Help\Linear.png</Link>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="..\mpESKD_2013\Resources\mpESKD_32x32.png">
@@ -342,11 +349,6 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\mpESKD_2013\Functions\mpAxis\Icons\mpAxis_32x32.png">
-      <Link>Functions\mpAxis\Icons\mpAxis_32x32.png</Link>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -354,27 +356,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32_dark.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32_dark.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLine_32x32.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLine_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png">
-      <Link>Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpAxis\Icons\mpAxis_32x32_dark.png">
-      <Link>Functions\mpAxis\Icons\mpAxis_32x32_dark.png</Link>
-    </Resource>
     <Resource Include="..\mpESKD_2013\Resources\Properties_32x32_dark.png">
       <Link>Resources\Properties_32x32_dark.png</Link>
     </Resource>
@@ -383,6 +364,66 @@
     <Resource Include="..\mpESKD_2013\Resources\StyleEditor_32x32_dark.png">
       <Link>Resources\StyleEditor_32x32_dark.png</Link>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpaxis\icons\mpAxis_32x32.png">
+      <Link>Functions\mpAxis\Icons\mpAxis_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpaxis\icons\mpAxis_32x32_dark.png">
+      <Link>Functions\mpAxis\Icons\mpAxis_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpbreakline\help\Curvilinear.png">
+      <Link>Functions\mpBreakLine\Help\Curvilinear.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpbreakline\help\Cylindrical.png">
+      <Link>Functions\mpBreakLine\Help\Cylindrical.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpbreakline\help\Linear.png">
+      <Link>Functions\mpBreakLine\Help\Linear.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpbreakline\icons\mpBreakLine_32x32.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLine_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpbreakline\icons\mpBreakLine_32x32_dark.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpbreakline\icons\mpBreakLineCurve_32x32.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpbreakline\icons\mpBreakLineCurve_32x32_dark.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpbreakline\icons\mpBreakLineCylinder_32x32.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpbreakline\icons\mpBreakLineCylinder_32x32_dark.png">
+      <Link>Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Functions\mpGroundLine\Icons\" />
+    <Folder Include="Functions\mpGroundLine\Overrules\" />
+    <Folder Include="Functions\mpGroundLine\Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

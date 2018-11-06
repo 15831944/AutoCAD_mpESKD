@@ -25,7 +25,6 @@ namespace mpESKD.Base.Styles
     /// <summary>Базовый класс презентора стиля для работы в редакторе стилей</summary>
     public class MPCOStyleForEditor : INotifyPropertyChanged
     {
-        private const string LangItem = "mpESKD";
         /// <summary>Базовый конструктор</summary>
         /// <param name="style"></param>
         /// <param name="currentStyleGuid"></param>
@@ -36,7 +35,7 @@ namespace mpESKD.Base.Styles
             if (style.StyleType == MPCOStyleType.System)
             {
                 CanEdit = false;
-                Name = style.Name + " (" + Language.GetItem(LangItem, "h12") + ")"; // Системный
+                Name = style.Name + " (" + Language.GetItem(MainFunction.LangItem, "h12") + ")"; // Системный
             }
             else
             {
@@ -52,7 +51,7 @@ namespace mpESKD.Base.Styles
         public MPCOStyleForEditor(StyleToBind parent)
         {
             Parent = parent;
-            Name = Language.GetItem(LangItem, "h13"); // Новый пользовательский стиль
+            Name = Language.GetItem(MainFunction.LangItem, "h13"); // Новый пользовательский стиль
             Description = string.Empty;
             FunctionName = parent.FunctionLocalName;
             CanEdit = true;

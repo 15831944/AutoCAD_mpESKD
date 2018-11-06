@@ -1,36 +1,37 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Runtime;
-using mpESKD.Base.Helpers;
-using mpESKD.Functions.mpAxis.Properties;
-using mpESKD.Functions.mpAxis.Styles;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-using mpESKD.Base.Styles;
-using mpESKD.Functions.mpAxis.Overrules;
-
-namespace mpESKD.Functions.mpAxis
+﻿namespace mpESKD.Functions.mpAxis
 {
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static class AxisFunction
-    {
-        private const string LangItem = "mpESKD";
-        /// <summary>Имя примитива, помещаемое в XData</summary>
-        public const string MPCOEntName = "mpAxis";
-        /// <summary>Отображаемое имя примитива</summary>
-        public static string MPCOEntDisplayName = "Прямая ось";
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Runtime;
+    using Base;
+    using Base.Helpers;
+    using Properties;
+    using Styles;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+    using mpESKD.Base.Styles;
+    using Overrules;
 
-        public static void Initialize()
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public class AxisFunction : IMPCOEntityFunction
+    {
+        /// <summary>Имя примитива, помещаемое в XData</summary>
+        public static string MPCOEntName = AxisInterface.Name; // "mpAxis";
+        
+        /// <summary>Отображаемое имя примитива</summary>
+        public static string MPCOEntDisplayName = AxisInterface.LName; // "Прямая ось".;
+
+        public void Initialize()
         {
-            MPCOEntDisplayName = Language.GetItem(LangItem, "h41");
             // Включение работы переопределения ручек (нужна регенерация в конце метода (?))
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance(), true);
             Overrule.Overruling = true;
-            //// создание файла хранения стилей, если отсутсвует
+
+            //// создание файла хранения стилей, если отсутствует
             AxisStyleManager.CheckStylesFile();
         }
 
@@ -48,7 +49,7 @@ namespace mpESKD.Functions.mpAxis
             }
             else
             {
-                MessageBox.Show(Language.GetItem(LangItem, "msg4"));
+                MessageBox.Show(Language.GetItem(MainFunction.LangItem, "msg4"));
                 //var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
                 //AcadHelpers.WriteMessageInDebug("\nLocation:");
 
@@ -103,17 +104,19 @@ namespace mpESKD.Functions.mpAxis
             axis.Dispose();
         }
 
-        public static void Terminate()
+        public void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance());
         }
+
         public static List<string> AxisRusAlphabet = new List<string>
         {
             "А","Б","В","Г","Д","Е","Ж","И","К","Л","М","Н","П","Р","С","Т","У","Ф","Ш","Э","Ю","Я",
             "АА","ББ","ВВ","ГГ","ДД","ЕЕ","ЖЖ","ИИ","КК","ЛЛ","ММ","НН","ПП","РР","СС","ТТ","УУ","ФФ","ШШ","ЭЭ","ЮЮ","ЯЯ"
         };
+
         /// <summary>Создание текстового стиля из стиля оси, согласно настройкам плагина</summary>
         public static void CreateTextStyleFromStyle(AxisStyle style)
         {
@@ -145,13 +148,16 @@ namespace mpESKD.Functions.mpAxis
             try
             {
                 Overrule.Overruling = false;
-                /* Регистрация СПДС приложения должна запускаться при запуске
+                
+                /* Регистрация ЕСКД приложения должна запускаться при запуске
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(AxisFunction.MPCOEntName);
+                
                 // add layer from style
                 var style = AxisStyleManager.GetCurrentStyle();
+                
                 // создание текстового стиля в документе нужно произвести до создания примитива
                 AxisFunction.CreateTextStyleFromStyle(style);
                 var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name,
@@ -164,9 +170,11 @@ namespace mpESKD.Functions.mpAxis
                     axisLastVerticalValue = ModPlus.Helpers.XDataHelpers.GetStringXData("AxisLastValueForVertical");
                 }
                 var axis = new Axis(style, axisLastHorizontalValue, axisLastVerticalValue);
-                var blockReference = CreateAxisBlock(ref axis);
+                var blockReference = MainFunction.CreateBlock(axis);
+                
                 // set layer
                 AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
+                
                 // set linetype
                 var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name,
                     AxisProperties.LineType.DefaultValue);
@@ -239,33 +247,6 @@ namespace mpESKD.Functions.mpAxis
             {
                 Overrule.Overruling = true;
             }
-        }
-
-        private static BlockReference CreateAxisBlock(ref Axis axis)
-        {
-            BlockReference blockReference;
-            using (AcadHelpers.Document.LockDocument())
-            {
-                ObjectId objectId;
-                using (var transaction = AcadHelpers.Document.TransactionManager.StartTransaction())
-                {
-                    using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
-                    {
-                        var blockTableRecordObjectId = blockTable.Add(axis.BlockRecord);
-                        blockReference = new BlockReference(axis.InsertionPoint, blockTableRecordObjectId);
-                        using (var blockTableRecord = AcadHelpers.Database.CurrentSpaceId.Write<BlockTableRecord>())
-                        {
-                            blockTableRecord.BlockScaling = BlockScaling.Uniform;
-                            objectId = blockTableRecord.AppendEntity(blockReference);
-                        }
-                        transaction.AddNewlyCreatedDBObject(blockReference, true);
-                        transaction.AddNewlyCreatedDBObject(axis.BlockRecord, true);
-                    }
-                    transaction.Commit();
-                }
-                axis.BlockId = objectId;
-            }
-            return blockReference;
         }
     }
 }

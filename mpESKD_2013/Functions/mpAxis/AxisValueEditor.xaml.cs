@@ -6,13 +6,12 @@ namespace mpESKD.Functions.mpAxis
 {
     public partial class AxisValueEditor
     {
-        private const string LangItem = "mpESKD";
         public Axis Axis;
 
         public AxisValueEditor()
         {
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(LangItem, "h67");
+            Title = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h67");
             // markers positions
             CbMarkersPosition.ItemsSource = AxisPropertiesHelpers.AxisMarkersTypeLocalNames;
         }

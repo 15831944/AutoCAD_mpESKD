@@ -1,24 +1,30 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.IO;
-using System.Reflection;
-using System.Windows.Forms;
-using System.Windows.Forms.Integration;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.Windows;
-using mpESKD.Base.Helpers;
-using mpESKD.Base.Properties;
-using ModPlus;
-using ModPlusAPI;
-
-namespace mpESKD
+﻿namespace mpESKD
 {
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Reflection;
+    using System.Windows.Forms;
+    using System.Windows.Forms.Integration;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.Runtime;
+    using Autodesk.AutoCAD.Windows;
+    using Base;
+    using Base.Helpers;
+    using Functions.mpAxis;
+    using Functions.mpBreakLine;
+    using Functions.mpGroundLine;
+    using mpESKD.Base.Properties;
+    using ModPlus;
+    using ModPlusAPI;
+
     public class MainFunction : IExtensionApplication
     {
-        private const string LangItem = "mpESKD";
+        public static string LangItem = "mpESKD";
+        
         #region Properties palette
 
         public static void AddToMpPalette(bool show)
@@ -96,19 +102,25 @@ namespace mpESKD
         }
         #endregion
 
+        private List<IMPCOEntityFunction> _functions;
+
         public void Initialize()
         {
             StartUpInitialize();
+
+            _functions = GetFunctions();
+            
             // Functions Init
-            Functions.mpBreakLine.BreakLineFunction.Initialize();
-            Functions.mpAxis.AxisFunction.Initialize();
+            _functions.ForEach(f => f.Initialize());
+
             // ribbon build for
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
+            
             // palette
-            var loadPropertiesPalette = bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings,
-                                        "mpESKD", "AutoLoad"), out bool b) & b;
-            var addPropertiesPaletteToMpPalette = bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings,
-                                                  "mpESKD", "AddToMpPalette"), out b) & b;
+            var loadPropertiesPalette = 
+                bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "AutoLoad"), out var b) & b;
+            var addPropertiesPaletteToMpPalette =
+                bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "AddToMpPalette"), out b) & b;
             if (loadPropertiesPalette & !addPropertiesPaletteToMpPalette)
             {
                 PropertiesFunction.Start();
@@ -124,7 +136,17 @@ namespace mpESKD
 
         public void Terminate()
         {
-            Functions.mpBreakLine.BreakLineFunction.Terminate();
+            _functions.ForEach(f => f.Terminate());
+        }
+
+        private List<IMPCOEntityFunction> GetFunctions()
+        {
+            return new List<IMPCOEntityFunction>
+            {
+                new AxisFunction(),
+                new BreakLineFunction(),
+                new GroundLineFunction()
+            };
         }
 
         private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
@@ -133,6 +155,7 @@ namespace mpESKD
             //may not be available yet, so check if before
             if (Autodesk.Windows.ComponentManager.Ribbon == null) return;
             LoadHelpers.RibbonBuilder.BuildRibbon();
+            
             //and remove the event handler
             Autodesk.Windows.ComponentManager.ItemInitialized -= ComponentManager_ItemInitialized;
         }
@@ -178,10 +201,10 @@ namespace mpESKD
                     {
                         var obj = tr.GetObject(ids[0], OpenMode.ForWrite);
                         // if axis
-                        if (obj is BlockReference blockReference && ExtendedDataHelpers.IsMPCOentity(blockReference, Functions.mpAxis.AxisFunction.MPCOEntName))
+                        if (obj is BlockReference blockReference && ExtendedDataHelpers.IsMPCOentity(blockReference, AxisFunction.MPCOEntName))
                         {
                             BeditCommandWatcher.UseBedit = false;
-                            Functions.mpAxis.AxisFunction.DoubleClickEdit(blockReference, location, tr);
+                            AxisFunction.DoubleClickEdit(blockReference, location, tr);
                         }
                         else BeditCommandWatcher.UseBedit = true;
                         tr.Commit();
@@ -189,7 +212,35 @@ namespace mpESKD
                 }
             }
         }
+
+        public static BlockReference CreateBlock(MPCOEntity mpcoEntity)
+        {
+            BlockReference blockReference;
+            using (AcadHelpers.Document.LockDocument())
+            {
+                ObjectId objectId;
+                using (var transaction = AcadHelpers.Document.TransactionManager.StartTransaction())
+                {
+                    using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
+                    {
+                        var blockTableRecordObjectId = blockTable.Add(mpcoEntity.BlockRecord);
+                        blockReference = new BlockReference(mpcoEntity.InsertionPoint, blockTableRecordObjectId);
+                        using (var blockTableRecord = AcadHelpers.Database.CurrentSpaceId.Write<BlockTableRecord>())
+                        {
+                            blockTableRecord.BlockScaling = BlockScaling.Uniform;
+                            objectId = blockTableRecord.AppendEntity(blockReference);
+                        }
+                        transaction.AddNewlyCreatedDBObject(blockReference, true);
+                        transaction.AddNewlyCreatedDBObject(mpcoEntity.BlockRecord, true);
+                    }
+                    transaction.Commit();
+                }
+                mpcoEntity.BlockId = objectId;
+            }
+            return blockReference;
+        }
     }
+
     /// <summary>Слежение за командой "редактор блоков" автокада</summary>
     public class BeditCommandWatcher
     {

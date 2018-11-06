@@ -17,7 +17,6 @@ namespace mpESKD.Functions.mpAxis.Properties
 {
     public partial class AxisPropertiesPalette
     {
-        private const string LangItem = "mpESKD";
         private readonly PropertiesPalette _parentPalette;
 
         public AxisPropertiesPalette(PropertiesPalette palette)
@@ -43,8 +42,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             // marker types
             var markerTypes = new List<string>
             {
-                ModPlusAPI.Language.GetItem(LangItem, "type1"), // "Тип 1",
-                ModPlusAPI.Language.GetItem(LangItem, "type2") //"Тип 2"
+                ModPlusAPI.Language.GetItem(MainFunction.LangItem, "type1"), // "Тип 1",
+                ModPlusAPI.Language.GetItem(MainFunction.LangItem, "type2") //"Тип 2"
             };
             CbFirstMarkerType.ItemsSource = markerTypes;
             CbSecondMarkerType.ItemsSource = markerTypes;
@@ -105,7 +104,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             if (!(sender is FrameworkElement fe)) return;
             if (fe.Name.Equals("CbStyle"))
-                _parentPalette.ShowDescription(ModPlusAPI.Language.GetItem(LangItem, "h52")); // "Стиль интеллектуального примитива"
+                _parentPalette.ShowDescription(ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h52")); // "Стиль интеллектуального примитива"
             if (fe.Name.Equals("TbMarkersCount"))
                 _parentPalette.ShowDescription(AxisProperties.MarkersCount.Description);
             if (fe.Name.Equals("TbMarkersDiameter"))

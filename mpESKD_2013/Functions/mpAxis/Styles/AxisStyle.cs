@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using mpESKD.Base.Helpers;
-using mpESKD.Base.Properties;
-using mpESKD.Base.Styles;
-using mpESKD.Functions.mpAxis.Properties;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-
-namespace mpESKD.Functions.mpAxis.Styles
+﻿namespace mpESKD.Functions.mpAxis.Styles
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Xml.Linq;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Base.Helpers;
+    using mpESKD.Base.Properties;
+    using mpESKD.Base.Styles;
+    using Properties;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+
     public class AxisStyle : IMPCOStyle
     {
         public AxisStyle()
@@ -92,39 +92,60 @@ namespace mpESKD.Functions.mpAxis.Styles
             LayerName = AxisProperties.LayerName.DefaultValue;
             Scale = AxisProperties.Scale.DefaultValue;
         }
+
         #region Properties
+        
         // Позиция маркеров
         public AxisMarkersPosition MarkersPosition { get; set; }
+        
         // Диаметр маркеров
         public int MarkersDiameter { get; set; }
+        
         // Количество маркеров
         public int MarkersCount { get; set; }
+        
         // Типы маркеров
         public int FirstMarkerType { get; set; }
+        
         public int SecondMarkerType { get; set; }
+        
         public int ThirdMarkerType { get; set; }
+        
         public int OrientMarkerType { get; set; }
+        
         // Излом
         public int Fracture { get; set; }
+        
         // Отступы излома
         public int BottomFractureOffset { get; set; }
+        
         public int TopFractureOffset { get; set; }
+        
         // Arrow size
         public int ArrowsSize { get; set; }
+        
         // Text
         public string TextStyle { get; set; }
+        
         public double TextHeight { get; set; }
+        
         // Стандартные
+        
         public double LineTypeScale { get; set; }
+        
         public string LineType { get; set; }
+        
         public string LayerName { get; set; }
+        
         public AnnotationScale Scale { get; set; }
+        
         #endregion
+        
         public XElement TextStyleXmlData { get; set; }
     }
+    
     public class AxisStyleManager
     {
-        private const string LangItem = "mpESKD";
         private const string StylesFileName = "AxisStyles.xml";
         private static string _currentStyleGuid;
         /// <summary>Guid текущего стиля</summary>
@@ -149,8 +170,10 @@ namespace mpESKD.Functions.mpAxis.Styles
                 UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpAxis", "CurrentStyleGuid", value, true);
             }
         }
+        
         /// <summary>Коллекция стилей</summary>
         public static List<AxisStyle> Styles = new List<AxisStyle>();
+        
         /// <summary>Проверка и создание в случае необходимости файла стилей</summary>
         public static void CheckStylesFile()
         {
@@ -176,6 +199,7 @@ namespace mpESKD.Functions.mpAxis.Styles
                 fXel.Save(stylesFile);
             }
         }
+        
         /// <summary>Получение стиля из коллекции по его идентификатору или первого системного стиля, если не найден
         /// В случае, если коллекция пустая, то происходит ее загрузка (с созданием, если нужно)</summary>
         /// <returns></returns>
@@ -198,8 +222,9 @@ namespace mpESKD.Functions.mpAxis.Styles
                 return CreateSystemStyles().FirstOrDefault();
             }
         }
+        
         /// <summary>Загрузка (десериализация) стилей из xml-файла
-        /// В случае отсутсвия файла - создание коллекции с одним системным стилем и ее сохранение в xml-файл</summary>
+        /// В случае отсутствия файла - создание коллекции с одним системным стилем и ее сохранение в xml-файл</summary>
         private static void LoadStylesFromXmlFile()
         {
             Styles.Clear();
@@ -294,6 +319,7 @@ namespace mpESKD.Functions.mpAxis.Styles
                 Styles.Add(style);
             }
         }
+
         public static void SaveStylesToXml(List<AxisStyleForEditor> styles)
         {
             var stylesFile = Path.Combine(MainFunction.StylesPath, StylesFileName);
@@ -369,9 +395,9 @@ namespace mpESKD.Functions.mpAxis.Styles
             var styles = new List<AxisStyle>();
             var style = new AxisStyle
             {
-                Name = Language.GetItem(LangItem, "h41"), // "Прямая ось",
+                Name = Language.GetItem(MainFunction.LangItem, "h41"), // "Прямая ось",
                 FunctionName = AxisFunction.MPCOEntName,
-                Description = Language.GetItem(LangItem, "h68"), // "Базовый стиль для прямой оси",
+                Description = Language.GetItem(MainFunction.LangItem, "h68"), // "Базовый стиль для прямой оси",
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
             };

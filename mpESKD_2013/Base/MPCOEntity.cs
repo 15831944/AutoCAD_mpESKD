@@ -22,6 +22,7 @@ namespace mpESKD.Base
         /// Должна соответствовать точке вставке блока
         /// </summary>
         public Point3d InsertionPoint { get; set; } = Point3d.Origin;
+        
         /// <summary>Коллекция базовых примитивов, входящих в примитив</summary>
         public abstract IEnumerable<Entity> Entities
         {
@@ -29,11 +30,14 @@ namespace mpESKD.Base
         }
 
         public bool IsValueCreated { get; set; }
+        
         /// <summary>Матрица трансформации BlockReference</summary>
         public Matrix3d BlockTransform { get; set; }
+        
         /// <summary>Масштаб примитива</summary>
         public AnnotationScale Scale { get; set; }
-        /// <summary>Масштаб типа линии для входящей полилинии</summary>
+        
+        /// <summary>Масштаб типа линии для примитивов, имеющих изменяемый тип линии</summary>
         public double LineTypeScale { get; set; }
         
         /// <summary>Текущий масштаб</summary>
@@ -41,12 +45,15 @@ namespace mpESKD.Base
         {
             return Scale.DrawingUnits / Scale.PaperUnits;
         }
+
         #region Block
+        
         // ObjectId "примитива"
         public ObjectId BlockId { get; set; }
 
         // Описание блока
         private BlockTableRecord _blockRecord;
+        
         public BlockTableRecord BlockRecord
         {
             get
@@ -196,7 +203,9 @@ namespace mpESKD.Base
             _blockRecord = blockTableRecord;
             return blockTableRecord;
         }
+        
         #endregion
+        
         /// <summary>Получение свойств блока, которые присуще примитиву</summary>
         public void GetParametersFromEntity(Entity entity)
         {
@@ -207,6 +216,19 @@ namespace mpESKD.Base
                 BlockTransform = blockReference.BlockTransform;
             }
         }
+
+        #region Abstract members
+
+        /// <summary>
+        /// Перерисовка элементов блока по параметрам ЕСКД элемента
+        /// </summary>
+        public abstract void UpdateEntities();
+
+        public abstract ResultBuffer GetParametersForXData();
+
+        public abstract void GetParametersFromResBuf(ResultBuffer resBuf);
+
+        #endregion
 
         public void Draw(WorldDraw draw)
         {
@@ -225,7 +247,7 @@ namespace mpESKD.Base
             }
         }
         /// <summary>
-        /// Расчлинение СПДС примитива
+        /// Расчлинение ЕСКД примитива
         /// </summary>
         /// <param name="entitySet"></param>
         public void Explode(DBObjectCollection entitySet)
@@ -242,6 +264,7 @@ namespace mpESKD.Base
             _blockRecord?.Dispose();
         }
     }
+
     public sealed class MyBinder : SerializationBinder
     {
         public override Type BindToType(

@@ -7,7 +7,6 @@ namespace mpESKD.Base.Properties
 {
     public class BaseSummaryProperties<T> : ObservableCollection<T>
     {
-        private const string LangItem = "mpESKD";
         #region Общие свойства - свойства которые есть у всех примитивов
         public string Style
         {
@@ -103,7 +102,7 @@ namespace mpESKD.Base.Properties
         protected string GetSummaryStrValue(string[] vals)
         {
             if (vals.Distinct().Count() > 1)
-                return "*" + Language.GetItem(LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
+                return "*" + Language.GetItem(MainFunction.LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
             return vals.FirstOrDefault();
         }
 

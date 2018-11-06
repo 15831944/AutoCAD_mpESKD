@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Autodesk.AutoCAD.Colors;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using mpESKD.Base;
-using mpESKD.Base.Helpers;
-using mpESKD.Base.Properties;
-using mpESKD.Base.Styles;
-using mpESKD.Functions.mpBreakLine.Properties;
-using mpESKD.Functions.mpBreakLine.Styles;
-using ModPlus.Helpers;
-using ModPlusAPI.Windows;
-// ReSharper disable InconsistentNaming
-
-namespace mpESKD.Functions.mpBreakLine
+﻿namespace mpESKD.Functions.mpBreakLine
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using Autodesk.AutoCAD.Colors;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using Base;
+    using Base.Helpers;
+    using mpESKD.Base.Styles;
+    using Properties;
+    using Styles;
+    using ModPlus.Helpers;
+    using ModPlusAPI.Windows;
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class BreakLine : MPCOEntity
     {
         /// <summary>Инициализация экземпляра класса для BreakLine без заполнения данными
@@ -35,7 +34,8 @@ namespace mpESKD.Functions.mpBreakLine
             };
             BlockRecord = blockTableRecord;
             StyleGuid = style.Guid;
-            // Применяем текущий стиль к СПДС примитиву
+            
+            // Применяем текущий стиль к ЕСКД примитиву
             ApplyStyle(style);
         }
         // Основные свойства  примитива
@@ -50,8 +50,10 @@ namespace mpESKD.Functions.mpBreakLine
 
         /// <summary>Вторая (конечная) точка примитива в мировой системе координат</summary>
         public Point3d EndPoint { get; set; } = Point3d.Origin;
+        
         // Получение управляющих точек в системе координат блока для отрисовки содержимого
         private Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
+        
         private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
 
         #region Grips
@@ -77,15 +79,20 @@ namespace mpESKD.Functions.mpBreakLine
 
         /// <summary>Выступ линии обрыва за граници "обрываемого" объекта</summary>
         public int Overhang { get; set; } = BreakLineProperties.Overhang.DefaultValue;
+        
         /// <summary>Ширина Обрыва для линейного обрыва</summary>
         public int BreakWidth { get; set; } = BreakLineProperties.BreakWidth.DefaultValue;
+        
         /// <summary>Длина обрыва для линейного обрыва</summary>
         public int BreakHeight { get; set; } = BreakLineProperties.BreakHeight.DefaultValue;
+        
         /// <summary>Тип линии обрыва: линейный, криволинейный, цилиндрический</summary>
         public BreakLineType BreakLineType { get; set; } = BreakLineProperties.BreakLineType.DefaultValue;
 
-        #region Базовые примитивы СПДС объекта
+        #region Базовые примитивы ЕСКД объекта
+        
         private readonly Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
+        
         public Polyline MainPolyline
         {
             get
@@ -122,8 +129,8 @@ namespace mpESKD.Functions.mpBreakLine
             }
         }
 
-        /// <summary>Обновление (перерисовка) базовых примитивов</summary>
-        public void UpdateEntities()
+        /// <inheritdoc />
+        public override void UpdateEntities()
         {
             try
             {
@@ -132,12 +139,12 @@ namespace mpESKD.Functions.mpBreakLine
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки (т.е. второй точки еще нет)
-                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint);
+                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
                 else if (length < BreakLineMinLength * scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength);
+                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
                 }
                 else
                 {
@@ -152,13 +159,11 @@ namespace mpESKD.Functions.mpBreakLine
             }
         }
         /// <summary>
-        /// Построение "базового" простого варианта СПДС примитива
+        /// Построение "базового" простого варианта ЕСКД примитива
         /// Тот вид, который висит на мышке при создании и указании точки вставки
         /// </summary>
-        private void MakeSimplyEntity(UpdateVariant variant)
+        private void MakeSimplyEntity(UpdateVariant variant, double scale)
         {
-            // need to add scale !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            var scale = GetScale();
             List<double> bulges;
             if (variant == UpdateVariant.SetInsertionPoint)
             {
@@ -292,6 +297,7 @@ namespace mpESKD.Functions.mpBreakLine
             }
             return pts;
         }
+        
         /// <summary>Изменение точек полилинии</summary>
         /// <param name="pts">Коллекция 2Д точек</param>
         /// <param name="bulges">Список выпуклостей</param>
@@ -304,7 +310,8 @@ namespace mpESKD.Functions.mpBreakLine
                 {
                     MainPolyline.SetPointAt(i, pts[i]);
                     MainPolyline.SetBulgeAt(i, bulges[i]);
-                }}
+                }
+            }
             else // иначе создаем заново
             {
                 for (var i = 0; i < MainPolyline.NumberOfVertices; i++)
@@ -338,7 +345,7 @@ namespace mpESKD.Functions.mpBreakLine
         }
         #endregion
 
-        public ResultBuffer GetParametersForXData()
+        public override ResultBuffer GetParametersForXData()
         {
             try
             {
@@ -346,7 +353,7 @@ namespace mpESKD.Functions.mpBreakLine
                 var resBuf = new ResultBuffer();
                 // 1001 - DxfCode.ExtendedDataRegAppName. AppName
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, BreakLineFunction.MPCOEntName));
-                // Вектор от конечной точки до начальной с учетом масштаба блока и трансвормацией блока
+                // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
                 var vector = EndPointOCS - InsertionPointOCS;
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z))); //1010
                 // Текстовые значения (код 1000)
@@ -372,7 +379,7 @@ namespace mpESKD.Functions.mpBreakLine
             }
         }
 
-        public void GetParametersFromResBuf(ResultBuffer resBuf)
+        public override void GetParametersFromResBuf(ResultBuffer resBuf)
         {
             try
             {
@@ -447,7 +454,7 @@ namespace mpESKD.Functions.mpBreakLine
             }
         }
 
-        private enum UpdateVariant
+        internal enum UpdateVariant
         {
             SetInsertionPoint,
             SetEndPointMinLength
@@ -477,7 +484,7 @@ namespace mpESKD.Functions.mpBreakLine
             }
         }
         /// <summary>
-        /// Создание экземпляра СПДС примитива по данным блока
+        /// Создание экземпляра ЕСКД примитива по данным блока
         /// </summary>
         /// <param name="ent">блок (примитив автокада)</param>
         /// <returns></returns>

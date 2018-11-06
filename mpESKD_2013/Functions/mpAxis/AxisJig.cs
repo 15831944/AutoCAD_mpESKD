@@ -10,7 +10,6 @@ namespace mpESKD.Functions.mpAxis
 {
     public class AxisJig : EntityJig
     {
-        private const string LangItem = "mpESKD";
         public AxisJigState JigState { get; set; } = AxisJigState.PromptInsertPoint;
         private readonly Axis _axis;
         private readonly PointSampler _insertionPoint = new PointSampler(Point3d.Origin);
@@ -28,12 +27,12 @@ namespace mpESKD.Functions.mpAxis
                 switch (JigState)
                 {
                     case AxisJigState.PromptInsertPoint:
-                        return _insertionPoint.Acquire(prompts, "\n" + Language.GetItem(LangItem, "msg1"), value =>
+                        return _insertionPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg1"), value =>
                         {
                             _axis.InsertionPoint = value;
                         });
                     case AxisJigState.PromptEndPoint:
-                        return _endPoint.Acquire(prompts, "\n" + Language.GetItem(LangItem, "msg2"), _insertionPoint.Value, value =>
+                        return _endPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg2"), _insertionPoint.Value, value =>
                         {
                             _axis.EndPoint = value;
                         });

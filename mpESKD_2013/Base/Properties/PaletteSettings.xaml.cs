@@ -6,11 +6,10 @@ namespace mpESKD.Base.Properties
 {
     public partial class PaletteSettings
     {
-        private const string LangItem = "mpESKD";
         public PaletteSettings()
         {
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(LangItem, "h1");
+            Title = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h1");
             Loaded += LmSettings_Loaded;
         }
         private void LmSettings_Loaded(object sender, RoutedEventArgs e)

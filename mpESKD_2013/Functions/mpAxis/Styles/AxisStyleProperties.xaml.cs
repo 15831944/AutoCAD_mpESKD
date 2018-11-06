@@ -14,7 +14,6 @@ namespace mpESKD.Functions.mpAxis.Styles
 {
     public partial class AxisStyleProperties
     {
-        private const string LangItem = "mpESKD";
         public AxisStyleProperties(string layerNameFromStyle)
         {
             InitializeComponent();
@@ -28,15 +27,15 @@ namespace mpESKD.Functions.mpAxis.Styles
             CbTextStyle.ItemsSource = AcadHelpers.TextStyles;
             // layers
             var layers = AcadHelpers.Layers;
-            layers.Insert(0, ModPlusAPI.Language.GetItem(LangItem, "defl")); // "По умолчанию"
+            layers.Insert(0, ModPlusAPI.Language.GetItem(MainFunction.LangItem, "defl")); // "По умолчанию"
             if (!layers.Contains(layerNameFromStyle))
                 layers.Insert(1, layerNameFromStyle);
             CbLayerName.ItemsSource = layers;
             // marker types
             var markerTypes = new List<string>
             {
-                ModPlusAPI.Language.GetItem(LangItem, "type1"), // "Тип 1",
-                ModPlusAPI.Language.GetItem(LangItem, "type2") // "Тип 2"
+                ModPlusAPI.Language.GetItem(MainFunction.LangItem, "type1"), // "Тип 1",
+                ModPlusAPI.Language.GetItem(MainFunction.LangItem, "type2") // "Тип 2"
             };
             CbFirstMarkerType.ItemsSource = markerTypes;
             CbSecondMarkerType.ItemsSource = markerTypes;

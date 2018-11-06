@@ -1,20 +1,19 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Linq;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.Windows;
-using RibbonPanelSource = Autodesk.Windows.RibbonPanelSource;
-using RibbonRowPanel = Autodesk.Windows.RibbonRowPanel;
-using System.Windows.Controls;
-using ModPlus.Helpers;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-
-namespace mpESKD.LoadHelpers
+﻿namespace mpESKD.LoadHelpers
 {
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System;
+    using System.Linq;
+    using Autodesk.AutoCAD.ApplicationServices;
+    using Autodesk.Windows;
+    using RibbonPanelSource = Autodesk.Windows.RibbonPanelSource;
+    using RibbonRowPanel = Autodesk.Windows.RibbonRowPanel;
+    using System.Windows.Controls;
+    using ModPlus.Helpers;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+
     public class RibbonBuilder
     {
-        private const string LangItem = "mpESKD";
         public static void BuildRibbon()
         {
             if (!IsLoaded())
@@ -131,12 +130,13 @@ namespace mpESKD.LoadHelpers
         {
             // Линии
             // create the panel source
-            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(LangItem, "tab3") };
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(MainFunction.LangItem, "tab3") };
             // now the panel
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
             ribTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
+
             #region mpAxis
             // Добавляем в него первую функцию, которую делаем основной
             var ribBtn = RibbonHelpers.AddBigButton(
@@ -151,21 +151,24 @@ namespace mpESKD.LoadHelpers
             if (ribBtn != null) ribRowPanel.Items.Add(ribBtn);
 
             #endregion
+            
             if (ribRowPanel.Items.Any())
             {
                 ribSourcePanel.Items.Add(ribRowPanel);
             }
         }
+
         private static void AddLinesPanel(RibbonTab ribTab)
         {
             // Линии
             // create the panel source
-            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(LangItem, "tab1") };
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(MainFunction.LangItem, "tab1") };
             // now the panel
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
             ribTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
+           
             #region mpBreakLine
             // Создаем SplitButton
             var risSplitBtn = new RibbonSplitButton
@@ -208,6 +211,7 @@ namespace mpESKD.LoadHelpers
             }
             ribRowPanel.Items.Add(risSplitBtn);
             #endregion
+            
             if (ribRowPanel.Items.Any())
             {
                 ribSourcePanel.Items.Add(ribRowPanel);
@@ -218,7 +222,7 @@ namespace mpESKD.LoadHelpers
             //create the panel source
             var ribSourcePanel = new RibbonPanelSource
             {
-                Title = Language.GetItem(LangItem, "tab2")
+                Title = Language.GetItem(MainFunction.LangItem, "tab2")
             };
             // now the panel
             var ribPanel = new RibbonPanel
@@ -231,20 +235,20 @@ namespace mpESKD.LoadHelpers
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpStyleEditor",
-                    Language.GetItem(LangItem, "tab4"),
+                    Language.GetItem(MainFunction.LangItem, "tab4"),
                     _colorTheme == 1 // 1 - light
                     ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32.png"
                     : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32_dark.png",
-                    Language.GetItem(LangItem, "tab5"), Orientation.Vertical, "", ""
+                    Language.GetItem(MainFunction.LangItem, "tab5"), Orientation.Vertical, "", ""
                 ));
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpPropertiesPalette",
-                    ConvertLName(Language.GetItem(LangItem, "tab6")),
+                    ConvertLName(Language.GetItem(MainFunction.LangItem, "tab6")),
                     _colorTheme == 1 // 1 - light
                     ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32.png"
                     : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32_dark.png",
-                    Language.GetItem(LangItem, "tab7"), Orientation.Vertical, "", ""
+                    Language.GetItem(MainFunction.LangItem, "tab7"), Orientation.Vertical, "", ""
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
         }

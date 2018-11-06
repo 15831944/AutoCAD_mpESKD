@@ -1,19 +1,21 @@
-﻿using System;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using mpESKD.Base.Helpers;
-using ModPlusAPI;
-
-namespace mpESKD.Functions.mpBreakLine
+﻿namespace mpESKD.Functions.mpBreakLine
 {
+    using System;
+    using Autodesk.AutoCAD.ApplicationServices;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Geometry;
+    using Base.Helpers;
+    using ModPlusAPI;
+
     public class BreakLineJig : EntityJig
     {
-        private const string LangItem = "mpESKD";
         public BreakLineJigState JigState { get; set; } = BreakLineJigState.PromptInsertPoint;
+        
         private readonly BreakLine _breakLine;
+        
         private readonly PointSampler _insertionPoint = new PointSampler(Point3d.Origin);
+        
         private readonly PointSampler _endPoint = new PointSampler(new Point3d(15, 0, 0));
 
         public BreakLineJig(BreakLine breakLine, BlockReference reference) : base(reference)
@@ -28,12 +30,12 @@ namespace mpESKD.Functions.mpBreakLine
                 switch (JigState)
                 {
                     case BreakLineJigState.PromptInsertPoint:
-                        return _insertionPoint.Acquire(prompts, "\n" + Language.GetItem(LangItem, "msg1"), value =>
+                        return _insertionPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg1"), value =>
                         {
                             _breakLine.InsertionPoint = value;
                         });
                     case BreakLineJigState.PromptEndPoint:
-                        return _endPoint.Acquire(prompts, "\n" + Language.GetItem(LangItem, "msg2"), _insertionPoint.Value, value =>
+                        return _endPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg2"), _insertionPoint.Value, value =>
                         {
                             _breakLine.EndPoint = value;
                         });
@@ -77,6 +79,7 @@ namespace mpESKD.Functions.mpBreakLine
     public class PointSampler
     {
         private static readonly Tolerance Tolerance;
+        
         public Point3d Value { get; set; }
 
         static PointSampler()
@@ -88,10 +91,12 @@ namespace mpESKD.Functions.mpBreakLine
         {
             Value = value;
         }
+        
         public SamplerStatus Acquire(JigPrompts prompts, string message, Action<Point3d> updater)
         {
             return Acquire(prompts, GetDefaultOptions(message), updater);
         }
+        
         public SamplerStatus Acquire(JigPrompts prompts, string message, Point3d basePoint, Action<Point3d> updater)
         {
             return Acquire(prompts, GetDefaultOptions(message, basePoint), updater);
@@ -125,6 +130,7 @@ namespace mpESKD.Functions.mpBreakLine
             jigPromptPointOption.UserInputControls = (UserInputControls)2272;
             return jigPromptPointOption;
         }
+       
         public static JigPromptPointOptions GetDefaultOptions(string message, Point3d basePoint)
         {
             var jigPromptPointOption = new JigPromptPointOptions(message);
@@ -141,6 +147,7 @@ namespace mpESKD.Functions.mpBreakLine
             return jigPromptPointOption;
         }
     }
+
     // Варианты состояния
     public enum BreakLineJigState
     {

@@ -1,22 +1,20 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Xml.Linq;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Runtime;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-using Exception = Autodesk.AutoCAD.Runtime.Exception;
-
-namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Helpers
 {
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Xml.Linq;
+    using Autodesk.AutoCAD.ApplicationServices;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.Runtime;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
+
     public static class AcadHelpers
     {
-        private const string LangItem = "mpESKD";
         /// <summary>БД активного документа</summary>
         public static Database Database => HostApplicationServices.WorkingDatabase;
 
@@ -217,7 +215,7 @@ namespace mpESKD.Base.Helpers
             if (blkRefObjectId == ObjectId.Null) return;
             if (MainStaticSettings.Settings.UseLayerFromStyle)
             {
-                if (!layerName.Equals(Language.GetItem(LangItem, "defl"))) // "По умолчанию"
+                if (!layerName.Equals(Language.GetItem(MainFunction.LangItem, "defl"))) // "По умолчанию"
                 {
                     if (LayerHelper.HasLayer(layerName))
                     {
@@ -319,15 +317,15 @@ namespace mpESKD.Base.Helpers
                                 Database.LoadLineTypeFile(ltname, path);
                                 ltid = lttbl[ltname];
                             }
-                            catch (Exception exception)
+                            catch (Autodesk.AutoCAD.Runtime.Exception exception)
                             {
                                 if (exception.ErrorStatus == ErrorStatus.FilerError)
-                                    MessageBox.Show(Language.GetItem(LangItem, "err1") + ": " + filename, MessageBoxIcon.Close); // Не удалось найти файл
+                                    MessageBox.Show(Language.GetItem(MainFunction.LangItem, "err1") + ": " + filename, MessageBoxIcon.Close); // Не удалось найти файл
                                 else if (exception.ErrorStatus == ErrorStatus.DuplicateRecordName)
                                 {
                                     // ignore
                                 }
-                                else MessageBox.Show(Language.GetItem(LangItem, "err2") + ": " + ltname, MessageBoxIcon.Close); //Не удалось загрузить тип линий
+                                else MessageBox.Show(Language.GetItem(MainFunction.LangItem, "err2") + ": " + ltname, MessageBoxIcon.Close); //Не удалось загрузить тип линий
                             }
                         }
                     tr.Commit();
@@ -432,7 +430,7 @@ namespace mpESKD.Base.Helpers
     public static class ExtendedDataHelpers
     {
         /// <summary>
-        /// Добавление регистрации приложения в соответсвующую таблицу чертежа
+        /// Добавление регистрации приложения в соответствующую таблицу чертежа
         /// </summary>
         public static void AddRegAppTableRecord(string appName)
         {
@@ -469,7 +467,7 @@ namespace mpESKD.Base.Helpers
         }
 
         /// <summary>
-        /// Проверка по XData вхождения блока, что он является любым СПДС примитивом
+        /// Проверка по XData вхождения блока, что он является любым ЕСКД примитивом
         /// </summary>
         /// <param name="blkRef">Вхождение блока</param>
         /// <param name="appName"></param>
