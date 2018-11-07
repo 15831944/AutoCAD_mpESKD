@@ -145,7 +145,8 @@
             {
                 new AxisFunction(),
                 new BreakLineFunction(),
-                new GroundLineFunction()
+                //// TODO Uncomment
+                ////new GroundLineFunction()
             };
         }
 

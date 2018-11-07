@@ -39,7 +39,8 @@
 
     public class GroundLineCommands
     {
-        [CommandMethod("ModPlus", "mpGroundLine", CommandFlags.Modal)]
+        //// TODO Uncomment
+        ////[CommandMethod("ModPlus", "mpGroundLine", CommandFlags.Modal)]
         public void CreateGroundLineCommand()
         {
             CreateGroundLine();
