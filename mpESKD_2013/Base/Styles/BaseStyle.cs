@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Xml.Linq;
-using mpESKD.Base.Properties;
-using ModPlusAPI;
-
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Base.Styles
 {
+    using Autodesk.AutoCAD.DatabaseServices;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
+    using System.Windows;
+    using System.Xml.Linq;
+    using mpESKD.Base.Properties;
+    using ModPlusAPI;
+
     /// <summary>Интерфейс стиля для элемента</summary>
     public interface IMPCOStyle
     {
@@ -95,9 +96,24 @@ namespace mpESKD.Base.Styles
             }
         }
         public string FunctionName { get; set; }
+
         public string Description { get; set; }
+        
         public string Guid { get; set; }
+        
         public XElement LayerXmlData { get; set; }
+
+        #region Common properties
+
+        public double LineTypeScale { get; set; }
+        
+        public string LineType { get; set; }
+        
+        public string LayerName { get; set; }
+        
+        public AnnotationScale Scale { get; set; }
+
+        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 

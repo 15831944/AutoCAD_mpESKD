@@ -1,17 +1,16 @@
-﻿<mpc:BaseMetroWindow x:Class="mpESKD.Functions.mpAxis.AxisValueEditor"
+﻿<mps:ModPlusWindow x:Class="mpESKD.Functions.mpAxis.AxisValueEditor"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                      xmlns:mpc="clr-namespace:ModPlusAPI.Windows.Mpc;assembly=ModPlusAPI"
+                      xmlns:mps="https://modplus.org/winfx/xaml/controls"
                       Loaded="AxisValueEditor_OnLoaded" SizeToContent="WidthAndHeight"
                       PreviewKeyDown="AxisValueEditor_OnPreviewKeyDown"
                       Topmost="True">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ModPlusAPI;component/Windows/WinResources/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
+            <XmlDataProvider x:Key="Lang" Source="D:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -31,44 +30,50 @@
         </Grid.RowDefinitions>
         <!-- first value -->
         <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding Source={StaticResource Lang}, XPath=p22}"
+                   Margin="{DynamicResource ModPlusDefaultMargin}"
                    Visibility="{Binding ElementName=TbFirstText, Path=Visibility}"></TextBlock>
         <TextBox Grid.Column="1" Grid.Row="0" Name="TbFirstPrefix" MinWidth="20"
-                 mah:TextBoxHelper.SelectAllOnFocus="True" MaxLength="3"></TextBox>
+                 mps:TextFieldAssist.SelectAllOnFocus="True" MaxLength="3"></TextBox>
         <TextBox Grid.Column="2" Grid.Row="0" Name="TbFirstText" MaxLength="2" MinWidth="20"
-                 mah:TextBoxHelper.SelectAllOnFocus="True"></TextBox>
+                 mps:TextFieldAssist.SelectAllOnFocus="True"></TextBox>
         <TextBox Grid.Column="3" Grid.Row="0" Name="TbFirstSuffix" MinWidth="20"
-                 mah:TextBoxHelper.SelectAllOnFocus="True" MaxLength="3"></TextBox>
+                 mps:TextFieldAssist.SelectAllOnFocus="True" MaxLength="3"></TextBox>
         
         <!-- second value -->
         <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding Source={StaticResource Lang}, XPath=p25}"
+                   Margin="{DynamicResource ModPlusDefaultMargin}"
                    Visibility="{Binding ElementName=TbSecondText, Path=Visibility}"></TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="1" Name="TbSecondPrefix" mah:TextBoxHelper.SelectAllOnFocus="True"
+        <TextBox Grid.Row="1" Grid.Column="1" Name="TbSecondPrefix" mps:TextFieldAssist.SelectAllOnFocus="True"
                  MaxLength="3" MinWidth="20"></TextBox>
-        <TextBox Grid.Row="1" Grid.Column="2" Name="TbSecondText" mah:TextBoxHelper.SelectAllOnFocus="True"
+        <TextBox Grid.Row="1" Grid.Column="2" Name="TbSecondText" mps:TextFieldAssist.SelectAllOnFocus="True"
                  MaxLength="2" MinWidth="20"></TextBox>
         <TextBox Grid.Row="1" Grid.Column="3" Name="TbSecondSuffix" MinWidth="20"
-                 mah:TextBoxHelper.SelectAllOnFocus="True" MaxLength="3"></TextBox>
+                 mps:TextFieldAssist.SelectAllOnFocus="True" MaxLength="3"></TextBox>
         <!-- third value -->
         <TextBlock Grid.Column="0" Grid.Row="2" Text="{Binding Source={StaticResource Lang}, XPath=p28}"
+                   Margin="{DynamicResource ModPlusDefaultMargin}"
                    Visibility="{Binding ElementName=TbThirdText, Path=Visibility}"></TextBlock>
         <TextBox Grid.Row="2" Grid.Column="1" Name="TbThirdPrefix" MaxLength="3"
-                 mah:TextBoxHelper.SelectAllOnFocus="True" MinWidth="20"></TextBox>
+                 mps:TextFieldAssist.SelectAllOnFocus="True" MinWidth="20"></TextBox>
         <TextBox Grid.Row="2" Grid.Column="2" Name="TbThirdText" MaxLength="2"
-                 mah:TextBoxHelper.SelectAllOnFocus="True" MinWidth="20"></TextBox>
+                 mps:TextFieldAssist.SelectAllOnFocus="True" MinWidth="20"></TextBox>
         <TextBox Grid.Row="2" Grid.Column="3" Name="TbThirdSuffix" MinWidth="20"
-                 mah:TextBoxHelper.SelectAllOnFocus="True" MaxLength="3"></TextBox>
+                 mps:TextFieldAssist.SelectAllOnFocus="True" MaxLength="3"></TextBox>
         <!-- Orient value -->
         <TextBlock Text="{Binding Source={StaticResource Lang}, XPath=p31}" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3"
+                   Margin="{DynamicResource ModPlusDefaultMargin}"
                    Visibility="{Binding ElementName=TbTopOrientText, Path=Visibility}"></TextBlock>
         <TextBox Grid.Column="3" Grid.Row="3" Name="TbTopOrientText" MaxLength="2" MinWidth="20"
-                 mah:TextBoxHelper.SelectAllOnFocus="True"></TextBox>
+                 mps:TextFieldAssist.SelectAllOnFocus="True"></TextBox>
         <TextBlock Text="{Binding Source={StaticResource Lang}, XPath=p30}" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="3"
+                   Margin="{DynamicResource ModPlusDefaultMargin}"
                    Visibility ="{Binding ElementName=TbBottomOrientText, Path=Visibility}"></TextBlock>
         <TextBox Grid.Column="3" Grid.Row="4" Name="TbBottomOrientText" MaxLength="2" MinWidth="20"
-                 mah:TextBoxHelper.SelectAllOnFocus="True"></TextBox>
+                 mps:TextFieldAssist.SelectAllOnFocus="True"></TextBox>
         <!-- markers position -->
         <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="5">
-            <TextBlock Text="{Binding Source={StaticResource Lang}, XPath=p8}"></TextBlock>
+            <TextBlock Text="{Binding Source={StaticResource Lang}, XPath=p8}"
+                       Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
             <ComboBox x:Name="CbMarkersPosition"></ComboBox>
         </StackPanel>
         <!-- accept -->
@@ -76,7 +81,7 @@
                 HorizontalAlignment="Right" Content="{Binding Source={StaticResource Lang}, XPath=accept}"
                 Name="BtAccept" Click="BtAccept_OnClick"></Button>
     </Grid>
-</mpc:BaseMetroWindow>
+</mps:ModPlusWindow>
 
 
 

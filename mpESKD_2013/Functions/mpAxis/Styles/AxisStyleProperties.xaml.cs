@@ -17,8 +17,8 @@ namespace mpESKD.Functions.mpAxis.Styles
         public AxisStyleProperties(string layerNameFromStyle)
         {
             InitializeComponent();
-            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
-            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeThemeForResurceDictionary(this.Resources, false);
+            ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+            ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeStyleForResourceDictionary(Resources);
             // markers positions
             CbMarkersPosition.ItemsSource = AxisPropertiesHelpers.AxisMarkersTypeLocalNames;
             // get list of scales

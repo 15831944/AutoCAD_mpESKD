@@ -4,21 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:mpESKD.Functions.mpAxis.Styles"
-             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:behaviors="clr-namespace:mpESKD.Base.Styles.Behaviors"
              xmlns:styleHelpers="clr-namespace:mpESKD.Base.Styles"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib">
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:mps="https://modplus.org/winfx/xaml/controls">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
                 <ResourceDictionary Source="../../../Base/Properties/Controls/ControlStylesForEditor.xaml"></ResourceDictionary>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
+            <XmlDataProvider x:Key="Lang" Source="D:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
             <local:AxisMarkersPositionValueConverter x:Key="AxisMarkersPositionValueConverter"></local:AxisMarkersPositionValueConverter>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -30,12 +27,14 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="{Binding Source={StaticResource Lang}, XPath=h54}" Margin="2"></TextBlock>
+        <TextBlock Grid.Row="0" Text="{Binding Source={StaticResource Lang}, XPath=h54}" 
+                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
         <TextBox Grid.Row="1" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 IsEnabled="{Binding CanEdit}" Margin="2" MaxLength="80"></TextBox>
-        <TextBlock Grid.Row="2" Text="{Binding Source={StaticResource Lang}, XPath=h55}" Margin="2"></TextBlock>
+                 IsEnabled="{Binding CanEdit}" MaxLength="80"></TextBox>
+        <TextBlock Grid.Row="2" Text="{Binding Source={StaticResource Lang}, XPath=h55}" 
+                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
         <TextBox Grid.Row="3" Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 IsEnabled="{Binding CanEdit}" Margin="2" TextWrapping="Wrap"></TextBox>
+                 IsEnabled="{Binding CanEdit}" TextWrapping="Wrap"></TextBox>
         <!--Properties-->
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
@@ -69,35 +68,38 @@
                 <styleHelpers:AnnotationScaleValueConverter x:Key="AnnotationScaleValueConverter"></styleHelpers:AnnotationScaleValueConverter>
             </Grid.Resources>
             <TextBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h49}" 
-                     Style="{StaticResource HeaderTextBoxForStyleEditor}"
-                     Background="{DynamicResource AccentColorBrush4}"></TextBox>
+                     Style="{StaticResource HeaderTextBoxForStyleEditor}"></TextBox>
             <!--Layer-->
             <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p7}"  
-                     Margin="15,0,0,0"></TextBox>
-            <ComboBox Grid.Row="1" Grid.Column="2" x:Name="CbLayerName" Margin="0,0,2,0"
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
+            <ComboBox Grid.Row="1" Grid.Column="2" x:Name="CbLayerName" Margin="0,0,2,0" VerticalAlignment="Stretch"
+                      BorderThickness="0 0 1 1"
                       SelectedItem="{Binding LayerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       IsEnabled="{Binding CanEdit}"
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
             <!--Scale-->
             <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p5}"
-                     Margin="15,0,0,0"></TextBox>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
             <ComboBox Grid.Row="2" Grid.Column="2" x:Name="CbScale" Margin="0,0,2,0"
+                      VerticalAlignment="Stretch" BorderThickness="0 0 1 1"
                       SelectedItem="{Binding Scale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource AnnotationScaleValueConverter}}" 
                       IsEnabled="{Binding CanEdit}" 
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
             ></ComboBox>
             <!--LineType-->
             <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p19}"
-                     Margin="15,0,0,0"></TextBox>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
             <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding LineType}" x:Name="TbLineType"
+                     BorderThickness="0 0 1 1" Height="26"
                      IsReadOnly="True" IsEnabled="{Binding CanEdit}" Margin="0,0,2,0"
                      PreviewMouseDown="TbLineType_OnPreviewMouseDown" Cursor="Hand"
                      GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
             </TextBox>
             <!--LinetypeScale-->
             <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p6}"
-                     Margin="15,0,0,0"></TextBox>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
             <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding LineTypeScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     BorderThickness="0 0 1 1" Height="26"
                      x:Name="TbLineTypeScale" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
                      IsEnabled="{Binding CanEdit}" Margin="0,0,2,0" >
                 <i:Interaction.Behaviors>
@@ -105,110 +107,126 @@
                 </i:Interaction.Behaviors>
             </TextBox>
 
-            <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" BorderThickness="1,0,1,0"
-                          HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="{DynamicResource MainGrayBrush}"></GridSplitter>
+            <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="4" BorderThickness="3,0,0,0"
+                          HorizontalAlignment="Center" VerticalAlignment="Stretch" 
+                          BorderBrush="{DynamicResource MidGrayBrush}"></GridSplitter>
             <!--Geometry-->
             <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h51}" 
-                     Style="{StaticResource HeaderTextBoxForStyleEditor}"
-                     Background="{DynamicResource AccentColorBrush4}"></TextBox>
+                     Style="{StaticResource HeaderTextBoxForStyleEditor}"></TextBox>
             <!--MarkersPosition-->
             <TextBox Grid.Row="6" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p8}"
-                     Margin="15,0,0,0"></TextBox>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
             <ComboBox Grid.Row="6" Grid.Column="2" Text="{Binding MarkersPosition, Converter={StaticResource AxisMarkersPositionValueConverter}}"
+                      BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                       x:Name="CbMarkersPosition" IsEnabled="{Binding CanEdit}" Margin="0,0,2,0"
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
             </ComboBox>
             <!--Fracture-->
-            <TextBox Grid.Row="7" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p9-1}" Margin="15,0,0,0"></TextBox>
-            <mah:NumericUpDown Grid.Row="7" Grid.Column="2" Value="{Binding Fracture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox Grid.Row="7" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p9-1}" 
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
+            <mps:NumericBox Grid.Row="7" Grid.Column="2" Value="{Binding Fracture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                                x:Name="TbFracture" Minimum="1" Maximum="20" Margin="0,0,2,0"
                                GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"
-                               IsEnabled="{Binding CanEdit}" HorizontalContentAlignment="Left"></mah:NumericUpDown>
+                               IsEnabled="{Binding CanEdit}"></mps:NumericBox>
             <!--BottomFractureOffset-->
             <TextBox Grid.Row="8" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p15-1}"
-                     Margin="15,0,0,0"></TextBox>
-            <mah:NumericUpDown Grid.Row="8" Grid.Column="2" Value="{Binding BottomFractureOffset}" 
-                               x:Name="TbBottomFractureOffset" Minimum="0" Maximum="30" Margin="0,0,2,0"
-                               GotFocus="FrameworkElement_OnGotFocus" IsEnabled="{Binding CanEdit}"
-                               LostFocus="FrameworkElement_OnLostFocus"></mah:NumericUpDown>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
+            <mps:NumericBox Grid.Row="8" Grid.Column="2" Value="{Binding BottomFractureOffset}" 
+                            BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
+                            x:Name="TbBottomFractureOffset" Minimum="0" Maximum="30" Margin="0,0,2,0"
+                            GotFocus="FrameworkElement_OnGotFocus" IsEnabled="{Binding CanEdit}"
+                            LostFocus="FrameworkElement_OnLostFocus"></mps:NumericBox>
             <!--TopFractureOffset-->
             <TextBox Grid.Row="9" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p16-1}"
-                     Margin="15,0,0,0"></TextBox>
-            <mah:NumericUpDown Grid.Row="9" Grid.Column="2" Value="{Binding TopFractureOffset}"
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
+            <mps:NumericBox Grid.Row="9" Grid.Column="2" Value="{Binding TopFractureOffset}"
+                            BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                                x:Name="TbTopFractureOffset" Minimum="0" Maximum="30" Margin="0,0,2,0" 
                                GotFocus="FrameworkElement_OnGotFocus" IsEnabled="{Binding CanEdit}"
-                               LostFocus="FrameworkElement_OnLostFocus"></mah:NumericUpDown>
+                               LostFocus="FrameworkElement_OnLostFocus"></mps:NumericBox>
             <!--MarkersDiameter-->
             <TextBox Grid.Row="10" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p10-1}"
-                     Margin="15,0,0,0"></TextBox>
-            <mah:NumericUpDown Grid.Row="10" Grid.Column="2" Value="{Binding MarkersDiameter}"
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
+            <mps:NumericBox Grid.Row="10" Grid.Column="2" Value="{Binding MarkersDiameter}"
+                            BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                                x:Name="TbMarkersDiameter" Minimum="6" Maximum="12" Margin="0,0,2,0"
                                GotFocus="FrameworkElement_OnGotFocus" IsEnabled="{Binding CanEdit}"
-                               LostFocus="FrameworkElement_OnLostFocus"></mah:NumericUpDown>
+                               LostFocus="FrameworkElement_OnLostFocus"></mps:NumericBox>
             <!--MarkersCount-->
             <TextBox Grid.Row="11" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p11}"
-                     Margin="15,0,0,0"></TextBox>
-            <mah:NumericUpDown Grid.Row="11" Grid.Column="2" Value="{Binding MarkersCount}"
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
+            <mps:NumericBox Grid.Row="11" Grid.Column="2" Value="{Binding MarkersCount}"
+                            BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                                x:Name="TbMarkersCount" Minimum="1" Maximum="3" Margin="0,0,2,0"
                                GotFocus="FrameworkElement_OnGotFocus" IsEnabled="{Binding CanEdit}"
-                               LostFocus="FrameworkElement_OnLostFocus"></mah:NumericUpDown>
+                               LostFocus="FrameworkElement_OnLostFocus"></mps:NumericBox>
             <!--FirstMarkerType-->
             <TextBox Grid.Row="12" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p12}"
-                     Margin="15,0,0,0"></TextBox>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
             <ComboBox Grid.Row="12" Grid.Column="2" x:Name="CbFirstMarkerType"
+                      BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                       IsEnabled="{Binding CanEdit}" SelectedIndex="{Binding FirstMarkerType}"
                       GotFocus="FrameworkElement_OnGotFocus" Margin="0,0,2,0"
                       LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
             <!--SecondMarkerType-->
             <TextBox Grid.Row="13" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p13}"
-                     Margin="15,0,0,0"></TextBox>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
             <ComboBox Grid.Row="13" Grid.Column="2" SelectedIndex="{Binding SecondMarkerType}"
+                      BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                       x:Name="CbSecondMarkerType" IsEnabled="{Binding CanEdit}"
                       GotFocus="FrameworkElement_OnGotFocus" Margin="0,0,2,0"
                       LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
             <!--ThirdMarkerType-->
             <TextBox Grid.Row="14" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p14}"
-                     Margin="15,0,0,0"></TextBox>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
             <ComboBox Grid.Row="14" Grid.Column="2" SelectedIndex="{Binding ThirdMarkerType}"
+                      BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                       x:Name="CbThirdMarkerType" IsEnabled="{Binding CanEdit}"
                       GotFocus="FrameworkElement_OnGotFocus"  Margin="0,0,2,0"
                       LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
             <!--OrientMarkerType-->
             <TextBox Grid.Row="15" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p34}"
-                     Margin="15,0,0,0"></TextBox>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
             <ComboBox Grid.Row="15" Grid.Column="2" SelectedIndex="{Binding OrientMarkerType}"
+                      BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                       x:Name="CbOrientMarkerType" IsEnabled="{Binding CanEdit}"
                       GotFocus="FrameworkElement_OnGotFocus" Margin="0,0,2,0"
                       LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
             <!--ArrowSize-->
             <TextBox Grid.Row="16" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p29-1}"
-                     Margin="15,0,0,0"></TextBox>
-            <mah:NumericUpDown Grid.Row="16" Grid.Column="2" Value="{Binding ArrowsSize}" 
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
+            <mps:NumericBox Grid.Row="16" Grid.Column="2" Value="{Binding ArrowsSize}" 
+                            BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                                x:Name="TbArrowsSize" Minimum="0" Maximum="10" IsEnabled="{Binding CanEdit}"
                                GotFocus="FrameworkElement_OnGotFocus"  Margin="0,0,2,0"
-                               LostFocus="FrameworkElement_OnLostFocus" ></mah:NumericUpDown>
+                               LostFocus="FrameworkElement_OnLostFocus" ></mps:NumericBox>
 
-            <GridSplitter Grid.Column="1" Grid.Row="6" Grid.RowSpan="11" BorderThickness="1,0,1,0"
-                          HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="{DynamicResource MainGrayBrush}"></GridSplitter>
+            <GridSplitter Grid.Column="1" Grid.Row="6" Grid.RowSpan="11" BorderThickness="3,0,0,0"
+                          HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                          BorderBrush="{DynamicResource MidGrayBrush}"></GridSplitter>
             <!--Content-->
             <TextBox Grid.Row="17" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Source={StaticResource Lang}, XPath=h64}" 
-                     Style="{StaticResource HeaderTextBoxForStyleEditor}"
-                     Background="{DynamicResource AccentColorBrush4}"></TextBox>
+                     Style="{StaticResource HeaderTextBoxForStyleEditor}"></TextBox>
             <!--TextStyle-->
             <TextBox Grid.Row="18" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p17}"
-                     Margin="15,0,0,0"></TextBox>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
             <ComboBox Grid.Row="18" Grid.Column="2" Text="{Binding TextStyle}"
+                      BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
                       x:Name="CbTextStyle" IsEnabled="{Binding CanEdit}" Margin="0,0,2,0"
                       GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></ComboBox>
             <!--TextHeight-->
             <TextBox Grid.Row="19" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p18-1}"
-                     Margin="15,0,0,0"></TextBox>
-            <mah:NumericUpDown Grid.Row="19" Grid.Column="2" Value="{Binding TextHeight}" NumericInputMode="Decimal" Margin="0,0,2,0"
-                               Minimum="0.000000001" Maximum="{x:Static sys:Double.MaxValue}" IsEnabled="{Binding CanEdit}"
-                               x:Name="TbTextHeight" GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus"></mah:NumericUpDown>
+                     Style="{StaticResource PropertyHeaderInStyleEditor}"></TextBox>
+            <mps:NumericBox Grid.Row="19" Grid.Column="2" Value="{Binding TextHeight}" NumericInputMode="Decimal" Margin="0,0,2,0"
+                            BorderThickness="0 0 1 1" VerticalAlignment="Stretch"
+                            Minimum="0.000000001" Maximum="{x:Static sys:Double.MaxValue}" IsEnabled="{Binding CanEdit}"
+                            x:Name="TbTextHeight" GotFocus="FrameworkElement_OnGotFocus"
+                            LostFocus="FrameworkElement_OnLostFocus"></mps:NumericBox>
 
-            <GridSplitter Grid.Column="1" Grid.Row="18" Grid.RowSpan="2" BorderThickness="1,0,1,0"
-                          HorizontalAlignment="Center" VerticalAlignment="Stretch" BorderBrush="{DynamicResource MainGrayBrush}"></GridSplitter>
+            <GridSplitter Grid.Column="1" Grid.Row="18" Grid.RowSpan="2" BorderThickness="3,0,0,0"
+                          HorizontalAlignment="Center" VerticalAlignment="Stretch" 
+                          BorderBrush="{DynamicResource MidGrayBrush}"></GridSplitter>
         </Grid>
     </Grid>
 </UserControl>

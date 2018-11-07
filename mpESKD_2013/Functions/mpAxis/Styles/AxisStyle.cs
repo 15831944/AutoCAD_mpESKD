@@ -129,16 +129,6 @@
         
         public double TextHeight { get; set; }
         
-        // Стандартные
-        
-        public double LineTypeScale { get; set; }
-        
-        public string LineType { get; set; }
-        
-        public string LayerName { get; set; }
-        
-        public AnnotationScale Scale { get; set; }
-        
         #endregion
         
         public XElement TextStyleXmlData { get; set; }

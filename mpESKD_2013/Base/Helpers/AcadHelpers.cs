@@ -264,7 +264,7 @@
         public static void WriteMessageInDebug(string message)
         {
 #if DEBUG
-            Editor.WriteMessage("\n" + message);
+            Editor?.WriteMessage("\n" + message);
 #endif
         }
 

@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpAxis
+﻿namespace mpESKD.Functions.mpGroundLine
 {
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -7,16 +7,21 @@
     using Base.Helpers;
     using ModPlusAPI;
 
-    public class AxisJig : EntityJig
+    public class GroundLineJig : EntityJig
     {
-        public AxisJigState JigState { get; set; } = AxisJigState.PromptInsertPoint;
-        private readonly Axis _axis;
-        private readonly JigHelper.PointSampler _insertionPoint = new JigHelper.PointSampler(Point3d.Origin);
-        private readonly JigHelper.PointSampler _endPoint = new JigHelper.PointSampler(new Point3d(0.0, -1.0, 0.0));
+        public GroundLineJigState JigState { get; set; } = GroundLineJigState.PromptInsertPoint;
 
-        internal AxisJig(Axis axis, BlockReference reference) : base(reference)
+        private readonly GroundLine _groundLine;
+
+        private readonly JigHelper.PointSampler _insertionPoint = new JigHelper.PointSampler(Point3d.Origin);
+
+        private readonly JigHelper.PointSampler _nextPoint = new JigHelper.PointSampler(new Point3d(10, 0, 0));
+
+        public Point3d? PreviousPoint { get; set; }
+
+        public GroundLineJig(GroundLine groundLine, BlockReference reference) : base(reference)
         {
-            _axis = axis;
+            _groundLine = groundLine;
         }
 
         protected override SamplerStatus Sampler(JigPrompts prompts)
@@ -25,16 +30,21 @@
             {
                 switch (JigState)
                 {
-                    case AxisJigState.PromptInsertPoint:
+                    case GroundLineJigState.PromptInsertPoint:
                         return _insertionPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg1"), value =>
                         {
-                            _axis.InsertionPoint = value;
+                            _groundLine.InsertionPoint = value;
                         });
-                    case AxisJigState.PromptEndPoint:
-                        return _endPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg2"), _insertionPoint.Value, value =>
+                    case GroundLineJigState.PromptNextPoint:
                         {
-                            _axis.EndPoint = value;
-                        });
+                            var basePoint = _insertionPoint.Value;
+                            if (PreviousPoint != null)
+                                basePoint = PreviousPoint.Value;
+                            return _nextPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg2"), basePoint, value =>
+                            {
+                                _groundLine.EndPoint = value;
+                            });
+                        }
                     default:
                         return SamplerStatus.NoChange;
                 }
@@ -55,12 +65,12 @@
                     {
                         var obj = (BlockReference)tr.GetObject(Entity.Id, OpenMode.ForWrite, true);
                         //obj.Erase(false);
-                        obj.Position = _axis.InsertionPoint;
+                        obj.Position = _groundLine.InsertionPoint;
                         obj.BlockUnit = AcadHelpers.Database.Insunits;
                         tr.Commit();
                     }
-                    _axis.UpdateEntities();
-                    _axis.BlockRecord.UpdateAnonymousBlocks();
+                    _groundLine.UpdateEntities();
+                    _groundLine.BlockRecord.UpdateAnonymousBlocks();
                 }
                 return true;
             }
@@ -72,11 +82,10 @@
         }
     }
 
-    // Варианты состояния
-    public enum AxisJigState
+    public enum GroundLineJigState
     {
-        PromptInsertPoint = 1, // Запрос точки вставки
-        PromptEndPoint = 2, // Запрос второй (конечной) точки
-        Done = 3 // Завершено
+        PromptInsertPoint = 1,
+        PromptNextPoint = 2,
+        Done = 3
     }
 }

@@ -46,13 +46,13 @@
       <HintPath>C:\_Acad dlls\2014\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MahApps.Metro">
-      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\MahApps.Metro.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="ModPlusAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlusAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ModPlusStyle">
+      <HintPath>..\..\..\..\ModPlus\Extensions\ModPlusStyle.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ModPlus_2014">
@@ -83,6 +83,9 @@
   <ItemGroup>
     <Compile Include="..\mpESKD_2013\Base\Helpers\AcadHelpers.cs">
       <Link>Base\Helpers\AcadHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Helpers\JigHelper.cs">
+      <Link>Base\Helpers\JigHelper.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Helpers\LayerHelper.cs">
       <Link>Base\Helpers\LayerHelper.cs</Link>
@@ -252,6 +255,12 @@
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\GroundLineInterface.cs">
       <Link>Functions\mpGroundLine\GroundLineInterface.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\GroundLineJig.cs">
+      <Link>Functions\mpGroundLine\GroundLineJig.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLineProperties.cs">
+      <Link>Functions\mpGroundLine\Properties\GroundLineProperties.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Styles\GroundLineStyle.cs">
       <Link>Functions\mpGroundLine\Styles\GroundLineStyle.cs</Link>
     </Compile>
@@ -405,7 +414,6 @@
   <ItemGroup>
     <Folder Include="Functions\mpGroundLine\Icons\" />
     <Folder Include="Functions\mpGroundLine\Overrules\" />
-    <Folder Include="Functions\mpGroundLine\Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

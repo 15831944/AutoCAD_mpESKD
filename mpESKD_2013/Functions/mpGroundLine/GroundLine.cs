@@ -11,6 +11,7 @@
     using Base.Styles;
     using ModPlus.Helpers;
     using ModPlusAPI.Windows;
+    using Properties;
     using Styles;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -115,6 +116,16 @@
             }
         }
 
+        /// <summary>
+        /// Перестроение точек - помещение EndPoint в список
+        /// </summary>
+        public void RebasePoints()
+        {
+            if (!MiddlePoints.Contains(EndPoint))
+                MiddlePoints.Add(EndPoint);
+            AcadHelpers.WriteMessageInDebug($"RebasePoints: Count {MiddlePoints.Count}");
+        }
+
         /// <inheritdoc />
         public override void UpdateEntities()
         {
@@ -175,22 +186,34 @@
         private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
         {
             var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
+            for (var i = 0; i < points.Count; i++)
+            {
+                var point2D = points[i];
+                AcadHelpers.WriteMessageInDebug($"Point {i}: {point2D.ToString()}");
+            }
+
             // Если количество точек совпадает, то просто их меняем
             if (points.Count == MainPolyline.NumberOfVertices)
             {
+                AcadHelpers.WriteMessageInDebug("Points count == number of vertices");
                 for (var i = 0; i < points.Count; i++)
                 {
                     MainPolyline.SetPointAt(i, points[i]);
-                    MainPolyline.SetBulgeAt(i, 0.0);
                 }
             }
             // Иначе создаем заново
             else
             {
+                AcadHelpers.WriteMessageInDebug("Points count != number of vertices");
                 for (var i = 0; i < MainPolyline.NumberOfVertices; i++)
                     MainPolyline.RemoveVertexAt(i);
+                AcadHelpers.WriteMessageInDebug($"Number of vertices: {MainPolyline.NumberOfVertices}");
                 for (var i = 0; i < points.Count; i++)
-                    MainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
+                {
+                    if (i < MainPolyline.NumberOfVertices)
+                        MainPolyline.SetPointAt(i, points[i]);
+                    else MainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
+                }
             }
         }
 
@@ -218,16 +241,16 @@
         {
             // apply settings from style
 
-            ////Scale = MainStaticSettings.Settings.UseScaleFromStyle
-            ////    ? StyleHelpers.GetPropertyValue(style, nameof(Scale), GroundLineProperties.Scale.DefaultValue)
-            ////    : AcadHelpers.Database.Cannoscale;
-            ////LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), AxisProperties.LineTypeScale.DefaultValue);
-            ////// set layer
-            ////var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name, AxisProperties.LayerName.DefaultValue);
-            ////AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
-            ////// set line type
-            ////var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name, AxisProperties.LineType.DefaultValue);
-            ////AcadHelpers.SetLineType(BlockId, lineType);
+            Scale = MainStaticSettings.Settings.UseScaleFromStyle
+                ? StyleHelpers.GetPropertyValue(style, nameof(Scale), GroundLineProperties.Scale.DefaultValue)
+                : AcadHelpers.Database.Cannoscale;
+            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), GroundLineProperties.LineTypeScale.DefaultValue);
+            // set layer
+            var layerName = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LayerName.Name, GroundLineProperties.LayerName.DefaultValue);
+            AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
+            // set line type
+            var lineType = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LineType.Name, GroundLineProperties.LineType.DefaultValue);
+            AcadHelpers.SetLineType(BlockId, lineType);
         }
 
         #endregion

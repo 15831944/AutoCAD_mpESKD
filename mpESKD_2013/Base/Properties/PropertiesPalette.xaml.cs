@@ -22,6 +22,7 @@ namespace mpESKD.Base.Properties
             StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
             AcadHelpers.Documents.DocumentCreated += Documents_DocumentCreated;
             AcadHelpers.Documents.DocumentActivated += Documents_DocumentActivated;
+            
             foreach (Document document in AcadHelpers.Documents)
             {
                 //document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
@@ -29,6 +30,20 @@ namespace mpESKD.Base.Properties
             }
             if (AcadHelpers.Document != null)
                 ShowPropertiesControlsBySelection();
+        }
+
+        private void Editor_SelectionRemoved(object sender, SelectionRemovedEventArgs e)
+        {
+            AcadHelpers.Editor.WriteMessage("Editor_SelectionRemoved\n");
+
+        }
+
+        private void Editor_SelectionAdded(object sender, SelectionAddedEventArgs e)
+        {
+            AcadHelpers.Editor.WriteMessage("Editor_SelectionAdded\n");
+            AcadHelpers.WriteMessageInDebug($"SelectionSet count: {e.Selection.Count}\n");
+            AcadHelpers.WriteMessageInDebug($"AddedObjects count: {e.AddedObjects.Count}\n");
+            ShowPropertiesControlsBySelection(e.AddedObjects);
         }
 
         private void Documents_DocumentActivated(object sender, DocumentCollectionEventArgs e)
@@ -51,8 +66,44 @@ namespace mpESKD.Base.Properties
 
         private void Document_ImpliedSelectionChanged(object sender, EventArgs e)
         {
+            AcadHelpers.WriteMessageInDebug("Document_ImpliedSelectionChanged from ModPlus");
             ShowPropertiesControlsBySelection();
         }
+
+        private void ShowPropertiesControlsBySelection(SelectionSet selectionSet)
+        {
+            if (selectionSet == null || selectionSet.Count == 0)
+            {
+                // Удаляем контролы свойств
+                if (StackPanelProperties.Children.Count > 0)
+                    StackPanelProperties.Children.Clear();
+                // Очищаем панель описания
+                ShowDescription(string.Empty);
+                // hide message
+                StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                if (MainStaticSettings.Settings.MaxSelectedObjects == 0 ||
+                    MainStaticSettings.Settings.MaxSelectedObjects >= selectionSet.Count)
+                {
+                    StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
+                    foreach (SelectedObject selectedObject in selectionSet)
+                    {
+                        using (OpenCloseTransaction tr = new OpenCloseTransaction())
+                        {
+                            var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
+                            if (obj is BlockReference)
+                            {
+                                ShowPropertiesForObject(obj);
+                            }
+                        }
+                    }
+                }
+                else StckMaxObjectsSelectedMessage.Visibility = Visibility.Visible;
+            }
+        }
+
         /// <summary>Добавление пользовательских элементов в палитру в зависимости от выбранных объектов</summary>
         private void ShowPropertiesControlsBySelection()
         {
@@ -63,7 +114,7 @@ namespace mpESKD.Base.Properties
                 if (StackPanelProperties.Children.Count > 0)
                     StackPanelProperties.Children.Clear();
                 // Очищаем панель описания
-                ShowDescription(String.Empty);
+                ShowDescription(string.Empty);
                 // hide message
                 StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
             }
@@ -80,32 +131,7 @@ namespace mpESKD.Base.Properties
                             var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                             if (obj is BlockReference)
                             {
-                                // mpBreakLine
-                                if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
-                                {
-                                    if (!HasPropertyControl(Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
-                                    {
-                                        var mpBreakLineProperties =
-                                            new Functions.mpBreakLine.Properties.BreakLinePropertiesPalette(this)
-                                            {
-                                                Name = Functions.mpBreakLine.BreakLineFunction.MPCOEntName
-                                            };
-                                        StackPanelProperties.Children.Add(mpBreakLineProperties);
-                                    }
-                                }
-                                // mpAxis
-                                if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpAxis.AxisFunction.MPCOEntName))
-                                {
-                                    if (!HasPropertyControl(Functions.mpAxis.AxisFunction.MPCOEntName))
-                                    {
-                                        var mpAxisProperties =
-                                            new Functions.mpAxis.Properties.AxisPropertiesPalette(this)
-                                            {
-                                                Name = Functions.mpAxis.AxisFunction.MPCOEntName
-                                            };
-                                        StackPanelProperties.Children.Add(mpAxisProperties);
-                                    }
-                                }
+                                ShowPropertiesForObject(obj);
                             }
                         }
                     }
@@ -113,10 +139,45 @@ namespace mpESKD.Base.Properties
                 else StckMaxObjectsSelectedMessage.Visibility = Visibility.Visible;
             }
         }
+
+        private void ShowPropertiesForObject(DBObject obj)
+        {
+            // mpBreakLine
+            if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
+            {
+                if (!HasPropertyControl(Functions.mpBreakLine.BreakLineFunction.MPCOEntName))
+                {
+                    var mpBreakLineProperties =
+                        new Functions.mpBreakLine.Properties.BreakLinePropertiesPalette(this)
+                        {
+                            Name = Functions.mpBreakLine.BreakLineFunction.MPCOEntName
+                        };
+                    StackPanelProperties.Children.Add(mpBreakLineProperties);
+                }
+            }
+
+            // mpAxis
+            if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpAxis.AxisFunction.MPCOEntName))
+            {
+                if (!HasPropertyControl(Functions.mpAxis.AxisFunction.MPCOEntName))
+                {
+                    var mpAxisProperties =
+                        new Functions.mpAxis.Properties.AxisPropertiesPalette(this)
+                        {
+                            Name = Functions.mpAxis.AxisFunction.MPCOEntName
+                        };
+                    StackPanelProperties.Children.Add(mpAxisProperties);
+                }
+            }
+
+            // mpGroundLine
+        }
+
         public void ShowDescription(string description)
         {
             TbDescription.Text = description;
         }
+
         private bool HasPropertyControl(string name)
         {
             foreach (object child in StackPanelProperties.Children)

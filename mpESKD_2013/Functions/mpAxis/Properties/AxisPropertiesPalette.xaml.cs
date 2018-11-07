@@ -23,7 +23,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             _parentPalette = palette;
             InitializeComponent();
-            ModPlusAPI.Language.SetLanguageProviderForWindow(Resources);
+            ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             // styles
             var sNames = new List<string>();
             foreach (var style in AxisStyleManager.Styles)

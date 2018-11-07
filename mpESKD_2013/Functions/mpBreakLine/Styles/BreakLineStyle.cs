@@ -62,12 +62,13 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         }
 
         #region Properties
+        
         public int Overhang { get; set; }
+        
         public int BreakHeight { get; set; }
+        
         public int BreakWidth { get; set; }
-        public double LineTypeScale { get; set; }
-        public string LayerName { get; set; }
-        public AnnotationScale Scale { get; set; }
+        
         #endregion
     }
 
