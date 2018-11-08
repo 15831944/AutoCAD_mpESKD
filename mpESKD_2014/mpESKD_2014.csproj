@@ -81,6 +81,9 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\mpESKD_2013\Base\Enums\UpdateVariant.cs">
+      <Link>Base\Enums\UpdateVariant.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\Helpers\AcadHelpers.cs">
       <Link>Base\Helpers\AcadHelpers.cs</Link>
     </Compile>

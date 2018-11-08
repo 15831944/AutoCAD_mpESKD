@@ -7,6 +7,7 @@
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
+    using Base.Enums;
     using Base.Helpers;
     using mpESKD.Base.Styles;
     using Properties;
@@ -433,13 +434,7 @@
                 ExceptionBox.Show(exception);
             }
         }
-
-        internal enum UpdateVariant
-        {
-            SetInsertionPoint,
-            SetEndPointMinLength
-        }
-
+        
         public static BreakLine GetBreakLineFromEntity(Entity ent)
         {
             using (ResultBuffer resBuf = ent.GetXDataForApplication(BreakLineFunction.MPCOEntName))

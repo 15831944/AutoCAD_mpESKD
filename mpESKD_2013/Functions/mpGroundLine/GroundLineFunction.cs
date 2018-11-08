@@ -82,19 +82,21 @@
                         var status = AcadHelpers.Editor.Drag(breakLineJig).Status;
                         if (status == PromptStatus.OK)
                         {
-                            AcadHelpers.WriteMessageInDebug("Status OK");
                             breakLineJig.JigState = GroundLineJigState.PromptNextPoint;
                             if (breakLineJig.PreviousPoint == null)
                             {
-                                if (groundLine.MiddlePoints.Any())
-                                    breakLineJig.PreviousPoint = groundLine.MiddlePoints.Last();
-                                else breakLineJig.PreviousPoint = groundLine.EndPoint;
+                                breakLineJig.PreviousPoint = groundLine.MiddlePoints.Any()
+                                    ? groundLine.MiddlePoints.Last() 
+                                    : groundLine.InsertionPoint;
                             }
-                            else groundLine.RebasePoints();
+                            else
+                            {
+                                groundLine.RebasePoints();
+                                breakLineJig.PreviousPoint = groundLine.MiddlePoints.Last();
+                            }
                         }
                         else
                         {
-                            AcadHelpers.WriteMessageInDebug("Status != OK");
                             if (groundLine.MiddlePoints.Any())
                             {
                                 groundLine.EndPoint = groundLine.MiddlePoints.Last();

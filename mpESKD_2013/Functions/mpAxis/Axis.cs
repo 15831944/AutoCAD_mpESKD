@@ -7,6 +7,7 @@
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.Geometry;
     using Base;
+    using Base.Enums;
     using Base.Helpers;
     using mpESKD.Base.Styles;
     using Properties;
@@ -1492,13 +1493,7 @@
                 ExceptionBox.Show(exception);
             }
         }
-
-        internal enum UpdateVariant
-        {
-            SetInsertionPoint,
-            SetEndPointMinLength
-        }
-
+        
         public static Axis GetAxisFromEntity(Entity ent)
         {
             using (ResultBuffer resBuf = ent.GetXDataForApplication(AxisFunction.MPCOEntName))

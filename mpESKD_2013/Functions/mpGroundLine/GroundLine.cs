@@ -8,6 +8,7 @@
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
+    using Base.Enums;
     using Base.Helpers;
     using Base.Styles;
     using ModPlus.Helpers;
@@ -350,13 +351,7 @@
                 ExceptionBox.Show(exception);
             }
         }
-
-        internal enum UpdateVariant
-        {
-            SetInsertionPoint,
-            SetEndPointMinLength
-        }
-
+        
         public static GroundLine GetGroundLineFromEntity(Entity ent)
         {
             using (ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineFunction.MPCOEntName))

@@ -81,6 +81,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\Enums\UpdateVariant.cs" />
     <Compile Include="Base\Helpers\AcadHelpers.cs" />
     <Compile Include="Base\Helpers\JigHelper.cs" />
     <Compile Include="Base\Helpers\LayerHelper.cs" />

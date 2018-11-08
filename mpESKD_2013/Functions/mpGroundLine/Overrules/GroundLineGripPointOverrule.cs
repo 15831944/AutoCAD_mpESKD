@@ -55,11 +55,9 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     if (groundLine != null)
                     {
                         // insertion (start) grip
-                        var gp = new GroundLineVertexGrip
+                        var gp = new GroundLineVertexGrip(groundLine, 0)
                         {
                             GripType = MPCOGrips.MPCOEntityGripType.Point,
-                            GroundLine = groundLine,
-                            GripName = GroundLineGripName.StartGrip,
                             GripPoint = groundLine.InsertionPoint
                         };
                         grips.Add(gp);
@@ -67,24 +65,18 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                         // middle points
                         for (var index = 0; index < groundLine.MiddlePoints.Count; index++)
                         {
-                            var mp = groundLine.MiddlePoints[index];
-                            gp = new GroundLineVertexGrip
+                            gp = new GroundLineVertexGrip(groundLine, index + 1)
                             {
                                 GripType = MPCOGrips.MPCOEntityGripType.Point,
-                                GroundLine = groundLine,
-                                GripName = GroundLineGripName.MiddleGrip,
-                                GripPoint = mp,
-                                MiddleGripIndex = index
+                                GripPoint = groundLine.MiddlePoints[index]
                             };
                             grips.Add(gp);
                         }
 
                         // end point
-                        gp = new GroundLineVertexGrip
+                        gp = new GroundLineVertexGrip(groundLine, groundLine.MiddlePoints.Count + 1)
                         {
                             GripType = MPCOGrips.MPCOEntityGripType.Point,
-                            GroundLine = groundLine,
-                            GripName = GroundLineGripName.EndGrip,
                             GripPoint = groundLine.EndPoint
                         };
                         grips.Add(gp);
@@ -107,23 +99,22 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     {
                         if (gripData is GroundLineVertexGrip vertexGrip)
                         {
-                            if (vertexGrip.GripName == GroundLineGripName.StartGrip)
+                            /*
+                             * Если индекс ручки
+                             */
+                            if (vertexGrip.GripIndex == 0)
                             {
-                                // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
-                                // Все точки всегда совпадают (+ ручка)
                                 ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
                                 vertexGrip.GroundLine.InsertionPoint = vertexGrip.GripPoint + offset;
                             }
-                            
-                            if(vertexGrip.GripName == GroundLineGripName.MiddleGrip)
-                            {
-                                vertexGrip.GroundLine.MiddlePoints[vertexGrip.MiddleGripIndex] = 
-                                    vertexGrip.GripPoint + offset;
-                            }
-
-                            if (vertexGrip.GripName == GroundLineGripName.EndGrip)
+                            else if (vertexGrip.GripIndex == vertexGrip.GroundLine.MiddlePoints.Count + 1)
                             {
                                 vertexGrip.GroundLine.EndPoint = vertexGrip.GripPoint + offset;
+                            }
+                            else
+                            {
+                                vertexGrip.GroundLine.MiddlePoints[vertexGrip.GripIndex - 1] =
+                                    vertexGrip.GripPoint + offset;
                             }
 
                             // Вот тут происходит перерисовка примитивов внутри блока
@@ -158,8 +149,11 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
     /// </summary>
     public class GroundLineVertexGrip : MPCOGrips.MPCOGripData //<-- Там будут определены типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
     {
-        public GroundLineVertexGrip()
+        public GroundLineVertexGrip(GroundLine groundLine, int index)
         {
+            GroundLine = groundLine;
+            GripIndex = index;
+
             // отключение контекстного меню и возможности менять команду
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
             ModeKeywordsDisabled = true;
@@ -168,55 +162,31 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         /// <summary>
         /// Экземпляр класса GroundLine
         /// </summary>
-        public GroundLine GroundLine { get; set; }
-
-        public GroundLineGripName GripName { get; set; }
+        public GroundLine GroundLine { get; }
 
         /// <summary>
-        /// Индекс средней точки в списке средних точек
+        /// Индекс точки
         /// </summary>
-        public int MiddleGripIndex { get; set; } = -1;
+        public int GripIndex { get; }
 
         // Подсказка в зависимости от имени ручки
         public override string GetTooltip()
         {
-            switch (GripName)
-            {
-                case GroundLineGripName.StartGrip:
-                case GroundLineGripName.MiddleGrip:
-                case GroundLineGripName.EndGrip:
-                    {
-                        return Language.GetItem(MainFunction.LangItem, "gp1"); // stretch
-                    }
-            }
-            return base.GetTooltip();
+            return Language.GetItem(MainFunction.LangItem, "gp1"); // stretch
         }
 
-        // Временное значение первой ручки
-        private Point3d _startGripTmp;
-
-        private Point3d _middleGripTmp;
-
-        // временное значение последней ручки
-        private Point3d _endGripTmp;
+        // Временное значение ручки
+        private Point3d _gripTmp;
 
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
             try
             {
-                AcadHelpers.WriteMessageInDebug($"OnGripStatusChanged status: {newStatus}");
-                AcadHelpers.WriteMessageInDebug($"OnGripStatusChanged GripName: {GripName}");
-
                 // При начале перемещения запоминаем первоначальное положение ручки
                 // Запоминаем начальные значения
                 if (newStatus == Status.GripStart)
                 {
-                    if (GripName == GroundLineGripName.StartGrip)
-                        _startGripTmp = GripPoint;
-                    if (GripName == GroundLineGripName.MiddleGrip)
-                        _middleGripTmp = GripPoint;
-                    if (GripName == GroundLineGripName.EndGrip)
-                        _endGripTmp = GripPoint;
+                    _gripTmp = GripPoint;
                 }
 
                 // При удачном перемещении ручки записываем новые значения в расширенные данные
@@ -238,12 +208,14 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                 // При отмене перемещения возвращаем временные значения
                 if (newStatus == Status.GripAbort)
                 {
-                    if (_startGripTmp != null & GripName == GroundLineGripName.StartGrip)
-                        GroundLine.InsertionPoint = _startGripTmp;
-                    if (_middleGripTmp != null & GripName == GroundLineGripName.MiddleGrip)
-                        GroundLine.MiddlePoints[MiddleGripIndex] = _middleGripTmp;
-                    if (_endGripTmp != null & GripName == GroundLineGripName.EndGrip)
-                        GroundLine.EndPoint = _endGripTmp;
+                    if (_gripTmp != null)
+                    {
+                        if (GripIndex == 0)
+                            GroundLine.InsertionPoint = _gripTmp;
+                        else if (GripIndex == GroundLine.MiddlePoints.Count + 1)
+                            GroundLine.EndPoint = _gripTmp;
+                        else GroundLine.MiddlePoints[GripIndex - 1] = _gripTmp;
+                    }
                 }
 
                 base.OnGripStatusChanged(entityId, newStatus);
@@ -253,12 +225,5 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                 ExceptionBox.Show(exception);
             }
         }
-    }
-
-    public enum GroundLineGripName
-    {
-        StartGrip,
-        MiddleGrip,
-        EndGrip
     }
 }
