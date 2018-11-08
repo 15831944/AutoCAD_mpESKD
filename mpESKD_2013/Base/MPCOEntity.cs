@@ -17,6 +17,7 @@ namespace mpESKD.Base
         {
             BlockTransform = Matrix3d.Identity;
         }
+
         /// <summary>
         /// Первая точка примитива в мировой системе координат.
         /// Должна соответствовать точке вставке блока

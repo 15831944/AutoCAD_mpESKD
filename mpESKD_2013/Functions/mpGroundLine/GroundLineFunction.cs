@@ -12,6 +12,7 @@
     using Base.Styles;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Overrules;
     using Properties;
     using Styles;
     using Exception = Autodesk.AutoCAD.Runtime.Exception;
@@ -27,20 +28,24 @@
 
         public void Initialize()
         {
-            //// TODO Release it!!!
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance(), true);
+
             GroundLineStyleManager.CheckStylesFile();
         }
 
         public void Terminate()
         {
-            //// TODO Release it!!!
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance());
         }
     }
 
     public class GroundLineCommands
     {
-        //// TODO Uncomment
-        ////[CommandMethod("ModPlus", "mpGroundLine", CommandFlags.Modal)]
+        [CommandMethod("ModPlus", "mpGroundLine", CommandFlags.Modal)]
         public void CreateGroundLineCommand()
         {
             CreateGroundLine();

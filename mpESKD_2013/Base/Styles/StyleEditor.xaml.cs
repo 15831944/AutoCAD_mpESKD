@@ -359,7 +359,7 @@ namespace mpESKD.Base.Styles
         private string AddStyleFromBreakLine(BlockReference blkReference)
         {
             var styleGuid = string.Empty;
-            var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkReference);
+            var breakLine = BreakLine.GetBreakLineFromEntity(blkReference);
             if (breakLine != null)
             {
                 var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == BreakLineFunction.MPCOEntName);
@@ -388,7 +388,7 @@ namespace mpESKD.Base.Styles
         private string AddStyleFromAxis(BlockReference blkReference)
         {
             var styleGuid = string.Empty;
-            var axis = AxisXDataHelper.GetAxisFromEntity(blkReference);
+            var axis = Axis.GetAxisFromEntity(blkReference);
             if (axis != null)
             {
                 var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == AxisFunction.MPCOEntName);

@@ -25,27 +25,12 @@ namespace mpESKD.Base.Properties
             
             foreach (Document document in AcadHelpers.Documents)
             {
-                //document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
                 document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
             }
             if (AcadHelpers.Document != null)
                 ShowPropertiesControlsBySelection();
         }
-
-        private void Editor_SelectionRemoved(object sender, SelectionRemovedEventArgs e)
-        {
-            AcadHelpers.Editor.WriteMessage("Editor_SelectionRemoved\n");
-
-        }
-
-        private void Editor_SelectionAdded(object sender, SelectionAddedEventArgs e)
-        {
-            AcadHelpers.Editor.WriteMessage("Editor_SelectionAdded\n");
-            AcadHelpers.WriteMessageInDebug($"SelectionSet count: {e.Selection.Count}\n");
-            AcadHelpers.WriteMessageInDebug($"AddedObjects count: {e.AddedObjects.Count}\n");
-            ShowPropertiesControlsBySelection(e.AddedObjects);
-        }
-
+        
         private void Documents_DocumentActivated(object sender, DocumentCollectionEventArgs e)
         {
             if (e.Document != null)
@@ -68,40 +53,6 @@ namespace mpESKD.Base.Properties
         {
             AcadHelpers.WriteMessageInDebug("Document_ImpliedSelectionChanged from ModPlus");
             ShowPropertiesControlsBySelection();
-        }
-
-        private void ShowPropertiesControlsBySelection(SelectionSet selectionSet)
-        {
-            if (selectionSet == null || selectionSet.Count == 0)
-            {
-                // Удаляем контролы свойств
-                if (StackPanelProperties.Children.Count > 0)
-                    StackPanelProperties.Children.Clear();
-                // Очищаем панель описания
-                ShowDescription(string.Empty);
-                // hide message
-                StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                if (MainStaticSettings.Settings.MaxSelectedObjects == 0 ||
-                    MainStaticSettings.Settings.MaxSelectedObjects >= selectionSet.Count)
-                {
-                    StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
-                    foreach (SelectedObject selectedObject in selectionSet)
-                    {
-                        using (OpenCloseTransaction tr = new OpenCloseTransaction())
-                        {
-                            var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
-                            if (obj is BlockReference)
-                            {
-                                ShowPropertiesForObject(obj);
-                            }
-                        }
-                    }
-                }
-                else StckMaxObjectsSelectedMessage.Visibility = Visibility.Visible;
-            }
         }
 
         /// <summary>Добавление пользовательских элементов в палитру в зависимости от выбранных объектов</summary>

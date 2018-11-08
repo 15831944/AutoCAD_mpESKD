@@ -38,6 +38,7 @@
             // Применяем текущий стиль к ЕСКД примитиву
             ApplyStyle(style);
         }
+        
         // Основные свойства  примитива
 
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
@@ -55,27 +56,6 @@
         private Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
         
         private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
-
-        #region Grips
-        /* Можно создать коллекцию ручек и логически получать их из коллекции по индексу
-         * Но я сделаю отдельно каждую ручку, таким образом я буду работать с конкретной 
-         * ручкой по ее "имени"
-         * Ручки "зависимы" от точек примитива, поэтому их будем только "получать"
-         * Я бы мог просто получать точки примитива, но так можно и запутаться
-         */
-        /// <summary>
-        /// Первая ручка. Равна точке вставки
-        /// </summary>
-        public Point3d StartGrip => InsertionPoint;
-        /// <summary>
-        /// Средняя ручка. Равна средней точке
-        /// </summary>
-        public Point3d MiddleGrip => MiddlePoint;
-        /// <summary>
-        /// Конечная ручка. Равна конечной точке
-        /// </summary>
-        public Point3d EndGrip => EndPoint;
-        #endregion
 
         /// <summary>Выступ линии обрыва за граници "обрываемого" объекта</summary>
         public int Overhang { get; set; } = BreakLineProperties.Overhang.DefaultValue;
@@ -459,35 +439,7 @@
             SetInsertionPoint,
             SetEndPointMinLength
         }
-    }
-    /// <summary>
-    /// Вспомогательный класс для работы с XData
-    /// </summary>
-    public static class BreakLineXDataHelper
-    {
-        public static bool SaveToEntity(DBObject dbObject, BreakLine breakLine)
-        {
-            try
-            {
-                dbObject.UpgradeOpen();
-                using (ResultBuffer resBuf = breakLine.GetParametersForXData())
-                {
-                    dbObject.XData = resBuf;
-                }
-                dbObject.DowngradeOpen();
-                return true;
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-                return false;
-            }
-        }
-        /// <summary>
-        /// Создание экземпляра ЕСКД примитива по данным блока
-        /// </summary>
-        /// <param name="ent">блок (примитив автокада)</param>
-        /// <returns></returns>
+
         public static BreakLine GetBreakLineFromEntity(Entity ent)
         {
             using (ResultBuffer resBuf = ent.GetXDataForApplication(BreakLineFunction.MPCOEntName))

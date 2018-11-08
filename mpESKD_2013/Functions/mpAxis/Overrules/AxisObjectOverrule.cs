@@ -29,7 +29,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                         {
-                            var axis = AxisXDataHelper.GetAxisFromEntity((Entity)dbObject);
+                            var axis = Axis.GetAxisFromEntity((Entity)dbObject);
                             if (axis != null)
                             {
                                 axis.UpdateEntities();

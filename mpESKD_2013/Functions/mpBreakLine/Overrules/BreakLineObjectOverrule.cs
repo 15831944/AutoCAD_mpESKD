@@ -8,8 +8,8 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
 {
     public class BreakLineObjectOverrule : ObjectOverrule
     {
-
         protected static BreakLineObjectOverrule _breakLineObjectOverrule;
+
         public static BreakLineObjectOverrule Instance()
         {
             if (_breakLineObjectOverrule != null) return _breakLineObjectOverrule;
@@ -30,7 +30,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                     {
-                        var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity((Entity)dbObject);
+                        var breakLine = BreakLine.GetBreakLineFromEntity((Entity)dbObject);
                         if (breakLine != null)
                         {
                             breakLine.UpdateEntities();

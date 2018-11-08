@@ -25,7 +25,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var breakLine = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var breakLine = Axis.GetAxisFromEntity(blkRef))
                         {
                             var style = AxisStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value));
                             if (style != null)
@@ -58,7 +58,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.MarkersPosition = AxisPropertiesHelpers.GetAxisMarkersPositionByLocalName(value);
                             axis.UpdateEntities();
@@ -85,7 +85,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.MarkersCount = value;
                             axis.UpdateEntities();
@@ -113,7 +113,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.Fracture = value;
                             axis.UpdateEntities();
@@ -141,7 +141,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             var oldFracture = axis.BottomFractureOffset;
                             axis.BottomFractureOffset = value;
@@ -173,7 +173,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.TopFractureOffset = value;
                             axis.UpdateEntities();
@@ -200,7 +200,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.MarkersDiameter = value;
                             axis.UpdateEntities();
@@ -227,7 +227,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.TextStyle = value;
                             axis.UpdateEntities();
@@ -254,7 +254,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.TextHeight = value;
                             axis.UpdateEntities();
@@ -283,7 +283,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.FirstTextPrefix = value;
                             axis.UpdateEntities();
@@ -310,7 +310,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.FirstTextSuffix = value;
                             axis.UpdateEntities();
@@ -337,7 +337,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.FirstText = value;
                             axis.UpdateEntities();
@@ -364,7 +364,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.SecondTextPrefix = value;
                             axis.UpdateEntities();
@@ -391,7 +391,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.SecondTextSuffix = value;
                             axis.UpdateEntities();
@@ -418,7 +418,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.SecondText = value;
                             axis.UpdateEntities();
@@ -445,7 +445,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.ThirdTextPrefix = value;
                             axis.UpdateEntities();
@@ -472,7 +472,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.ThirdTextSuffix = value;
                             axis.UpdateEntities();
@@ -499,7 +499,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.ThirdText = value;
                             axis.UpdateEntities();
@@ -529,7 +529,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.FirstMarkerType = value.Equals(Language.GetItem(MainFunction.LangItem, "type1")) // "Тип 1"
                                 ? 0 : 1;
@@ -557,7 +557,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.SecondMarkerType = value.Equals(Language.GetItem(MainFunction.LangItem, "type1")) // "Тип 1"
                                 ? 0 : 1;
@@ -585,7 +585,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.ThirdMarkerType = value.Equals(Language.GetItem(MainFunction.LangItem, "type1")) // "Тип 1"
                                 ? 0 : 1;
@@ -616,7 +616,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.ArrowsSize = value;
                             axis.UpdateEntities();
@@ -643,7 +643,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.BottomOrientText = value;
                             axis.UpdateEntities();
@@ -670,7 +670,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.TopOrientText = value;
                             axis.UpdateEntities();
@@ -697,7 +697,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.BottomOrientMarkerVisible = value;
                             axis.UpdateEntities();
@@ -724,7 +724,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.TopOrientMarkerVisible = value;
                             axis.UpdateEntities();
@@ -751,7 +751,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.OrientMarkerType = value.Equals(Language.GetItem(MainFunction.LangItem, "type1")) // "Тип 1"
                                 ? 0 : 1;
@@ -785,7 +785,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             var oldScale = axis.GetScale();
                             axis.Scale = AcadHelpers.GetAnnotationScaleByName(value);
@@ -818,7 +818,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var axis = AxisXDataHelper.GetAxisFromEntity(blkRef))
+                        using (var axis = Axis.GetAxisFromEntity(blkRef))
                         {
                             axis.LineTypeScale = value;
                             axis.UpdateEntities();
@@ -905,7 +905,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 _blkRefObjectId = ObjectId.Null;
                 return;
             }
-            var axis = AxisXDataHelper.GetAxisFromEntity(blkReference);
+            var axis = Axis.GetAxisFromEntity(blkReference);
             if (axis != null)
             {
                 _style = AxisStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(axis.StyleGuid))?.Name;

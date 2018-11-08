@@ -29,7 +29,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
             {
                 try
                 {
-                    var axis = AxisXDataHelper.GetAxisFromEntity(entity);
+                    var axis = Axis.GetAxisFromEntity(entity);
                     if (axis != null)
                     {
                         snapPoints.Add(axis.InsertionPoint);

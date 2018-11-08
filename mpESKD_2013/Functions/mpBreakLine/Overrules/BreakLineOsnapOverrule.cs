@@ -28,7 +28,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             {
                 try
                 {
-                    var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(entity);
+                    var breakLine = BreakLine.GetBreakLineFromEntity(entity);
                     if (breakLine != null)
                     {
                         snapPoints.Add(breakLine.InsertionPoint);

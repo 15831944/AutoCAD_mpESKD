@@ -38,7 +38,7 @@
         public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location, Transaction tr)
         {
             BeditCommandWatcher.UseBedit = false;
-            var axis = AxisXDataHelper.GetAxisFromEntity(blockReference);
+            var axis = Axis.GetAxisFromEntity(blockReference);
             axis.UpdateEntities();
             bool saveBack = false;
             if (MainStaticSettings.Settings.AxisUsePluginTextEditor)

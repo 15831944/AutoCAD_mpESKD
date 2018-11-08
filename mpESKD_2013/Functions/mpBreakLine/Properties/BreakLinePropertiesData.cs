@@ -24,7 +24,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkRef))
+                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
                         {
                             var style = BreakLineStylesManager.Styles.FirstOrDefault(s => s.Name.Equals(value));
                             if (style != null)
@@ -56,7 +56,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkRef))
+                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
                         {
                             breakLine.Overhang = value;
                             breakLine.UpdateEntities();
@@ -83,7 +83,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkRef))
+                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
                         {
                             breakLine.BreakHeight = value;
                             breakLine.UpdateEntities();
@@ -110,7 +110,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkRef))
+                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
                         {
                             breakLine.BreakWidth = value;
                             breakLine.UpdateEntities();
@@ -137,7 +137,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkRef))
+                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
                         {
                             breakLine.BreakLineType = BreakLinePropertiesHelpers.GetBreakLineTypeByLocalName(value);
                             breakLine.UpdateEntities();
@@ -166,7 +166,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkRef))
+                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
                         {
                             breakLine.Scale = AcadHelpers.GetAnnotationScaleByName(value);
                             breakLine.UpdateEntities();
@@ -194,7 +194,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 {
                     using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        using (var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkRef))
+                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
                         {
                             breakLine.LineTypeScale = value;
                             breakLine.UpdateEntities();
@@ -265,7 +265,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 _blkRefObjectId = ObjectId.Null;
                 return;
             }
-            var breakLine = BreakLineXDataHelper.GetBreakLineFromEntity(blkReference);
+            var breakLine = BreakLine.GetBreakLineFromEntity(blkReference);
             if (breakLine != null)
             {
                 _style = BreakLineStylesManager.Styles.FirstOrDefault(s => s.Guid.Equals(breakLine.StyleGuid))?.Name;

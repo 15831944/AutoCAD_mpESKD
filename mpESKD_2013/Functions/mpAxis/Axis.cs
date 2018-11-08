@@ -146,30 +146,7 @@
         private Point3d TopMarkerPointOCS => TopMarkerPoint.TransformBy(BlockTransform.Inverse());
         private Point3d BottomOrientPointOCS => BottomOrientPoint.TransformBy(BlockTransform.Inverse());
         private Point3d TopOrientPointOCS => TopOrientPoint.TransformBy(BlockTransform.Inverse());
-
-        #region Grips
-        /* Можно создать коллекцию ручек и логически получать их из коллекции по индексу
-         * Но я сделаю отдельно каждую ручку, таким образом я буду работать с конкретной 
-         * ручкой по ее "имени"
-         * Ручки "зависимы" от точек примитива, поэтому их будем только "получать"
-         * Я бы мог просто получать точки примитива, но так можно и запутаться
-         */
-        /// <summary>Первая ручка. Равна точке вставки</summary>
-        public Point3d StartGrip => InsertionPoint;
-        /// <summary>Средняя ручка. Равна средней точке</summary>
-        public Point3d MiddleGrip => MiddlePoint;
-        /// <summary>Конечная ручка. Равна конечной точке</summary>
-        public Point3d EndGrip => EndPoint;
-        /// <summary>Ручка нижней точки расположения маркеров</summary>
-        public Point3d BottomMarkerGrip => BottomMarkerPoint;
-        /// <summary>Ручка верхней точки расположения маркеров</summary>
-        public Point3d TopMarkerGrip => TopMarkerPoint;
-        /// <summary>Ручка нижнего маркера ориентира</summary>
-        public Point3d BottomOrientGrip => BottomOrientPoint;
-        /// <summary>Ручка верхнего маркера ориентира</summary>
-        public Point3d TopOrientGrip => TopOrientPoint;
-        #endregion
-
+        
         #endregion
 
         #region General Properties
@@ -1521,32 +1498,7 @@
             SetInsertionPoint,
             SetEndPointMinLength
         }
-    }
 
-    /// <summary>Вспомогательный класс для работы с XData</summary>
-    public static class AxisXDataHelper
-    {
-        public static bool SaveToEntity(DBObject dbObject, Axis axis)
-        {
-            try
-            {
-                dbObject.UpgradeOpen();
-                using (ResultBuffer resBuf = axis.GetParametersForXData())
-                {
-                    dbObject.XData = resBuf;
-                }
-                dbObject.DowngradeOpen();
-                return true;
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-                return false;
-            }
-        }
-        /// <summary>Создание экземпляра ЕСКД примитива по данным блока</summary>
-        /// <param name="ent">блок (примитив автокада)</param>
-        /// <returns></returns>
         public static Axis GetAxisFromEntity(Entity ent)
         {
             using (ResultBuffer resBuf = ent.GetXDataForApplication(AxisFunction.MPCOEntName))

@@ -266,6 +266,15 @@
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\GroundLineJig.cs">
       <Link>Functions\mpGroundLine\GroundLineJig.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs">
+      <Link>Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs">
+      <Link>Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs">
+      <Link>Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLineProperties.cs">
       <Link>Functions\mpGroundLine\Properties\GroundLineProperties.cs</Link>
     </Compile>
@@ -421,7 +430,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Functions\mpGroundLine\Icons\" />
-    <Folder Include="Functions\mpGroundLine\Overrules\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

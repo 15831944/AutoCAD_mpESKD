@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
@@ -67,18 +68,6 @@
         }
 
         private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
-
-        #region Grips
-
-        /// <summary>Первая ручка. Равна точке вставки</summary>
-        public Point3d StartGrip => InsertionPoint;
-
-        public List<Point3d> MiddleGrips => MiddlePoints;
-
-        /// <summary>Конечная ручка. Равна конечной точке</summary>
-        public Point3d EndGrip => EndPoint;
-
-        #endregion
 
         #endregion
 
@@ -263,9 +252,29 @@
                 var resBuf = new ResultBuffer();
                 // 1001 - DxfCode.ExtendedDataRegAppName. AppName
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, GroundLineFunction.MPCOEntName));
+
+                // 1010
+                // Векторы от средних точек до начальной точки
+                foreach (Point3d middlePointOCS in MiddlePointsOCS)
+                {
+                    var vector = middlePointOCS - InsertionPointOCS;
+                    resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z)));
+                }
+
                 // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
-                var vector = EndPointOCS - InsertionPointOCS;
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z))); //0
+                {
+                    var vector = EndPointOCS - InsertionPointOCS;
+                    resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z)));
+                }
+
+                // Текстовые значения (код 1000)
+                // Стиль
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
+                // scale
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 1
+
+                // Значения типа double (dxfCode 1040)
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
 
                 return resBuf;
             }
@@ -284,18 +293,55 @@
                 /* indexes
                  * Для каждого значения с повторяющимся кодом назначен свой индекc (см. метод GetParametersForXData)
                  */
+                List<Point3d> middleAndEndPoints = new List<Point3d>();
+                var index1000 = 0;
+                var index1040 = 0;
                 foreach (TypedValue typedValue in resBufArr)
                 {
                     switch ((DxfCode)typedValue.TypeCode)
                     {
                         case DxfCode.ExtendedDataXCoordinate:
                             {
-                                // Получаем вектор от последней точки до первой в системе координат блока
-                                var vectorFromEndToInsertion = ((Point3d)typedValue.Value).GetAsVector();
-                                // получаем конечную точку в мировой системе координат
-                                EndPoint = (InsertionPointOCS + vectorFromEndToInsertion).TransformBy(BlockTransform);
+                                // Получаем вектор от точки до первой в системе координат блока
+                                var vectorFromPointToInsertion = ((Point3d)typedValue.Value).GetAsVector();
+                                // получаем точку в мировой системе координат
+                                var point = (InsertionPointOCS + vectorFromPointToInsertion).TransformBy(BlockTransform);
+                                middleAndEndPoints.Add(point);
                                 break;
                             }
+                        case DxfCode.ExtendedDataAsciiString:
+                            {
+                                switch (index1000)
+                                {
+                                    case 0:
+                                        StyleGuid = typedValue.Value.ToString();
+                                        break;
+                                    case 1:
+                                        Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
+                                        break;
+                                }
+                                // index
+                                index1000++;
+                                break;
+                            }
+                        case DxfCode.ExtendedDataReal:
+                            {
+                                if (index1040 == 0) // 0 - LineTypeScale
+                                    LineTypeScale = (double)typedValue.Value;
+                                index1040++;
+                                break;
+                            }
+                    }
+                }
+
+                // rebase points
+                if (middleAndEndPoints.Any())
+                {
+                    EndPoint = middleAndEndPoints.Last();
+                    MiddlePoints.Clear();
+                    for (var i = 0; i < middleAndEndPoints.Count - 1; i++)
+                    {
+                        MiddlePoints.Add(middleAndEndPoints[i]);
                     }
                 }
             }
@@ -309,6 +355,23 @@
         {
             SetInsertionPoint,
             SetEndPointMinLength
+        }
+
+        public static GroundLine GetGroundLineFromEntity(Entity ent)
+        {
+            using (ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineFunction.MPCOEntName))
+            {
+                // В случае команды ОТМЕНА может вернуть null
+                if (resBuf == null) return null;
+                GroundLine groundLine = new GroundLine(ent.ObjectId);
+                // Получаем параметры из самого блока
+                // ОБЯЗАТЕЛЬНО СНАЧАЛА ИЗ БЛОКА!!!!!!
+                groundLine.GetParametersFromEntity(ent);
+                // Получаем параметры из XData
+                groundLine.GetParametersFromResBuf(resBuf);
+
+                return groundLine;
+            }
         }
     }
 }
