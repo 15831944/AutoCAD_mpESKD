@@ -12,7 +12,7 @@
                 <ResourceDictionary Source="../../../Base/Properties/Controls/ControlStyles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <converters:ColumnWidthConverter x:Key="ColumnWidthConverter"/>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
+            <XmlDataProvider x:Key="Lang" Source="D:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Expander Header="{Binding Source={StaticResource Lang}, XPath=h48}" IsExpanded="True" Name="Expander">

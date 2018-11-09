@@ -81,10 +81,14 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\BasePropertiesData.cs" />
+    <Compile Include="Base\Enums\BreakLineType.cs" />
+    <Compile Include="Base\Enums\GroundLineFirstStrokeOffset.cs" />
     <Compile Include="Base\Enums\UpdateVariant.cs" />
     <Compile Include="Base\Helpers\AcadHelpers.cs" />
     <Compile Include="Base\Helpers\JigHelper.cs" />
     <Compile Include="Base\Helpers\LayerHelper.cs" />
+    <Compile Include="Base\Helpers\MathExtensions.cs" />
     <Compile Include="Base\Helpers\TextStyleHelper.cs" />
     <Compile Include="Base\IMPCOEntityFunction.cs" />
     <Compile Include="Base\MPCOEntity.cs" />
@@ -165,6 +169,11 @@
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\Properties\GroundLineProperties.cs" />
+    <Compile Include="Functions\mpGroundLine\Properties\GroundLinePropertiesData.cs" />
+    <Compile Include="Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml.cs">
+      <DependentUpon>GroundLinePropertiesPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Functions\mpGroundLine\Properties\GroundLineSummaryProperties.cs" />
     <Compile Include="Functions\mpGroundLine\Styles\GroundLineStyle.cs" />
     <Compile Include="Interface.cs" />
     <Compile Include="LoadHelpers\RibbonBuilder.cs" />
@@ -224,6 +233,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

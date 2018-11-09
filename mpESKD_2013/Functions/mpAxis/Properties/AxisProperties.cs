@@ -269,6 +269,7 @@ namespace mpESKD.Functions.mpAxis.Properties
             Language.GetItem(MainFunction.LangItem, "amt2"),// "Сверху",
             Language.GetItem(MainFunction.LangItem, "amt3")//"Снизу"
         };
+
         #region Methods
 
         public static AxisMarkersPosition GetAxisMarkersPositionByLocalName(string local)

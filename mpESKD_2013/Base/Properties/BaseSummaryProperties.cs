@@ -1,10 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using ModPlusAPI;
-
-namespace mpESKD.Base.Properties
+﻿namespace mpESKD.Base.Properties
 {
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.Linq;
+    using ModPlusAPI;
+    using System.Reflection;
+
     public class BaseSummaryProperties<T> : ObservableCollection<T>
     {
         #region Общие свойства - свойства которые есть у всех примитивов
@@ -121,6 +122,24 @@ namespace mpESKD.Base.Properties
             foreach (var data in this)
             {
                 data.GetType().GetProperty(propName)?.SetValue(data, value, null);
+            }
+        }
+        
+        /// <summary>
+        /// Вызов события изменения для каждого свойства объекта
+        /// </summary>
+        protected void AllPropertyChangedReise()
+        {
+            string[] propsNames = this.GetType()
+                .GetProperties
+                (BindingFlags.Instance
+                 | BindingFlags.Public
+                 | BindingFlags.DeclaredOnly)
+                .Select(prop => prop.Name)
+                .ToArray();
+            foreach (string propName in propsNames)
+            {
+                OnPropertyChanged(new PropertyChangedEventArgs(propName));
             }
         }
     }

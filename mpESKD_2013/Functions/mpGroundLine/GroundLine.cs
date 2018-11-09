@@ -2,8 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
@@ -77,8 +79,32 @@
         /// <summary>
         /// Минимальная длина линии грунта
         /// </summary>
-        public double GroundLineMinLength => 10.0;
+        public static double GroundLineMinLength => 20.0;
 
+        /// <summary>
+        /// Отступ первого штриха в каждом сегменте полилинии
+        /// </summary>
+        public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineProperties.FirstStrokeOffset.DefaultValue;
+
+        /// <summary>
+        /// Длина штриха
+        /// </summary>
+        public int StrokeLength { get; set; } = GroundLineProperties.StrokeLength.DefaultValue;
+
+        /// <summary>
+        /// Расстояние между штрихами
+        /// </summary>
+        public int StrokeOffset { get; set; } = GroundLineProperties.StrokeOffset.DefaultValue;
+
+        /// <summary>
+        /// Угол наклона штриха в градусах
+        /// </summary>
+        public int StrokeAngle { get; set; } = GroundLineProperties.StrokeAngle.DefaultValue;
+
+        /// <summary>
+        /// Отступ группы штрихов
+        /// </summary>
+        public int Space { get; set; } = GroundLineProperties.Space.DefaultValue;
 
         #endregion
 
@@ -98,12 +124,28 @@
             }
         }
 
+        public List<Line> Strokes { get; } = new List<Line>();
+
         public override IEnumerable<Entity> Entities
         {
             get
             {
                 yield return MainPolyline;
+                foreach (var s in Strokes)
+                {
+                    yield return s;
+                }
             }
+        }
+
+        /// <summary>Установка свойств для примитивов, которые не меняются</summary>
+        /// <param name="entity">Примитив автокада</param>
+        private static void SetPropertiesToCadEntity(Entity entity)
+        {
+            entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+            entity.LineWeight = LineWeight.ByBlock;
+            entity.Linetype = "Continuous";
+            entity.LinetypeScale = 1.0;
         }
 
         /// <summary>
@@ -113,7 +155,6 @@
         {
             if (!MiddlePoints.Contains(EndPoint))
                 MiddlePoints.Add(EndPoint);
-            AcadHelpers.WriteMessageInDebug($"RebasePoints: Count {MiddlePoints.Count}");
         }
 
         /// <inheritdoc />
@@ -173,19 +214,16 @@
         /// <param name="middlePoints"></param>
         /// <param name="endPoint"></param>
         /// <param name="scale"></param>
-        private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
+        /// <param name="indexOfEditingVertex">Индекс редактируемой вершины</param>
+        private void CreateEntities(
+            Point3d insertionPoint, List<Point3d> middlePoints,
+            Point3d endPoint, double scale, int indexOfEditingVertex = -1)
         {
             var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
-            for (var i = 0; i < points.Count; i++)
-            {
-                var point2D = points[i];
-                AcadHelpers.WriteMessageInDebug($"Point {i}: {point2D.ToString()}");
-            }
 
             // Если количество точек совпадает, то просто их меняем
             if (points.Count == MainPolyline.NumberOfVertices)
             {
-                AcadHelpers.WriteMessageInDebug("Points count == number of vertices");
                 for (var i = 0; i < points.Count; i++)
                 {
                     MainPolyline.SetPointAt(i, points[i]);
@@ -194,10 +232,8 @@
             // Иначе создаем заново
             else
             {
-                AcadHelpers.WriteMessageInDebug("Points count != number of vertices");
                 for (var i = 0; i < MainPolyline.NumberOfVertices; i++)
                     MainPolyline.RemoveVertexAt(i);
-                AcadHelpers.WriteMessageInDebug($"Number of vertices: {MainPolyline.NumberOfVertices}");
                 for (var i = 0; i < points.Count; i++)
                 {
                     if (i < MainPolyline.NumberOfVertices)
@@ -205,6 +241,84 @@
                     else MainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
                 }
             }
+
+            // create strokes
+            Strokes.Clear();
+            if (MainPolyline.Length >= GroundLineMinLength)
+            {
+                for (var i = 1; i < MainPolyline.NumberOfVertices; i++)
+                {
+                    var previousPoint = MainPolyline.GetPoint3dAt(i - 1);
+                    var currentPoint = MainPolyline.GetPoint3dAt(i);
+                    Strokes.AddRange(CreateStrokesOnMainPolylineSegment(currentPoint, previousPoint, scale));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Создание штрихов на сегменте полилинии
+        /// </summary>
+        /// <param name="previousPoint"></param>
+        /// <param name="currentPoint"></param>
+        /// <param name="scale">Масштаб ЕСКД объекта</param>
+        private List<Line> CreateStrokesOnMainPolylineSegment(
+            Point3d currentPoint, Point3d previousPoint, double scale)
+        {
+            List<Line> segmentStrokeDependencies = new List<Line>();
+
+            Vector3d segmentVector = currentPoint - previousPoint;
+            double segmentLength = segmentVector.Length;
+            Vector3d perpendicular = segmentVector.GetPerpendicularVector().Negate();
+            double distanceAtSegmentStart = MainPolyline.GetDistAtPoint(previousPoint);
+
+            var overflowIndex = 0;
+
+            // Индекс штриха. Возможные значения - 0, 1, 2
+            var strokeIndex = 0;
+            var summDistanceAtSegment = 0.0;
+            while (true)
+            {
+                double distance = 0.0;
+                if (Math.Abs(summDistanceAtSegment) < 0.0001)
+                {
+                    if (FirstStrokeOffset == GroundLineFirstStrokeOffset.ByHalfSpace)
+                        distance = Space / 2.0 * scale;
+                    else distance = StrokeOffset * scale;
+                }
+                else
+                {
+                    if (strokeIndex == 0)
+                        distance = Space * scale;
+                    if (strokeIndex == 1 || strokeIndex == 2)
+                        distance = StrokeOffset * scale;
+                }
+
+                if (strokeIndex == 2)
+                    strokeIndex = 0;
+                else strokeIndex++;
+
+                summDistanceAtSegment += distance;
+
+                if (summDistanceAtSegment >= segmentLength)
+                    break;
+
+                var firstStrokePoint = MainPolyline.GetPointAtDist(distanceAtSegmentStart + summDistanceAtSegment);
+                var helpPoint =
+                    firstStrokePoint + segmentVector.Negate().GetNormal() * StrokeLength * scale * Math.Cos(StrokeAngle.DegreeToRadian());
+                var secondStrokePoint =
+                    helpPoint + perpendicular * StrokeLength * scale * Math.Sin(StrokeAngle.DegreeToRadian());
+                Line stroke = new Line(firstStrokePoint, secondStrokePoint);
+                SetPropertiesToCadEntity(stroke);
+
+                // индекс сегмента равен "левой" вершине
+                segmentStrokeDependencies.Add(stroke);
+
+                Debug.Assert(overflowIndex < 1000, "Overflow in stroke creation");
+                if (overflowIndex >= 1000)
+                    break;
+            }
+
+            return segmentStrokeDependencies;
         }
 
         private Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
@@ -230,7 +344,12 @@
         public void ApplyStyle(GroundLineStyle style)
         {
             // apply settings from style
-
+            FirstStrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(FirstStrokeOffset), GroundLineProperties.FirstStrokeOffset.DefaultValue);
+            StrokeLength = StyleHelpers.GetPropertyValue(style, nameof(StrokeLength), GroundLineProperties.StrokeLength.DefaultValue);
+            StrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(StrokeOffset), GroundLineProperties.StrokeOffset.DefaultValue);
+            StrokeAngle = StyleHelpers.GetPropertyValue(style, nameof(StrokeAngle), GroundLineProperties.StrokeAngle.DefaultValue);
+            Space = StyleHelpers.GetPropertyValue(style, nameof(Space), GroundLineProperties.Space.DefaultValue);
+            // general
             Scale = MainStaticSettings.Settings.UseScaleFromStyle
                 ? StyleHelpers.GetPropertyValue(style, nameof(Scale), GroundLineProperties.Scale.DefaultValue)
                 : AcadHelpers.Database.Cannoscale;
@@ -351,7 +470,7 @@
                 ExceptionBox.Show(exception);
             }
         }
-        
+
         public static GroundLine GetGroundLineFromEntity(Entity ent)
         {
             using (ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineFunction.MPCOEntName))

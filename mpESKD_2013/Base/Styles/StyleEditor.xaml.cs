@@ -30,7 +30,7 @@ namespace mpESKD.Base.Styles
             PreviewKeyDown += StyleEditor_OnPreviewKeyDown;
             ContentRendered += StyleEditor_ContentRendered;
             // check style files
-            BreakLineStylesManager.CheckStylesFile();
+            BreakLineStyleManager.CheckStylesFile();
             AxisStyleManager.CheckStylesFile();
         }
 
@@ -78,7 +78,7 @@ namespace mpESKD.Base.Styles
                 FunctionLocalName = BreakLineFunction.MPCOEntDisplayName,
                 FunctionName = BreakLineFunction.MPCOEntName
             };
-            var breakLineStyles = BreakLineStylesManager.GetStylesForEditor();
+            var breakLineStyles = BreakLineStyleManager.GetStylesForEditor();
             foreach (BreakLineStyleForEditor style in breakLineStyles)
             {
                 style.Parent = styleToBind;
@@ -263,7 +263,7 @@ namespace mpESKD.Base.Styles
             }
             // save styles
             // break line style
-            BreakLineStylesManager.SaveStylesToXml(
+            BreakLineStyleManager.SaveStylesToXml(
                 _styles.Single(s => s.FunctionName == BreakLineFunction.MPCOEntName)
                 .Styles.Where(s => s.CanEdit).Cast<BreakLineStyleForEditor>().ToList());
             // axis styles

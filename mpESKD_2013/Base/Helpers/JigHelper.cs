@@ -14,7 +14,7 @@
 
             static PointSampler()
             {
-                Tolerance = new Tolerance(1E-1, 1E-1);
+                Tolerance = new Tolerance(1E-6, 1E-6);
             }
 
             public PointSampler(Point3d value)

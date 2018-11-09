@@ -14,7 +14,6 @@ namespace mpESKD.Functions.mpBreakLine.Properties
 {
     public partial class BreakLinePropertiesPalette
     {
-        private const string LangItem = "mpESKD";
         private readonly PropertiesPalette _parentPalette;
 
         public BreakLinePropertiesPalette(PropertiesPalette palette)
@@ -24,7 +23,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             // styles
             var sNames = new List<string>();
-            foreach (var style in BreakLineStylesManager.Styles)
+            foreach (var style in BreakLineStyleManager.Styles)
             {
                 sNames.Add(style.Name);
             }
@@ -90,7 +89,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         {
             if(!(sender is FrameworkElement fe)) return;
             if (fe.Name.Equals("CbStyle"))
-                _parentPalette.ShowDescription(ModPlusAPI.Language.GetItem(LangItem, "h52"));
+                _parentPalette.ShowDescription(ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h52"));
             if (fe.Name.Equals("TbOverhang"))
                 _parentPalette.ShowDescription(BreakLineProperties.Overhang.Description);
             if (fe.Name.Equals("TbBreakHeight"))

@@ -13,6 +13,8 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Functions.mpBreakLine.Styles
 {
+    using Base.Enums;
+
     public class BreakLineStyle : IMPCOStyle
     {
         public BreakLineStyle()
@@ -72,7 +74,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         #endregion
     }
 
-    public static class BreakLineStylesManager
+    public static class BreakLineStyleManager
     {
         private const string StylesFileName = "BreakLineStyles.xml";
 

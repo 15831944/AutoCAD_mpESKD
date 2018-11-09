@@ -5,6 +5,7 @@
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Base;
+    using Base.Enums;
     using Overrules;
     using Base.Helpers;
     using mpESKD.Base.Styles;
@@ -32,7 +33,7 @@
             Overrule.Overruling = true;
 
             // создание файла хранения стилей, если отсутствует
-            BreakLineStylesManager.CheckStylesFile();
+            BreakLineStyleManager.CheckStylesFile();
         }
         public void Terminate()
         {
@@ -73,7 +74,7 @@
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(BreakLineFunction.MPCOEntName);
                 // add layer from style
-                var style = BreakLineStylesManager.GetCurrentStyle();
+                var style = BreakLineStyleManager.GetCurrentStyle();
                 var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,
                     BreakLineProperties.LayerName.DefaultValue);
                 var breakLine = new BreakLine(style)

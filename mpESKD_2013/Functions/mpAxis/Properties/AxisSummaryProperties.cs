@@ -319,22 +319,5 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             AllPropertyChangedReise();
         }
-        /// <summary>
-        /// Вызов события изменения для каждого свойства объекта
-        /// </summary>
-        protected void AllPropertyChangedReise()
-        {
-            string[] propsNames = this.GetType()
-                .GetProperties
-                (BindingFlags.Instance
-                 | BindingFlags.Public
-                 | BindingFlags.DeclaredOnly)
-                .Select(prop => prop.Name)
-                .ToArray();
-            foreach (string propName in propsNames)
-            {
-                OnPropertyChanged(new PropertyChangedEventArgs(propName));
-            }
-        }
     }
 }

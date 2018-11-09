@@ -1,16 +1,17 @@
-﻿using System;
-using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using mpESKD.Base.Helpers;
-using mpESKD.Functions.mpAxis.Styles;
-using ModPlusAPI;
-
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 #pragma warning disable CS0618
 
 namespace mpESKD.Functions.mpAxis.Properties
 {
-    public class AxisPropertiesData
+    using System;
+    using System.Linq;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Base.Helpers;
+    using Styles;
+    using ModPlusAPI;
+    using Base;
+
+    public class AxisPropertiesData : BasePropertiesData
     {
         private ObjectId _blkRefObjectId;
 
@@ -872,8 +873,6 @@ namespace mpESKD.Functions.mpAxis.Properties
 
         #endregion
 
-        public bool IsValid { get; set; }
-
         public AxisPropertiesData(ObjectId blkRefObjectId)
         {
             if (Verify(blkRefObjectId))
@@ -960,21 +959,6 @@ namespace mpESKD.Functions.mpAxis.Properties
 
                 AnyPropertyChangedReise();
             }
-        }
-
-        private static bool Verify(ObjectId breakLineObjectId)
-        {
-            return !breakLineObjectId.IsNull &&
-                   breakLineObjectId.IsValid &
-                   !breakLineObjectId.IsErased &
-                   !breakLineObjectId.IsEffectivelyErased;
-        }
-
-        public event EventHandler AnyPropertyChanged;
-        /// <summary>Вызов события изменения какого-либо свойства</summary>
-        protected void AnyPropertyChangedReise()
-        {
-            AnyPropertyChanged?.Invoke(this, null);
         }
     }
 }

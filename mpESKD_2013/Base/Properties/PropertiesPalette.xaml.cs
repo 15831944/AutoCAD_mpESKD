@@ -51,7 +51,6 @@ namespace mpESKD.Base.Properties
 
         private void Document_ImpliedSelectionChanged(object sender, EventArgs e)
         {
-            AcadHelpers.WriteMessageInDebug("Document_ImpliedSelectionChanged from ModPlus");
             ShowPropertiesControlsBySelection();
         }
 
@@ -122,6 +121,18 @@ namespace mpESKD.Base.Properties
             }
 
             // mpGroundLine
+            if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpGroundLine.GroundLineFunction.MPCOEntName))
+            {
+                if (!HasPropertyControl(Functions.mpGroundLine.GroundLineFunction.MPCOEntName))
+                {
+                    var mpGroundLineProperties =
+                        new Functions.mpGroundLine.Properties.GroundLinePropertiesPalette(this)
+                        {
+                            Name = Functions.mpGroundLine.GroundLineFunction.MPCOEntName
+                        };
+                    StackPanelProperties.Children.Add(mpGroundLineProperties);
+                }
+            }
         }
 
         public void ShowDescription(string description)

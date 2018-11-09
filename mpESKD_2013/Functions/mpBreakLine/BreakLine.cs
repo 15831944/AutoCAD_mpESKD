@@ -25,6 +25,7 @@
         {
             BlockId = blockId;
         }
+        
         /// <summary>Инициализация экземпляра класса для BreakLine для создания</summary>
         public BreakLine(BreakLineStyle style)
         {
@@ -42,6 +43,21 @@
         
         // Основные свойства  примитива
 
+        /// <summary>Минимальная длина линии обрыва от точки вставки до конечной точки</summary>
+        public double BreakLineMinLength
+        {
+            get
+            {
+                if (BreakLineType == BreakLineType.Linear)
+                    return 15.0;
+                if (BreakLineType == BreakLineType.Curvilinear)
+                    return 1.0;
+                if (BreakLineType == BreakLineType.Cylindrical)
+                    return 1.0;
+                return 15.0;
+            }
+        }
+
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
         public Point3d MiddlePoint => new Point3d
         (
@@ -58,7 +74,7 @@
         
         private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
 
-        /// <summary>Выступ линии обрыва за граници "обрываемого" объекта</summary>
+        /// <summary>Выступ линии обрыва за границы "обрываемого" объекта</summary>
         public int Overhang { get; set; } = BreakLineProperties.Overhang.DefaultValue;
         
         /// <summary>Ширина Обрыва для линейного обрыва</summary>
@@ -94,22 +110,7 @@
                 //yield return other entities
             }
         }
-
-        /// <summary>Минимальная длина линии обрыва от точки вставки до конечной точки</summary>
-        public double BreakLineMinLength
-        {
-            get
-            {
-                if (BreakLineType == BreakLineType.Linear)
-                    return 15.0;
-                if (BreakLineType == BreakLineType.Curvilinear)
-                    return 1.0;
-                if (BreakLineType == BreakLineType.Cylindrical)
-                    return 1.0;
-                return 15.0;
-            }
-        }
-
+        
         /// <inheritdoc />
         public override void UpdateEntities()
         {

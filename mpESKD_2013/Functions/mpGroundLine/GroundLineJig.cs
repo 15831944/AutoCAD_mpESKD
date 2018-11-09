@@ -15,7 +15,7 @@
 
         private readonly JigHelper.PointSampler _insertionPoint = new JigHelper.PointSampler(Point3d.Origin);
 
-        private readonly JigHelper.PointSampler _nextPoint = new JigHelper.PointSampler(new Point3d(10, 0, 0));
+        private readonly JigHelper.PointSampler _nextPoint = new JigHelper.PointSampler(new Point3d(GroundLine.GroundLineMinLength, 0, 0));
 
         public Point3d? PreviousPoint { get; set; }
 

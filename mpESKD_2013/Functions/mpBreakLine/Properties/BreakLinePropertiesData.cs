@@ -1,16 +1,35 @@
-﻿using System;
-using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using mpESKD.Base.Helpers;
-using mpESKD.Functions.mpBreakLine.Styles;
-
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 #pragma warning disable CS0618
 
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
-    public class BreakLinePropertiesData
+    using System;
+    using System.Linq;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Base;
+    using Base.Helpers;
+    using Styles;
+
+    public class BreakLinePropertiesData : BasePropertiesData
     {
+        public BreakLinePropertiesData(ObjectId blkRefObjectId)
+        {
+            if (Verify(blkRefObjectId))
+            {
+                IsValid = true;
+                _blkRefObjectId = blkRefObjectId;
+                using (BlockReference blkRef = blkRefObjectId.Open(OpenMode.ForRead, false, true) as BlockReference)
+                {
+                    if (blkRef != null)
+                    {
+                        blkRef.Modified += BlkRef_Modified;
+                        Update(blkRef);
+                    }
+                }
+            }
+            else IsValid = false;
+        }
+
         private ObjectId _blkRefObjectId;
 
         private string _style;
@@ -26,7 +45,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                     {
                         using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
                         {
-                            var style = BreakLineStylesManager.Styles.FirstOrDefault(s => s.Name.Equals(value));
+                            var style = BreakLineStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value));
                             if (style != null)
                             {
                                 breakLine.StyleGuid = style.Guid;
@@ -230,27 +249,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         }
 
         #endregion
-
-        public bool IsValid { get; set; }
-
-        public BreakLinePropertiesData(ObjectId blkRefObjectId)
-        {
-            if (Verify(blkRefObjectId))
-            {
-                IsValid = true;
-                _blkRefObjectId = blkRefObjectId;
-                using (BlockReference blkRef = blkRefObjectId.Open(OpenMode.ForRead, false, true) as BlockReference)
-                {
-                    if (blkRef != null)
-                    {
-                        blkRef.Modified += BlkRef_Modified;
-                        Update(blkRef);
-                    }
-                }
-            }
-            else IsValid = false;
-        }
-
+        
         private void BlkRef_Modified(object sender, EventArgs e)
         {
             BlockReference blkRef = sender as BlockReference;
@@ -268,7 +267,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             var breakLine = BreakLine.GetBreakLineFromEntity(blkReference);
             if (breakLine != null)
             {
-                _style = BreakLineStylesManager.Styles.FirstOrDefault(s => s.Guid.Equals(breakLine.StyleGuid))?.Name;
+                _style = BreakLineStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(breakLine.StyleGuid))?.Name;
                 _overgang = breakLine.Overhang;
                 _breakHeight = breakLine.BreakHeight;
                 _breakWidth = breakLine.BreakWidth;
@@ -278,21 +277,6 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 _lineTypeScale = breakLine.LineTypeScale;
                 AnyPropertyChangedReise();
             }
-        }
-
-        private static bool Verify(ObjectId breakLineObjectId)
-        {
-            return !breakLineObjectId.IsNull &&
-                   breakLineObjectId.IsValid &
-                   !breakLineObjectId.IsErased &
-                   !breakLineObjectId.IsEffectivelyErased;
-        }
-
-        public event EventHandler AnyPropertyChanged;
-        /// <summary>Вызов события изменения какого-либо свойства</summary>
-        protected void AnyPropertyChangedReise()
-        {
-            AnyPropertyChanged?.Invoke(this, null);
         }
     }
 }

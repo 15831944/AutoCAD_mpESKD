@@ -12,7 +12,18 @@ namespace mpESKD.Functions.mpBreakLine.Properties
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class BreakLineSummaryProperties: BaseSummaryProperties<BreakLinePropertiesData>
     {
+        public BreakLineSummaryProperties(IEnumerable<ObjectId> objectIds)
+        {
+            foreach (ObjectId objectId in objectIds)
+            {
+                BreakLinePropertiesData data = new BreakLinePropertiesData(objectId);
+                if (data.IsValid)
+                    Add(data);
+            }
+        }
         
+        #region Properties
+
         public int? Overhang
         {
             get => GetIntProp(nameof(Overhang));
@@ -50,15 +61,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             }
         }
         
-        public BreakLineSummaryProperties(IEnumerable<ObjectId> objectIds)
-        {
-            foreach (ObjectId objectId in objectIds)
-            {
-                BreakLinePropertiesData data = new BreakLinePropertiesData(objectId);
-                if (data.IsValid)
-                    Add(data);
-            }
-        }
+        #endregion
 
         public new void Add(BreakLinePropertiesData data)
         {
@@ -69,23 +72,6 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         private void Data_AnyPropertyChanged(object sender, EventArgs e)
         {
             AllPropertyChangedReise();
-        }
-        /// <summary>
-        /// Вызов события изменения для каждого свойства объекта
-        /// </summary>
-        protected void AllPropertyChangedReise()
-        {
-            string[] propsNames = this.GetType()
-                .GetProperties
-                (BindingFlags.Instance
-                 | BindingFlags.Public
-                 | BindingFlags.DeclaredOnly)
-                .Select(prop => prop.Name)
-                .ToArray();
-            foreach (string propName in propsNames)
-            {
-                OnPropertyChanged(new PropertyChangedEventArgs(propName));
-            }
         }
     }
 }

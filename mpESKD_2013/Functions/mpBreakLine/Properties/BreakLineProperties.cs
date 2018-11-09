@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Windows.Data;
-using Autodesk.AutoCAD.DatabaseServices;
-using mpESKD.Base.Properties;
-using ModPlusAPI;
-
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Windows.Data;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using mpESKD.Base.Properties;
+    using ModPlusAPI;
+    using Base.Enums;
+
     // ReSharper disable once InconsistentNaming
     public static class BreakLineProperties
     {
@@ -18,7 +19,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         {
             Name = "BreakLineType",
             DisplayName = Language.GetItem(MainFunction.LangItem, "p1"), // Тип линии
-            DefaultValue = Properties.BreakLineType.Linear,
+            DefaultValue = Base.Enums.BreakLineType.Linear,
             Description = Language.GetItem(MainFunction.LangItem, "d1")
         };
         /// <summary>Поле, описывающее свойство "Выступы за объект"</summary>
@@ -126,15 +127,5 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         {
             return BreakLinePropertiesHelpers.GetBreakLineTypeByLocalName(value?.ToString());
         }
-    }
-
-    /// <summary>
-    /// Тип линии: линейный, криволинейный, цилиндрический
-    /// </summary>
-    public enum BreakLineType
-    {
-        Linear = 1,
-        Curvilinear = 2,
-        Cylindrical = 3
     }
 }

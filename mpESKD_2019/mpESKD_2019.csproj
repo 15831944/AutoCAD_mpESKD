@@ -89,6 +89,15 @@
 	-->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\mpESKD_2013\Base\BasePropertiesData.cs">
+      <Link>Base\BasePropertiesData.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\BreakLineType.cs">
+      <Link>Base\Enums\BreakLineType.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\GroundLineFirstStrokeOffset.cs">
+      <Link>Base\Enums\GroundLineFirstStrokeOffset.cs</Link>
+    </Compile>
     <Compile Include="..\mpeskd_2013\base\enums\UpdateVariant.cs">
       <Link>Base\Enums\UpdateVariant.cs</Link>
     </Compile>
@@ -100,6 +109,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Helpers\LayerHelper.cs">
       <Link>Base\Helpers\LayerHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Helpers\MathExtensions.cs">
+      <Link>Base\Helpers\MathExtensions.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Helpers\TextStyleHelper.cs">
       <Link>Base\Helpers\TextStyleHelper.cs</Link>
@@ -281,6 +293,16 @@
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLineProperties.cs">
       <Link>Functions\mpGroundLine\Properties\GroundLineProperties.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLinePropertiesData.cs">
+      <Link>Functions\mpGroundLine\Properties\GroundLinePropertiesData.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml.cs">
+      <Link>Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml.cs</Link>
+      <DependentUpon>GroundLinePropertiesPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLineSummaryProperties.cs">
+      <Link>Functions\mpGroundLine\Properties\GroundLineSummaryProperties.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Styles\GroundLineStyle.cs">
       <Link>Functions\mpGroundLine\Styles\GroundLineStyle.cs</Link>
     </Compile>
@@ -369,6 +391,11 @@
     </Page>
     <Page Include="..\mpESKD_2013\Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml">
       <Link>Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml">
+      <Link>Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
