@@ -86,6 +86,7 @@
     <Compile Include="Base\Enums\GroundLineFirstStrokeOffset.cs" />
     <Compile Include="Base\Enums\UpdateVariant.cs" />
     <Compile Include="Base\Helpers\AcadHelpers.cs" />
+    <Compile Include="Base\Helpers\GeometryHelpers.cs" />
     <Compile Include="Base\Helpers\JigHelper.cs" />
     <Compile Include="Base\Helpers\LayerHelper.cs" />
     <Compile Include="Base\Helpers\MathExtensions.cs" />
@@ -278,8 +279,12 @@
   <ItemGroup>
     <Resource Include="Resources\StyleEditor_32x32_dark.png" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Functions\mpGroundLine\Icons\" />
+    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png" />
+    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png" />
+    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32.png" />
+    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

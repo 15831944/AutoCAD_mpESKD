@@ -43,7 +43,7 @@ namespace mpESKD.Functions.mpAxis.Properties
             var markerTypes = new List<string>
             {
                 ModPlusAPI.Language.GetItem(MainFunction.LangItem, "type1"), // "Тип 1",
-                ModPlusAPI.Language.GetItem(MainFunction.LangItem, "type2") //"Тип 2"
+                ModPlusAPI.Language.GetItem(MainFunction.LangItem, "type2") // "Тип 2"
             };
             CbFirstMarkerType.ItemsSource = markerTypes;
             CbSecondMarkerType.ItemsSource = markerTypes;

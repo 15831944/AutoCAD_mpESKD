@@ -149,11 +149,20 @@
             };
         }
 
+        [CommandMethod("ModPlus", "mpESKDCreateRibbonTab", CommandFlags.Modal)]
+        public void CreateRibbon()
+        {
+            if (Autodesk.Windows.ComponentManager.Ribbon == null)
+                return;
+            LoadHelpers.RibbonBuilder.BuildRibbon();
+        }
+
         private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
         {
             //now one Ribbon item is initialized, but the Ribbon control
             //may not be available yet, so check if before
-            if (Autodesk.Windows.ComponentManager.Ribbon == null) return;
+            if (Autodesk.Windows.ComponentManager.Ribbon == null)
+                return;
             LoadHelpers.RibbonBuilder.BuildRibbon();
             
             //and remove the event handler

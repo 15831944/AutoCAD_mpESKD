@@ -201,7 +201,7 @@
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var tmpEndPoint = GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, GroundLineMinLength * scale);
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, GroundLineMinLength * scale);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
@@ -214,10 +214,9 @@
         /// <param name="middlePoints"></param>
         /// <param name="endPoint"></param>
         /// <param name="scale"></param>
-        /// <param name="indexOfEditingVertex">Индекс редактируемой вершины</param>
         private void CreateEntities(
             Point3d insertionPoint, List<Point3d> middlePoints,
-            Point3d endPoint, double scale, int indexOfEditingVertex = -1)
+            Point3d endPoint, double scale)
         {
             var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
 
@@ -283,6 +282,8 @@
                 {
                     if (FirstStrokeOffset == GroundLineFirstStrokeOffset.ByHalfSpace)
                         distance = Space / 2.0 * scale;
+                    else if (FirstStrokeOffset == GroundLineFirstStrokeOffset.BySpace)
+                        distance = Space * scale;
                     else distance = StrokeOffset * scale;
                 }
                 else
@@ -326,9 +327,9 @@
             // ReSharper disable once UseObjectOrCollectionInitializer
             var points = new Point2dCollection();
 
-            points.Add(GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
-            middlePoints.ForEach(p => points.Add(GeometryHelpers.ConvertPoint3dToPoint2d(p)));
-            points.Add(GeometryHelpers.ConvertPoint3dToPoint2d(endPoint));
+            points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
+            middlePoints.ForEach(p => points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(p)));
+            points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint));
 
             return points;
         }
@@ -392,6 +393,14 @@
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
                 // scale
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 1
+                // Отступ первого штриха
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstStrokeOffset.ToString())); // 2
+
+                // Целочисленные значения (код 1070)
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeLength)); // 0
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeOffset)); // 1
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeAngle)); // 2
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Space)); // 3
 
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
@@ -416,6 +425,7 @@
                 List<Point3d> middleAndEndPoints = new List<Point3d>();
                 var index1000 = 0;
                 var index1040 = 0;
+                var index1070 = 0;
                 foreach (TypedValue typedValue in resBufArr)
                 {
                     switch ((DxfCode)typedValue.TypeCode)
@@ -439,11 +449,35 @@
                                     case 1:
                                         Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
                                         break;
+                                    case 2:
+                                        FirstStrokeOffset = GroundLinePropertiesHelpers.GetFirstStrokeOffsetFromString(typedValue.Value.ToString());
+                                        break;
                                 }
                                 // index
                                 index1000++;
                                 break;
                             }
+                        case DxfCode.ExtendedDataInteger16:
+                        {
+                            switch (index1070)
+                            {
+                                case 0:
+                                    StrokeLength = (Int16)typedValue.Value;
+                                    break;
+                                case 1:
+                                    StrokeOffset = (Int16)typedValue.Value;
+                                    break;
+                                case 2:
+                                    StrokeAngle = (Int16)typedValue.Value;
+                                    break;
+                                case 3:
+                                    Space = (Int16)typedValue.Value;
+                                    break;
+                                }
+                            //index
+                            index1070++;
+                            break;
+                        }
                         case DxfCode.ExtendedDataReal:
                             {
                                 if (index1040 == 0) // 0 - LineTypeScale

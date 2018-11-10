@@ -64,8 +64,143 @@ namespace mpESKD.Functions.mpGroundLine.Properties
             }
         }
 
+        private string _firstStrokeOffset;
+        public string FirstStrokeOffset
+        {
+            get => _firstStrokeOffset;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
+                        {
+                            axis.FirstStrokeOffset = GroundLinePropertiesHelpers.GetFirstStrokeOffsetByLocalName(value);
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private int _strokeLength;
+        public int StrokeLength
+        {
+            get => _strokeLength;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
+                        {
+                            axis.StrokeLength = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private int _strokeOffset;
+        public int StrokeOffset
+        {
+            get => _strokeOffset;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
+                        {
+                            axis.StrokeOffset = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private int _strokeAngle;
+        public int StrokeAngle
+        {
+            get => _strokeAngle;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
+                        {
+                            axis.StrokeAngle = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
+        private int _space;
+        public int Space
+        {
+            get => _space;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
+                        {
+                            axis.Space = value;
+                            axis.UpdateEntities();
+                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
+                            using (var resBuf = axis.GetParametersForXData())
+                            {
+                                if (blkRef != null) blkRef.XData = resBuf;
+                            }
+                        }
+                        if (blkRef != null) blkRef.ResetBlock();
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
         #region General
-        
+
         private string _scale;
 
         public string Scale
@@ -123,6 +258,25 @@ namespace mpESKD.Functions.mpGroundLine.Properties
             }
         }
 
+        private string _lineType;
+
+        /// <summary>Слой</summary>
+        public string LineType
+        {
+            get => _lineType;
+            set
+            {
+                using (AcadHelpers.Document.LockDocument())
+                {
+                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    {
+                        if (blkRef != null) blkRef.Linetype = value;
+                    }
+                }
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+        }
+
         private string _layerName;
 
         /// <summary>Слой</summary>
@@ -158,17 +312,19 @@ namespace mpESKD.Functions.mpGroundLine.Properties
                 _blkRefObjectId = ObjectId.Null;
                 return;
             }
-            var breakLine = GroundLine.GetGroundLineFromEntity(blkReference);
-            if (breakLine != null)
+            var groundLine = GroundLine.GetGroundLineFromEntity(blkReference);
+            if (groundLine != null)
             {
-                _style = GroundLineStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(breakLine.StyleGuid))?.Name;
-                ////_overgang = breakLine.Overhang;
-                ////_breakHeight = breakLine.BreakHeight;
-                ////_breakWidth = breakLine.BreakWidth;
-                ////_breakLineType = BreakLinePropertiesHelpers.GetLocalBreakLineTypeName(breakLine.BreakLineType);
-                _scale = breakLine.Scale.Name;
+                _style = GroundLineStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(groundLine.StyleGuid))?.Name;
+                _firstStrokeOffset = GroundLinePropertiesHelpers.GetLocalFirstStrokeOffsetName(groundLine.FirstStrokeOffset);
+                _strokeLength = groundLine.StrokeLength;
+                _strokeOffset = groundLine.StrokeOffset;
+                _strokeAngle = groundLine.StrokeAngle;
+                _space = groundLine.Space;
+                _scale = groundLine.Scale.Name;
                 _layerName = blkReference.Layer;
-                _lineTypeScale = breakLine.LineTypeScale;
+                _lineTypeScale = groundLine.LineTypeScale;
+                _lineType = blkReference.Linetype;
                 AnyPropertyChangedReise();
             }
         }

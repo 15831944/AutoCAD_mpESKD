@@ -114,7 +114,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                                     /* Если новая точка получается на расстоянии меньше минимального, то
                                      * переносим ее в направлении между двумя точками на минимальное расстояние
                                      */
-                                    var tmpInsertionPoint = GeometryHelpers.Point3dAtDirection(
+                                    var tmpInsertionPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                                         gripPoint.BreakLine.EndPoint, newPt, gripPoint.BreakLine.EndPoint,
                                         gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale());
 

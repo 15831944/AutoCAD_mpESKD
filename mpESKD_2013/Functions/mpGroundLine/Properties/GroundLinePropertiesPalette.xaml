@@ -111,7 +111,7 @@
                 <TextBox Grid.Row="1" Grid.Column="0" 
                          Text="{Binding Source={x:Static glProps:GroundLineProperties.FirstStrokeOffset}, Path=DisplayName}"
                          Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
-                <ComboBox Grid.Row="1" Grid.Column="2" Text="{Binding MarkersPosition}" x:Name="CbFirstStrokeOffset"
+                <ComboBox Grid.Row="1" Grid.Column="2" Text="{Binding FirstStrokeOffset}" x:Name="CbFirstStrokeOffset"
                           Style="{StaticResource PropertyValueComboBox}"
                           GotFocus="FrameworkElement_OnGotFocus" LostFocus="FrameworkElement_OnLostFocus">
                 </ComboBox>
@@ -119,29 +119,29 @@
                 <TextBox Grid.Row="2" Grid.Column="0" 
                          Text="{Binding Source={x:Static glProps:GroundLineProperties.StrokeLength}, Path=DisplayName}"
                          Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
-                <ctrls:IntTextBox Grid.Row="2" Grid.Column="2" Value="{Binding Fracture}" Style="{StaticResource PropertyValueIntTextBox}"
+                <ctrls:IntTextBox Grid.Row="2" Grid.Column="2" Value="{Binding StrokeLength}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbStrokeLength" Minimum="1" Maximum="10" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--StrokeOffset-->
                 <TextBox Grid.Row="3" Grid.Column="0" 
                          Text="{Binding Source={x:Static glProps:GroundLineProperties.StrokeOffset}, Path=DisplayName}"
                          Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
-                <ctrls:IntTextBox Grid.Row="3" Grid.Column="2" Value="{Binding BottomFractureOffset}" Style="{StaticResource PropertyValueIntTextBox}"
+                <ctrls:IntTextBox Grid.Row="3" Grid.Column="2" Value="{Binding StrokeOffset}" Style="{StaticResource PropertyValueIntTextBox}"
                                   x:Name="TbStrokeOffset" Minimum="1" Maximum="10" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--StrokeAngle-->
                 <TextBox Grid.Row="4" Grid.Column="0" 
                          Text="{Binding Source={x:Static glProps:GroundLineProperties.StrokeAngle}, Path=DisplayName}"
                          Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
-                <ctrls:IntTextBox Grid.Row="4" Grid.Column="2" Value="{Binding BottomFractureOffset}" Style="{StaticResource PropertyValueIntTextBox}"
-                                  x:Name="TbStrokeAngle" Minimum="1" Maximum="10" GotFocus="FrameworkElement_OnGotFocus" 
+                <ctrls:IntTextBox Grid.Row="4" Grid.Column="2" Value="{Binding StrokeAngle}" Style="{StaticResource PropertyValueIntTextBox}"
+                                  x:Name="TbStrokeAngle" Minimum="30" Maximum="90" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--Space-->
                 <TextBox Grid.Row="5" Grid.Column="0" 
                          Text="{Binding Source={x:Static glProps:GroundLineProperties.Space}, Path=DisplayName}"
                          Style="{StaticResource PropertyNameTextBoxBase}"></TextBox>
-                <ctrls:IntTextBox Grid.Row="5" Grid.Column="2" Value="{Binding BottomFractureOffset}" Style="{StaticResource PropertyValueIntTextBox}"
-                                  x:Name="TbSpace" Minimum="1" Maximum="10" GotFocus="FrameworkElement_OnGotFocus" 
+                <ctrls:IntTextBox Grid.Row="5" Grid.Column="2" Value="{Binding Space}" Style="{StaticResource PropertyValueIntTextBox}"
+                                  x:Name="TbSpace" Minimum="1" Maximum="20" GotFocus="FrameworkElement_OnGotFocus" 
                                   LostFocus="FrameworkElement_OnLostFocus"></ctrls:IntTextBox>
                 <!--splitter-->
                 <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="5" BorderThickness="1,0,1,0"

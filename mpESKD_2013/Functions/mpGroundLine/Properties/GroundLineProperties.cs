@@ -8,6 +8,8 @@
 
     public static class GroundLineProperties
     {
+        ////TODO Localization!
+
         /// <summary>Поле, описывающее свойство "Масштаб"</summary>
         public static MPCOTypeProperty<AnnotationScale> Scale = new MPCOTypeProperty<AnnotationScale>
         {
@@ -19,7 +21,7 @@
         public static MPCOStringProperty LineType = new MPCOStringProperty
         {
             Name = nameof(LineType),
-            DisplayName = Language.GetItem(MainFunction.LangItem, "p19"), // Тип линии:
+            DisplayName = "Тип линии:",
             DefaultValue = "Continuous",
             Description = Language.GetItem(MainFunction.LangItem, "d19")
         };
@@ -40,8 +42,6 @@
             DefaultValue = Language.GetItem(MainFunction.LangItem, "defl"), // По умолчанию
             Description = Language.GetItem(MainFunction.LangItem, "d7") // Слой примитива
         };
-
-        ////TODO Localization!
 
         public static MPCOTypeProperty<GroundLineFirstStrokeOffset> FirstStrokeOffset = new MPCOTypeProperty<GroundLineFirstStrokeOffset>
         {
@@ -110,25 +110,30 @@
         public static List<string> FirstStrokeOffsetNames = new List<string>
         {
             "Расстояние между штрихами",
-            "Половина расстояния между группами штрихов"
+            "Половина расстояния между группами штрихов",
+            "Расстояние между группами штрихов"
         };
 
         public static GroundLineFirstStrokeOffset GetFirstStrokeOffsetByLocalName(string local)
         {
-            if (local == "Расстояние между штрихами") return GroundLineFirstStrokeOffset.ByStrokeOffset;
+            if (local == FirstStrokeOffsetNames[0]) return GroundLineFirstStrokeOffset.ByStrokeOffset;
+            if (local == FirstStrokeOffsetNames[2]) return GroundLineFirstStrokeOffset.BySpace;
             return GroundLineFirstStrokeOffset.ByHalfSpace;
         }
 
         public static string GetLocalFirstStrokeOffsetName(GroundLineFirstStrokeOffset firstStrokeOffset)
         {
             if (firstStrokeOffset == GroundLineFirstStrokeOffset.ByStrokeOffset)
-                return "Расстояние между штрихами";
-            return "Половина расстояния между группами штрихов";
+                return FirstStrokeOffsetNames[0];
+            if (firstStrokeOffset == GroundLineFirstStrokeOffset.BySpace)
+                return FirstStrokeOffsetNames[2];
+            return FirstStrokeOffsetNames[1];
         }
 
         public static GroundLineFirstStrokeOffset GetFirstStrokeOffsetFromString(string str)
         {
             if (str == "ByStrokeOffset") return GroundLineFirstStrokeOffset.ByStrokeOffset;
+            if (str == "BySpace") return GroundLineFirstStrokeOffset.BySpace;
             return GroundLineFirstStrokeOffset.ByHalfSpace;
         }
     }

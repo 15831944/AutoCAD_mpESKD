@@ -12,7 +12,6 @@
     using mpESKD.Base.Styles;
     using Properties;
     using Styles;
-    using ModPlus.Helpers;
     using ModPlusAPI.Windows;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -742,7 +741,7 @@
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var tmpEndPoint = GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, AxisMinLength * scale);
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, AxisMinLength * scale);
                 SetEntitiesPoints(InsertionPointOCS, tmpEndPoint, BottomMarkerPointOCS, TopMarkerPointOCS, scale);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
@@ -868,10 +867,10 @@
                     _bottomOrientMarker.Value.Center = bottomOrientMarkerCenter;
                     _bottomOrientMarker.Value.Diameter = MarkersDiameter * scale;
                     // line
-                    var _bottomOrientLineStartPoint = GeometryHelpers.Point3dAtDirection(
+                    var _bottomOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, bottomOrientMarkerCenter, firstMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    var _bottomOrientLineEndPoint = GeometryHelpers.Point3dAtDirection(
+                    var _bottomOrientLineEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         bottomOrientMarkerCenter, firstMarkerCenter, bottomOrientMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
                     if (_bottomOrientLineEndPoint.IsEqualTo(_bottomOrientLineStartPoint, Tolerance.Global))
@@ -896,26 +895,26 @@
                         {
                             _bottomOrientArrow.Value.Visible = true;
                             // arrow draw
-                            var arrowStartPoint = GeometryHelpers.Point3dAtDirection(_bottomOrientLineEndPoint,
+                            var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(_bottomOrientLineEndPoint,
                                 _bottomOrientLineStartPoint,
                                 _bottomOrientLineEndPoint, ArrowsSize * scale);
                             if (_bottomOrientArrow.Value.NumberOfVertices == 2)
                             {
                                 _bottomOrientArrow.Value.SetPointAt(0,
-                                    GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint));
+                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint));
                                 _bottomOrientArrow.Value.SetBulgeAt(0, 0.0);
                                 _bottomOrientArrow.Value.SetPointAt(1,
-                                    GeometryHelpers.ConvertPoint3dToPoint2d(_bottomOrientLineEndPoint));
+                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(_bottomOrientLineEndPoint));
                                 _bottomOrientArrow.Value.SetBulgeAt(1, 0.0);
                                 _bottomOrientArrow.Value.SetStartWidthAt(0, ArrowsSize * scale * 1 / 3);
                             }
                             else
                             {
                                 _bottomOrientArrow.Value.AddVertexAt(0,
-                                    GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint),
+                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint),
                                     0.0, ArrowsSize * scale * 1 / 3, 0.0);
                                 _bottomOrientArrow.Value.AddVertexAt(1,
-                                    GeometryHelpers.ConvertPoint3dToPoint2d(_bottomOrientLineEndPoint),
+                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(_bottomOrientLineEndPoint),
                                     0.0, 0.0, 0.0);
                             }
                         }
@@ -1081,10 +1080,10 @@
                     _topOrientMarker.Value.Center = topOrientMarkerCenter;
                     _topOrientMarker.Value.Diameter = MarkersDiameter * scale;
                     // line
-                    var _topOrientLineStartPoint = GeometryHelpers.Point3dAtDirection(
+                    var _topOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, topOrientMarkerCenter, firstMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    var _topOrientLineEndPoint = GeometryHelpers.Point3dAtDirection(
+                    var _topOrientLineEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         topOrientMarkerCenter, firstMarkerCenter, topOrientMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
                     if (_topOrientLineEndPoint.IsEqualTo(_topOrientLineStartPoint, Tolerance.Global))
@@ -1109,26 +1108,26 @@
                         {
                             _topOrientArrow.Value.Visible = true;
                             // arrow draw
-                            var arrowStartPoint = GeometryHelpers.Point3dAtDirection(_topOrientLineEndPoint,
+                            var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(_topOrientLineEndPoint,
                                 _topOrientLineStartPoint,
                                 _topOrientLineEndPoint, ArrowsSize * scale);
                             if (_topOrientArrow.Value.NumberOfVertices == 2)
                             {
                                 _topOrientArrow.Value.SetPointAt(0,
-                                    GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint));
+                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint));
                                 _topOrientArrow.Value.SetBulgeAt(0, 0.0);
                                 _topOrientArrow.Value.SetPointAt(1,
-                                    GeometryHelpers.ConvertPoint3dToPoint2d(_topOrientLineEndPoint));
+                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(_topOrientLineEndPoint));
                                 _topOrientArrow.Value.SetBulgeAt(1, 0.0);
                                 _topOrientArrow.Value.SetStartWidthAt(0, ArrowsSize * scale * 1 / 3);
                             }
                             else
                             {
                                 _topOrientArrow.Value.AddVertexAt(0,
-                                    GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint),
+                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint),
                                     0.0, ArrowsSize * scale * 1 / 3, 0.0);
                                 _topOrientArrow.Value.AddVertexAt(1,
-                                    GeometryHelpers.ConvertPoint3dToPoint2d(_topOrientLineEndPoint),
+                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(_topOrientLineEndPoint),
                                     0.0, 0.0, 0.0);
                             }
                         }

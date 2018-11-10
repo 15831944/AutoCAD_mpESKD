@@ -168,50 +168,107 @@
             ribTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
-           
+
             #region mpBreakLine
-            // Создаем SplitButton
-            var risSplitBtn = new RibbonSplitButton
+
             {
-                Text = "RibbonSplitButton",
-                Orientation = Orientation.Vertical,
-                Size = RibbonItemSize.Large,
-                ShowImage = true,
-                ShowText = true,
-                ListButtonStyle = Autodesk.Private.Windows.RibbonListButtonStyle.SplitButton,
-                ResizeStyle = RibbonItemResizeStyles.NoResize,
-                ListStyle = RibbonSplitButtonListStyle.List
-            };
-            // Добавляем в него первую функцию, которую делаем основной
-            var ribBtn = RibbonHelpers.AddBigButton(
-                Functions.mpBreakLine.BreakLineInterface.Name,
-                Functions.mpBreakLine.BreakLineInterface.LName,
-                GetBigIconForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.Name),
-                Functions.mpBreakLine.BreakLineInterface.Description,
-                Orientation.Vertical,
-                Functions.mpBreakLine.BreakLineInterface.FullDescription,
-                GetHelpImageForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.ToolTipHelpImage)
+                // Создаем SplitButton
+                var risSplitBtn = new RibbonSplitButton
+                {
+                    Text = "RibbonSplitButton",
+                    Orientation = Orientation.Vertical,
+                    Size = RibbonItemSize.Large,
+                    ShowImage = true,
+                    ShowText = true,
+                    ListButtonStyle = Autodesk.Private.Windows.RibbonListButtonStyle.SplitButton,
+                    ResizeStyle = RibbonItemResizeStyles.NoResize,
+                    ListStyle = RibbonSplitButtonListStyle.List
+                };
+
+                // Добавляем в него первую функцию, которую делаем основной
+                var ribBtn = RibbonHelpers.AddBigButton(
+                    Functions.mpBreakLine.BreakLineInterface.Name,
+                    Functions.mpBreakLine.BreakLineInterface.LName,
+                    GetBigIconForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.Name),
+                    Functions.mpBreakLine.BreakLineInterface.Description,
+                    Orientation.Vertical,
+                    Functions.mpBreakLine.BreakLineInterface.FullDescription,
+                    GetHelpImageForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.ToolTipHelpImage)
                 );
-            if (ribBtn != null)
-            {
-                risSplitBtn.Items.Add(ribBtn);
-                risSplitBtn.Current = ribBtn;
+                if (ribBtn != null)
+                {
+                    risSplitBtn.Items.Add(ribBtn);
+                    risSplitBtn.Current = ribBtn;
+                }
+
+                // Затем добавляем подфункции
+                for (int i = 0; i < Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames.Count; i++)
+                {
+                    risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
+                        Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames[i],
+                        Functions.mpBreakLine.BreakLineInterface.SubFunctionsLNames[i],
+                        GetBigIconForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames[i]),
+                        Functions.mpBreakLine.BreakLineInterface.SubDescriptions[i], Orientation.Vertical,
+                        Functions.mpBreakLine.BreakLineInterface.SubFullDescriptions[i],
+                        GetHelpImageForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.SubHelpImages[i])
+                    ));
+                }
+
+                ribRowPanel.Items.Add(risSplitBtn);
             }
-            // Затем добавляем подфункции
-            for (int i = 0; i < Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames.Count; i++)
-            {
-                risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
-                    Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames[i],
-                    Functions.mpBreakLine.BreakLineInterface.SubFunctionsLNames[i],
-                    GetBigIconForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames[i]),
-                    Functions.mpBreakLine.BreakLineInterface.SubDescriptions[i], Orientation.Vertical,
-                    Functions.mpBreakLine.BreakLineInterface.SubFullDescriptions[i],
-                    GetHelpImageForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.SubHelpImages[i])
-                ));
-            }
-            ribRowPanel.Items.Add(risSplitBtn);
+
             #endregion
-            
+
+            #region mpGroundLine
+
+            {
+                // Создаем SplitButton
+                var risSplitBtn = new RibbonSplitButton
+                {
+                    Text = "RibbonSplitButton",
+                    Orientation = Orientation.Vertical,
+                    Size = RibbonItemSize.Large,
+                    ShowImage = true,
+                    ShowText = true,
+                    ListButtonStyle = Autodesk.Private.Windows.RibbonListButtonStyle.SplitButton,
+                    ResizeStyle = RibbonItemResizeStyles.NoResize,
+                    ListStyle = RibbonSplitButtonListStyle.List
+                };
+
+                // Добавляем в него первую функцию, которую делаем основной
+                var ribBtn = RibbonHelpers.AddBigButton(
+                    Functions.mpGroundLine.GroundLineInterface.Name,
+                    Functions.mpGroundLine.GroundLineInterface.LName,
+                    GetBigIconForFunction(Functions.mpGroundLine.GroundLineInterface.Name, Functions.mpGroundLine.GroundLineInterface.Name),
+                    Functions.mpGroundLine.GroundLineInterface.Description,
+                    Orientation.Vertical,
+                    Functions.mpGroundLine.GroundLineInterface.FullDescription,
+                    GetHelpImageForFunction(Functions.mpGroundLine.GroundLineInterface.Name, Functions.mpGroundLine.GroundLineInterface.ToolTipHelpImage)
+                );
+                if (ribBtn != null)
+                {
+                    risSplitBtn.Items.Add(ribBtn);
+                    risSplitBtn.Current = ribBtn;
+                }
+
+                // Затем добавляем подфункции
+                for (int i = 0; i < Functions.mpGroundLine.GroundLineInterface.SubFunctionsNames.Count; i++)
+                {
+                    risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
+                        Functions.mpGroundLine.GroundLineInterface.SubFunctionsNames[i],
+                        Functions.mpGroundLine.GroundLineInterface.SubFunctionsLNames[i],
+                        GetBigIconForFunction(Functions.mpGroundLine.GroundLineInterface.Name, Functions.mpGroundLine.GroundLineInterface.SubFunctionsNames[i]),
+                        Functions.mpGroundLine.GroundLineInterface.SubDescriptions[i], Orientation.Vertical,
+                        Functions.mpGroundLine.GroundLineInterface.SubFullDescriptions[i],
+                        GetHelpImageForFunction(Functions.mpGroundLine.GroundLineInterface.Name, Functions.mpGroundLine.GroundLineInterface.SubHelpImages[i])
+                    ));
+                }
+
+                ribRowPanel.Items.Add(risSplitBtn);
+            }
+
+            #endregion
+
             if (ribRowPanel.Items.Any())
             {
                 ribSourcePanel.Items.Add(ribRowPanel);

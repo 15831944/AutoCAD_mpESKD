@@ -1,11 +1,11 @@
-﻿using Autodesk.AutoCAD.Colors;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.GraphicsInterface;
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Base.Overrules
 {
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.GraphicsInterface;
+
     public class MPCOGrips
     {
         /// <summary>
@@ -32,31 +32,66 @@ namespace mpESKD.Base.Overrules
             /// <summary>
             /// Список (выпадающий список)
             /// </summary>
-            List
+            List,
+            /// <summary>
+            /// Ручка "Развернуть"
+            /// </summary>
+            Mirror
         }
+
         public abstract class MPCOGripData : GripData
         {
             /// <summary>
             /// Тип ручки примитива
             /// </summary>
             public MPCOEntityGripType GripType { get; set; }
-
+            
             public override bool ViewportDraw(ViewportDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint,
                 int gripSizeInPixels)
             {
                 CoordinateSystem3d eCS = GetECS(entityId);
                 Point2d numPixelsInUnitSquare = worldDraw.Viewport.GetNumPixelsInUnitSquare(GripPoint);
-                double num = (double)gripSizeInPixels / numPixelsInUnitSquare.X;
+                double num = gripSizeInPixels / numPixelsInUnitSquare.X;
+                
                 Point3dCollection point3dCollections = new Point3dCollection();
-                point3dCollections.Add((GripPoint - (num * eCS.Xaxis)) - (num * eCS.Yaxis));
-                point3dCollections.Add((GripPoint - (num * eCS.Xaxis)) + (num * eCS.Yaxis));
-                point3dCollections.Add((GripPoint + (num * eCS.Xaxis)) + (num * eCS.Yaxis));
-                point3dCollections.Add((GripPoint + (num * eCS.Xaxis)) - (num * eCS.Yaxis));
+                switch (GripType)
+                {
+                    case MPCOEntityGripType.Point:
+                        point3dCollections = PointsForSquareGrip(num, eCS);
+                        break;
+                    case MPCOEntityGripType.Plus:
+                        point3dCollections = PointsForPlusGrip(num, eCS);
+                        break;
+                    case MPCOEntityGripType.Minus:
+                        point3dCollections = PointsForMinusGrip(num, eCS);
+                        break;
+                }
+                short backupColor = worldDraw.SubEntityTraits.Color;
+                FillType backupFillType = worldDraw.SubEntityTraits.FillType;
+
                 worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
-                worldDraw.Geometry.Polygon(point3dCollections);
+                worldDraw.SubEntityTraits.Color = GetGripColor();
+                if(GripType != MPCOEntityGripType.Mirror)
+                    worldDraw.Geometry.Polygon(point3dCollections);
+                else
+                {
+                    worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, eCS));
+                    worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, eCS));
+                }
                 worldDraw.SubEntityTraits.FillType = FillType.FillNever;
-                worldDraw.SubEntityTraits.TrueColor = new EntityColor(0, 0, 0);
-                worldDraw.Geometry.Polygon(point3dCollections);
+                // обводка
+                worldDraw.SubEntityTraits.Color = 250;
+                if (GripType != MPCOEntityGripType.Mirror)
+                    worldDraw.Geometry.Polygon(point3dCollections);
+                else
+                {
+                    worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, eCS));
+                    worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, eCS));
+                }
+                // restore
+                worldDraw.SubEntityTraits.Color = backupColor;
+                worldDraw.SubEntityTraits.FillType = backupFillType;
+
                 return true;
             }
 
@@ -70,23 +105,102 @@ namespace mpESKD.Base.Overrules
                         Entity obj = (Entity)openCloseTransaction.GetObject(entityId, OpenMode.ForRead);
                         if (obj != null)
                         {
-                            //if (obj.IsPlanar || obj is MLeader)
-                            //{
                             Plane plane = obj.GetPlane();
                             Plane plane1 = new Plane(plane.PointOnPlane, plane.Normal);
                             coordinateSystem3D = plane1.GetCoordinateSystem();
-                            //}
-                            //if (obj is Wipeout)
-                            //{
-                            //    CoordinateSystem3d orientation = (obj as Wipeout).Orientation;
-                            //    Plane plane2 = new Plane(orientation.Origin, orientation.Zaxis.GetNormal());
-                            //    coordinateSystem3d = plane2.GetCoordinateSystem();
-                            //}
                         }
                         openCloseTransaction.Commit();
                     }
                 }
                 return coordinateSystem3D;
+            }
+
+            private Point3dCollection PointsForSquareGrip(double num, CoordinateSystem3d eCS)
+            {
+                Point3dCollection point3dCollections = new Point3dCollection();
+                point3dCollections.Add((GripPoint - (num * eCS.Xaxis)) - (num * eCS.Yaxis));
+                point3dCollections.Add((GripPoint - (num * eCS.Xaxis)) + (num * eCS.Yaxis));
+                point3dCollections.Add((GripPoint + (num * eCS.Xaxis)) + (num * eCS.Yaxis));
+                point3dCollections.Add((GripPoint + (num * eCS.Xaxis)) - (num * eCS.Yaxis));
+
+                return point3dCollections;
+            }
+
+            private Point3dCollection PointsForPlusGrip(double num, CoordinateSystem3d eCS)
+            {
+                var num2 = num / 3;
+                Point3dCollection point3dCollection = new Point3dCollection();
+
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis + num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint + num2 * eCS.Xaxis + num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint + num2 * eCS.Xaxis + num * eCS.Yaxis);
+                point3dCollection.Add(GripPoint - num2 * eCS.Xaxis + num * eCS.Yaxis);
+                point3dCollection.Add(GripPoint - num2 * eCS.Xaxis + num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis + num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis - num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint - num2 * eCS.Xaxis - num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint - num2 * eCS.Xaxis - num * eCS.Yaxis);
+                point3dCollection.Add(GripPoint + num2 * eCS.Xaxis - num * eCS.Yaxis);
+                point3dCollection.Add(GripPoint + num2 * eCS.Xaxis - num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis - num2 * eCS.Yaxis);
+                
+                return point3dCollection;
+            }
+
+            private Point3dCollection PointsForMinusGrip(double num, CoordinateSystem3d eCS)
+            {
+                var num2 = num / 3;
+                Point3dCollection point3dCollection = new Point3dCollection();
+
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis + num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis + num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis - num2 * eCS.Yaxis);
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis - num2 * eCS.Yaxis);
+
+                return point3dCollection;
+            }
+
+            private Point3dCollection PointsForReverseGripFirstArrow(double num, CoordinateSystem3d eCS)
+            {
+                Point3dCollection point3dCollection = new Point3dCollection();
+
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis * 0.0 - num * eCS.Yaxis * 0.25);
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis * 0.75 + num * eCS.Yaxis * 1.25);
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis * 1.5 - num * eCS.Yaxis * 0.25);
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis * 1.0 - num * eCS.Yaxis * 0.25);
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis * 1.0 - num * eCS.Yaxis * 1.25);
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis * 0.5 - num * eCS.Yaxis * 1.25);
+                point3dCollection.Add(GripPoint - num * eCS.Xaxis * 0.5 - num * eCS.Yaxis * 0.25);
+
+                return point3dCollection;
+            }
+
+            private Point3dCollection PointsForReverseGripSecondArrow(double num, CoordinateSystem3d eCS)
+            {
+                Point3dCollection point3dCollection = new Point3dCollection();
+
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis * 0.0 + num * eCS.Yaxis * 0.25);
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis * 0.75 - num * eCS.Yaxis * 1.25);
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis * 1.5 + num * eCS.Yaxis * 0.25);
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis * 1.0 + num * eCS.Yaxis * 0.25);
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis * 1.0 + num * eCS.Yaxis * 1.25);
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis * 0.5 + num * eCS.Yaxis * 1.25);
+                point3dCollection.Add(GripPoint + num * eCS.Xaxis * 0.5 + num * eCS.Yaxis * 0.25);
+
+                return point3dCollection;
+            }
+
+            private short GetGripColor()
+            {
+                switch (GripType)
+                {
+                    case MPCOEntityGripType.Plus:
+                        return 110;
+                    case MPCOEntityGripType.Minus:
+                        return 20;
+                }
+
+                return 150;
             }
         }
     }

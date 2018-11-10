@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using Autodesk.AutoCAD.DatabaseServices;
-using mpESKD.Base.Properties;
-
-namespace mpESKD.Functions.mpAxis.Properties
+﻿namespace mpESKD.Functions.mpAxis.Properties
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using mpESKD.Base.Properties;
+
     public class AxisSummaryProperties : BaseSummaryProperties<AxisPropertiesData>
     {
         /// <summary>Позиция маркеров</summary>
@@ -20,6 +18,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(MarkersPosition)));
             }
         }
+        
         /// <summary>Излом</summary>
         public int? Fracture
         {
@@ -30,6 +29,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(Fracture)));
             }
         }
+
         /// <summary>Нижний отступ излома</summary>
         public int? BottomFractureOffset
         {
@@ -284,6 +284,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(LineType)));
             }
         }
+
         public new string Scale
         {
             get => GetStrProp(nameof(Scale));

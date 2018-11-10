@@ -162,7 +162,7 @@
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var tmpEndPoint = GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, BreakLineMinLength * scale /** BlockTransform.GetScale()*/);
+                var tmpEndPoint =ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, BreakLineMinLength * scale /** BlockTransform.GetScale()*/);
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
@@ -187,30 +187,30 @@
                 // точки
                 if (Overhang > 0)
                 {
-                    pts.Add(GeometryHelpers.Point2dAtDirection(endPoint, insertionPoint, insertionPoint, Overhang * scale));
+                    pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(endPoint, insertionPoint, insertionPoint, Overhang * scale));
                     bulges.Add(0.0);
                 }
                 // Первая точка, соответствующая ручке
-                pts.Add(GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
                 bulges.Add(0.0);
-                pts.Add(GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - BreakWidth / 2.0 * scale));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - BreakWidth / 2.0 * scale));
                 bulges.Add(0.0);
-                pts.Add(GeometryHelpers.GetPerpendicularPoint2d(
+                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,
-                    GeometryHelpers.ConvertPoint2DToPoint3D(GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - BreakWidth / 4.0 * scale)),
+                    ModPlus.Helpers.GeometryHelpers.ConvertPoint2DToPoint3D(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - BreakWidth / 4.0 * scale)),
                     BreakHeight / 2.0 * scale));
                 bulges.Add(0.0);
-                pts.Add(GeometryHelpers.GetPerpendicularPoint2d(insertionPoint, GeometryHelpers.ConvertPoint2DToPoint3D(
-                    GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 + BreakWidth / 4.0 * scale)), -BreakHeight / 2.0 * scale));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(insertionPoint, ModPlus.Helpers.GeometryHelpers.ConvertPoint2DToPoint3D(
+                    ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 + BreakWidth / 4.0 * scale)), -BreakHeight / 2.0 * scale));
                 bulges.Add(0.0);
-                pts.Add(GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 + BreakWidth / 2.0 * scale));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 + BreakWidth / 2.0 * scale));
                 bulges.Add(0.0);
                 // Конечная точка, соответствующая ручке
-                pts.Add(GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
                 bulges.Add(0.0);
                 if (Overhang > 0)
                 {
-                    pts.Add(GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length + Overhang * scale));
+                    pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length + Overhang * scale));
                     bulges.Add(0.0);
                 }
             }
@@ -218,28 +218,28 @@
             {
                 if (Overhang > 0)
                 {
-                    pts.Add(GeometryHelpers.GetPerpendicularPoint2d(
+                    pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                         insertionPoint,
-                        GeometryHelpers.Point3dAtDirection(endPoint, insertionPoint, insertionPoint, Overhang / 100.0 * length),
+                        ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(endPoint, insertionPoint, insertionPoint, Overhang / 100.0 * length),
                         -Overhang / 200.0 * length
                     ));
                     bulges.Add(length / 10 / length / 4 * 2);
                 }
                 // Первая точка, соответствующая ручке
-                pts.Add(GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
                 bulges.Add(length / 10 / length / 2 * 4);
 
                 // Средняя точка
-                pts.Add(GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 2));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 2));
                 bulges.Add(-length / 10 / length / 2 * 4);
                 // Конечная точка, соответствующая ручке
-                pts.Add(GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
                 bulges.Add(0);
                 if (Overhang > 0)
                 {
-                    pts.Add(GeometryHelpers.GetPerpendicularPoint2d(
+                    pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                         insertionPoint,
-                        GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, endPoint, Overhang / 100.0 * length),
+                        ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, endPoint, Overhang / 100.0 * length),
                         -Overhang / 200.0 * length
                     ));
                     bulges.Add(length / 10 / length / 4 * 2);
@@ -248,33 +248,33 @@
             if (BreakLineType == BreakLineType.Cylindrical)
             {
                 // first
-                pts.Add(GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
                 bulges.Add(-0.392699081698724);
-                pts.Add(GeometryHelpers.GetPerpendicularPoint2d(
+                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,
-                    GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, insertionPoint, length / 10.0),
+                    ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, insertionPoint, length / 10.0),
                     length / 10
                 ));
                 bulges.Add(-length / 10 / length / 2 * 3);
                 //center
-                pts.Add(GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 2));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 2));
                 bulges.Add(length / 10 / length / 2 * 3);
-                pts.Add(GeometryHelpers.GetPerpendicularPoint2d(
+                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,
-                    GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, insertionPoint, length - (length / 10.0)),
+                    ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, insertionPoint, length - (length / 10.0)),
                     -length / 10
                     ));
                 bulges.Add(0.392699081698724);
                 // endpoint
-                pts.Add(GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
                 bulges.Add(0.392699081698724);
-                pts.Add(GeometryHelpers.GetPerpendicularPoint2d(
+                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,
-                    GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, insertionPoint, length - (length / 10.0)),
+                    ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, insertionPoint, length - (length / 10.0)),
                     length / 10
                 ));
                 bulges.Add(length / 10 / length / 2 * 3);
-                pts.Add(GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 2));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 2));
                 bulges.Add(0.0);
             }
             return pts;

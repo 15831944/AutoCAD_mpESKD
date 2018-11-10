@@ -1,16 +1,22 @@
 ﻿// ReSharper disable InconsistentNaming
 namespace mpESKD.Functions.mpGroundLine.Overrules
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.GraphicsInterface;
     using Autodesk.AutoCAD.Runtime;
     using Base.Helpers;
     using Base.Overrules;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Exception = System.Exception;
+    using Exception = Autodesk.AutoCAD.Runtime.Exception;
+    using Polyline = System.Windows.Shapes.Polyline;
 
     public class GroundLineGripPointOverrule : GripOverrule
     {
@@ -32,22 +38,8 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             {
                 if (IsApplicable(entity))
                 {
-                    // Чтобы "отключить" точку вставки блока, нужно получить сначала блок
-                    // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
-                    BlockReference blkRef = (BlockReference)entity;
-
-                    // Удаляем стандартную ручку позиции блока (точки вставки)
-                    GripData toRemove = null;
-                    foreach (GripData gd in grips)
-                    {
-                        if (gd.GripPoint == blkRef.Position)
-                        {
-                            toRemove = gd;
-                            break;
-                        }
-                    }
-
-                    if (toRemove != null) grips.Remove(toRemove);
+                    // Удаляю все ручки - это удалит ручку вставки блока
+                    grips.Clear();
 
                     // Получаем экземпляр класса, который описывает как должен выглядеть примитив
                     // т.е. правила построения графики внутри блока
@@ -55,32 +47,143 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     var groundLine = GroundLine.GetGroundLineFromEntity(entity);
                     if (groundLine != null)
                     {
+                        Vector3d val = new Vector3d(entity.GetPlane(), Vector2d.XAxis);
+                        var scale = val.Length;
+
+                        // Если средних точек нет, значит линия состоит всего из двух точек
+                        // в этом случае не нужно добавлять точки удаления крайних вершин
+
                         // insertion (start) grip
-                        var gp = new GroundLineVertexGrip(groundLine, 0)
+                        var vertexGrip = new GroundLineVertexGrip(groundLine, 0)
                         {
-                            GripType = MPCOGrips.MPCOEntityGripType.Point,
                             GripPoint = groundLine.InsertionPoint
                         };
-                        grips.Add(gp);
+                        grips.Add(vertexGrip);
+
+                        if (groundLine.MiddlePoints.Any())
+                        {
+                            var removeVertexGrip = new GroundLineRemoveVertexGrip(groundLine, 0)
+                            {
+                                GripPoint = groundLine.InsertionPoint - Vector3d.YAxis * 4 * scale
+                            };
+                            grips.Add(removeVertexGrip);
+                        }
 
                         // middle points
                         for (var index = 0; index < groundLine.MiddlePoints.Count; index++)
                         {
-                            gp = new GroundLineVertexGrip(groundLine, index + 1)
+                            vertexGrip = new GroundLineVertexGrip(groundLine, index + 1)
                             {
-                                GripType = MPCOGrips.MPCOEntityGripType.Point,
                                 GripPoint = groundLine.MiddlePoints[index]
                             };
-                            grips.Add(gp);
+                            grips.Add(vertexGrip);
+
+                            var removeVertexGrip = new GroundLineRemoveVertexGrip(groundLine, index + 1)
+                            {
+                                GripPoint = groundLine.MiddlePoints[index] - Vector3d.YAxis * 4 * scale
+                            };
+                            grips.Add(removeVertexGrip);
                         }
 
                         // end point
-                        gp = new GroundLineVertexGrip(groundLine, groundLine.MiddlePoints.Count + 1)
+                        vertexGrip = new GroundLineVertexGrip(groundLine, groundLine.MiddlePoints.Count + 1)
                         {
-                            GripType = MPCOGrips.MPCOEntityGripType.Point,
                             GripPoint = groundLine.EndPoint
                         };
-                        grips.Add(gp);
+                        grips.Add(vertexGrip);
+
+                        if (groundLine.MiddlePoints.Any())
+                        {
+                            var removeVertexGrip = new GroundLineRemoveVertexGrip(groundLine, groundLine.MiddlePoints.Count + 1)
+                            {
+                                GripPoint = groundLine.EndPoint - Vector3d.YAxis * 4 * scale
+                            };
+                            grips.Add(removeVertexGrip);
+                        }
+
+                        #region AddVertex grips
+
+                        // add vertex grips
+                        for (var i = 0; i < groundLine.MiddlePoints.Count; i++)
+                        {
+                            if (i == 0)
+                            {
+                                var addVertexGrip = new GroundLineAddVertexGrip(groundLine,
+                                    groundLine.InsertionPoint, groundLine.MiddlePoints[i])
+                                {
+                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.InsertionPoint, groundLine.MiddlePoints[i])
+                                };
+                                grips.Add(addVertexGrip);
+                            }
+                            else
+                            {
+                                var addVertexGrip = new GroundLineAddVertexGrip(groundLine,
+                                    groundLine.MiddlePoints[i - 1], groundLine.MiddlePoints[i])
+                                {
+                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.MiddlePoints[i - 1], groundLine.MiddlePoints[i])
+                                };
+                                grips.Add(addVertexGrip);
+                            }
+                            // last segment
+                            if (i == groundLine.MiddlePoints.Count - 1)
+                            {
+                                var addVertexGrip = new GroundLineAddVertexGrip(groundLine,
+                                    groundLine.MiddlePoints[i], groundLine.EndPoint)
+                                {
+                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.MiddlePoints[i], groundLine.EndPoint)
+                                };
+                                grips.Add(addVertexGrip);
+                            }
+                        }
+
+                        {
+                            if (groundLine.MiddlePoints.Any())
+                            {
+                                var addVertexGrip = new GroundLineAddVertexGrip(groundLine, groundLine.EndPoint, null)
+                                {
+                                    GripPoint = groundLine.EndPoint +
+                                                (groundLine.EndPoint - groundLine.MiddlePoints.Last()).GetNormal() * 4 * scale
+                                };
+                                grips.Add(addVertexGrip);
+
+                                addVertexGrip = new GroundLineAddVertexGrip(groundLine, null, groundLine.InsertionPoint)
+                                {
+                                    GripPoint = groundLine.InsertionPoint +
+                                                (groundLine.MiddlePoints.First() - groundLine.InsertionPoint).GetNormal() * 4 * scale
+                                };
+                                grips.Add(addVertexGrip);
+                            }
+                            else
+                            {
+                                var addVertexGrip = new GroundLineAddVertexGrip(groundLine, groundLine.EndPoint, null)
+                                {
+                                    GripPoint = groundLine.EndPoint + 
+                                                (groundLine.InsertionPoint - groundLine.EndPoint).GetNormal() * 4 * scale
+                                };
+                                grips.Add(addVertexGrip);
+
+                                addVertexGrip = new GroundLineAddVertexGrip(groundLine, null, groundLine.EndPoint)
+                                {
+                                    GripPoint = groundLine.InsertionPoint +
+                                                (groundLine.EndPoint - groundLine.InsertionPoint ).GetNormal() * 4 * scale
+                                };
+                                grips.Add(addVertexGrip);
+
+                                addVertexGrip = new GroundLineAddVertexGrip(groundLine, groundLine.InsertionPoint, groundLine.EndPoint)
+                                {
+                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.InsertionPoint, groundLine.EndPoint)
+                                };
+                                grips.Add(addVertexGrip);
+                            }
+                        }
+
+                        #endregion
+
+                        var reverseGrip = new GroundLineReverseGrip(groundLine)
+                        {
+                            GripPoint = groundLine.InsertionPoint + Vector3d.YAxis * 4 * scale
+                        };
+                        grips.Add(reverseGrip);
                     }
                 }
             }
@@ -100,9 +203,6 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     {
                         if (gripData is GroundLineVertexGrip vertexGrip)
                         {
-                            /*
-                             * Если индекс ручки
-                             */
                             if (vertexGrip.GripIndex == 0)
                             {
                                 ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
@@ -122,10 +222,11 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                             vertexGrip.GroundLine.UpdateEntities();
                             vertexGrip.GroundLine.BlockRecord.UpdateAnonymousBlocks();
                         }
-                        ////else if ()
-                        ////{
+                        else if (gripData is GroundLineAddVertexGrip addVertexGrip)
+                        {
+                            addVertexGrip.NewPoint = addVertexGrip.GripPoint + offset;
+                        }
 
-                        ////}
                         else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
                     }
                 }
@@ -148,12 +249,13 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
     /// <summary>
     /// Ручка вершин
     /// </summary>
-    public class GroundLineVertexGrip : MPCOGrips.MPCOGripData //<-- Там будут определены типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
+    public class GroundLineVertexGrip : MPCOGrips.MPCOGripData
     {
         public GroundLineVertexGrip(GroundLine groundLine, int index)
         {
             GroundLine = groundLine;
             GripIndex = index;
+            GripType = MPCOGrips.MPCOEntityGripType.Point;
 
             // отключение контекстного меню и возможности менять команду
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
@@ -225,6 +327,229 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             {
                 ExceptionBox.Show(exception);
             }
+        }
+    }
+
+    public class GroundLineAddVertexGrip : MPCOGrips.MPCOGripData
+    {
+        public GroundLineAddVertexGrip(GroundLine groundLine, Point3d? leftPoint, Point3d? rightPoint)
+        {
+            GroundLine = groundLine;
+            GripLeftPoint = leftPoint;
+            GripRightPoint = rightPoint;
+            GripType = MPCOGrips.MPCOEntityGripType.Plus;
+            RubberBandLineDisabled = true;
+
+            // отключение контекстного меню и возможности менять команду
+            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
+            ModeKeywordsDisabled = true;
+        }
+
+        /// <summary>
+        /// Экземпляр класса GroundLine
+        /// </summary>
+        public GroundLine GroundLine { get; }
+
+        /// <summary>
+        /// Левая точка
+        /// </summary>
+        public Point3d? GripLeftPoint { get; }
+
+        /// <summary>
+        /// Правая точка
+        /// </summary>
+        public Point3d? GripRightPoint { get; }
+
+        public Point3d NewPoint { get; set; }
+
+        public override string GetTooltip()
+        {
+            //TODO Localization
+            return "Добавить вершину";
+        }
+
+        public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
+        {
+            if (newStatus == Status.GripStart)
+            {
+                AcadHelpers.Editor.TurnForcedPickOn();
+                AcadHelpers.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
+            }
+
+            if (newStatus == Status.GripEnd)
+            {
+                AcadHelpers.Editor.TurnForcedPickOff();
+                AcadHelpers.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+                using (GroundLine)
+                {
+                    Point3d? newInsertionPoint = null;
+
+                    if (GripLeftPoint == GroundLine.InsertionPoint)
+                    {
+                        GroundLine.MiddlePoints.Insert(0, NewPoint);
+                    }
+                    else if (GripLeftPoint == null)
+                    {
+                        GroundLine.MiddlePoints.Insert(0, GroundLine.InsertionPoint);
+                        GroundLine.InsertionPoint = NewPoint;
+                        newInsertionPoint = NewPoint;
+                    }
+                    else if (GripRightPoint == null)
+                    {
+                        GroundLine.MiddlePoints.Add(GroundLine.EndPoint);
+                        GroundLine.EndPoint = NewPoint;
+                    }
+                    else
+                    {
+                        GroundLine.MiddlePoints.Insert(GroundLine.MiddlePoints.IndexOf(GripLeftPoint.Value) + 1, NewPoint);
+                    }
+                    GroundLine.UpdateEntities();
+                    GroundLine.BlockRecord.UpdateAnonymousBlocks();
+                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
+                        if (newInsertionPoint.HasValue)
+                            ((BlockReference)blkRef).Position = newInsertionPoint.Value;
+                        using (var resBuf = GroundLine.GetParametersForXData())
+                        {
+                            blkRef.XData = resBuf;
+                        }
+
+                        tr.Commit();
+                    }
+                }
+            }
+
+            if (newStatus == Status.GripAbort)
+            {
+                AcadHelpers.Editor.TurnForcedPickOff();
+                AcadHelpers.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+            }
+
+            base.OnGripStatusChanged(entityId, newStatus);
+        }
+
+        private void AddNewVertex_EdOnPointMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
+        {
+            try
+            {
+                if (GripLeftPoint.HasValue)
+                {
+                    Line leftLine = new Line(GripLeftPoint.Value, pointMonitorEventArgs.Context.ComputedPoint)
+                    {
+                        ColorIndex = 150
+                    };
+                    pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(leftLine);
+                }
+
+                if (GripRightPoint.HasValue)
+                {
+                    Line rightLine = new Line(pointMonitorEventArgs.Context.ComputedPoint, GripRightPoint.Value)
+                    {
+                        ColorIndex = 150
+                    };
+                    pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(rightLine);
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+    }
+
+    public class GroundLineRemoveVertexGrip : MPCOGrips.MPCOGripData
+    {
+        public GroundLineRemoveVertexGrip(GroundLine groundLine, int index)
+        {
+            GroundLine = groundLine;
+            GripIndex = index;
+            GripType = MPCOGrips.MPCOEntityGripType.Minus;
+
+            // отключение контекстного меню и возможности менять команду
+            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
+            ModeKeywordsDisabled = true;
+        }
+
+        /// <summary>
+        /// Экземпляр класса GroundLine
+        /// </summary>
+        public GroundLine GroundLine { get; }
+
+        /// <summary>
+        /// Индекс точки
+        /// </summary>
+        public int GripIndex { get; }
+
+        // Подсказка в зависимости от имени ручки
+        public override string GetTooltip()
+        {
+            //todo localization
+            return "Удалить вершину";
+        }
+
+        public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
+        {
+            using (GroundLine)
+            {
+                Point3d? newInsertionPoint = null;
+
+                if (GripIndex == 0)
+                {
+                    GroundLine.InsertionPoint = GroundLine.MiddlePoints[0];
+                    newInsertionPoint = GroundLine.MiddlePoints[0];
+                    GroundLine.MiddlePoints.RemoveAt(0);
+                }
+                else if (GripIndex == GroundLine.MiddlePoints.Count + 1)
+                {
+                    GroundLine.EndPoint = GroundLine.MiddlePoints.Last();
+                    GroundLine.MiddlePoints.RemoveAt(GroundLine.MiddlePoints.Count - 1);
+                }
+                else
+                {
+                    GroundLine.MiddlePoints.RemoveAt(GripIndex - 1);
+                }
+
+                GroundLine.UpdateEntities();
+                GroundLine.BlockRecord.UpdateAnonymousBlocks();
+                using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
+                    if (newInsertionPoint.HasValue)
+                        ((BlockReference)blkRef).Position = newInsertionPoint.Value;
+                    using (var resBuf = GroundLine.GetParametersForXData())
+                    {
+                        blkRef.XData = resBuf;
+                    }
+
+                    tr.Commit();
+                }
+            }
+
+            return ReturnValue.GetNewGripPoints;
+        }
+    }
+
+    public class GroundLineReverseGrip : MPCOGrips.MPCOGripData
+    {
+        public GroundLineReverseGrip(GroundLine groundLine)
+        {
+            GroundLine = groundLine;
+            GripType = MPCOGrips.MPCOEntityGripType.Mirror;
+
+            // отключение контекстного меню и возможности менять команду
+            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
+            ModeKeywordsDisabled = true;
+        }
+
+        /// <summary>
+        /// Экземпляр класса GroundLine
+        /// </summary>
+        public GroundLine GroundLine { get; }
+
+        public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
+        {
+            return ReturnValue.GetNewGripPoints;
         }
     }
 }

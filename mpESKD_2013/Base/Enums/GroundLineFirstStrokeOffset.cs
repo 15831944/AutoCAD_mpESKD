@@ -13,6 +13,11 @@
         /// <summary>
         /// Половина расстояния между группами штрихов
         /// </summary>
-        ByHalfSpace
+        ByHalfSpace,
+
+        /// <summary>
+        /// Расстояние между группами штрихов
+        /// </summary>
+        BySpace
     }
 }

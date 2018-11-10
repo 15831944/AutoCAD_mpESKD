@@ -94,6 +94,9 @@
     <Compile Include="..\mpESKD_2013\Base\Helpers\AcadHelpers.cs">
       <Link>Base\Helpers\AcadHelpers.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Helpers\GeometryHelpers.cs">
+      <Link>Base\Helpers\GeometryHelpers.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\Helpers\JigHelper.cs">
       <Link>Base\Helpers\JigHelper.cs</Link>
     </Compile>
@@ -450,8 +453,20 @@
       <Link>Resources\StyleEditor_32x32_dark.png</Link>
     </Resource>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Functions\mpGroundLine\Icons\" />
+    <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png">
+      <Link>Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png">
+      <Link>Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLine_32x32.png">
+      <Link>Functions\mpGroundLine\Icons\mpGroundLine_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png">
+      <Link>Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png</Link>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

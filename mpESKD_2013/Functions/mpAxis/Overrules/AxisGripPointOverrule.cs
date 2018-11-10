@@ -181,7 +181,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                                     /* Если новая точка получается на расстоянии меньше минимального, то
                                      * переносим ее в направлении между двумя точками на минимальное расстояние
                                      */
-                                    var tmpInsertionPoint = GeometryHelpers.Point3dAtDirection(
+                                    var tmpInsertionPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                                         gripPoint.Axis.EndPoint, newPt, gripPoint.Axis.EndPoint,
                                         gripPoint.Axis.AxisMinLength * GetFullScale(gripPoint));
 

@@ -853,6 +853,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
             }
         }
+
         private string _layerName;
         /// <summary>Слой</summary>
         public string LayerName

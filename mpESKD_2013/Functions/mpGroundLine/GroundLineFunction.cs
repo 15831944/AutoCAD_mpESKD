@@ -51,6 +51,12 @@
             CreateGroundLine();
         }
 
+        [CommandMethod("ModPlus", "mpGroundLineFromPolyline", CommandFlags.Modal)]
+        public void CreateGroundLineFromPolyline()
+        {
+            MessageBox.Show("YES!");
+        }
+
         private void CreateGroundLine()
         {
             // send statistic

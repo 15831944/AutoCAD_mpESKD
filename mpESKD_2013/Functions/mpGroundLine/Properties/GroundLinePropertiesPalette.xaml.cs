@@ -142,9 +142,7 @@
                             {
                                 if (ltr != null)
                                 {
-                                    //TbLineType.Text = ltr.Name;
-                                    //TODO Uncomment
-                                    //((GroundLineSummaryProperties) DataContext).LineType = ltr.Name;
+                                    ((GroundLineSummaryProperties) DataContext).LineType = ltr.Name;
                                 }
                             }
                             tr.Commit();
