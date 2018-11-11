@@ -19,6 +19,9 @@ using Visibility = System.Windows.Visibility;
 
 namespace mpESKD.Base.Styles
 {
+    using Functions.mpGroundLine;
+    using Functions.mpGroundLine.Styles;
+
     public partial class StyleEditor
     {
         public StyleEditor()
@@ -26,30 +29,17 @@ namespace mpESKD.Base.Styles
             InitializeComponent();
             Title = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "tab4");
             Loaded += StyleEditor_OnLoaded;
-            MouseLeftButtonDown += StyleEditor_OnMouseLeftButtonDown;
-            PreviewKeyDown += StyleEditor_OnPreviewKeyDown;
             ContentRendered += StyleEditor_ContentRendered;
             // check style files
             BreakLineStyleManager.CheckStylesFile();
             AxisStyleManager.CheckStylesFile();
+            GroundLineStyleManager.CheckStylesFile();
         }
 
-        #region Window work
         private void StyleEditor_OnLoaded(object sender, RoutedEventArgs e)
         {
             SizeToContent = SizeToContent.Manual;
         }
-
-        private void StyleEditor_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
-
-        private void StyleEditor_OnPreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape) Close();
-        }
-        #endregion
 
         private ObservableCollection<StyleToBind> _styles;
         private void StyleEditor_ContentRendered(object sender, EventArgs e)
@@ -101,6 +91,24 @@ namespace mpESKD.Base.Styles
                 styleToBind.Styles.Add(style);
             }
             _styles.Add(styleToBind);
+
+            #endregion
+
+            #region Ground line
+
+            styleToBind = new StyleToBind()
+            {
+                FunctionLocalName = GroundLineFunction.MPCOEntDisplayName,
+                FunctionName = GroundLineFunction.MPCOEntName
+            };
+            var groundLineStyles = GroundLineStyleManager.GetStylesForEditor();
+            foreach (GroundLineStyleForEditor style in groundLineStyles)
+            {
+                style.Parent = styleToBind;
+                styleToBind.Styles.Add(style);
+            }
+            _styles.Add(styleToBind);
+
             #endregion
         }
 
@@ -133,6 +141,12 @@ namespace mpESKD.Base.Styles
                     BorderProperties.Child = new AxisStyleProperties(axisStyle.LayerName) { DataContext = item };
                     SetImage(AxisFunction.MPCOEntName);
                 }
+                // ground line
+                if (styleForEditor is GroundLineStyleForEditor groundLineStyle)
+                {
+                    BorderProperties.Child = new GroundLineStyleProperties(groundLineStyle.LayerName) { DataContext = item };
+                    SetImage(GroundLineFunction.MPCOEntName);
+                }
             }
             else SetImage(string.Empty);
         }
@@ -145,8 +159,10 @@ namespace mpESKD.Base.Styles
             {
                 if (styleToBind.FunctionName == BreakLineFunction.MPCOEntName)
                     styleToBind.Styles.Add(new BreakLineStyleForEditor(styleToBind));
-                if(styleToBind.FunctionName == AxisFunction.MPCOEntName)
+                if (styleToBind.FunctionName == AxisFunction.MPCOEntName)
                     styleToBind.Styles.Add(new AxisStyleForEditor(styleToBind));
+                if (styleToBind.FunctionName == GroundLineFunction.MPCOEntName)
+                    styleToBind.Styles.Add(new GroundLineStyleForEditor(styleToBind));
             }
             // break line
             if (selected is BreakLineStyleForEditor breakLineStyleForEditor)
@@ -158,6 +174,11 @@ namespace mpESKD.Base.Styles
             {
                 axisStyleForEditor.Parent.Styles.Add(new AxisStyleForEditor(axisStyleForEditor.Parent));
             }
+            // ground line
+            if (selected is GroundLineStyleForEditor groundLineStyleForEditor)
+            {
+                groundLineStyleForEditor.Parent.Styles.Add(new GroundLineStyleForEditor(groundLineStyleForEditor.Parent));
+            }
         }
 
         private void SetImage(string imageName)
@@ -165,8 +186,14 @@ namespace mpESKD.Base.Styles
             if (string.IsNullOrEmpty(imageName)) VbImage.Child = null;
             else
             {
-                if (Resources["Image" + imageName] is Canvas imgResorce)
-                    VbImage.Child = imgResorce;
+                {
+                    if (Resources["Image" + imageName] is Canvas imgResource)
+                        VbImage.Child = imgResource;
+                }
+                {
+                    if (Resources["Image" + imageName] is Viewbox imgResource)
+                        VbImage.Child = imgResource;
+                }
             }
         }
         // delete style
@@ -180,7 +207,7 @@ namespace mpESKD.Base.Styles
                     if (style.IsCurrent)
                     {
                         var selectedIndex = style.Parent.Styles.IndexOf(style);
-                        // set current to previus
+                        // set current to previous
                         SetCurrentStyle(style.Parent.Styles[selectedIndex - 1]);
                     }
                     // remove from collection
@@ -260,16 +287,27 @@ namespace mpESKD.Base.Styles
                     if (currentStyle != null)
                         UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpAxis", "CurrentStyleGuid", currentStyle.Guid, true);
                 }
+
+                if (styleToBind.FunctionName == GroundLineFunction.MPCOEntName)
+                {
+                    var currentStyle = styleToBind.Styles.FirstOrDefault(s => s.IsCurrent);
+                    if (currentStyle != null)
+                        UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpGroundLine", "CurrentStyleGuid", currentStyle.Guid, true);
+                }
             }
             // save styles
             // break line style
             BreakLineStyleManager.SaveStylesToXml(
                 _styles.Single(s => s.FunctionName == BreakLineFunction.MPCOEntName)
-                .Styles.Where(s => s.CanEdit).Cast<BreakLineStyleForEditor>().ToList());
+                    .Styles.Where(s => s.CanEdit).Cast<BreakLineStyleForEditor>().ToList());
             // axis styles
             AxisStyleManager.SaveStylesToXml(
                 _styles.Single(s => s.FunctionName == AxisFunction.MPCOEntName)
-                .Styles.Where(s => s.CanEdit).Cast<AxisStyleForEditor>().ToList());
+                    .Styles.Where(s => s.CanEdit).Cast<AxisStyleForEditor>().ToList());
+            // ground line styles
+            GroundLineStyleManager.SaveStylesToXml(
+                _styles.Single(s => s.FunctionName == GroundLineFunction.MPCOEntName)
+                    .Styles.Where(s => s.CanEdit).Cast<GroundLineStyleForEditor>().ToList());
         }
 
         private void BtExpandCollapseImage_OnMouseEnter(object sender, MouseEventArgs e)
@@ -337,13 +375,16 @@ namespace mpESKD.Base.Styles
                         {
                             // mpBreakLine
                             if (ExtendedDataHelpers.IsApplicable(obj, BreakLineFunction.MPCOEntName))
-                               newStyleGuid = AddStyleFromBreakLine(blockReference);
+                                newStyleGuid = AddStyleFromBreakLine(blockReference);
                             // mpAxis
                             if (ExtendedDataHelpers.IsApplicable(obj, AxisFunction.MPCOEntName))
                                 newStyleGuid = AddStyleFromAxis(blockReference);
+                            // mpGroundLine
+                            if (ExtendedDataHelpers.IsApplicable(obj, GroundLineFunction.MPCOEntName))
+                                newStyleGuid = AddStyleFromGroundLine(blockReference);
                         }
                     }
-                    if(!string.IsNullOrEmpty(newStyleGuid))
+                    if (!string.IsNullOrEmpty(newStyleGuid))
                         SearchInTreeViewByGuid(newStyleGuid);
                 }
             }
@@ -353,6 +394,7 @@ namespace mpESKD.Base.Styles
             }
             finally { Show(); }
         }
+
         /// <summary>Создание нового стиля из BreakLine</summary>
         /// <param name="blkReference">Блок, представляющий BreakLine</param>
         /// <returns>Guid нового стиля</returns>
@@ -382,6 +424,7 @@ namespace mpESKD.Base.Styles
             }
             return styleGuid;
         }
+
         /// <summary>Создание нового стиля из Axis</summary>
         /// <param name="blkReference">Блок, представляющий BreakLine</param>
         /// <returns>Guid нового стиля</returns>
@@ -423,6 +466,44 @@ namespace mpESKD.Base.Styles
             }
             return styleGuid;
         }
+
+        /// <summary>
+        /// Создание нового стиля из GroundLine
+        /// </summary>
+        /// <param name="blkReference">Блок, представляющий GroundLine</param>
+        /// <returns>Guid нового стиля</returns>
+        private string AddStyleFromGroundLine(BlockReference blkReference)
+        {
+            var styleGuid = string.Empty;
+            var groundLine = GroundLine.GetGroundLineFromEntity(blkReference);
+            if (groundLine != null)
+            {
+                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == GroundLineFunction.MPCOEntName);
+                if (styleToBind != null)
+                {
+                    var styleForEditor = new GroundLineStyleForEditor(styleToBind)
+                    {
+                        // general
+                        LayerName = blkReference.Layer,
+                        LineTypeScale = groundLine.LineTypeScale,
+                        Scale = groundLine.Scale,
+                        //
+                        LineType = blkReference.Linetype,
+                        //
+                        FirstStrokeOffset = groundLine.FirstStrokeOffset,
+                        StrokeLength = groundLine.StrokeLength,
+                        StrokeOffset = groundLine.StrokeOffset,
+                        StrokeAngle = groundLine.StrokeAngle,
+                        Space = groundLine.Space
+                    };
+                    styleGuid = styleForEditor.Guid;
+                    styleToBind.Styles.Add(styleForEditor);
+                }
+            }
+
+            return styleGuid;
+        }
+
         /// <summary>Поиск и выбор в TreeView стиля по Guid</summary>
         private void SearchInTreeViewByGuid(string styleGuid)
         {
@@ -439,7 +520,7 @@ namespace mpESKD.Base.Styles
                             {
                                 treeViewItem.IsExpanded = true;
                                 treeViewItem.UpdateLayout();
-                                if (treeViewItem.ItemContainerGenerator.ContainerFromIndex(treeViewItem.Items.Count-1) is TreeViewItem tvi)
+                                if (treeViewItem.ItemContainerGenerator.ContainerFromIndex(treeViewItem.Items.Count - 1) is TreeViewItem tvi)
                                     tvi.IsSelected = true;
                                 collapseIt = false;
                                 break;
@@ -463,8 +544,11 @@ namespace mpESKD.Base.Styles
         {
             Styles = new ObservableCollection<MPCOStyleForEditor>();
         }
+
         public string FunctionLocalName { get; set; }
+
         public string FunctionName { get; set; }
+
         public ObservableCollection<MPCOStyleForEditor> Styles { get; set; }
     }
 }

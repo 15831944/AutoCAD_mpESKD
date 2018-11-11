@@ -196,21 +196,7 @@ namespace mpESKD.Base.Styles
             };
         }
     }
-
-    //public class MPCOstyle : IMPCOStyle
-    //{
-    //    public MPCOstyle()
-    //    {
-    //        Properties = new List<MPCOBaseProperty>();
-    //    }
-    //    public string Name { get; set; }
-    //    public string FunctionName { get; set; }
-    //    public string Description { get; set; }
-    //    public string Guid { get; set; }
-    //    public MPCOStyleType StyleType { get; set; }
-    //    public List<MPCOBaseProperty> Properties { get; set; }
-    //}
-
+    
     public static class StyleEditorWork
     {
         private static StyleEditor _styleEditor;

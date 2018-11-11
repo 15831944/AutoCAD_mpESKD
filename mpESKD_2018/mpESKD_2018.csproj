@@ -299,6 +299,10 @@
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Styles\GroundLineStyle.cs">
       <Link>Functions\mpGroundLine\Styles\GroundLineStyle.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml.cs">
+      <Link>Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml.cs</Link>
+      <DependentUpon>GroundLineStyleProperties.xaml</DependentUpon>
+    </Compile>
     <Compile Include="..\mpESKD_2013\LoadHelpers\RibbonBuilder.cs">
       <Link>LoadHelpers\RibbonBuilder.cs</Link>
     </Compile>
@@ -382,6 +386,11 @@
     </Page>
     <Page Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml">
       <Link>Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpESKD_2013\Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml">
+      <Link>Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

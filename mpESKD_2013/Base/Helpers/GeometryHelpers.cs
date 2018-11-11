@@ -19,5 +19,25 @@ namespace mpESKD.Base.Helpers
                 (firstPoint.X + secondPoint.X) / 2,
                 (firstPoint.Y + secondPoint.Y) / 2);
         }
+
+        public static string AsString(this Point3d point)
+        {
+            return $"{point.X}${point.Y}${point.Z}";
+        }
+
+        public static Point3d ParseToPoint3d(this string str)
+        {
+            if (!string.IsNullOrEmpty(str))
+            {
+                var splitted = str.Split('$');
+                if (splitted.Length == 3)
+                    return new Point3d(
+                        double.Parse(splitted[0]),
+                        double.Parse(splitted[1]),
+                        double.Parse(splitted[2]));
+            }
+
+            return Point3d.Origin;
+        }
     }
 }

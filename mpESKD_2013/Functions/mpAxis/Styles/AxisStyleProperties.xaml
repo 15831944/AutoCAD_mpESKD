@@ -15,7 +15,7 @@
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
                 <ResourceDictionary Source="../../../Base/Properties/Controls/ControlStylesForEditor.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="D:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
             <local:AxisMarkersPositionValueConverter x:Key="AxisMarkersPositionValueConverter"></local:AxisMarkersPositionValueConverter>
         </ResourceDictionary>
     </UserControl.Resources>

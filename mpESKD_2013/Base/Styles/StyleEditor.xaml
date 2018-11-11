@@ -4,7 +4,6 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                       xmlns:local="clr-namespace:mpESKD"
-                      xmlns:sys="clr-namespace:System;assembly=mscorlib"
                       xmlns:mps="https://modplus.org/winfx/xaml/controls"
                       mc:Ignorable="d" SizeToContent="WidthAndHeight" 
                       ResizeMode="CanResizeWithGrip"
@@ -15,7 +14,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="D:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
             <!--Images-->
             <Canvas x:Key="ImagempBreakLine" Width="190" Height="150">
@@ -354,6 +353,49 @@
                     </TextBlock.RenderTransform>
                 </TextBlock>
             </Canvas>
+            <Viewbox x:Key="ImagempGroundLine" Width="190" Height="150">
+                <Canvas Width="178.250" Height="119.620">
+                    <Path StrokeThickness="1.5" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 150.457,0.000 L 150.457,75.981 L 18.847,75.981"/>
+                    <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 43.270,75.448 L 26.988,103.649"/>
+                    <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 56.838,75.448 L 40.556,103.649"/>
+                    <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 70.406,75.448 L 54.124,103.649"/>
+                    <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 104.326,75.448 L 88.044,103.649"/>
+                    <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 117.894,75.448 L 101.612,103.649"/>
+                    <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 131.462,75.448 L 115.180,103.649"/>
+                    <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 149.924,50.202 L 178.125,66.483"/>
+                    <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 149.924,36.634 L 178.125,52.915"/>
+                    <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 149.924,23.066 L 178.125,39.347"/>
+
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 24.905,107.257 L 19.229,117.088"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 153.638,86.391 L 135.359,118.052"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 42.591,71.910 L 42.591,44.859"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 18.847,71.910 L 18.847,44.859"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 56.838,71.910 L 56.838,44.859"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 45.340,45.022 L 39.843,50.519"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 21.596,45.022 L 16.099,50.519"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 0.750,73.259 L 6.195,78.703"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 17.159,114.222 L 24.609,114.222"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 59.587,45.022 L 54.089,50.519"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 72.867,45.022 L 67.370,50.519"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 153.306,92.275 L 151.363,85.023"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 137.537,119.587 L 135.594,112.335"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 106.767,45.022 L 101.269,50.519"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 15.625,47.771 L 60.145,47.771"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 70.118,71.910 L 70.118,44.859"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 104.018,71.910 L 104.018,44.859"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 66.625,47.771 L 107.458,47.771"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 119.195,105.932 L 138.598,117.135"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 135.982,79.208 L 154.239,89.749"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 16.250,75.981 L 0.000,75.981"/>
+                    <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 3.544,75.980 C 2.828,78.693 2.446,81.541 2.446,84.479 C 2.446,97.511 9.956,108.789 20.884,114.222"/>
+
+                    <TextBlock Foreground="{DynamicResource AccentColorBrush}" Canvas.Left="46.097" Canvas.Top="28.840" FontSize="15" FontFamily="ISOCPEUR">a</TextBlock>
+                    <TextBlock Foreground="{DynamicResource AccentColorBrush}" Canvas.Left="84.652" Canvas.Top="28.840" FontSize="15" FontFamily="ISOCPEUR">c</TextBlock>
+                    <TextBlock Foreground="{DynamicResource AccentColorBrush}" RenderTransform="0.500,-0.866,0.866,0.500,0.000,0.000" Canvas.Left="128.007" Canvas.Top="94.888" FontSize="15" FontFamily="ISOCPEUR">l</TextBlock>
+                    <TextBlock Foreground="{DynamicResource AccentColorBrush}" Canvas.Left="26.876" Canvas.Top="28.840" FontSize="15" FontFamily="ISOCPEUR">b</TextBlock>
+                    <TextBlock Foreground="{DynamicResource AccentColorBrush}" Canvas.Left="10.350" Canvas.Top="82.590" FontSize="15" FontFamily="ISOCPEUR">α</TextBlock>
+                </Canvas>
+            </Viewbox>
         </ResourceDictionary>
     </Window.Resources>
     <TabControl Padding="5,10,5,5">
@@ -373,7 +415,7 @@
                 <Grid.Resources>
                     <Path x:Key="Folder" Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" Fill="Black" />
                 </Grid.Resources>
-                
+
                 <!--Controls-->
                 <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
                     <Grid.ColumnDefinitions>
@@ -382,11 +424,6 @@
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Grid.Resources>
-                        <Path x:Key="Plus-Outline" Data="M4,9H9V4H15V9H20V15H15V20H9V15H4V9M11,13V18H13V13H18V11H13V6H11V11H6V13H11Z" Fill="Black" />
-                        <Path x:Key="Delete" Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" Fill="Black" />
-                        <Path x:Key="Current" Data="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" Fill="Black" />
-                    </Grid.Resources>
                     <!--Add style-->
                     <Button Grid.Column="0" Name="BtAddNewStyle" Click="BtAddNewStyle_OnClick"
                             Style="{DynamicResource ModPlusTransparentRoundButton}" Width="32" Height="32"
@@ -436,7 +473,7 @@
                         </Viewbox>
                     </Button>
                 </Grid>
-                
+
                 <!--Styles-->
                 <TreeView Grid.Row="1" Grid.Column="0" MinHeight="50"
                           Name="TvStyles" SelectedItemChanged="TvStyles_OnSelectedItemChanged"
@@ -459,11 +496,11 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-                
+
                 <mps:Card Grid.Row="3" Grid.Column="0">
-                    <Viewbox  Stretch="Uniform" Name="VbImage" ></Viewbox>
+                    <Viewbox  Stretch="Uniform" Name="VbImage"></Viewbox>
                 </mps:Card>
-                
+
                 <!--Image show controls-->
                 <Button Grid.Row="3" Grid.Column="0" 
                         Style="{DynamicResource ModPlusTransparentRoundButton}"
@@ -493,17 +530,17 @@
                         </Canvas>
                     </Viewbox>
                 </Button>
-                
-                <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Margin="0,0,0,0"
+
+                <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Margin="-4,0,-4,0"
                               VerticalAlignment="Stretch" HorizontalAlignment="Center"
                               Name="VerticalGridSplitter"
-                              BorderThickness="2,0,0,0" BorderBrush="{DynamicResource MidGrayBrush}"></GridSplitter>
-                
-                <GridSplitter Grid.Row="2" Grid.Column="0" BorderBrush="{DynamicResource MidGrayBrush}"
+                              BorderThickness="8,0,0,0" BorderBrush="Transparent"></GridSplitter>
+
+                <GridSplitter Grid.Row="2" Grid.Column="0" BorderBrush="Transparent"
                               Name="HorizontalGridSplitter"
                               HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                              Margin="0" BorderThickness="0,2,0,0"></GridSplitter>
-                
+                              Margin="0 -4 0 -4" BorderThickness="0,8,0,0"></GridSplitter>
+
                 <!--Properties-->
                 <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="3" Margin="0,0,0,20" MinWidth="50">
                     <Grid.RowDefinitions>
@@ -539,7 +576,7 @@
                 </Grid.DataContext>
                 <TextBlock Grid.Row="0" HorizontalAlignment="Center" FontSize="16" Margin="2"
                            Text="{Binding Source={StaticResource Lang}, XPath=h21}"
-                           Foreground="{DynamicResource AccentBaseColorBrush}"></TextBlock>
+                           Foreground="{DynamicResource AccentColorBrush}"></TextBlock>
                 <!--Main settings-->
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
@@ -646,7 +683,7 @@
                 </Grid>
                 <TextBlock Grid.Row="2" HorizontalAlignment="Center" FontSize="16" Margin="2"
                            Text="{Binding Source={StaticResource Lang}, XPath=h40}"
-                           Foreground="{DynamicResource AccentBaseColorBrush}"></TextBlock>
+                           Foreground="{DynamicResource AccentColorBrush}"></TextBlock>
                 <!-- settings for entities -->
                 <TabControl Grid.Row="3" TabStripPlacement="Left">
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h41}">

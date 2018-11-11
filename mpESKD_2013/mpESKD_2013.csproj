@@ -176,6 +176,9 @@
     </Compile>
     <Compile Include="Functions\mpGroundLine\Properties\GroundLineSummaryProperties.cs" />
     <Compile Include="Functions\mpGroundLine\Styles\GroundLineStyle.cs" />
+    <Compile Include="Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml.cs">
+      <DependentUpon>GroundLineStyleProperties.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Interface.cs" />
     <Compile Include="LoadHelpers\RibbonBuilder.cs" />
     <Compile Include="MainFunction.cs" />
@@ -238,6 +241,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

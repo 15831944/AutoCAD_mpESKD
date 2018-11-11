@@ -19,6 +19,7 @@ namespace mpESKD.Base.Properties
         public PropertiesPalette()
         {
             InitializeComponent();
+            ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
             AcadHelpers.Documents.DocumentCreated += Documents_DocumentCreated;
             AcadHelpers.Documents.DocumentActivated += Documents_DocumentActivated;

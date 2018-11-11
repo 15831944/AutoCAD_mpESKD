@@ -40,7 +40,7 @@
                             var basePoint = _insertionPoint.Value;
                             if (PreviousPoint != null)
                                 basePoint = PreviousPoint.Value;
-                            return _nextPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg2"), basePoint, value =>
+                            return _nextPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg5"), basePoint, value =>
                             {
                                 _groundLine.EndPoint = value;
                             });
@@ -64,7 +64,6 @@
                     using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                     {
                         var obj = (BlockReference)tr.GetObject(Entity.Id, OpenMode.ForWrite, true);
-                        //obj.Erase(false);
                         obj.Position = _groundLine.InsertionPoint;
                         obj.BlockUnit = AcadHelpers.Database.Insunits;
                         tr.Commit();

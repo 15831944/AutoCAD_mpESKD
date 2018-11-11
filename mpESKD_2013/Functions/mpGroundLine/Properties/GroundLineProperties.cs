@@ -8,8 +8,6 @@
 
     public static class GroundLineProperties
     {
-        ////TODO Localization!
-
         /// <summary>Поле, описывающее свойство "Масштаб"</summary>
         public static MPCOTypeProperty<AnnotationScale> Scale = new MPCOTypeProperty<AnnotationScale>
         {
@@ -21,9 +19,9 @@
         public static MPCOStringProperty LineType = new MPCOStringProperty
         {
             Name = nameof(LineType),
-            DisplayName = "Тип линии:",
+            DisplayName = Language.GetItem(MainFunction.LangItem, "p35"), // "Тип линии:",
             DefaultValue = "Continuous",
-            Description = Language.GetItem(MainFunction.LangItem, "d19")
+            Description = Language.GetItem(MainFunction.LangItem, "d35")
         };
         /// <summary>Поле, описывающее свойство "Масштаб типа линии"</summary>
         public static MPCODoubleProperty LineTypeScale = new MPCODoubleProperty
@@ -46,8 +44,8 @@
         public static MPCOTypeProperty<GroundLineFirstStrokeOffset> FirstStrokeOffset = new MPCOTypeProperty<GroundLineFirstStrokeOffset>
         {
             Name = nameof(FirstStrokeOffset),
-            DisplayName = "Отступ первого штриха",
-            Description = "Отступ первого штриха в каждом сегменте линии грунта",
+            DisplayName = Language.GetItem(MainFunction.LangItem, "p36"), // "Отступ первого штриха",
+            Description = Language.GetItem(MainFunction.LangItem, "d36"), // "Отступ первого штриха в каждом сегменте линии грунта",
             DefaultValue = GroundLineFirstStrokeOffset.ByHalfSpace
         };
 
@@ -57,8 +55,8 @@
         public static MPCOIntProperty StrokeLength = new MPCOIntProperty
         {
             Name = nameof(StrokeLength),
-            DisplayName = "Длина штриха",
-            Description = "Длина штриха",
+            DisplayName = Language.GetItem(MainFunction.LangItem, "p37"), // "Длина штриха",
+            Description = Language.GetItem(MainFunction.LangItem, "d37"), // "Длина штриха",
             DefaultValue = 8,
             Minimum = 1,
             Maximum = 10
@@ -70,8 +68,8 @@
         public static MPCOIntProperty StrokeOffset = new MPCOIntProperty
         {
             Name = nameof(StrokeOffset),
-            DisplayName = "Расстояние между штрихами",
-            Description = "Расстояние между штрихами",
+            DisplayName = Language.GetItem(MainFunction.LangItem, "p38"), // "Расстояние между штрихами",
+            Description = Language.GetItem(MainFunction.LangItem, "d38"), // "Расстояние между штрихами",
             DefaultValue = 4,
             Minimum = 1,
             Maximum = 10
@@ -83,8 +81,8 @@
         public static MPCOIntProperty StrokeAngle = new MPCOIntProperty
         {
             Name = nameof(StrokeAngle),
-            DisplayName = "Угол наклона штриха",
-            Description = "Угол наклона штриха",
+            DisplayName = Language.GetItem(MainFunction.LangItem, "p39"), // "Угол наклона штриха",
+            Description = Language.GetItem(MainFunction.LangItem, "d39"), // "Угол наклона штриха",
             DefaultValue = 60,
             Minimum = 30,
             Maximum = 90
@@ -96,22 +94,21 @@
         public static MPCOIntProperty Space = new MPCOIntProperty
         {
             Name = nameof(Space),
-            DisplayName = "Отступ группы штрихов",
-            Description = "Отступ группы штрихов",
+            DisplayName = Language.GetItem(MainFunction.LangItem, "p40"), // "Отступ группы штрихов",
+            Description = Language.GetItem(MainFunction.LangItem, "d40"), // "Отступ группы штрихов",
             DefaultValue = 10,
             Minimum = 1,
             Maximum = 20
         };
     }
 
-    //TODO Localization
     public static class GroundLinePropertiesHelpers
     {
         public static List<string> FirstStrokeOffsetNames = new List<string>
         {
-            "Расстояние между штрихами",
-            "Половина расстояния между группами штрихов",
-            "Расстояние между группами штрихов"
+            Language.GetItem(MainFunction.LangItem, "glfst1"), // "Расстояние между штрихами",
+            Language.GetItem(MainFunction.LangItem, "glfst2"), // "Половина расстояния между группами штрихов",
+            Language.GetItem(MainFunction.LangItem, "glfst3") // "Расстояние между группами штрихов"
         };
 
         public static GroundLineFirstStrokeOffset GetFirstStrokeOffsetByLocalName(string local)

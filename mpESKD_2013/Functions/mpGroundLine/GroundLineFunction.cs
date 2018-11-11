@@ -1,11 +1,10 @@
 ﻿namespace mpESKD.Functions.mpGroundLine
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
-    using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Helpers;
@@ -15,7 +14,6 @@
     using Overrules;
     using Properties;
     using Styles;
-    using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class GroundLineFunction : IMPCOEntityFunction
@@ -52,15 +50,16 @@
         }
 
         [CommandMethod("ModPlus", "mpGroundLineFromPolyline", CommandFlags.Modal)]
-        public void CreateGroundLineFromPolyline()
+        public void CreateGroundLineFromPolylineCommand()
         {
-            MessageBox.Show("YES!");
+            CreateGroundLineFromPolyline();
         }
 
         private void CreateGroundLine()
         {
             // send statistic
             Statistic.SendCommandStarting(GroundLineFunction.MPCOEntName, MpVersionData.CurCadVers);
+            
             try
             {
                 Overrule.Overruling = false;
@@ -92,7 +91,7 @@
                             if (breakLineJig.PreviousPoint == null)
                             {
                                 breakLineJig.PreviousPoint = groundLine.MiddlePoints.Any()
-                                    ? groundLine.MiddlePoints.Last() 
+                                    ? groundLine.MiddlePoints.Last()
                                     : groundLine.InsertionPoint;
                             }
                             else
@@ -138,13 +137,97 @@
                     }
                 }
             }
-            catch (Exception exception)
+            catch (System.Exception exception)
             {
                 ExceptionBox.Show(exception);
             }
             finally
             {
                 Overrule.Overruling = true;
+            }
+        }
+
+        private void CreateGroundLineFromPolyline()
+        {
+            // send statistic
+            Statistic.SendCommandStarting("mpGroundLineFromPolyline", MpVersionData.CurCadVers);
+            try
+            {
+                var peo = new PromptEntityOptions("\n" + Language.GetItem(MainFunction.LangItem, "msg6"))
+                {
+                    AllowNone = false,
+                    AllowObjectOnLockedLayer = true
+                };
+                peo.SetRejectMessage("\n" + Language.GetItem(MainFunction.LangItem, "wrong"));
+                peo.AddAllowedClass(typeof(Polyline), true);
+
+                var per = AcadHelpers.Editor.GetEntity(peo);
+                if (per.Status != PromptStatus.OK) return;
+
+                /* Регистрация ЕСКД приложения должна запускаться при запуске
+                 * функции, т.к. регистрация происходит в текущем документе
+                 * При инициализации плагина регистрации нет!
+                 */
+                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineFunction.MPCOEntName);
+                var style = GroundLineStyleManager.GetCurrentStyle();
+                var layerName = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LayerName.Name,
+                    GroundLineProperties.LayerName.DefaultValue);
+                var groundLine = new GroundLine(style);
+                var blockReference = MainFunction.CreateBlock(groundLine);
+
+                blockReference.BlockUnit = AcadHelpers.Database.Insunits;
+
+                // set layer
+                AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
+
+                var plineId = per.ObjectId;
+
+                using (AcadHelpers.Document.LockDocument(DocumentLockMode.ProtectedAutoWrite, null, null, true))
+                {
+                    using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        var dbObj = tr.GetObject(plineId, OpenMode.ForRead);
+                        if (dbObj is Polyline pline)
+                        {
+                            for (int i = 0; i < pline.NumberOfVertices; i++)
+                            {
+                                if (i == 0)
+                                    groundLine.InsertionPoint = pline.GetPoint3dAt(i);
+                                else if (i == pline.NumberOfVertices - 1)
+                                    groundLine.EndPoint = pline.GetPoint3dAt(i);
+                                else
+                                    groundLine.MiddlePoints.Add(pline.GetPoint3dAt(i));
+                            }
+
+                            groundLine.UpdateEntities();
+                            groundLine.BlockRecord.UpdateAnonymousBlocks();
+
+                            var ent = (BlockReference) tr.GetObject(groundLine.BlockId, OpenMode.ForWrite);
+                            ent.Position = pline.GetPoint3dAt(0);
+
+                            ent.XData = groundLine.GetParametersForXData();
+                        }
+                        tr.Commit();
+                    }
+
+                    AcadHelpers.Document.TransactionManager.QueueForGraphicsFlush();
+                    AcadHelpers.Document.TransactionManager.FlushGraphics();
+
+                    // "Удалить исходную полилинию?"
+                    if (MessageBox.ShowYesNo(Language.GetItem(MainFunction.LangItem, "msg7"), MessageBoxIcon.Question))
+                    {
+                        using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                        {
+                            var dbObj = tr.GetObject(plineId, OpenMode.ForWrite);
+                            dbObj.Erase(true);
+                            tr.Commit();
+                        }
+                    }
+                }
+            }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
             }
         }
     }

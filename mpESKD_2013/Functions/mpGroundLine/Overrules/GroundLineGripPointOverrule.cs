@@ -1,22 +1,15 @@
 ﻿// ReSharper disable InconsistentNaming
 namespace mpESKD.Functions.mpGroundLine.Overrules
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
-    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
-    using Autodesk.AutoCAD.GraphicsInterface;
     using Autodesk.AutoCAD.Runtime;
     using Base.Helpers;
     using Base.Overrules;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Exception = Autodesk.AutoCAD.Runtime.Exception;
-    using Polyline = System.Windows.Shapes.Polyline;
 
     public class GroundLineGripPointOverrule : GripOverrule
     {
@@ -179,10 +172,28 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
                         #endregion
 
-                        var reverseGrip = new GroundLineReverseGrip(groundLine)
+                        var reverseGrip = new GroundLineReverseGrip(groundLine);
+                        if (groundLine.MiddlePoints.Any())
                         {
-                            GripPoint = groundLine.InsertionPoint + Vector3d.YAxis * 4 * scale
-                        };
+                            Point2dCollection points = new Point2dCollection();
+                            points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(groundLine.InsertionPoint));
+                            groundLine.MiddlePoints.ForEach(p => points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(p)));
+                            points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(groundLine.EndPoint));
+                            Polyline polyline = new Polyline();
+                            for (var i = 0; i < points.Count; i++)
+                            {
+                                polyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
+                            }
+
+                            reverseGrip.GripPoint = polyline.GetPointAtDist(polyline.Length / 2) +
+                                                    Vector3d.YAxis * 4 * scale;
+                        }
+                        else
+                        {
+                            reverseGrip.GripPoint =
+                                GeometryHelpers.GetMiddlePoint3d(groundLine.InsertionPoint, groundLine.EndPoint) +
+                                Vector3d.YAxis * 4 * scale;
+                        }
                         grips.Add(reverseGrip);
                     }
                 }
@@ -364,8 +375,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
         public override string GetTooltip()
         {
-            //TODO Localization
-            return "Добавить вершину";
+            return Language.GetItem(MainFunction.LangItem, "gp4"); //  "Добавить вершину";
         }
 
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
@@ -484,8 +494,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         // Подсказка в зависимости от имени ручки
         public override string GetTooltip()
         {
-            //todo localization
-            return "Удалить вершину";
+            return Language.GetItem(MainFunction.LangItem, "gp3"); // "Удалить вершину";
         }
 
         public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
@@ -549,6 +558,29 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
         public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
         {
+            using (GroundLine)
+            {
+                Point3d newInsertionPoint = GroundLine.EndPoint;
+                GroundLine.EndPoint = GroundLine.InsertionPoint;
+                GroundLine.InsertionPoint = newInsertionPoint;
+                GroundLine.MiddlePoints.Reverse();
+                GroundLine.BlockTransform = GroundLine.BlockTransform.Inverse();
+                
+                GroundLine.UpdateEntities();
+                GroundLine.BlockRecord.UpdateAnonymousBlocks();
+                using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
+                    ((BlockReference)blkRef).Position = newInsertionPoint;
+                    using (var resBuf = GroundLine.GetParametersForXData())
+                    {
+                        blkRef.XData = resBuf;
+                    }
+
+                    tr.Commit();
+                }
+            }
+
             return ReturnValue.GetNewGripPoints;
         }
     }

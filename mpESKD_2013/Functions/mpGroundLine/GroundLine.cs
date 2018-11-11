@@ -13,7 +13,6 @@
     using Base.Enums;
     using Base.Helpers;
     using Base.Styles;
-    using ModPlus.Helpers;
     using ModPlusAPI.Windows;
     using Properties;
     using Styles;
@@ -71,7 +70,7 @@
         }
 
         private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
-
+        
         #endregion
 
         #region Properties

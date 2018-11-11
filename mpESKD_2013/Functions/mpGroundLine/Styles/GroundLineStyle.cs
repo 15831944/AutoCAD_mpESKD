@@ -317,8 +317,7 @@
             {
                 Name = GroundLineFunction.MPCOEntDisplayName,
                 FunctionName = GroundLineFunction.MPCOEntName,
-                //TODO Localization
-                Description = "Базовый стиль для линии грунта",
+                Description = Language.GetItem(MainFunction.LangItem, "h78"), // "Базовый стиль для линии грунта",
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
             };
