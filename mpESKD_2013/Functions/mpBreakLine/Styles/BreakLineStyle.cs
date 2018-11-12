@@ -1,40 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using mpESKD.Base.Helpers;
-using mpESKD.Base.Properties;
-using mpESKD.Base.Styles;
-using mpESKD.Functions.mpBreakLine.Properties;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-
-namespace mpESKD.Functions.mpBreakLine.Styles
+﻿namespace mpESKD.Functions.mpBreakLine.Styles
 {
     using Base.Enums;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Xml.Linq;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Base.Helpers;
+    using mpESKD.Base.Properties;
+    using mpESKD.Base.Styles;
+    using Properties;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
 
-    public class BreakLineStyle : IMPCOStyle
+    public class BreakLineStyle : MPCOStyle
     {
-        public BreakLineStyle()
-        {
-            Properties = new List<MPCOBaseProperty>();
-        }
-        // Global
-        public string Name { get; set; }
-        public string FunctionName { get; set; }
-        public string Description { get; set; }
-        public string Guid { get; set; }
-        public MPCOStyleType StyleType { get; set; }
-        public XElement LayerXmlData { get; set; }
-        // Properties
-        public List<MPCOBaseProperty> Properties { get; set; }
     }
 
     public class BreakLineStyleForEditor : MPCOStyleForEditor
     {
-        public BreakLineStyleForEditor(IMPCOStyle style, string currentStyleGuid, StyleToBind parent) : base(style, currentStyleGuid, parent)
+        public BreakLineStyleForEditor(MPCOStyle style, string currentStyleGuid, StyleToBind parent) : base(style, currentStyleGuid, parent)
         {
             // Properties
             Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang),

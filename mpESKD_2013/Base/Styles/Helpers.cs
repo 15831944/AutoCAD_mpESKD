@@ -27,7 +27,8 @@ namespace mpESKD.Base.Styles
                 return typeProperty.Value;
             return null;
         }
-        public static int GetPropertyValue(IMPCOStyle style, string propName, int defaultValue)
+
+        public static int GetPropertyValue(MPCOStyle style, string propName, int defaultValue)
         {
             if (style.Properties != null && style.Properties.Any())
                 foreach (var property in style.Properties)
@@ -37,7 +38,8 @@ namespace mpESKD.Base.Styles
                 }
             return defaultValue;
         }
-        public static double GetPropertyValue(IMPCOStyle style, string propName, double defaultValue)
+
+        public static double GetPropertyValue(MPCOStyle style, string propName, double defaultValue)
         {
             if (style.Properties != null && style.Properties.Any())
                 foreach (var property in style.Properties)
@@ -47,7 +49,8 @@ namespace mpESKD.Base.Styles
                 }
             return defaultValue;
         }
-        public static string GetPropertyValue(IMPCOStyle style, string propName, string defaultValue)
+
+        public static string GetPropertyValue(MPCOStyle style, string propName, string defaultValue)
         {
             if (style.Properties != null && style.Properties.Any())
                 foreach (var property in style.Properties)
@@ -57,7 +60,8 @@ namespace mpESKD.Base.Styles
                 }
             return defaultValue;
         }
-        public static T GetPropertyValue<T>(IMPCOStyle style, string propName, T defaultValue)
+
+        public static T GetPropertyValue<T>(MPCOStyle style, string propName, T defaultValue)
         {
             if (style.Properties != null && style.Properties.Any())
                 foreach (var property in style.Properties)
@@ -129,6 +133,7 @@ namespace mpESKD.Base.Styles
                 return MPCOStyleType.User;
             return MPCOStyleType.System;
         }
+
         /// <summary>Создание XElement из свойства для сохранения в файл стилей</summary>
         public static XElement CreateXElementFromProperty(KeyValuePair<string, object> property)
         {

@@ -11,6 +11,8 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Base
 {
+    using Styles;
+
     public abstract class MPCOEntity : IDisposable
     {
         protected MPCOEntity()
@@ -218,7 +220,12 @@ namespace mpESKD.Base
             }
         }
 
+        /// <summary>Идентификатор стиля</summary>
+        public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
+
         #region Abstract members
+
+        public abstract void ApplyStyle (MPCOStyle style);
 
         /// <summary>
         /// Перерисовка элементов блока по параметрам ЕСКД элемента

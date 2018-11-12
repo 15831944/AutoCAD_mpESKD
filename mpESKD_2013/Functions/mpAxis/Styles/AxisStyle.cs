@@ -13,27 +13,14 @@
     using ModPlusAPI;
     using ModPlusAPI.Windows;
 
-    public class AxisStyle : IMPCOStyle
+    public class AxisStyle : MPCOStyle
     {
-        public AxisStyle()
-        {
-            Properties = new List<MPCOBaseProperty>();
-        }
-        // Global
-        public string Name { get; set; }
-        public string FunctionName { get; set; }
-        public string Description { get; set; }
-        public string Guid { get; set; }
-        public MPCOStyleType StyleType { get; set; }
-        public XElement LayerXmlData { get; set; }
         public XElement TextStyleXmlData { get; set; }
-        // Properties
-        public List<MPCOBaseProperty> Properties { get; set; }
     }
 
     public class AxisStyleForEditor : MPCOStyleForEditor
     {
-        public AxisStyleForEditor(IMPCOStyle style, string currentStyleGuid, StyleToBind parent) : base(style, currentStyleGuid, parent)
+        public AxisStyleForEditor(MPCOStyle style, string currentStyleGuid, StyleToBind parent) : base(style, currentStyleGuid, parent)
         {
             // Properties
             Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture),

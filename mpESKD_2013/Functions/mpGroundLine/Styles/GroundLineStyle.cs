@@ -13,29 +13,15 @@
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Properties;
-    
-    public class GroundLineStyle : IMPCOStyle
+
+    public class GroundLineStyle : MPCOStyle
     {
-        public GroundLineStyle()
-        {
-            Properties = new List<MPCOBaseProperty>();
-        }
-
-        // Global
-        public string Name { get; set; }
-        public string FunctionName { get; set; }
-        public string Description { get; set; }
-        public string Guid { get; set; }
-        public MPCOStyleType StyleType { get; set; }
-        public XElement LayerXmlData { get; set; }
-
-        // Properties
-        public List<MPCOBaseProperty> Properties { get; set; }
     }
 
     public class GroundLineStyleForEditor : MPCOStyleForEditor
     {
-        public GroundLineStyleForEditor(IMPCOStyle style, string currentStyleGuid, StyleToBind parent) : base(style, currentStyleGuid, parent)
+        public GroundLineStyleForEditor(MPCOStyle style, string currentStyleGuid, StyleToBind parent) 
+            : base(style, currentStyleGuid, parent)
         {
             FirstStrokeOffset = StyleHelpers.GetPropertyValue<GroundLineFirstStrokeOffset>(
                 style, nameof(FirstStrokeOffset), GroundLineProperties.FirstStrokeOffset.DefaultValue);

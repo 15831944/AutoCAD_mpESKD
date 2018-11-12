@@ -206,11 +206,8 @@
 
         #region Style
 
-        /// <summary>Идентификатор стиля</summary>
-        public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
-
         /// <summary>Применение стиля по сути должно переопределять текущие параметры</summary>
-        public void ApplyStyle(AxisStyle style)
+        public override void ApplyStyle(MPCOStyle style)
         {
             // apply settings from style
             Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture), AxisProperties.Fracture.DefaultValue);
@@ -245,7 +242,7 @@
                 else
                 {
                     if (MainStaticSettings.Settings.IfNoTextStyle == 1 &&
-                        TextStyleHelper.CreateTextStyle(style.TextStyleXmlData))
+                        TextStyleHelper.CreateTextStyle(((AxisStyle)style).TextStyleXmlData))
                         TextStyle = textStyleName;
                 }
             }

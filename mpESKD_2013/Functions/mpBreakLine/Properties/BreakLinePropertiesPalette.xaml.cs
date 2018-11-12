@@ -12,6 +12,8 @@ using mpESKD.Functions.mpBreakLine.Styles;
 
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
+    using Base.Enums;
+
     public partial class BreakLinePropertiesPalette
     {
         private readonly PropertiesPalette _parentPalette;
@@ -29,7 +31,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             }
             CbStyle.ItemsSource = sNames;
 
-            CbBreakLineType.ItemsSource = BreakLinePropertiesHelpers.BreakLineTypeLocalNames;
+            CbBreakLineType.ItemsSource = BreakLineTypeHelper.LocalNames;
             // get list of scales
             CbScale.ItemsSource = AcadHelpers.Scales;
             // fill layers

@@ -5,7 +5,6 @@
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
@@ -78,7 +77,7 @@
         /// <summary>
         /// Минимальная длина линии грунта
         /// </summary>
-        public static double GroundLineMinLength => 20.0;
+        public double GroundLineMinLength => 20.0;
 
         /// <summary>
         /// Отступ первого штриха в каждом сегменте полилинии
@@ -337,11 +336,10 @@
 
         #region Style
 
-        /// <summary>Идентификатор стиля</summary>
-        public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
+        /////// <summary>Идентификатор стиля</summary>
+        ////public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
 
-        /// <summary>Применение стиля по сути должно переопределять текущие параметры</summary>
-        public void ApplyStyle(GroundLineStyle style)
+        public override void ApplyStyle(MPCOStyle style)
         {
             // apply settings from style
             FirstStrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(FirstStrokeOffset), GroundLineProperties.FirstStrokeOffset.DefaultValue);
@@ -361,6 +359,28 @@
             var lineType = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LineType.Name, GroundLineProperties.LineType.DefaultValue);
             AcadHelpers.SetLineType(BlockId, lineType);
         }
+
+        /////// <summary>Применение стиля по сути должно переопределять текущие параметры</summary>
+        ////public override void ApplyStyle(GroundLineStyle style)
+        ////{
+        ////    // apply settings from style
+        ////    FirstStrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(FirstStrokeOffset), GroundLineProperties.FirstStrokeOffset.DefaultValue);
+        ////    StrokeLength = StyleHelpers.GetPropertyValue(style, nameof(StrokeLength), GroundLineProperties.StrokeLength.DefaultValue);
+        ////    StrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(StrokeOffset), GroundLineProperties.StrokeOffset.DefaultValue);
+        ////    StrokeAngle = StyleHelpers.GetPropertyValue(style, nameof(StrokeAngle), GroundLineProperties.StrokeAngle.DefaultValue);
+        ////    Space = StyleHelpers.GetPropertyValue(style, nameof(Space), GroundLineProperties.Space.DefaultValue);
+        ////    // general
+        ////    Scale = MainStaticSettings.Settings.UseScaleFromStyle
+        ////        ? StyleHelpers.GetPropertyValue(style, nameof(Scale), GroundLineProperties.Scale.DefaultValue)
+        ////        : AcadHelpers.Database.Cannoscale;
+        ////    LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), GroundLineProperties.LineTypeScale.DefaultValue);
+        ////    // set layer
+        ////    var layerName = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LayerName.Name, GroundLineProperties.LayerName.DefaultValue);
+        ////    AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
+        ////    // set line type
+        ////    var lineType = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LineType.Name, GroundLineProperties.LineType.DefaultValue);
+        ////    AcadHelpers.SetLineType(BlockId, lineType);
+        ////}
 
         #endregion
 
@@ -503,7 +523,7 @@
                 ExceptionBox.Show(exception);
             }
         }
-
+        
         public static GroundLine GetGroundLineFromEntity(Entity ent)
         {
             using (ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineFunction.MPCOEntName))

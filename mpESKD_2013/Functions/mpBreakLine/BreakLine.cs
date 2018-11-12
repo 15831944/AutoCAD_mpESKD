@@ -12,7 +12,6 @@
     using mpESKD.Base.Styles;
     using Properties;
     using Styles;
-    using ModPlus.Helpers;
     using ModPlusAPI.Windows;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -304,13 +303,8 @@
         }
         #endregion
 
-        #region Style
-
-        /// <summary>Идентификатор стиля</summary>
-        public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
-
         /// <summary>Применение стиля по сути должно переопределять текущие параметры</summary>
-        public void ApplyStyle(BreakLineStyle style)
+        public override void ApplyStyle(MPCOStyle style)
         {
             // apply settings from style
             Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.Overhang.DefaultValue);
@@ -325,7 +319,6 @@
                 BreakLineProperties.LayerName.DefaultValue);
             AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
         }
-        #endregion
 
         public override ResultBuffer GetParametersForXData()
         {
@@ -392,7 +385,7 @@
                                         StyleGuid = typedValue.Value.ToString();
                                         break;
                                     case 1:
-                                        BreakLineType = BreakLinePropertiesHelpers.GetBreakLineTypeFromString(typedValue.Value.ToString());
+                                        BreakLineType = BreakLineTypeHelper.Parse(typedValue.Value.ToString());
                                         break;
                                     case 2:
                                         Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());

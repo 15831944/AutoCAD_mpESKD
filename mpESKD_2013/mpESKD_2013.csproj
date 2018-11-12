@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="Base\BasePropertiesData.cs" />
     <Compile Include="Base\Enums\BreakLineType.cs" />
+    <Compile Include="Base\Enums\EntityDirection.cs" />
     <Compile Include="Base\Enums\GroundLineFirstStrokeOffset.cs" />
     <Compile Include="Base\Enums\UpdateVariant.cs" />
     <Compile Include="Base\Helpers\AcadHelpers.cs" />
@@ -117,6 +118,7 @@
     </Compile>
     <Compile Include="Base\Properties\PropertiesHelpers.cs" />
     <Compile Include="Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs" />
+    <Compile Include="Base\Styles\StyleManager.cs" />
     <Compile Include="Functions\mpAxis\Axis.cs" />
     <Compile Include="Functions\mpAxis\AxisFunction.cs" />
     <Compile Include="Functions\mpAxis\AxisInterface.cs" />
@@ -178,6 +180,23 @@
     <Compile Include="Functions\mpGroundLine\Styles\GroundLineStyle.cs" />
     <Compile Include="Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml.cs">
       <DependentUpon>GroundLineStyleProperties.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Functions\mpSection\Overrules\SectionGripPointOverrule.cs" />
+    <Compile Include="Functions\mpSection\Overrules\SectionObjectOverrule.cs" />
+    <Compile Include="Functions\mpSection\Overrules\SectionOsnapOverrule.cs" />
+    <Compile Include="Functions\mpSection\Properties\SectionProperties.cs" />
+    <Compile Include="Functions\mpSection\Properties\SectionPropertiesData.cs" />
+    <Compile Include="Functions\mpSection\Properties\SectionPropertiesPalatte.xaml.cs">
+      <DependentUpon>SectionPropertiesPalatte.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Functions\mpSection\Properties\SectionSummaryProperties.cs" />
+    <Compile Include="Functions\mpSection\Section.cs" />
+    <Compile Include="Functions\mpSection\SectionFunction.cs" />
+    <Compile Include="Functions\mpSection\SectionInterface.cs" />
+    <Compile Include="Functions\mpSection\SectionJig.cs" />
+    <Compile Include="Functions\mpSection\Styles\SectionStyle.cs" />
+    <Compile Include="Functions\mpSection\Styles\SectionStyleProperties.xaml.cs">
+      <DependentUpon>SectionStyleProperties.xaml</DependentUpon>
     </Compile>
     <Compile Include="Interface.cs" />
     <Compile Include="LoadHelpers\RibbonBuilder.cs" />
@@ -248,6 +267,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Functions\mpSection\Properties\SectionPropertiesPalatte.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Functions\mpSection\Styles\SectionStyleProperties.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Functions\mpBreakLine\Help\Curvilinear.png" />
@@ -286,7 +313,9 @@
   <ItemGroup>
     <Resource Include="Resources\StyleEditor_32x32_dark.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Functions\mpSection\Icons\" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png" />

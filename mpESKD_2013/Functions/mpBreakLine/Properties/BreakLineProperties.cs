@@ -76,56 +76,56 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             Description = Language.GetItem(MainFunction.LangItem, "d7") // Слой примитива
         };
     }
-    public static class BreakLinePropertiesHelpers
-    {
-        public static List<string> BreakLineTypeLocalNames = new List<string>
-        {
-            Language.GetItem(MainFunction.LangItem, "blt1"), // "Линейный",
-            Language.GetItem(MainFunction.LangItem, "blt2"), //"Криволинейный",
-            Language.GetItem(MainFunction.LangItem, "blt3") //"Цилиндрический"
-        };
+    ////public static class BreakLinePropertiesHelpers
+    ////{
+    ////    public static List<string> BreakLineTypeLocalNames = new List<string>
+    ////    {
+    ////        Language.GetItem(MainFunction.LangItem, "blt1"), // "Линейный",
+    ////        Language.GetItem(MainFunction.LangItem, "blt2"), //"Криволинейный",
+    ////        Language.GetItem(MainFunction.LangItem, "blt3") //"Цилиндрический"
+    ////    };
 
-        #region Methods
+    ////    #region Methods
 
-        public static BreakLineType GetBreakLineTypeByLocalName(string local)
-        {
-            if (local == Language.GetItem(MainFunction.LangItem, "blt1")) return BreakLineType.Linear;
-            if (local == Language.GetItem(MainFunction.LangItem, "blt2")) return BreakLineType.Curvilinear;
-            if (local == Language.GetItem(MainFunction.LangItem, "blt3")) return BreakLineType.Cylindrical;
-            return BreakLineType.Linear;
-        }
+    ////    public static BreakLineType GetBreakLineTypeByLocalName(string local)
+    ////    {
+    ////        if (local == Language.GetItem(MainFunction.LangItem, "blt1")) return BreakLineType.Linear;
+    ////        if (local == Language.GetItem(MainFunction.LangItem, "blt2")) return BreakLineType.Curvilinear;
+    ////        if (local == Language.GetItem(MainFunction.LangItem, "blt3")) return BreakLineType.Cylindrical;
+    ////        return BreakLineType.Linear;
+    ////    }
 
-        public static string GetLocalBreakLineTypeName(BreakLineType breakLineType)
-        {
-            if (breakLineType == BreakLineType.Linear) return Language.GetItem(MainFunction.LangItem, "blt1");
-            if (breakLineType == BreakLineType.Curvilinear) return Language.GetItem(MainFunction.LangItem, "blt2");
-            if (breakLineType == BreakLineType.Cylindrical) return Language.GetItem(MainFunction.LangItem, "blt3");
-            return Language.GetItem(MainFunction.LangItem, "blt1");
-        }
+    ////    public static string GetLocalBreakLineTypeName(BreakLineType breakLineType)
+    ////    {
+    ////        if (breakLineType == BreakLineType.Linear) return Language.GetItem(MainFunction.LangItem, "blt1");
+    ////        if (breakLineType == BreakLineType.Curvilinear) return Language.GetItem(MainFunction.LangItem, "blt2");
+    ////        if (breakLineType == BreakLineType.Cylindrical) return Language.GetItem(MainFunction.LangItem, "blt3");
+    ////        return Language.GetItem(MainFunction.LangItem, "blt1");
+    ////    }
 
-        public static BreakLineType GetBreakLineTypeFromString(string str)
-        {
-            if (str == "Linear") return BreakLineType.Linear;
-            if (str == "Curvilinear") return BreakLineType.Curvilinear;
-            if (str == "Cylindrical") return BreakLineType.Cylindrical;
-            return BreakLineType.Linear;
-        }
+    ////    public static BreakLineType GetBreakLineTypeFromString(string str)
+    ////    {
+    ////        if (str == "Linear") return BreakLineType.Linear;
+    ////        if (str == "Curvilinear") return BreakLineType.Curvilinear;
+    ////        if (str == "Cylindrical") return BreakLineType.Cylindrical;
+    ////        return BreakLineType.Linear;
+    ////    }
 
-        #endregion
-    }
+    ////    #endregion
+    ////}
 
-    public class BreakLineTypeValueConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is BreakLineType breakLine)
-                return BreakLinePropertiesHelpers.GetLocalBreakLineTypeName(breakLine);
-            return string.Empty;
-        }
+    ////public class BreakLineTypeValueConverter : IValueConverter
+    ////{
+    ////    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    ////    {
+    ////        if (value is BreakLineType breakLine)
+    ////            return BreakLinePropertiesHelpers.GetLocalBreakLineTypeName(breakLine);
+    ////        return string.Empty;
+    ////    }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return BreakLinePropertiesHelpers.GetBreakLineTypeByLocalName(value?.ToString());
-        }
-    }
+    ////    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    ////    {
+    ////        return BreakLinePropertiesHelpers.GetBreakLineTypeByLocalName(value?.ToString());
+    ////    }
+    ////}
 }

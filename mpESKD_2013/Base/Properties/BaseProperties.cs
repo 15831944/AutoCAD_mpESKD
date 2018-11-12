@@ -1,6 +1,34 @@
 ﻿// ReSharper disable InconsistentNaming
 namespace mpESKD.Base.Properties
 {
+    public interface IGeneralProperties
+    {
+        /// <summary>
+        /// Стиль интеллектуального примитива
+        /// </summary>
+        string Style { get; set; }
+
+        /// <summary>
+        /// Масштаб интеллектуального примитива
+        /// </summary>
+        string Scale { get; set; }
+
+        /// <summary>
+        /// Масштаб типа линии
+        /// </summary>
+        double LineTypeScale { get; set; }
+
+        /// <summary>
+        /// Тип линии
+        /// </summary>
+        string LineType { get; set; }
+
+        /// <summary>
+        /// Имя слоя
+        /// </summary>
+        string LayerName { get; set; }
+    }
+
     public class MPCOBaseProperty
     {
         public string Name { get; set; }
@@ -44,6 +72,7 @@ namespace mpESKD.Base.Properties
         public int Minimum { get; set; }
         public int Maximum { get; set; }
     }
+
     public class MPCODoubleProperty : MPCOBaseProperty
     {
         public MPCODoubleProperty()

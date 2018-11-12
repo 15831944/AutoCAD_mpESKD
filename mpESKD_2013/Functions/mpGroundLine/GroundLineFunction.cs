@@ -30,6 +30,8 @@
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance(), true);
 
+            //todo check it
+            StyleManager.CheckStylesFile<GroundLineStyle>();
             GroundLineStyleManager.CheckStylesFile();
         }
 

@@ -2,317 +2,112 @@
 #pragma warning disable CS0618
 namespace mpESKD.Functions.mpGroundLine.Properties
 {
-    using System;
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Base;
-    using Base.Helpers;
     using Styles;
 
     public class GroundLinePropertiesData : BasePropertiesData
     {
-        public GroundLinePropertiesData(ObjectId blkRefObjectId)
+        public GroundLinePropertiesData(ObjectId blockReferenceObjectId)
+            : base(blockReferenceObjectId)
         {
-            if (Verify(blkRefObjectId))
-            {
-                IsValid = true;
-                _blkRefObjectId = blkRefObjectId;
-                using (BlockReference blkRef = blkRefObjectId.Open(OpenMode.ForRead, false, true) as BlockReference)
-                {
-                    if (blkRef != null)
-                    {
-                        blkRef.Modified += BlkRef_Modified;
-                        Update(blkRef);
-                    }
-                }
-            }
-            else IsValid = false;
         }
 
-        private ObjectId _blkRefObjectId;
+        #region General properties
 
         private string _style;
 
-        public string Style
+        /// <inheritdoc />
+        public override string Style
         {
             get => _style;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var groundLine = GroundLine.GetGroundLineFromEntity(blkRef))
-                        {
-                            var style = GroundLineStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value));
-                            if (style != null)
-                            {
-                                groundLine.StyleGuid = style.Guid;
-                                groundLine.ApplyStyle(style);
-                                groundLine.UpdateEntities();
-                                groundLine.GetBlockTableRecordWithoutTransaction(blkRef);
-                                using (var resBuf = groundLine.GetParametersForXData())
-                                {
-                                    if (blkRef != null) blkRef.XData = resBuf;
-                                }
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeStyleProperty(GroundLine.GetGroundLineFromEntity,
+                GroundLineStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value)));
         }
+
+        private string _scale;
+
+        public override string Scale
+        {
+            get => _scale;
+            set => ChangeScaleProperty(GroundLine.GetGroundLineFromEntity, value);
+        }
+
+        private double _lineTypeScale;
+
+        /// <inheritdoc />
+        public override double LineTypeScale
+        {
+            get => _lineTypeScale;
+            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.LineTypeScale = value);
+        }
+
+        private string _lineType;
+
+        /// <inheritdoc />
+        public override string LineType
+        {
+            get => _lineType;
+            set => ChangeLineTypeProperty(value);
+        }
+
+        private string _layerName;
+
+        /// <inheritdoc />
+        public override string LayerName
+        {
+            get => _layerName;
+            set => ChangeLayerNameProperty(value);
+        }
+
+        #endregion
 
         private string _firstStrokeOffset;
         public string FirstStrokeOffset
         {
             get => _firstStrokeOffset;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
-                        {
-                            axis.FirstStrokeOffset = GroundLinePropertiesHelpers.GetFirstStrokeOffsetByLocalName(value);
-                            axis.UpdateEntities();
-                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = axis.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeProperty(
+                GroundLine.GetGroundLineFromEntity,
+                groundLine => groundLine.FirstStrokeOffset = GroundLinePropertiesHelpers.GetFirstStrokeOffsetByLocalName(value));
         }
 
         private int _strokeLength;
         public int StrokeLength
         {
             get => _strokeLength;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
-                        {
-                            axis.StrokeLength = value;
-                            axis.UpdateEntities();
-                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = axis.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.StrokeLength = value);
         }
 
         private int _strokeOffset;
         public int StrokeOffset
         {
             get => _strokeOffset;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
-                        {
-                            axis.StrokeOffset = value;
-                            axis.UpdateEntities();
-                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = axis.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.StrokeOffset = value);
         }
 
         private int _strokeAngle;
         public int StrokeAngle
         {
             get => _strokeAngle;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
-                        {
-                            axis.StrokeAngle = value;
-                            axis.UpdateEntities();
-                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = axis.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.StrokeAngle = value);
         }
 
         private int _space;
         public int Space
         {
             get => _space;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var axis = GroundLine.GetGroundLineFromEntity(blkRef))
-                        {
-                            axis.Space = value;
-                            axis.UpdateEntities();
-                            axis.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = axis.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.Space = value);
         }
-
-        #region General
-
-        private string _scale;
-
-        public string Scale
+  
+        public override void Update(BlockReference blockReference)
         {
-            get => _scale;
-            set
+            if (blockReference == null)
             {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var groundLine = GroundLine.GetGroundLineFromEntity(blkRef))
-                        {
-                            groundLine.Scale = AcadHelpers.GetAnnotationScaleByName(value);
-                            groundLine.UpdateEntities();
-                            groundLine.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = groundLine.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
-        }
-
-        private double _lineTypeScale;
-
-        /// <summary>Масштаб типа линии</summary>
-        public double LineTypeScale
-        {
-            get => _lineTypeScale;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var groundLineFromEntity = GroundLine.GetGroundLineFromEntity(blkRef))
-                        {
-                            groundLineFromEntity.LineTypeScale = value;
-                            groundLineFromEntity.UpdateEntities();
-                            groundLineFromEntity.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = groundLineFromEntity.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
-        }
-
-        private string _lineType;
-
-        /// <summary>Слой</summary>
-        public string LineType
-        {
-            get => _lineType;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        if (blkRef != null) blkRef.Linetype = value;
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
-        }
-
-        private string _layerName;
-
-        /// <summary>Слой</summary>
-        public string LayerName
-        {
-            get => _layerName;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        if (blkRef != null) blkRef.Layer = value;
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
-        }
-
-        #endregion
-
-        private void BlkRef_Modified(object sender, EventArgs e)
-        {
-            BlockReference blkRef = sender as BlockReference;
-            if (blkRef != null)
-                Update(blkRef);
-        }
-
-        private void Update(BlockReference blkReference)
-        {
-            if (blkReference == null)
-            {
-                _blkRefObjectId = ObjectId.Null;
+                BlkRefObjectId = ObjectId.Null;
                 return;
             }
-            var groundLine = GroundLine.GetGroundLineFromEntity(blkReference);
+            var groundLine = GroundLine.GetGroundLineFromEntity(blockReference);
             if (groundLine != null)
             {
                 _style = GroundLineStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(groundLine.StyleGuid))?.Name;
@@ -322,9 +117,9 @@ namespace mpESKD.Functions.mpGroundLine.Properties
                 _strokeAngle = groundLine.StrokeAngle;
                 _space = groundLine.Space;
                 _scale = groundLine.Scale.Name;
-                _layerName = blkReference.Layer;
+                _layerName = blockReference.Layer;
                 _lineTypeScale = groundLine.LineTypeScale;
-                _lineType = blkReference.Linetype;
+                _lineType = blockReference.Linetype;
                 AnyPropertyChangedReise();
             }
         }

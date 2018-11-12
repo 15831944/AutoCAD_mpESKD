@@ -3,277 +3,118 @@
 
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
-    using System;
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Base;
-    using Base.Helpers;
+    using Base.Enums;
     using Styles;
 
     public class BreakLinePropertiesData : BasePropertiesData
     {
-        public BreakLinePropertiesData(ObjectId blkRefObjectId)
+        public BreakLinePropertiesData(ObjectId blockReferenceObjectId)
+            : base(blockReferenceObjectId)
         {
-            if (Verify(blkRefObjectId))
-            {
-                IsValid = true;
-                _blkRefObjectId = blkRefObjectId;
-                using (BlockReference blkRef = blkRefObjectId.Open(OpenMode.ForRead, false, true) as BlockReference)
-                {
-                    if (blkRef != null)
-                    {
-                        blkRef.Modified += BlkRef_Modified;
-                        Update(blkRef);
-                    }
-                }
-            }
-            else IsValid = false;
+            
         }
 
-        private ObjectId _blkRefObjectId;
+        #region General properties
 
         private string _style;
 
-        public string Style
+        /// <inheritdoc />
+        public override string Style
         {
             get => _style;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
-                        {
-                            var style = BreakLineStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value));
-                            if (style != null)
-                            {
-                                breakLine.StyleGuid = style.Guid;
-                                breakLine.ApplyStyle(style);
-                                breakLine.UpdateEntities();
-                                breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
-                                using (var resBuf = breakLine.GetParametersForXData())
-                                {
-                                    if (blkRef != null) blkRef.XData = resBuf;
-                                }
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeStyleProperty(BreakLine.GetBreakLineFromEntity,
+                BreakLineStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value)));
         }
 
-        private int _overgang;
+        private string _scale;
+
+        /// <inheritdoc />
+        public override string Scale
+        {
+            get => _scale;
+            set => ChangeScaleProperty(BreakLine.GetBreakLineFromEntity, value);
+        }
+
+        private double _lineTypeScale;
+
+        /// <inheritdoc />
+        public override double LineTypeScale
+        {
+            get => _lineTypeScale;
+            set => ChangeProperty(BreakLine.GetBreakLineFromEntity, breakLine => breakLine.LineTypeScale = value);
+        }
+
+        private string _lineType;
+
+        /// <inheritdoc />
+        public override string LineType
+        {
+            get => _lineType;
+            set => ChangeLineTypeProperty(value);
+        }
+
+        private string _layerName;
+
+        /// <inheritdoc />
+        public override string LayerName
+        {
+            get => _layerName;
+            set => ChangeLayerNameProperty(value);
+        }
+
+        #endregion
+
+        private int _overhang;
         public int Overhang
         {
-            get => _overgang;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
-                        {
-                            breakLine.Overhang = value;
-                            breakLine.UpdateEntities();
-                            breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = breakLine.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            get => _overhang;
+            set => ChangeProperty(BreakLine.GetBreakLineFromEntity, breakLine => breakLine.Overhang = value);
         }
 
         private int _breakHeight;
         public int BreakHeight
         {
             get => _breakHeight;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
-                        {
-                            breakLine.BreakHeight = value;
-                            breakLine.UpdateEntities();
-                            breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = breakLine.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeProperty(BreakLine.GetBreakLineFromEntity, breakLine => breakLine.BreakHeight = value);
         }
 
         private int _breakWidth;
         public int BreakWidth
         {
             get => _breakWidth;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
-                        {
-                            breakLine.BreakWidth = value;
-                            breakLine.UpdateEntities();
-                            breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = breakLine.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeProperty(BreakLine.GetBreakLineFromEntity, breakLine => breakLine.BreakWidth = value);
         }
 
         private string _breakLineType;
         public string BreakLineType
         {
             get => _breakLineType;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
-                        {
-                            breakLine.BreakLineType = BreakLinePropertiesHelpers.GetBreakLineTypeByLocalName(value);
-                            breakLine.UpdateEntities();
-                            breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = breakLine.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
+            set => ChangeProperty(
+                BreakLine.GetBreakLineFromEntity,
+                breakLine => breakLine.BreakLineType = BreakLineTypeHelper.GetByLocalName(value));
         }
-
-        #region General
         
-        private string _scale;
-        public string Scale
-        {
-            get => _scale;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
-                        {
-                            breakLine.Scale = AcadHelpers.GetAnnotationScaleByName(value);
-                            breakLine.UpdateEntities();
-                            breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = breakLine.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
-        }
-
-        private double _lineTypeScale;
-        /// <summary>Масштаб типа линии</summary>
-        public double LineTypeScale
-        {
-            get => _lineTypeScale;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        using (var breakLine = BreakLine.GetBreakLineFromEntity(blkRef))
-                        {
-                            breakLine.LineTypeScale = value;
-                            breakLine.UpdateEntities();
-                            breakLine.GetBlockTableRecordWithoutTransaction(blkRef);
-                            using (var resBuf = breakLine.GetParametersForXData())
-                            {
-                                if (blkRef != null) blkRef.XData = resBuf;
-                            }
-                        }
-                        if (blkRef != null) blkRef.ResetBlock();
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
-        }
-
-        private string _layerName;
-        /// <summary>Слой</summary>
-        public string LayerName
-        {
-            get => _layerName;
-            set
-            {
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
-                    {
-                        if (blkRef != null) blkRef.Layer = value;
-                    }
-                }
-                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
-            }
-        }
-
-        #endregion
-        
-        private void BlkRef_Modified(object sender, EventArgs e)
-        {
-            BlockReference blkRef = sender as BlockReference;
-            if (blkRef != null)
-                Update(blkRef);
-        }
-
-        private void Update(BlockReference blkReference)
+        public override void Update(BlockReference blkReference)
         {
             if (blkReference == null)
             {
-                _blkRefObjectId = ObjectId.Null;
+                BlkRefObjectId = ObjectId.Null;
                 return;
             }
             var breakLine = BreakLine.GetBreakLineFromEntity(blkReference);
             if (breakLine != null)
             {
                 _style = BreakLineStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(breakLine.StyleGuid))?.Name;
-                _overgang = breakLine.Overhang;
+                _overhang = breakLine.Overhang;
                 _breakHeight = breakLine.BreakHeight;
                 _breakWidth = breakLine.BreakWidth;
-                _breakLineType = BreakLinePropertiesHelpers.GetLocalBreakLineTypeName(breakLine.BreakLineType);
+                _breakLineType = BreakLineTypeHelper.GetLocalName(breakLine.BreakLineType);
                 _scale = breakLine.Scale.Name;
                 _layerName = blkReference.Layer;
+                _lineType = blkReference.Linetype;
                 _lineTypeScale = breakLine.LineTypeScale;
                 AnyPropertyChangedReise();
             }

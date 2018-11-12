@@ -85,6 +85,9 @@
     <Compile Include="..\mpESKD_2013\Base\Enums\BreakLineType.cs">
       <Link>Base\Enums\BreakLineType.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\EntityDirection.cs">
+      <Link>Base\Enums\EntityDirection.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\GroundLineFirstStrokeOffset.cs">
       <Link>Base\Enums\GroundLineFirstStrokeOffset.cs</Link>
     </Compile>
@@ -175,6 +178,9 @@
     <Compile Include="..\mpESKD_2013\Base\Styles\StyleEditor.xaml.cs">
       <Link>Base\Styles\StyleEditor.xaml.cs</Link>
       <DependentUpon>StyleEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Styles\StyleManager.cs">
+      <Link>Base\Styles\StyleManager.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpAxis\Axis.cs">
       <Link>Functions\mpAxis\Axis.cs</Link>
@@ -303,6 +309,47 @@
       <Link>Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml.cs</Link>
       <DependentUpon>GroundLineStyleProperties.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\overrules\SectionGripPointOverrule.cs">
+      <Link>Functions\mpSection\Overrules\SectionGripPointOverrule.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\overrules\SectionObjectOverrule.cs">
+      <Link>Functions\mpSection\Overrules\SectionObjectOverrule.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\overrules\SectionOsnapOverrule.cs">
+      <Link>Functions\mpSection\Overrules\SectionOsnapOverrule.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\properties\SectionProperties.cs">
+      <Link>Functions\mpSection\Properties\SectionProperties.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\properties\SectionPropertiesData.cs">
+      <Link>Functions\mpSection\Properties\SectionPropertiesData.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\properties\SectionPropertiesPalatte.xaml.cs">
+      <Link>Functions\mpSection\Properties\SectionPropertiesPalatte.xaml.cs</Link>
+      <DependentUpon>SectionPropertiesPalatte.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\properties\SectionSummaryProperties.cs">
+      <Link>Functions\mpSection\Properties\SectionSummaryProperties.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\Section.cs">
+      <Link>Functions\mpSection\Section.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\SectionFunction.cs">
+      <Link>Functions\mpSection\SectionFunction.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\SectionInterface.cs">
+      <Link>Functions\mpSection\SectionInterface.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\SectionJig.cs">
+      <Link>Functions\mpSection\SectionJig.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\styles\SectionStyle.cs">
+      <Link>Functions\mpSection\Styles\SectionStyle.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\mpsection\styles\SectionStyleProperties.xaml.cs">
+      <Link>Functions\mpSection\Styles\SectionStyleProperties.xaml.cs</Link>
+      <DependentUpon>SectionStyleProperties.xaml</DependentUpon>
+    </Compile>
     <Compile Include="..\mpESKD_2013\LoadHelpers\RibbonBuilder.cs">
       <Link>LoadHelpers\RibbonBuilder.cs</Link>
     </Compile>
@@ -394,6 +441,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="..\mpeskd_2013\functions\mpsection\properties\SectionPropertiesPalatte.xaml">
+      <Link>Functions\mpSection\Properties\SectionPropertiesPalatte.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\functions\mpsection\styles\SectionStyleProperties.xaml">
+      <Link>Functions\mpSection\Styles\SectionStyleProperties.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="..\mpESKD_2013\Functions\mpBreakLine\Help\Curvilinear.png">
@@ -462,7 +519,9 @@
       <Link>Resources\StyleEditor_32x32_dark.png</Link>
     </Resource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Functions\mpSection\Icons\" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png">
       <Link>Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png</Link>

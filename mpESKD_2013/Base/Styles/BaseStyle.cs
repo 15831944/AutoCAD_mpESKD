@@ -8,20 +8,48 @@ namespace mpESKD.Base.Styles
     using System.Runtime.CompilerServices;
     using System.Windows;
     using System.Xml.Linq;
-    using mpESKD.Base.Properties;
+    using Properties;
     using ModPlusAPI;
 
     /// <summary>Интерфейс стиля для элемента</summary>
-    public interface IMPCOStyle
+    ////public interface IMPCOStyle
+    ////{
+    ////    string Name { get; set; }
+
+    ////    string FunctionName { get; set; }
+        
+    ////    string Description { get; set; }
+        
+    ////    string Guid { get; set; }
+        
+    ////    MPCOStyleType StyleType { get; set; }
+        
+    ////    XElement LayerXmlData { get; set; }
+        
+    ////    List<MPCOBaseProperty> Properties { get; set; }
+    ////}
+
+    public abstract class MPCOStyle
     {
-        string Name { get; set; }
-        string FunctionName { get; set; }
-        string Description { get; set; }
-        string Guid { get; set; }
-        MPCOStyleType StyleType { get; set; }
-        XElement LayerXmlData { get; set; }
-        List<MPCOBaseProperty> Properties { get; set; }
+        protected MPCOStyle()
+        {
+            Properties = new List<MPCOBaseProperty>();
+        }
+        public string Name { get; set; }
+
+        public string FunctionName { get; set; }
+
+        public string Description { get; set; }
+
+        public string Guid { get; set; }
+
+        public MPCOStyleType StyleType { get; set; }
+
+        public XElement LayerXmlData { get; set; }
+
+        public List<MPCOBaseProperty> Properties { get; set; }
     }
+
     /// <inheritdoc />
     /// <summary>Базовый класс презентора стиля для работы в редакторе стилей</summary>
     public class MPCOStyleForEditor : INotifyPropertyChanged
@@ -30,7 +58,7 @@ namespace mpESKD.Base.Styles
         /// <param name="style"></param>
         /// <param name="currentStyleGuid"></param>
         /// <param name="parent"></param>
-        public MPCOStyleForEditor(IMPCOStyle style, string currentStyleGuid, StyleToBind parent)
+        public MPCOStyleForEditor(MPCOStyle style, string currentStyleGuid, StyleToBind parent)
         {
             Parent = parent;
             if (style.StyleType == MPCOStyleType.System)
