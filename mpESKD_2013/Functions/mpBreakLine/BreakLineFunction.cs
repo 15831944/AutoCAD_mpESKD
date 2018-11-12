@@ -33,7 +33,7 @@
             Overrule.Overruling = true;
 
             // создание файла хранения стилей, если отсутствует
-            BreakLineStyleManager.CheckStylesFile();
+            StyleManager.CheckStylesFile<BreakLineStyle>();
         }
         public void Terminate()
         {

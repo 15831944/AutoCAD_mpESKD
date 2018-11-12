@@ -1,26 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using mpESKD.Base.Helpers;
-using mpESKD.Functions.mpAxis;
-using mpESKD.Functions.mpAxis.Styles;
-using mpESKD.Functions.mpBreakLine;
-using mpESKD.Functions.mpBreakLine.Styles;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-using Visibility = System.Windows.Visibility;
-
-namespace mpESKD.Base.Styles
+﻿namespace mpESKD.Base.Styles
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Input;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.EditorInput;
+    using Helpers;
+    using Functions.mpAxis;
+    using Functions.mpAxis.Styles;
+    using Functions.mpBreakLine;
+    using Functions.mpBreakLine.Styles;
     using Functions.mpGroundLine;
     using Functions.mpGroundLine.Styles;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
 
     public partial class StyleEditor
     {
@@ -31,9 +29,9 @@ namespace mpESKD.Base.Styles
             Loaded += StyleEditor_OnLoaded;
             ContentRendered += StyleEditor_ContentRendered;
             // check style files
-            BreakLineStyleManager.CheckStylesFile();
-            AxisStyleManager.CheckStylesFile();
-            GroundLineStyleManager.CheckStylesFile();
+            StyleManager.CheckStylesFile<BreakLineStyle>();
+            StyleManager.CheckStylesFile<AxisStyle>();
+            StyleManager.CheckStylesFile<GroundLineStyle>();
         }
 
         private void StyleEditor_OnLoaded(object sender, RoutedEventArgs e)
@@ -101,7 +99,9 @@ namespace mpESKD.Base.Styles
                 FunctionLocalName = GroundLineFunction.MPCOEntDisplayName,
                 FunctionName = GroundLineFunction.MPCOEntName
             };
-            var groundLineStyles = GroundLineStyleManager.GetStylesForEditor();
+            //todo old
+            //var groundLineStyles = GroundLineStyleManager.GetStylesForEditor();
+            var groundLineStyles = GroundLineStyleForEditor.GetStylesForEditor();
             foreach (GroundLineStyleForEditor style in groundLineStyles)
             {
                 style.Parent = styleToBind;
@@ -210,9 +210,12 @@ namespace mpESKD.Base.Styles
                         // set current to previous
                         SetCurrentStyle(style.Parent.Styles[selectedIndex - 1]);
                     }
+
+                    // remove from style manager
+                    StyleManager.RemoveStyle(style.Guid);
+
                     // remove from collection
                     style.Parent.Styles.Remove(style);
-                    // remove from file
                 }
         }
         // set current style
@@ -305,9 +308,15 @@ namespace mpESKD.Base.Styles
                 _styles.Single(s => s.FunctionName == AxisFunction.MPCOEntName)
                     .Styles.Where(s => s.CanEdit).Cast<AxisStyleForEditor>().ToList());
             // ground line styles
-            GroundLineStyleManager.SaveStylesToXml(
+            StyleManager.SaveStylesToXml<GroundLineStyle, GroundLineStyleForEditor>(
                 _styles.Single(s => s.FunctionName == GroundLineFunction.MPCOEntName)
-                    .Styles.Where(s => s.CanEdit).Cast<GroundLineStyleForEditor>().ToList());
+                    .Styles.Where(s => s.CanEdit).Cast<GroundLineStyleForEditor>().ToList(),
+                GroundLineStyleForEditor.ConvertStyleForEditorToXElement);
+            StyleManager.ReloadStyles(GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(), GroundLineStyle.Instance.ParseStyleFromXElement);
+            // todo old
+            ////GroundLineStyleManager.SaveStylesToXml(
+            ////    _styles.Single(s => s.FunctionName == GroundLineFunction.MPCOEntName)
+            ////        .Styles.Where(s => s.CanEdit).Cast<GroundLineStyleForEditor>().ToList());
         }
 
         private void BtExpandCollapseImage_OnMouseEnter(object sender, MouseEventArgs e)
@@ -330,10 +339,10 @@ namespace mpESKD.Base.Styles
             RightColumn.MinWidth = 0.0;
             TopRow.Height = new GridLength(0);
             RightColumn.Width = new GridLength(0);
-            BtExpandImage.Visibility = Visibility.Collapsed;
-            BtCollapseImage.Visibility = Visibility.Visible;
-            VerticalGridSplitter.Visibility = Visibility.Collapsed;
-            HorizontalGridSplitter.Visibility = Visibility.Collapsed;
+            BtExpandImage.Visibility = System.Windows.Visibility.Collapsed;
+            BtCollapseImage.Visibility = System.Windows.Visibility.Visible;
+            VerticalGridSplitter.Visibility = System.Windows.Visibility.Collapsed;
+            HorizontalGridSplitter.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private void BtCollapseImage_OnClick(object sender, RoutedEventArgs e)
@@ -342,10 +351,10 @@ namespace mpESKD.Base.Styles
             RightColumn.MinWidth = 200.0;
             TopRow.Height = _topRowHeight;
             RightColumn.Width = _rightColumnWidth;
-            BtExpandImage.Visibility = Visibility.Visible;
-            BtCollapseImage.Visibility = Visibility.Collapsed;
-            VerticalGridSplitter.Visibility = Visibility.Visible;
-            HorizontalGridSplitter.Visibility = Visibility.Visible;
+            BtExpandImage.Visibility = System.Windows.Visibility.Visible;
+            BtCollapseImage.Visibility = System.Windows.Visibility.Collapsed;
+            VerticalGridSplitter.Visibility = System.Windows.Visibility.Visible;
+            HorizontalGridSplitter.Visibility = System.Windows.Visibility.Visible;
         }
 
         #region Create styles from entities

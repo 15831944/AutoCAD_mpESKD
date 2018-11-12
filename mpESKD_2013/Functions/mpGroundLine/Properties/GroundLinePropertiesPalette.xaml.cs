@@ -10,6 +10,7 @@
     using Autodesk.AutoCAD.Windows;
     using Base.Helpers;
     using Base.Properties;
+    using Base.Styles;
     using Styles;
 
     public partial class GroundLinePropertiesPalette
@@ -22,12 +23,14 @@
             InitializeComponent();
             ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             // styles
-            var sNames = new List<string>();
-            foreach (var style in GroundLineStyleManager.Styles)
-            {
-                sNames.Add(style.Name);
-            }
-            CbStyle.ItemsSource = sNames;
+            //todo old
+            ////var sNames = new List<string>();
+            ////foreach (var style in GroundLineStyleManager.Styles)
+            ////{
+            ////    sNames.Add(style.Name);
+            ////}
+
+            CbStyle.ItemsSource = StyleManager.GetStyles<GroundLineStyle>().Select(s => s.Name);
 
             // get FirstStrokeOffset values
             CbFirstStrokeOffset.ItemsSource = GroundLinePropertiesHelpers.FirstStrokeOffsetNames;

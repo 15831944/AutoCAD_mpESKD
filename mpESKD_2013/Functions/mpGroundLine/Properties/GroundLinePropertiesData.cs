@@ -5,6 +5,7 @@ namespace mpESKD.Functions.mpGroundLine.Properties
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Base;
+    using Base.Styles;
     using Styles;
 
     public class GroundLinePropertiesData : BasePropertiesData
@@ -23,7 +24,9 @@ namespace mpESKD.Functions.mpGroundLine.Properties
         {
             get => _style;
             set => ChangeStyleProperty(GroundLine.GetGroundLineFromEntity,
-                GroundLineStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value)));
+                StyleManager.GetStyles<GroundLineStyle>().FirstOrDefault(s => s.Name.Equals(value)));
+            //todo old
+                //GroundLineStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value)));
         }
 
         private string _scale;
@@ -110,7 +113,9 @@ namespace mpESKD.Functions.mpGroundLine.Properties
             var groundLine = GroundLine.GetGroundLineFromEntity(blockReference);
             if (groundLine != null)
             {
-                _style = GroundLineStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(groundLine.StyleGuid))?.Name;
+                //todo old
+                //_style = GroundLineStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(groundLine.StyleGuid))?.Name;
+                _style = StyleManager.GetStyles<GroundLineStyle>().FirstOrDefault(s => s.Guid.Equals(groundLine.StyleGuid))?.Name;
                 _firstStrokeOffset = GroundLinePropertiesHelpers.GetLocalFirstStrokeOffsetName(groundLine.FirstStrokeOffset);
                 _strokeLength = groundLine.StrokeLength;
                 _strokeOffset = groundLine.StrokeOffset;

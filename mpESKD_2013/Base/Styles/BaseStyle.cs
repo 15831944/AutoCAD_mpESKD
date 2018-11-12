@@ -11,24 +11,6 @@ namespace mpESKD.Base.Styles
     using Properties;
     using ModPlusAPI;
 
-    /// <summary>Интерфейс стиля для элемента</summary>
-    ////public interface IMPCOStyle
-    ////{
-    ////    string Name { get; set; }
-
-    ////    string FunctionName { get; set; }
-        
-    ////    string Description { get; set; }
-        
-    ////    string Guid { get; set; }
-        
-    ////    MPCOStyleType StyleType { get; set; }
-        
-    ////    XElement LayerXmlData { get; set; }
-        
-    ////    List<MPCOBaseProperty> Properties { get; set; }
-    ////}
-
     public abstract class MPCOStyle
     {
         protected MPCOStyle()
@@ -48,6 +30,8 @@ namespace mpESKD.Base.Styles
         public XElement LayerXmlData { get; set; }
 
         public List<MPCOBaseProperty> Properties { get; set; }
+
+        public abstract List<T> CreateSystemStyles<T>() where T : MPCOStyle;
     }
 
     /// <inheritdoc />
@@ -126,19 +110,19 @@ namespace mpESKD.Base.Styles
         public string FunctionName { get; set; }
 
         public string Description { get; set; }
-        
+
         public string Guid { get; set; }
-        
+
         public XElement LayerXmlData { get; set; }
 
         #region Common properties
 
         public double LineTypeScale { get; set; }
-        
+
         public string LineType { get; set; }
-        
+
         public string LayerName { get; set; }
-        
+
         public AnnotationScale Scale { get; set; }
 
         #endregion
@@ -150,7 +134,7 @@ namespace mpESKD.Base.Styles
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-    
+
     public enum MPCOStyleType
     {
         System = 1,

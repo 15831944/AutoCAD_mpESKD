@@ -16,6 +16,11 @@
 
     public class BreakLineStyle : MPCOStyle
     {
+        public override List<T> CreateSystemStyles<T>()
+        {
+            //todo release
+            throw new NotImplementedException();
+        }
     }
 
     public class BreakLineStyleForEditor : MPCOStyleForEditor
@@ -92,32 +97,6 @@
         /// <summary>Коллекция стилей</summary>
         public static List<BreakLineStyle> Styles = new List<BreakLineStyle>();
         
-        /// <summary>Проверка и создание в случае необходимости файла стилей</summary>
-        public static void CheckStylesFile()
-        {
-            bool needToCreate;
-            var stylesFile = Path.Combine(MainFunction.StylesPath, StylesFileName);
-            if (File.Exists(stylesFile))
-            {
-                try
-                {
-                    XElement.Load(stylesFile);
-                    needToCreate = false;
-                }
-                catch
-                {
-                    needToCreate = true;
-                }
-            }
-            else needToCreate = true;
-
-            if (needToCreate)
-            {
-                XElement fXel = new XElement("Styles");
-                fXel.Save(stylesFile);
-            }
-        }
-
         /// <summary>Получение стиля из коллекции по его идентификатору или первого системного стиля, если не найден
         /// В случае, если коллекция пустая, то происходит ее загрузка (с созданием, если нужно)</summary>
         /// <returns></returns>

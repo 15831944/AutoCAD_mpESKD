@@ -1,13 +1,18 @@
 ﻿namespace mpESKD.Functions.mpGroundLine
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Xml.Linq;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Runtime;
     using Base;
+    using Base.Enums;
     using Base.Helpers;
+    using Base.Properties;
     using Base.Styles;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
@@ -30,9 +35,8 @@
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance(), true);
 
-            //todo check it
             StyleManager.CheckStylesFile<GroundLineStyle>();
-            GroundLineStyleManager.CheckStylesFile();
+            StyleManager.LoadStylesFromXmlFile(GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(), GroundLineStyle.Instance.ParseStyleFromXElement);
         }
 
         public void Terminate()
@@ -41,6 +45,8 @@
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance());
         }
+
+        
     }
 
     public class GroundLineCommands
@@ -71,7 +77,9 @@
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(GroundLineFunction.MPCOEntName);
-                var style = GroundLineStyleManager.GetCurrentStyle();
+                // todo check
+                GroundLineStyle style = StyleManager.GetCurrentStyle(GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(), GroundLineStyle.Instance.ParseStyleFromXElement);
+                //var style = GroundLineStyleManager.GetCurrentStyle();
                 var layerName = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LayerName.Name,
                     GroundLineProperties.LayerName.DefaultValue);
                 var groundLine = new GroundLine(style);
@@ -171,7 +179,9 @@
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(GroundLineFunction.MPCOEntName);
-                var style = GroundLineStyleManager.GetCurrentStyle();
+                //todo old
+                //var style = GroundLineStyleManager.GetCurrentStyle();
+                GroundLineStyle style = StyleManager.GetCurrentStyle(GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(), GroundLineStyle.Instance.ParseStyleFromXElement);
                 var layerName = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LayerName.Name,
                     GroundLineProperties.LayerName.DefaultValue);
                 var groundLine = new GroundLine(style);

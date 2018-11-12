@@ -32,7 +32,7 @@
             Overrule.Overruling = true;
 
             //// создание файла хранения стилей, если отсутствует
-            AxisStyleManager.CheckStylesFile();
+            StyleManager.CheckStylesFile<AxisStyle>();
         }
 
         public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location, Transaction tr)
