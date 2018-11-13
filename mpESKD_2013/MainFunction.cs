@@ -102,7 +102,7 @@
         }
         #endregion
 
-        private List<IMPCOEntityFunction> _functions;
+        private List<IIntellectualEntityFunction> _functions;
 
         public void Initialize()
         {
@@ -139,9 +139,9 @@
             _functions.ForEach(f => f.Terminate());
         }
 
-        private List<IMPCOEntityFunction> GetFunctions()
+        private List<IIntellectualEntityFunction> GetFunctions()
         {
-            return new List<IMPCOEntityFunction>
+            return new List<IIntellectualEntityFunction>
             {
                 new AxisFunction(),
                 new BreakLineFunction(),
@@ -222,7 +222,7 @@
             }
         }
 
-        public static BlockReference CreateBlock(MPCOEntity mpcoEntity)
+        public static BlockReference CreateBlock(IntellectualEntity mpcoEntity)
         {
             BlockReference blockReference;
             using (AcadHelpers.Document.LockDocument())

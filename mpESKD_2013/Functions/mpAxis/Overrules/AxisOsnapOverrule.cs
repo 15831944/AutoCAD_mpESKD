@@ -9,6 +9,8 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Functions.mpAxis.Overrules
 {
+    using Base;
+
     public class AxisOsnapOverrule : OsnapOverrule
     {
         protected static AxisOsnapOverrule _axisOsnapOverrule;
@@ -29,7 +31,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
             {
                 try
                 {
-                    var axis = Axis.GetAxisFromEntity(entity);
+                    var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(entity);
                     if (axis != null)
                     {
                         snapPoints.Add(axis.InsertionPoint);

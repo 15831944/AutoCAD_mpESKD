@@ -15,7 +15,7 @@
     using ModPlusAPI.Windows;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class Axis : MPCOEntity
+    public class Axis : IntellectualEntity
     {
         #region Constructors
         /// <summary>Инициализация экземпляра класса для Axis без заполнения данными

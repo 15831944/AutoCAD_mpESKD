@@ -7,6 +7,8 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Functions.mpAxis.Overrules
 {
+    using Base;
+
     public class AxisObjectOverrule : ObjectOverrule
     {
         protected static AxisObjectOverrule _axisObjectOverrule;
@@ -29,7 +31,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                         {
-                            var axis = Axis.GetAxisFromEntity((Entity)dbObject);
+                            var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>((Entity)dbObject);
                             if (axis != null)
                             {
                                 axis.UpdateEntities();

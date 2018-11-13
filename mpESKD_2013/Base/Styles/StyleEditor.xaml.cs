@@ -446,7 +446,7 @@
         private string AddStyleFromAxis(BlockReference blkReference)
         {
             var styleGuid = string.Empty;
-            var axis = Axis.GetAxisFromEntity(blkReference);
+            var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blkReference);
             if (axis != null)
             {
                 var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == AxisFunction.MPCOEntName);

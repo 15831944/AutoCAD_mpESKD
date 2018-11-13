@@ -107,6 +107,9 @@
     <Compile Include="..\mpESKD_2013\Base\Enums\GroundLineFirstStrokeOffset.cs">
       <Link>Base\Enums\GroundLineFirstStrokeOffset.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\PropertiesCategory.cs">
+      <Link>Base\Enums\PropertiesCategory.cs</Link>
+    </Compile>
     <Compile Include="..\mpeskd_2013\base\enums\UpdateVariant.cs">
       <Link>Base\Enums\UpdateVariant.cs</Link>
     </Compile>
@@ -128,11 +131,11 @@
     <Compile Include="..\mpESKD_2013\Base\Helpers\TextStyleHelper.cs">
       <Link>Base\Helpers\TextStyleHelper.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\IMPCOEntityFunction.cs">
-      <Link>Base\IMPCOEntityFunction.cs</Link>
+    <Compile Include="..\mpESKD_2013\Base\IIntellectualEntityFunction.cs">
+      <Link>Base\IIntellectualEntityFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\MPCOEntity.cs">
-      <Link>Base\MPCOEntity.cs</Link>
+    <Compile Include="..\mpESKD_2013\Base\IntellectualEntity.cs">
+      <Link>Base\IntellectualEntity.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Overrules\MPCOGrips.cs">
       <Link>Base\Overrules\MPCOGrips.cs</Link>
@@ -184,6 +187,9 @@
     <Compile Include="..\mpESKD_2013\Base\Properties\PropertiesPalette.xaml.cs">
       <Link>Base\Properties\PropertiesPalette.xaml.cs</Link>
       <DependentUpon>PropertiesPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Properties\SummaryPropertyData.cs">
+      <Link>Base\Properties\SummaryPropertyData.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Styles\BaseStyle.cs">
       <Link>Base\Styles\BaseStyle.cs</Link>
@@ -377,6 +383,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\MainSettings.cs">
       <Link>MainSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Properties\Annotations.cs">
+      <Link>Properties\Annotations.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Properties\AssemblyInfoCommon.cs">
       <Link>Properties\AssemblyInfoCommon.cs</Link>

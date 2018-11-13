@@ -1,30 +1,40 @@
 ﻿namespace mpESKD.Base
 {
     using System;
+    using Enums;
     using ModPlusAPI.Annotations;
 
     public class EntityPropertyAttribute : Attribute
     {
-        public EntityPropertyAttribute(string category, string name, string displayName, string description, Type valueType, object defaultValue, object minimum, object maximum)
+        public EntityPropertyAttribute(
+            PropertiesCategory category, 
+            string name,
+            string displayNameLocalizationKey,
+            string descriptionLocalizationKey,
+            Type valueType,
+            object defaultValue,
+            object minimum, 
+            object maximum)
         {
             Category = category;
             Name = name;
-            DisplayName = displayName;
-            Description = description;
+            DisplayNameLocalizationKey = displayNameLocalizationKey;
+            DescriptionLocalizationKey = descriptionLocalizationKey;
             ValueType = valueType;
             DefaultValue = defaultValue;
             Minimum = minimum;
             Maximum = maximum;
         }
-        //todo enum?
-        public string Category { get; }
+        
+        public PropertiesCategory Category { get; }
 
         public string Name { get;  }
 
-        public string DisplayName { get; }
+        public string DisplayNameLocalizationKey { get; }
 
-        public string Description { get;  }
+        public string DescriptionLocalizationKey { get;  }
 
+        //todo need?
         public Type ValueType { get;  }
         
         public object DefaultValue { get;  }

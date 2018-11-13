@@ -3,9 +3,13 @@ namespace mpESKD.Base.Properties
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using Autodesk.AutoCAD.DatabaseServices;
+    using Enums;
     using Helpers;
     using ModPlusAPI.Annotations;
 
@@ -16,7 +20,7 @@ namespace mpESKD.Base.Properties
             if (Verify(blkRefObjectId))
             {
                 IsValid = true;
-                BlkRefObjectId = blkRefObjectId;
+                _blkRefObjectId = blkRefObjectId;
                 using (BlockReference blkRef = blkRefObjectId.Open(OpenMode.ForRead, false, true) as BlockReference)
                 {
                     if (blkRef != null)
@@ -29,9 +33,11 @@ namespace mpESKD.Base.Properties
             else IsValid = false;
         }
 
-        public ObjectId BlkRefObjectId;
+        private ObjectId _blkRefObjectId;
 
-        public List<EntityProperty> Properties { get; } = new List<EntityProperty>();
+        private IntellectualEntity _intellectualEntity;
+
+        public ObservableCollection<IntellectualEntityProperty> Properties { get; } = new ObservableCollection<IntellectualEntityProperty>();
 
         public bool IsValid { get; set; }
 
@@ -54,72 +60,116 @@ namespace mpESKD.Base.Properties
         {
             if (blockReference == null)
             {
-                BlkRefObjectId = ObjectId.Null;
+                _blkRefObjectId = ObjectId.Null;
                 return;
             }
-            var mpcoEntity  = new EntityReaderFactory().GetFromEntity(blockReference);
-            if (mpcoEntity != null)
+            var intellectualEntity = new EntityReaderFactory().GetFromEntity(blockReference);
+            if (intellectualEntity != null)
             {
-                var type = mpcoEntity.GetType();
+                _intellectualEntity = intellectualEntity;
+
+                var type = intellectualEntity.GetType();
+
                 foreach (var propertyInfo in type.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
                 {
                     var att = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
-                    AcadHelpers.WriteMessageInDebug($"Attr category: {att.Category}");
-                    AcadHelpers.WriteMessageInDebug($"Attr name: {att.Name}");
-
-                    var value = propertyInfo.GetValue(mpcoEntity);
-                    AcadHelpers.WriteMessageInDebug($"Property value: {value}");
+                    var value = propertyInfo.GetValue(intellectualEntity);
+                    if (att != null && value != null)
+                    {
+                        IntellectualEntityProperty property = new IntellectualEntityProperty(att, value);
+                        property.PropertyChanged += Property_PropertyChanged;
+                        Properties.Add(property);
+                    }
                 }
-
-                //    _style = StyleManager.GetStyles<GroundLineStyle>().FirstOrDefault(s => s.Guid.Equals(groundLine.StyleGuid))?.Name;
-                //    _firstStrokeOffset = GroundLinePropertiesHelpers.GetLocalFirstStrokeOffsetName(groundLine.FirstStrokeOffset);
-                //    _strokeLength = groundLine.StrokeLength;
-                //    _strokeOffset = groundLine.StrokeOffset;
-                //    _strokeAngle = groundLine.StrokeAngle;
-                //    _space = groundLine.Space;
-                //    _scale = groundLine.Scale.Name;
-                //    _layerName = blockReference.Layer;
-                //    _lineTypeScale = groundLine.LineTypeScale;
-                //    _lineType = blockReference.Linetype;
-                //    AnyPropertyChangedReise();
+                AnyPropertyChangedRaise();
             }
+        }
+
+        private void Property_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            using (AcadHelpers.Document.LockDocument())
+            {
+                using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                {
+                    //todo wrong!
+                    _intellectualEntity.GetType().GetProperty(e.PropertyName).SetValue(_intellectualEntity, 10);
+                    _intellectualEntity.UpdateEntities();
+                    _intellectualEntity.GetBlockTableRecordWithoutTransaction(blkRef);
+                    using (var resBuf = _intellectualEntity.GetParametersForXData())
+                    {
+                        if (blkRef != null) blkRef.XData = resBuf;
+                    }
+                    if (blkRef != null)
+                        blkRef.ResetBlock();
+                }
+            }
+            Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+        }
+
+        public event EventHandler AnyPropertyChanged;
+
+        /// <summary>Вызов события изменения какого-либо свойства</summary>
+        protected void AnyPropertyChangedRaise()
+        {
+            AnyPropertyChanged?.Invoke(this, null);
         }
     }
 
     //todo Move to file
-    public class EntityProperty
+    public class IntellectualEntityProperty : INotifyPropertyChanged
     {
-        public EntityProperty(EntityPropertyAttribute attribute, object value)
+        private object _value;
+
+        public IntellectualEntityProperty(EntityPropertyAttribute attribute, object value)
         {
             Category = attribute.Category;
             Name = attribute.Name;
-            DisplayName = attribute.DisplayName;
-            Description = attribute.Description;
+            DisplayNameLocalizationKey = attribute.DisplayNameLocalizationKey;
+            DescriptionLocalizationKey = attribute.DescriptionLocalizationKey;
             ValueType = typeof(object);
             DefaultValue = attribute.DefaultValue;
             Minimum = attribute.Minimum;
             Maximum = attribute.Maximum;
             Value = value;
         }
-        public string Category { get; }
 
-        public string Name { get;  }
+        public PropertiesCategory Category { get; }
 
-        public string DisplayName { get; }
+        public string Name { get; }
 
-        public string Description { get;  }
+        public string DisplayNameLocalizationKey { get; }
 
-        public Type ValueType { get;  }
-        
-        public object DefaultValue { get;  }
+        public string DescriptionLocalizationKey { get; }
+
+        //todo need?
+        public Type ValueType { get; }
+
+        public object DefaultValue { get; }
 
         //todo notify?!
-        public object Value { get; set; }
+        public object Value
+        {
+            get => _value;
+            set
+            {
+                if (Equals(value, _value)) return;
+                _value = value;
+                OnPropertyChanged();
+            }
+        }
 
         [CanBeNull]
-        public object Minimum { get;  }
+        public object Minimum { get; }
 
         [CanBeNull]
-        public object Maximum { get;  }
+        public object Maximum { get; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [Annotations.NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

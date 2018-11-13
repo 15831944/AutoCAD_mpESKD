@@ -58,7 +58,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         // Получаем первую ручку (совпадает с точкой вставки блока)
                         var gp = new BreakLineGrip
                         {
-                            GripType = MPCOGrips.MPCOEntityGripType.Point,
+                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
                             BreakLine = breakLine,
                             GripName = BreakLineGripName.StartGrip,
                             GripPoint = breakLine.InsertionPoint // вот эта точка из экземпляра класса breakline
@@ -67,7 +67,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         // получаем среднюю ручку
                         gp = new BreakLineGrip
                         {
-                            GripType = MPCOGrips.MPCOEntityGripType.Point,
+                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
                             BreakLine = breakLine,
                             GripName = BreakLineGripName.MiddleGrip,
                             GripPoint = breakLine.MiddlePoint
@@ -76,7 +76,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         // получаем конечную ручку
                         gp = new BreakLineGrip
                         {
-                            GripType = MPCOGrips.MPCOEntityGripType.Point,
+                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
                             BreakLine = breakLine,
                             GripName = BreakLineGripName.EndGrip,
                             GripPoint = breakLine.EndPoint

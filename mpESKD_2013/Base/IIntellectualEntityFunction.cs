@@ -1,7 +1,6 @@
 ﻿namespace mpESKD.Base
 {
-    // ReSharper disable once InconsistentNaming
-    public interface IMPCOEntityFunction
+    public interface IIntellectualEntityFunction
     {
         void Initialize();
 

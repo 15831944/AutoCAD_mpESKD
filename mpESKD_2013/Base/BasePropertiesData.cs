@@ -61,10 +61,10 @@ namespace mpESKD.Base
         /// <summary>
         /// Изменение свойства
         /// </summary>
-        /// <typeparam name="T">Экземпляр класса, унаследованный от <see cref="MPCOEntity"/></typeparam>
+        /// <typeparam name="T">Экземпляр класса, унаследованный от <see cref="IntellectualEntity"/></typeparam>
         /// <param name="getEntityFunc">Метод получения экземпляра класса из вставки блока</param>
         /// <param name="updateProp">Метод обновления свойства</param>
-        public void ChangeProperty<T> (Func<BlockReference, T> getEntityFunc, Action<T> updateProp) where T: MPCOEntity
+        public void ChangeProperty<T> (Func<BlockReference, T> getEntityFunc, Action<T> updateProp) where T: IntellectualEntity
         {
             using (AcadHelpers.Document.LockDocument())
             {
@@ -86,7 +86,7 @@ namespace mpESKD.Base
             Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
         }
 
-        public void ChangeScaleProperty<T>(Func<BlockReference, T> getEntityFunc, string scaleValue) where T : MPCOEntity
+        public void ChangeScaleProperty<T>(Func<BlockReference, T> getEntityFunc, string scaleValue) where T : IntellectualEntity
         {
             using (AcadHelpers.Document.LockDocument())
             {
@@ -110,7 +110,7 @@ namespace mpESKD.Base
 
         public void ChangeStyleProperty<T>(
             Func<BlockReference, T> getEntityFunc,
-            MPCOStyle style) where T: MPCOEntity
+            MPCOStyle style) where T: IntellectualEntity
         {
             using (AcadHelpers.Document.LockDocument())
             {

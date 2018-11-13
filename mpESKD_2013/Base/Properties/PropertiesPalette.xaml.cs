@@ -14,6 +14,8 @@ using Visibility = System.Windows.Visibility;
 
 namespace mpESKD.Base.Properties
 {
+    using Functions.mpGroundLine.Properties;
+
     public partial class PropertiesPalette
     {
         public PropertiesPalette()
@@ -125,15 +127,18 @@ namespace mpESKD.Base.Properties
             // mpGroundLine
             if (ExtendedDataHelpers.IsApplicable(obj, Functions.mpGroundLine.GroundLineFunction.MPCOEntName))
             {
-                if (!HasPropertyControl(Functions.mpGroundLine.GroundLineFunction.MPCOEntName))
-                {
-                    var mpGroundLineProperties =
-                        new Functions.mpGroundLine.Properties.GroundLinePropertiesPalette(this)
-                        {
-                            Name = Functions.mpGroundLine.GroundLineFunction.MPCOEntName
-                        };
-                    StackPanelProperties.Children.Add(mpGroundLineProperties);
-                }
+                var test = new GroundLinePropertiesPaletteTest(this);
+                StackPanelProperties.Children.Add(test);
+                //todo test
+                ////if (!HasPropertyControl(Functions.mpGroundLine.GroundLineFunction.MPCOEntName))
+                ////{
+                ////    var mpGroundLineProperties =
+                ////        new Functions.mpGroundLine.Properties.GroundLinePropertiesPalette(this)
+                ////        {
+                ////            Name = Functions.mpGroundLine.GroundLineFunction.MPCOEntName
+                ////        };
+                ////    StackPanelProperties.Children.Add(mpGroundLineProperties);
+                ////}
             }
         }
 

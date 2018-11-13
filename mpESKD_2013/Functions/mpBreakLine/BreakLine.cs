@@ -15,7 +15,7 @@
     using ModPlusAPI.Windows;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class BreakLine : MPCOEntity
+    public class BreakLine : IntellectualEntity
     {
         /// <summary>Инициализация экземпляра класса для BreakLine без заполнения данными
         /// В данном случае уже все данные получены и нужно только "построить" 

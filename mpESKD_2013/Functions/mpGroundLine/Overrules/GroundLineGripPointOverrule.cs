@@ -269,7 +269,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         {
             GroundLine = groundLine;
             GripIndex = index;
-            GripType = MPCOGrips.MPCOEntityGripType.Point;
+            GripType = MPCOGrips.IntellectualEntityGripType.Point;
 
             // отключение контекстного меню и возможности менять команду
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
@@ -351,7 +351,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             GroundLine = groundLine;
             GripLeftPoint = leftPoint;
             GripRightPoint = rightPoint;
-            GripType = MPCOGrips.MPCOEntityGripType.Plus;
+            GripType = MPCOGrips.IntellectualEntityGripType.Plus;
             RubberBandLineDisabled = true;
 
             // отключение контекстного меню и возможности менять команду
@@ -477,7 +477,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         {
             GroundLine = groundLine;
             GripIndex = index;
-            GripType = MPCOGrips.MPCOEntityGripType.Minus;
+            GripType = MPCOGrips.IntellectualEntityGripType.Minus;
 
             // отключение контекстного меню и возможности менять команду
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
@@ -547,7 +547,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         public GroundLineReverseGrip(GroundLine groundLine)
         {
             GroundLine = groundLine;
-            GripType = MPCOGrips.MPCOEntityGripType.Mirror;
+            GripType = MPCOGrips.IntellectualEntityGripType.Mirror;
 
             // отключение контекстного меню и возможности менять команду
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool

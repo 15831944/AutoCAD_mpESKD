@@ -16,7 +16,7 @@
     using Styles;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class GroundLineFunction : IMPCOEntityFunction
+    public class GroundLineFunction : IIntellectualEntityFunction
     {
         /// <summary>Имя примитива, помещаемое в XData</summary>
         public static readonly string MPCOEntName = GroundLineInterface.Name; // mpGroundLine

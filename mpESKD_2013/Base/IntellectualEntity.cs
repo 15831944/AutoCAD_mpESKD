@@ -13,9 +13,9 @@ namespace mpESKD.Base
 {
     using Styles;
 
-    public abstract class MPCOEntity : IDisposable
+    public abstract class IntellectualEntity : IDisposable
     {
-        protected MPCOEntity()
+        protected IntellectualEntity()
         {
             BlockTransform = Matrix3d.Identity;
         }

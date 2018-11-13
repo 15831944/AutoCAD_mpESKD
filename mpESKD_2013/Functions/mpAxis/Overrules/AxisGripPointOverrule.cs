@@ -14,6 +14,8 @@ using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 namespace mpESKD.Functions.mpAxis.Overrules
 {
+    using Base;
+
     public class AxisGripPointsOverrule : GripOverrule
     {
         protected static AxisGripPointsOverrule _axisGripPointOverrule;
@@ -55,14 +57,14 @@ namespace mpESKD.Functions.mpAxis.Overrules
                     // Получаем экземпляр класса, который описывает как должен выглядеть примитив
                     // т.е. правила построения графики внутри блока
                     // Информация соберается по XData и свойствам самого блока
-                    var axis = Axis.GetAxisFromEntity(entity);
+                    var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(entity);
                     // Параноя программиста =)
                     if (axis != null)
                     {
                         // Получаем первую ручку (совпадает с точкой вставки блока)
                         var gp = new AxisGrip
                         {
-                            GripType = MPCOGrips.MPCOEntityGripType.Point,
+                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
                             Axis = axis,
                             GripName = AxisGripName.StartGrip,
                             GripPoint = axis.InsertionPoint // вот эта точка из экземпляра класса axis
@@ -72,7 +74,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         // получаем среднюю ручку
                         gp = new AxisGrip
                         {
-                            GripType = MPCOGrips.MPCOEntityGripType.Point,
+                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
                             Axis = axis,
                             GripName = AxisGripName.MiddleGrip,
                             GripPoint = axis.MiddlePoint
@@ -81,7 +83,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         // получаем конечную ручку
                         gp = new AxisGrip
                         {
-                            GripType = MPCOGrips.MPCOEntityGripType.Point,
+                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
                             Axis = axis,
                             GripName = AxisGripName.EndGrip,
                             GripPoint = axis.EndPoint
@@ -94,7 +96,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             // other points
                             gp = new AxisGrip
                             {
-                                GripType = MPCOGrips.MPCOEntityGripType.Point,
+                                GripType = MPCOGrips.IntellectualEntityGripType.Point,
                                 Axis = axis,
                                 GripName = AxisGripName.BottomMarkerGrip,
                                 GripPoint = axis.BottomMarkerPoint
@@ -106,7 +108,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         {
                             gp = new AxisGrip
                             {
-                                GripType = MPCOGrips.MPCOEntityGripType.Point,
+                                GripType = MPCOGrips.IntellectualEntityGripType.Point,
                                 Axis = axis,
                                 GripName = AxisGripName.TopMarkerGrip,
                                 GripPoint = axis.TopMarkerPoint
@@ -119,7 +121,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             {
                                 gp = new AxisGrip
                                 {
-                                    GripType = MPCOGrips.MPCOEntityGripType.Point,
+                                    GripType = MPCOGrips.IntellectualEntityGripType.Point,
                                     Axis = axis,
                                     GripName = AxisGripName.BottomOrientGrip,
                                     GripPoint = axis.BottomOrientPoint
@@ -132,7 +134,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             {
                                 gp = new AxisGrip
                                 {
-                                    GripType = MPCOGrips.MPCOEntityGripType.Point,
+                                    GripType = MPCOGrips.IntellectualEntityGripType.Point,
                                     Axis = axis,
                                     GripName = AxisGripName.TopOrientGrip,
                                     GripPoint = axis.TopOrientPoint

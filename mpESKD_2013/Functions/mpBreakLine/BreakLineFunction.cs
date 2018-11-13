@@ -18,7 +18,7 @@
 
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class BreakLineFunction : IMPCOEntityFunction
+    public class BreakLineFunction : IIntellectualEntityFunction
     {
         /// <summary>Имя примитива, помещаемое в XData</summary>
         public static string MPCOEntName = BreakLineInterface.Name; // "mpBreakLine";

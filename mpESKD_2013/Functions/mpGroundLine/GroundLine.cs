@@ -11,21 +11,17 @@
     using Base;
     using Base.Enums;
     using Base.Helpers;
+    using Base.Properties;
     using Base.Styles;
+    using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Properties;
     using Styles;
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class GroundLine : MPCOEntity
+    public class GroundLine : IntellectualEntity //todo implement : IGeneralProperties
     {
         #region Constructor
-
-        public GroundLine()
-        {
-            
-        }
-
+        
         /// <summary>Инициализация экземпляра класса для GroundLine без заполнения данными
         /// В данном случае уже все данные получены и нужно только "построить" 
         /// базовые примитивы</summary>
@@ -78,7 +74,7 @@
         #endregion
 
         #region Properties
-
+        
         /// <summary>
         /// Минимальная длина линии грунта
         /// </summary>
@@ -87,31 +83,34 @@
         /// <summary>
         /// Отступ первого штриха в каждом сегменте полилинии
         /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, nameof(FirstStrokeOffset), "p36", "d36", 
+            typeof(GroundLineFirstStrokeOffset), GroundLineFirstStrokeOffset.ByHalfSpace, null, null)]
         public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineProperties.FirstStrokeOffset.DefaultValue;
 
         /// <summary>
         /// Длина штриха
         /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, nameof(StrokeLength), "p37", "d37", typeof(int), 8, 1, 10)]
         public int StrokeLength { get; set; } = GroundLineProperties.StrokeLength.DefaultValue;
 
         /// <summary>
         /// Расстояние между штрихами
         /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, nameof(StrokeOffset), "p38", "d38", typeof(int), 4, 1, 10)]
         public int StrokeOffset { get; set; } = GroundLineProperties.StrokeOffset.DefaultValue;
 
         /// <summary>
         /// Угол наклона штриха в градусах
         /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, nameof(StrokeAngle), "p39", "d39", typeof(int), 60, 30, 90)]
         public int StrokeAngle { get; set; } = GroundLineProperties.StrokeAngle.DefaultValue;
 
         /// <summary>
         /// Отступ группы штрихов
         /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, nameof(Space), "p40", "d40", typeof(int), 10, 1, 20)]
         public int Space { get; set; } = GroundLineProperties.Space.DefaultValue;
-
-        [EntityProperty("Geometry", nameof(TestProperty), "Display name of prop", "some description", typeof(int), 15, 1, 20)]
-        public int TestProperty { get; set; } = 10;
-
+        
         #endregion
 
         #region Примитивы ЕСКД объекта
@@ -143,7 +142,7 @@
                 }
             }
         }
-
+        
         /// <summary>Установка свойств для примитивов, которые не меняются</summary>
         /// <param name="entity">Примитив автокада</param>
         private static void SetPropertiesToCadEntity(Entity entity)
@@ -403,8 +402,6 @@
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeOffset)); // 1
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeAngle)); // 2
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Space)); // 3
-                //todo test
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, TestProperty)); // 4
 
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
@@ -477,10 +474,6 @@
                                     case 3:
                                         Space = (Int16)typedValue.Value;
                                         break;
-                                    //todo test
-                                    case 4:
-                                        TestProperty = (Int16)typedValue.Value;
-                                        break;
                                 }
                                 //index
                                 index1070++;
@@ -512,5 +505,7 @@
                 ExceptionBox.Show(exception);
             }
         }
+
+
     }
 }

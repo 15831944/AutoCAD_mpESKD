@@ -11,7 +11,7 @@ namespace mpESKD.Base.Overrules
         /// <summary>
         /// Виды ручек для примитива
         /// </summary>
-        public enum MPCOEntityGripType
+        public enum IntellectualEntityGripType
         {
             /// <summary>
             /// Обычная точка
@@ -44,7 +44,7 @@ namespace mpESKD.Base.Overrules
             /// <summary>
             /// Тип ручки примитива
             /// </summary>
-            public MPCOEntityGripType GripType { get; set; }
+            public IntellectualEntityGripType GripType { get; set; }
             
             public override bool ViewportDraw(ViewportDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint,
                 int gripSizeInPixels)
@@ -56,13 +56,13 @@ namespace mpESKD.Base.Overrules
                 Point3dCollection point3dCollections = new Point3dCollection();
                 switch (GripType)
                 {
-                    case MPCOEntityGripType.Point:
+                    case IntellectualEntityGripType.Point:
                         point3dCollections = PointsForSquareGrip(num, eCS);
                         break;
-                    case MPCOEntityGripType.Plus:
+                    case IntellectualEntityGripType.Plus:
                         point3dCollections = PointsForPlusGrip(num, eCS);
                         break;
-                    case MPCOEntityGripType.Minus:
+                    case IntellectualEntityGripType.Minus:
                         point3dCollections = PointsForMinusGrip(num, eCS);
                         break;
                 }
@@ -71,7 +71,7 @@ namespace mpESKD.Base.Overrules
 
                 worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
                 worldDraw.SubEntityTraits.Color = GetGripColor();
-                if(GripType != MPCOEntityGripType.Mirror)
+                if(GripType != IntellectualEntityGripType.Mirror)
                     worldDraw.Geometry.Polygon(point3dCollections);
                 else
                 {
@@ -81,7 +81,7 @@ namespace mpESKD.Base.Overrules
                 worldDraw.SubEntityTraits.FillType = FillType.FillNever;
                 // обводка
                 worldDraw.SubEntityTraits.Color = 250;
-                if (GripType != MPCOEntityGripType.Mirror)
+                if (GripType != IntellectualEntityGripType.Mirror)
                     worldDraw.Geometry.Polygon(point3dCollections);
                 else
                 {
@@ -194,9 +194,9 @@ namespace mpESKD.Base.Overrules
             {
                 switch (GripType)
                 {
-                    case MPCOEntityGripType.Plus:
+                    case IntellectualEntityGripType.Plus:
                         return 110;
-                    case MPCOEntityGripType.Minus:
+                    case IntellectualEntityGripType.Minus:
                         return 20;
                 }
 

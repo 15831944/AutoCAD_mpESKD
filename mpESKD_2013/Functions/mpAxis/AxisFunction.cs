@@ -15,7 +15,7 @@
     using Overrules;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class AxisFunction : IMPCOEntityFunction
+    public class AxisFunction : IIntellectualEntityFunction
     {
         /// <summary>Имя примитива, помещаемое в XData</summary>
         public static string MPCOEntName = AxisInterface.Name; // "mpAxis";
@@ -41,7 +41,7 @@
         public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location, Transaction tr)
         {
             BeditCommandWatcher.UseBedit = false;
-            var axis = Axis.GetAxisFromEntity(blockReference);
+            var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blockReference);
             axis.UpdateEntities();
             bool saveBack = false;
             if (MainStaticSettings.Settings.AxisUsePluginTextEditor)

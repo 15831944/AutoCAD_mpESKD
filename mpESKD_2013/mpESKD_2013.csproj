@@ -87,6 +87,7 @@
     <Compile Include="Base\Enums\BreakLineType.cs" />
     <Compile Include="Base\Enums\EntityDirection.cs" />
     <Compile Include="Base\Enums\GroundLineFirstStrokeOffset.cs" />
+    <Compile Include="Base\Enums\PropertiesCategory.cs" />
     <Compile Include="Base\Enums\UpdateVariant.cs" />
     <Compile Include="Base\Helpers\AcadHelpers.cs" />
     <Compile Include="Base\Helpers\GeometryHelpers.cs" />
@@ -94,8 +95,8 @@
     <Compile Include="Base\Helpers\LayerHelper.cs" />
     <Compile Include="Base\Helpers\MathExtensions.cs" />
     <Compile Include="Base\Helpers\TextStyleHelper.cs" />
-    <Compile Include="Base\IMPCOEntityFunction.cs" />
-    <Compile Include="Base\MPCOEntity.cs" />
+    <Compile Include="Base\IIntellectualEntityFunction.cs" />
+    <Compile Include="Base\IntellectualEntity.cs" />
     <Compile Include="Base\Overrules\MPCOGrips.cs" />
     <Compile Include="Base\Properties\BaseProperties.cs" />
     <Compile Include="Base\Properties\BaseSummaryProperties.cs" />
@@ -120,6 +121,7 @@
       <DependentUpon>PaletteSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Base\Properties\PropertiesHelpers.cs" />
+    <Compile Include="Base\Properties\SummaryPropertyData.cs" />
     <Compile Include="Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs" />
     <Compile Include="Base\Styles\StyleManager.cs" />
     <Compile Include="Functions\mpAxis\Axis.cs" />
@@ -179,6 +181,9 @@
     <Compile Include="Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml.cs">
       <DependentUpon>GroundLinePropertiesPalette.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Functions\mpGroundLine\Properties\GroundLinePropertiesPaletteTest.xaml.cs">
+      <DependentUpon>GroundLinePropertiesPaletteTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Functions\mpGroundLine\Properties\GroundLineSummaryProperties.cs" />
     <Compile Include="Functions\mpGroundLine\Styles\GroundLineStyle.cs" />
     <Compile Include="Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml.cs">
@@ -205,6 +210,7 @@
     <Compile Include="LoadHelpers\RibbonBuilder.cs" />
     <Compile Include="MainFunction.cs" />
     <Compile Include="MainSettings.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfoCommon.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -263,6 +269,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Functions\mpGroundLine\Properties\GroundLinePropertiesPaletteTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

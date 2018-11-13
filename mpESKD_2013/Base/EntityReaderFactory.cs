@@ -19,7 +19,7 @@
         public static EntityReaderFactory Instance => _entityReaderFactory ?? (_entityReaderFactory = new EntityReaderFactory());
 
         [CanBeNull]
-        public MPCOEntity GetFromEntity(Entity entity)
+        public IntellectualEntity GetFromEntity(Entity entity)
         {
             var appName = entity.XData.AsArray()
                 .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString().StartsWith("mp"))
@@ -29,7 +29,7 @@
         }
 
         [CanBeNull]
-        public MPCOEntity GetFromEntity(Entity entity, string appName)
+        public IntellectualEntity GetFromEntity(Entity entity, string appName)
         {
             switch (appName)
             {
@@ -45,7 +45,7 @@
         }
 
         [CanBeNull]
-        public T GetFromEntity<T>(Entity entity) where T : MPCOEntity
+        public T GetFromEntity<T>(Entity entity) where T : IntellectualEntity
         {
             return GetFromEntity(entity, "mp" + typeof(T).Name) as T;
         }

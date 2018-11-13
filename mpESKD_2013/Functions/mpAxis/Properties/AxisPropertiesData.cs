@@ -27,9 +27,10 @@ namespace mpESKD.Functions.mpAxis.Properties
         public override string Style
         {
             get => _style;
-            set => ChangeStyleProperty(Axis.GetAxisFromEntity, 
+            set => ChangeStyleProperty(
+                //todo old
+                EntityReaderFactory.Instance.GetFromEntity<Axis>,
                 StyleManager.GetStyles<AxisStyle>().FirstOrDefault(s => s.Name.Equals(value)));
-                //AxisStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value)));
         }
 
         private string _scale;
@@ -39,7 +40,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             get => _scale;
             set => ChangeProperty(
-                Axis.GetAxisFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<Axis>,
                 axis =>
                 {
                     var oldScale = axis.GetScale();
@@ -58,7 +59,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         public override double LineTypeScale
         {
             get => _lineTypeScale;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.LineTypeScale = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.LineTypeScale = value);
         }
 
         private string _lineType;
@@ -87,7 +88,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             get => _markersPosition;
             set => ChangeProperty(
-                Axis.GetAxisFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<Axis>,
                 axis => axis.MarkersPosition = AxisPropertiesHelpers.GetAxisMarkersPositionByLocalName(value));
         }
 
@@ -96,7 +97,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         public int MarkersCount
         {
             get => _markersCount;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.MarkersCount = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.MarkersCount = value);
         }
 
         private int _fracture;
@@ -104,7 +105,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         public int Fracture
         {
             get => _fracture;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.Fracture = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.Fracture = value);
         }
 
         private int _bottomFractureOffset;
@@ -113,7 +114,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             get => _bottomFractureOffset;
             set => ChangeProperty(
-                Axis.GetAxisFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<Axis>,
                 axis =>
                 {
                     var oldFracture = axis.BottomFractureOffset;
@@ -129,28 +130,28 @@ namespace mpESKD.Functions.mpAxis.Properties
         public int TopFractureOffset
         {
             get => _topFractureOffset;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.TopFractureOffset = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.TopFractureOffset = value);
         }
 
         private int _markersDiameter;
         public int MarkersDiameter
         {
             get => _markersDiameter;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.MarkersDiameter = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.MarkersDiameter = value);
         }
 
         private string _textStyle;
         public string TextStyle
         {
             get => _textStyle;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.TextStyle = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.TextStyle = value);
         }
 
         private double _textHeight;
         public double TextHeight
         {
             get => _textHeight;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.TextHeight = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.TextHeight = value);
         }
 
         #region Text
@@ -160,21 +161,21 @@ namespace mpESKD.Functions.mpAxis.Properties
         public string FirstTextPrefix
         {
             get => _firstTextPrefix;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.FirstTextPrefix = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.FirstTextPrefix = value);
         }
 
         private string _firstTextSuffix;
         public string FirstTextSuffix
         {
             get => _firstTextSuffix;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.FirstTextSuffix = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.FirstTextSuffix = value);
         }
 
         private string _firstText;
         public string FirstText
         {
             get => _firstText;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.FirstText = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.FirstText = value);
         }
 
         // second text
@@ -182,21 +183,21 @@ namespace mpESKD.Functions.mpAxis.Properties
         public string SecondTextPrefix
         {
             get => _secondTextPrefix;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.SecondTextPrefix = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.SecondTextPrefix = value);
         }
 
         private string _secondTextSuffix;
         public string SecondTextSuffix
         {
             get => _secondTextSuffix;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.SecondTextSuffix = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.SecondTextSuffix = value);
         }
 
         private string _secondText;
         public string SecondText
         {
             get => _secondText;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.SecondText = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.SecondText = value);
         }
 
         // third text
@@ -204,21 +205,21 @@ namespace mpESKD.Functions.mpAxis.Properties
         public string ThirdTextPrefix
         {
             get => _thirdTextPrefix;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.ThirdTextPrefix = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.ThirdTextPrefix = value);
         }
 
         private string _thirdTextSuffix;
         public string ThirdTextSuffix
         {
             get => _thirdTextSuffix;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.ThirdTextSuffix = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.ThirdTextSuffix = value);
         }
 
         private string _thirdText;
         public string ThirdText
         {
             get => _thirdText;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.ThirdText = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.ThirdText = value);
         }
 
         #endregion
@@ -230,7 +231,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             get => _firstMarkerType;
             set => ChangeProperty(
-                Axis.GetAxisFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<Axis>,
                 axis => axis.FirstMarkerType = value.Equals(Language.GetItem(MainFunction.LangItem, "type1")) // "Тип 1"
                     ? 0 : 1);
         }
@@ -240,7 +241,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             get => _secondMarkerType;
             set => ChangeProperty(
-                Axis.GetAxisFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<Axis>,
                 axis => axis.SecondMarkerType = value.Equals(Language.GetItem(MainFunction.LangItem, "type1")) // "Тип 1"
                     ? 0 : 1);
         }
@@ -250,7 +251,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             get => _thirdMarkerType;
             set => ChangeProperty(
-                Axis.GetAxisFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<Axis>,
                 axis => axis.ThirdMarkerType = value.Equals(Language.GetItem(MainFunction.LangItem, "type1")) // "Тип 1"
                     ? 0 : 1);
         }
@@ -263,35 +264,35 @@ namespace mpESKD.Functions.mpAxis.Properties
         public int ArrowSize
         {
             get => _arrowSize;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.ArrowsSize = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.ArrowsSize = value);
         }
 
         private string _bottomOrientText;
         public string BottomOrientText
         {
             get => _bottomOrientText;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.BottomOrientText = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.BottomOrientText = value);
         }
 
         private string _topOrientText;
         public string TopOrientText
         {
             get => _topOrientText;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.TopOrientText = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.TopOrientText = value);
         }
 
         private bool _bottomOrientMarkerVisible;
         public bool BottomOrientMarkerVisible
         {
             get => _bottomOrientMarkerVisible;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.BottomOrientMarkerVisible = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.BottomOrientMarkerVisible = value);
         }
 
         private bool _topOrientMarkerVisible;
         public bool TopOrientMarkerVisible
         {
             get => _topOrientMarkerVisible;
-            set => ChangeProperty(Axis.GetAxisFromEntity, axis => axis.TopOrientMarkerVisible = value);
+            set => ChangeProperty(EntityReaderFactory.Instance.GetFromEntity<Axis>, axis => axis.TopOrientMarkerVisible = value);
         }
 
         private string _orientMarkerType;
@@ -299,7 +300,7 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             get => _orientMarkerType;
             set => ChangeProperty(
-                Axis.GetAxisFromEntity, 
+                EntityReaderFactory.Instance.GetFromEntity<Axis>, 
                 axis => axis.OrientMarkerType = value.Equals(Language.GetItem(MainFunction.LangItem, "type1")) // "Тип 1"
                 ? 0 : 1);
         }
@@ -313,7 +314,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 BlkRefObjectId = ObjectId.Null;
                 return;
             }
-            var axis = Axis.GetAxisFromEntity(blkReference);
+            var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blkReference);
             if (axis != null)
             {
                 //_style = AxisStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(axis.StyleGuid))?.Name;
