@@ -7,6 +7,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
     using Autodesk.AutoCAD.DatabaseServices;
     using Base;
     using Base.Enums;
+    using Base.Styles;
     using Styles;
 
     public class BreakLinePropertiesData : BasePropertiesData
@@ -25,8 +26,10 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         public override string Style
         {
             get => _style;
-            set => ChangeStyleProperty(BreakLine.GetBreakLineFromEntity,
-                BreakLineStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value)));
+            set => ChangeStyleProperty(
+                //BreakLine.GetBreakLineFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<BreakLine>,
+                StyleManager.GetStyles<BreakLineStyle>().FirstOrDefault(s => s.Name.Equals(value)));
         }
 
         private string _scale;
@@ -35,7 +38,10 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         public override string Scale
         {
             get => _scale;
-            set => ChangeScaleProperty(BreakLine.GetBreakLineFromEntity, value);
+            set => ChangeScaleProperty(
+                //BreakLine.GetBreakLineFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<BreakLine>,
+                value);
         }
 
         private double _lineTypeScale;
@@ -44,7 +50,10 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         public override double LineTypeScale
         {
             get => _lineTypeScale;
-            set => ChangeProperty(BreakLine.GetBreakLineFromEntity, breakLine => breakLine.LineTypeScale = value);
+            set => ChangeProperty(
+                //BreakLine.GetBreakLineFromEntity, 
+                EntityReaderFactory.Instance.GetFromEntity<BreakLine>,
+                breakLine => breakLine.LineTypeScale = value);
         }
 
         private string _lineType;
@@ -71,21 +80,30 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         public int Overhang
         {
             get => _overhang;
-            set => ChangeProperty(BreakLine.GetBreakLineFromEntity, breakLine => breakLine.Overhang = value);
+            set => ChangeProperty(
+                //BreakLine.GetBreakLineFromEntity, 
+                EntityReaderFactory.Instance.GetFromEntity<BreakLine>,
+                breakLine => breakLine.Overhang = value);
         }
 
         private int _breakHeight;
         public int BreakHeight
         {
             get => _breakHeight;
-            set => ChangeProperty(BreakLine.GetBreakLineFromEntity, breakLine => breakLine.BreakHeight = value);
+            set => ChangeProperty(
+                //BreakLine.GetBreakLineFromEntity, 
+                EntityReaderFactory.Instance.GetFromEntity<BreakLine>,
+                breakLine => breakLine.BreakHeight = value);
         }
 
         private int _breakWidth;
         public int BreakWidth
         {
             get => _breakWidth;
-            set => ChangeProperty(BreakLine.GetBreakLineFromEntity, breakLine => breakLine.BreakWidth = value);
+            set => ChangeProperty(
+                //BreakLine.GetBreakLineFromEntity, 
+                EntityReaderFactory.Instance.GetFromEntity<BreakLine>,
+                breakLine => breakLine.BreakWidth = value);
         }
 
         private string _breakLineType;
@@ -93,7 +111,8 @@ namespace mpESKD.Functions.mpBreakLine.Properties
         {
             get => _breakLineType;
             set => ChangeProperty(
-                BreakLine.GetBreakLineFromEntity,
+                //BreakLine.GetBreakLineFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<BreakLine>,
                 breakLine => breakLine.BreakLineType = BreakLineTypeHelper.GetByLocalName(value));
         }
         
@@ -104,10 +123,10 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 BlkRefObjectId = ObjectId.Null;
                 return;
             }
-            var breakLine = BreakLine.GetBreakLineFromEntity(blkReference);
+            var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(blkReference);
             if (breakLine != null)
             {
-                _style = BreakLineStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(breakLine.StyleGuid))?.Name;
+                _style = StyleManager.GetStyles<BreakLineStyle>().FirstOrDefault(s => s.Guid.Equals(breakLine.StyleGuid))?.Name;
                 _overhang = breakLine.Overhang;
                 _breakHeight = breakLine.BreakHeight;
                 _breakWidth = breakLine.BreakWidth;

@@ -23,21 +23,14 @@
             InitializeComponent();
             ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             // styles
-            //todo old
-            ////var sNames = new List<string>();
-            ////foreach (var style in GroundLineStyleManager.Styles)
-            ////{
-            ////    sNames.Add(style.Name);
-            ////}
-
             CbStyle.ItemsSource = StyleManager.GetStyles<GroundLineStyle>().Select(s => s.Name);
 
             // get FirstStrokeOffset values
             CbFirstStrokeOffset.ItemsSource = GroundLinePropertiesHelpers.FirstStrokeOffsetNames;
-            
+
             // get list of scales
             CbScale.ItemsSource = AcadHelpers.Scales;
-            
+
             // fill layers
             CbLayerName.ItemsSource = AcadHelpers.Layers;
             if (AcadHelpers.Document != null)
@@ -65,9 +58,9 @@
             else
             {
                 List<ObjectId> objectIds = new List<ObjectId>();
-                foreach (SelectedObject selectedObject in psr.Value)
+                using (OpenCloseTransaction tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    using (OpenCloseTransaction tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    foreach (SelectedObject selectedObject in psr.Value)
                     {
                         var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference)
@@ -78,12 +71,16 @@
                             }
                         }
                     }
+                    tr.Commit();
                 }
                 if (objectIds.Any())
                 {
                     Expander.Header = GroundLineFunction.MPCOEntDisplayName + " (" + objectIds.Count + ")";
                     _groundLineSummaryProperties = new GroundLineSummaryProperties(objectIds);
                     SetData(_groundLineSummaryProperties);
+
+                    //todo test
+                    EntityPropertyData entityPropertyData = new EntityPropertyData(objectIds[0]);
                 }
             }
         }
@@ -95,7 +92,7 @@
 
         private void FrameworkElement_OnGotFocus(object sender, RoutedEventArgs e)
         {
-            if(!(sender is FrameworkElement fe)) return;
+            if (!(sender is FrameworkElement fe)) return;
 
             if (fe.Name.Equals("CbStyle"))
                 _parentPalette.ShowDescription(ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h52"));
@@ -145,7 +142,7 @@
                             {
                                 if (ltr != null)
                                 {
-                                    ((GroundLineSummaryProperties) DataContext).LineType = ltr.Name;
+                                    ((GroundLineSummaryProperties)DataContext).LineType = ltr.Name;
                                 }
                             }
                             tr.Commit();

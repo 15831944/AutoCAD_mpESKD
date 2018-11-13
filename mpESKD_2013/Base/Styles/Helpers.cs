@@ -1,16 +1,16 @@
-﻿using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Windows.Data;
-using System.Xml.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Runtime;
-using mpESKD.Base.Properties;
-
-namespace mpESKD.Base.Styles
+﻿namespace mpESKD.Base.Styles
 {
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Windows.Data;
+    using System.Xml.Linq;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Runtime;
+    using Properties;
+
     public static class StyleHelpers
     {
         public static object GetPropertyValue(MPCOBaseProperty property)
@@ -21,8 +21,6 @@ namespace mpESKD.Base.Styles
                 return doubleProperty.Value;
             if (property is MPCOStringProperty stringProperty)
                 return stringProperty.Value;
-            if (property is MPCOScaleProperty scaleProperty)
-                return scaleProperty.ScaleName;
             if (property is MPCOTypeProperty<object> typeProperty)
                 return typeProperty.Value;
             return null;
@@ -71,6 +69,16 @@ namespace mpESKD.Base.Styles
                 }
             return defaultValue;
         }
+        //todo release it to use in MPCOStyleForEditor constructor!
+        ////public static T GetPropertyValue<T>(this MPCOStyle style, MPCOBaseProperty property)
+        ////{
+        ////    if(style.Properties != null && style.Properties.Any())
+        ////        foreach (var styleProperty in style.Properties)
+        ////        {
+                    
+        ////        }
+        ////    return property.
+        ////}
 
         public static MPCOIntProperty CreateProperty(int value, MPCOIntProperty descriptiveProperty)
         {
@@ -86,6 +94,7 @@ namespace mpESKD.Base.Styles
                 Value = value
             };
         }
+
         public static MPCODoubleProperty CreateProperty(double value, MPCODoubleProperty descriptiveProperty)
         {
             return new MPCODoubleProperty
@@ -100,6 +109,7 @@ namespace mpESKD.Base.Styles
                 Value = value
             };
         }
+
         public static MPCOStringProperty CreateProperty(string value, MPCOStringProperty descriptiveProperty)
         {
             return new MPCOStringProperty
@@ -112,6 +122,7 @@ namespace mpESKD.Base.Styles
                 Value = value
             };
         }
+
         public static MPCOTypeProperty<T> CreateProperty<T>(T value, MPCOTypeProperty<T> descriptiveProperty)
         {
             return new MPCOTypeProperty<T>
@@ -159,6 +170,7 @@ namespace mpESKD.Base.Styles
                 Maximum = descriptiveProperty.Maximum
             };
         }
+
         public static MPCODoubleProperty CreatePropertyFromXml(XElement propXel, MPCODoubleProperty descriptiveProperty)
         {
             var nameAttr = propXel.Attribute("Name");
@@ -174,6 +186,7 @@ namespace mpESKD.Base.Styles
                 Maximum = descriptiveProperty.Maximum
             };
         }
+
         public static MPCOStringProperty CreatePropertyFromXml(XElement propXel, MPCOStringProperty descriptiveProperty)
         {
             var nameAttr = propXel.Attribute("Name");
@@ -187,6 +200,7 @@ namespace mpESKD.Base.Styles
                 DisplayName = descriptiveProperty.DisplayName,
             };
         }
+
         public static MPCOTypeProperty<T> CreatePropertyFromXml<T>(XElement propXel, MPCOTypeProperty<T> descriptiveProperty, T value)
         {
             var nameAttr = propXel.Attribute("Name");

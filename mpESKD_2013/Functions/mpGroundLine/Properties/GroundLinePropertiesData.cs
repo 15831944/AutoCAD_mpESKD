@@ -23,10 +23,11 @@ namespace mpESKD.Functions.mpGroundLine.Properties
         public override string Style
         {
             get => _style;
-            set => ChangeStyleProperty(GroundLine.GetGroundLineFromEntity,
+            set => ChangeStyleProperty(
+                //todo old
+                //GroundLine.GetGroundLineFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<GroundLine>,
                 StyleManager.GetStyles<GroundLineStyle>().FirstOrDefault(s => s.Name.Equals(value)));
-            //todo old
-                //GroundLineStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value)));
         }
 
         private string _scale;
@@ -34,7 +35,11 @@ namespace mpESKD.Functions.mpGroundLine.Properties
         public override string Scale
         {
             get => _scale;
-            set => ChangeScaleProperty(GroundLine.GetGroundLineFromEntity, value);
+            set => ChangeScaleProperty(
+                //todo old
+                //GroundLine.GetGroundLineFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<GroundLine>,
+                value);
         }
 
         private double _lineTypeScale;
@@ -43,7 +48,11 @@ namespace mpESKD.Functions.mpGroundLine.Properties
         public override double LineTypeScale
         {
             get => _lineTypeScale;
-            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.LineTypeScale = value);
+            set => ChangeProperty(
+                //todo old
+                //GroundLine.GetGroundLineFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<GroundLine>,
+                groundLine => groundLine.LineTypeScale = value);
         }
 
         private string _lineType;
@@ -71,7 +80,9 @@ namespace mpESKD.Functions.mpGroundLine.Properties
         {
             get => _firstStrokeOffset;
             set => ChangeProperty(
-                GroundLine.GetGroundLineFromEntity,
+                //todo old
+                //GroundLine.GetGroundLineFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<GroundLine>,
                 groundLine => groundLine.FirstStrokeOffset = GroundLinePropertiesHelpers.GetFirstStrokeOffsetByLocalName(value));
         }
 
@@ -79,28 +90,44 @@ namespace mpESKD.Functions.mpGroundLine.Properties
         public int StrokeLength
         {
             get => _strokeLength;
-            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.StrokeLength = value);
+            set => ChangeProperty(
+                //todo old
+                //GroundLine.GetGroundLineFromEntity, 
+                EntityReaderFactory.Instance.GetFromEntity<GroundLine>,
+                groundLine => groundLine.StrokeLength = value);
         }
 
         private int _strokeOffset;
         public int StrokeOffset
         {
             get => _strokeOffset;
-            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.StrokeOffset = value);
+            set => ChangeProperty(
+                //todo old
+                //GroundLine.GetGroundLineFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<GroundLine>,
+                groundLine => groundLine.StrokeOffset = value);
         }
 
         private int _strokeAngle;
         public int StrokeAngle
         {
             get => _strokeAngle;
-            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.StrokeAngle = value);
+            set => ChangeProperty(
+                // todo old
+                //GroundLine.GetGroundLineFromEntity,
+                EntityReaderFactory.Instance.GetFromEntity<GroundLine>,
+                groundLine => groundLine.StrokeAngle = value);
         }
 
         private int _space;
         public int Space
         {
             get => _space;
-            set => ChangeProperty(GroundLine.GetGroundLineFromEntity, groundLine => groundLine.Space = value);
+            set => ChangeProperty(
+                // todo old
+                //GroundLine.GetGroundLineFromEntity, 
+                EntityReaderFactory.Instance.GetFromEntity<GroundLine>,
+                groundLine => groundLine.Space = value);
         }
   
         public override void Update(BlockReference blockReference)
@@ -110,11 +137,10 @@ namespace mpESKD.Functions.mpGroundLine.Properties
                 BlkRefObjectId = ObjectId.Null;
                 return;
             }
-            var groundLine = GroundLine.GetGroundLineFromEntity(blockReference);
+            //var groundLine = GroundLine.GetGroundLineFromEntity(blockReference);
+            var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(blockReference);
             if (groundLine != null)
             {
-                //todo old
-                //_style = GroundLineStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(groundLine.StyleGuid))?.Name;
                 _style = StyleManager.GetStyles<GroundLineStyle>().FirstOrDefault(s => s.Guid.Equals(groundLine.StyleGuid))?.Name;
                 _firstStrokeOffset = GroundLinePropertiesHelpers.GetLocalFirstStrokeOffsetName(groundLine.FirstStrokeOffset);
                 _strokeLength = groundLine.StrokeLength;

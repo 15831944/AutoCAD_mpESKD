@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Functions.mpBreakLine
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -13,6 +14,7 @@
     using Styles;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -34,6 +36,9 @@
 
             // создание файла хранения стилей, если отсутствует
             StyleManager.CheckStylesFile<BreakLineStyle>();
+            StyleManager.LoadStylesFromXmlFile(
+                BreakLineStyle.Instance.CreateSystemStyles<BreakLineStyle>(),
+                BreakLineStyle.Instance.ParseStyleFromXElement<BreakLineStyle>);
         }
         public void Terminate()
         {
@@ -74,7 +79,10 @@
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(BreakLineFunction.MPCOEntName);
                 // add layer from style
-                var style = BreakLineStyleManager.GetCurrentStyle();
+                BreakLineStyle style = StyleManager.GetCurrentStyle(
+                    BreakLineStyle.Instance.CreateSystemStyles<BreakLineStyle>(),
+                    BreakLineStyle.Instance.ParseStyleFromXElement<BreakLineStyle>);
+
                 var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,
                     BreakLineProperties.LayerName.DefaultValue);
                 var breakLine = new BreakLine(style)

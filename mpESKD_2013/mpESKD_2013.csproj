@@ -81,7 +81,9 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\Attributes.cs" />
     <Compile Include="Base\BasePropertiesData.cs" />
+    <Compile Include="Base\EntityReaderFactory.cs" />
     <Compile Include="Base\Enums\BreakLineType.cs" />
     <Compile Include="Base\Enums\EntityDirection.cs" />
     <Compile Include="Base\Enums\GroundLineFirstStrokeOffset.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Base\Properties\Converters\ValidationRules.cs" />
     <Compile Include="Base\Properties\Converters\ValueConverters.cs" />
     <Compile Include="Base\Properties\Converters\TextInputToVisibilityConverterForInt.cs" />
+    <Compile Include="Base\Properties\EntityPropertyData.cs" />
     <Compile Include="Base\Properties\PaletteSettings.xaml.cs">
       <DependentUpon>PaletteSettings.xaml</DependentUpon>
     </Compile>

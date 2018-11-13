@@ -6,6 +6,8 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Functions.mpBreakLine.Overrules
 {
+    using Base;
+
     public class BreakLineObjectOverrule : ObjectOverrule
     {
         protected static BreakLineObjectOverrule _breakLineObjectOverrule;
@@ -30,7 +32,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                     {
-                        var breakLine = BreakLine.GetBreakLineFromEntity((Entity)dbObject);
+                        var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>((Entity)dbObject);
                         if (breakLine != null)
                         {
                             breakLine.UpdateEntities();

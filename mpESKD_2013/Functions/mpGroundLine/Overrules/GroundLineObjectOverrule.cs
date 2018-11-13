@@ -3,6 +3,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
+    using Base;
     using Base.Helpers;
     using ModPlusAPI.Windows;
 
@@ -30,7 +31,9 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                         {
-                            GroundLine groundLine = GroundLine.GetGroundLineFromEntity((Entity)dbObject);
+                            //todo old
+                            //GroundLine groundLine = GroundLine.GetGroundLineFromEntity((Entity)dbObject);
+                            var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>((Entity)dbObject);
                             if (groundLine != null)
                             {
                                 groundLine.UpdateEntities();

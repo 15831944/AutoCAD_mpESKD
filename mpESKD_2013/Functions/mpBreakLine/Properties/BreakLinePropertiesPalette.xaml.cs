@@ -13,6 +13,7 @@ using mpESKD.Functions.mpBreakLine.Styles;
 namespace mpESKD.Functions.mpBreakLine.Properties
 {
     using Base.Enums;
+    using Base.Styles;
 
     public partial class BreakLinePropertiesPalette
     {
@@ -24,12 +25,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
             InitializeComponent();
             ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             // styles
-            var sNames = new List<string>();
-            foreach (var style in BreakLineStyleManager.Styles)
-            {
-                sNames.Add(style.Name);
-            }
-            CbStyle.ItemsSource = sNames;
+            CbStyle.ItemsSource = StyleManager.GetStyles<BreakLineStyle>().Select(s => s.Name);
 
             CbBreakLineType.ItemsSource = BreakLineTypeHelper.LocalNames;
             // get list of scales

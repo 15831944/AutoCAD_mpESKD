@@ -10,6 +10,8 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Functions.mpBreakLine.Overrules
 {
+    using Base;
+
     /// <summary>Класс, создающий и обрабатывающий переопределение ручек</summary>
     public class BreakLineGripPointsOverrule : GripOverrule
     {
@@ -49,7 +51,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                     // Получаем экземпляр класса, который описывает как должен выглядеть примитив
                     // т.е. правила построения графики внутри блока
                     // Информация собирается по XData и свойствам самого блока
-                    var breakLine = BreakLine.GetBreakLineFromEntity(entity);
+                    var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(entity);
                     // Паранойя программиста =)
                     if (breakLine != null)
                     {

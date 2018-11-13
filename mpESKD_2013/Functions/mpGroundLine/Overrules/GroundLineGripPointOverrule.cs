@@ -6,6 +6,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
+    using Base;
     using Base.Helpers;
     using Base.Overrules;
     using ModPlusAPI;
@@ -37,7 +38,9 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     // Получаем экземпляр класса, который описывает как должен выглядеть примитив
                     // т.е. правила построения графики внутри блока
                     // Информация собирается по XData и свойствам самого блока
-                    var groundLine = GroundLine.GetGroundLineFromEntity(entity);
+                    //todo old
+                    //var groundLine = GroundLine.GetGroundLineFromEntity(entity);
+                    var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(entity);
                     if (groundLine != null)
                     {
                         Vector3d val = new Vector3d(entity.GetPlane(), Vector2d.XAxis);

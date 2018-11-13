@@ -8,6 +8,8 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Functions.mpBreakLine.Overrules
 {
+    using Base;
+
     public class BreakLineOsnapOverrule : OsnapOverrule
     {
         protected static BreakLineOsnapOverrule _breakLineOsnapOverrule;
@@ -28,7 +30,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             {
                 try
                 {
-                    var breakLine = BreakLine.GetBreakLineFromEntity(entity);
+                    var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(entity);
                     if (breakLine != null)
                     {
                         snapPoints.Add(breakLine.InsertionPoint);

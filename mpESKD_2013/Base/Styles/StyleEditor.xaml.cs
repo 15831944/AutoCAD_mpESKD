@@ -66,7 +66,7 @@
                 FunctionLocalName = BreakLineFunction.MPCOEntDisplayName,
                 FunctionName = BreakLineFunction.MPCOEntName
             };
-            var breakLineStyles = BreakLineStyleManager.GetStylesForEditor();
+            var breakLineStyles = BreakLineStyleForEditor.GetStylesForEditor();
             foreach (BreakLineStyleForEditor style in breakLineStyles)
             {
                 style.Parent = styleToBind;
@@ -82,7 +82,7 @@
                 FunctionLocalName = AxisFunction.MPCOEntDisplayName,
                 FunctionName = AxisFunction.MPCOEntName
             };
-            var axisStyles = AxisStyleManager.GetStylesForEditor();
+            var axisStyles = AxisStyleForEditor.GetStylesForEditor();
             foreach (AxisStyleForEditor style in axisStyles)
             {
                 style.Parent = styleToBind;
@@ -99,8 +99,6 @@
                 FunctionLocalName = GroundLineFunction.MPCOEntDisplayName,
                 FunctionName = GroundLineFunction.MPCOEntName
             };
-            //todo old
-            //var groundLineStyles = GroundLineStyleManager.GetStylesForEditor();
             var groundLineStyles = GroundLineStyleForEditor.GetStylesForEditor();
             foreach (GroundLineStyleForEditor style in groundLineStyles)
             {
@@ -300,23 +298,31 @@
             }
             // save styles
             // break line style
-            BreakLineStyleManager.SaveStylesToXml(
+            StyleManager.SaveStylesToXml<BreakLineStyle, BreakLineStyleForEditor>(
                 _styles.Single(s => s.FunctionName == BreakLineFunction.MPCOEntName)
-                    .Styles.Where(s => s.CanEdit).Cast<BreakLineStyleForEditor>().ToList());
+                    .Styles.Where(s => s.CanEdit).Cast<BreakLineStyleForEditor>().ToList(),
+                BreakLineStyleForEditor.ConvertStyleForEditorToXElement);
+            StyleManager.ReloadStyles(
+                BreakLineStyle.Instance.CreateSystemStyles<BreakLineStyle>(),
+                BreakLineStyle.Instance.ParseStyleFromXElement<BreakLineStyle>);
+
             // axis styles
-            AxisStyleManager.SaveStylesToXml(
+            StyleManager.SaveStylesToXml<AxisStyle, AxisStyleForEditor>(
                 _styles.Single(s => s.FunctionName == AxisFunction.MPCOEntName)
-                    .Styles.Where(s => s.CanEdit).Cast<AxisStyleForEditor>().ToList());
+                    .Styles.Where(s => s.CanEdit).Cast<AxisStyleForEditor>().ToList(),
+                AxisStyleForEditor.ConvertStyleForEditorToXElement);
+            StyleManager.ReloadStyles(
+                AxisStyle.Instance.CreateSystemStyles<AxisStyle>(),
+                AxisStyle.Instance.ParseStyleFromXElement<AxisStyle>);
+            
             // ground line styles
             StyleManager.SaveStylesToXml<GroundLineStyle, GroundLineStyleForEditor>(
                 _styles.Single(s => s.FunctionName == GroundLineFunction.MPCOEntName)
                     .Styles.Where(s => s.CanEdit).Cast<GroundLineStyleForEditor>().ToList(),
                 GroundLineStyleForEditor.ConvertStyleForEditorToXElement);
-            StyleManager.ReloadStyles(GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(), GroundLineStyle.Instance.ParseStyleFromXElement);
-            // todo old
-            ////GroundLineStyleManager.SaveStylesToXml(
-            ////    _styles.Single(s => s.FunctionName == GroundLineFunction.MPCOEntName)
-            ////        .Styles.Where(s => s.CanEdit).Cast<GroundLineStyleForEditor>().ToList());
+            StyleManager.ReloadStyles(
+                GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(), 
+                GroundLineStyle.Instance.ParseStyleFromXElement<GroundLineStyle>);
         }
 
         private void BtExpandCollapseImage_OnMouseEnter(object sender, MouseEventArgs e)
@@ -410,7 +416,7 @@
         private string AddStyleFromBreakLine(BlockReference blkReference)
         {
             var styleGuid = string.Empty;
-            var breakLine = BreakLine.GetBreakLineFromEntity(blkReference);
+            var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(blkReference);
             if (breakLine != null)
             {
                 var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == BreakLineFunction.MPCOEntName);
@@ -484,7 +490,9 @@
         private string AddStyleFromGroundLine(BlockReference blkReference)
         {
             var styleGuid = string.Empty;
-            var groundLine = GroundLine.GetGroundLineFromEntity(blkReference);
+            //todo old
+            //var groundLine = GroundLine.GetGroundLineFromEntity(blkReference);
+            var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(blkReference);
             if (groundLine != null)
             {
                 var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == GroundLineFunction.MPCOEntName);

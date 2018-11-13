@@ -5,6 +5,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
+    using Base;
     using Base.Helpers;
     using ModPlusAPI.Windows;
 
@@ -29,7 +30,9 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             {
                 try
                 {
-                    var groundLine = GroundLine.GetGroundLineFromEntity(entity);
+                    // todo old
+                    // GroundLine.GetGroundLineFromEntity(entity);
+                    var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(entity); 
                     if (groundLine != null)
                     {
                         snapPoints.Add(groundLine.InsertionPoint);

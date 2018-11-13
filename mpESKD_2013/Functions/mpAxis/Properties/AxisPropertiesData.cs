@@ -9,6 +9,7 @@ namespace mpESKD.Functions.mpAxis.Properties
     using Styles;
     using ModPlusAPI;
     using Base;
+    using Base.Styles;
 
     public class AxisPropertiesData : BasePropertiesData
     {
@@ -27,7 +28,8 @@ namespace mpESKD.Functions.mpAxis.Properties
         {
             get => _style;
             set => ChangeStyleProperty(Axis.GetAxisFromEntity, 
-                AxisStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value)));
+                StyleManager.GetStyles<AxisStyle>().FirstOrDefault(s => s.Name.Equals(value)));
+                //AxisStyleManager.Styles.FirstOrDefault(s => s.Name.Equals(value)));
         }
 
         private string _scale;
@@ -314,7 +316,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             var axis = Axis.GetAxisFromEntity(blkReference);
             if (axis != null)
             {
-                _style = AxisStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(axis.StyleGuid))?.Name;
+                //_style = AxisStyleManager.Styles.FirstOrDefault(s => s.Guid.Equals(axis.StyleGuid))?.Name;
+                _style = StyleManager.GetStyles<AxisStyle>().FirstOrDefault(s => s.Guid.Equals(axis.StyleGuid))?.Name;
                 _markersCount = axis.MarkersCount;
                 _markersDiameter = axis.MarkersDiameter;
                 _firstMarkerType = axis.FirstMarkerType == 0

@@ -15,6 +15,8 @@ using Visibility = System.Windows.Visibility;
 
 namespace mpESKD.Functions.mpAxis.Properties
 {
+    using Base.Styles;
+
     public partial class AxisPropertiesPalette
     {
         private readonly PropertiesPalette _parentPalette;
@@ -25,12 +27,8 @@ namespace mpESKD.Functions.mpAxis.Properties
             InitializeComponent();
             ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             // styles
-            var sNames = new List<string>();
-            foreach (var style in AxisStyleManager.Styles)
-            {
-                sNames.Add(style.Name);
-            }
-            CbStyle.ItemsSource = sNames;
+            CbStyle.ItemsSource = StyleManager.GetStyles<AxisStyle>().Select(s => s.Name);
+
             // markers positions
             CbMarkersPosition.ItemsSource = AxisPropertiesHelpers.AxisMarkersTypeLocalNames;
             // get list of scales

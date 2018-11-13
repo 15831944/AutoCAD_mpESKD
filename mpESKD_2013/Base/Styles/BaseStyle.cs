@@ -10,6 +10,7 @@ namespace mpESKD.Base.Styles
     using System.Xml.Linq;
     using Properties;
     using ModPlusAPI;
+    using ModPlusAPI.Annotations;
 
     public abstract class MPCOStyle
     {
@@ -17,21 +18,56 @@ namespace mpESKD.Base.Styles
         {
             Properties = new List<MPCOBaseProperty>();
         }
+
+        /// <summary>
+        /// Имя стиля
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Имя функции
+        /// </summary>
         public string FunctionName { get; set; }
 
+        /// <summary>
+        /// Описание стиля
+        /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// Идентификатор стиля
+        /// </summary>
         public string Guid { get; set; }
 
+        /// <summary>
+        /// Тип стиля (системный, пользовательский)
+        /// </summary>
         public MPCOStyleType StyleType { get; set; }
 
+        /// <summary>
+        /// Xml данные слоя
+        /// </summary>
         public XElement LayerXmlData { get; set; }
 
-        public List<MPCOBaseProperty> Properties { get; set; }
+        /// <summary>
+        /// Xml данные текстового стиля (может быть null)
+        /// </summary>
+        [CanBeNull]
+        public XElement TextStyleXmlData { get; set; }
 
+        /// <summary>
+        /// Свойства
+        /// </summary>
+        public List<MPCOBaseProperty> Properties { get; set; }
+        
+        /// <summary>
+        /// Создание системных стилей для указанного типа стиля
+        /// </summary>
+        /// <typeparam name="T">Тип стиля</typeparam>
+        /// <returns></returns>
         public abstract List<T> CreateSystemStyles<T>() where T : MPCOStyle;
+
+        public abstract T ParseStyleFromXElement<T>(XElement styleXel) where T : MPCOStyle, new();
     }
 
     /// <inheritdoc />
@@ -114,6 +150,8 @@ namespace mpESKD.Base.Styles
         public string Guid { get; set; }
 
         public XElement LayerXmlData { get; set; }
+
+        public XElement TextStyleXmlData { get; set; }
 
         #region Common properties
 

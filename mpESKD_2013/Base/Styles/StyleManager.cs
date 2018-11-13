@@ -161,6 +161,10 @@
                     var layerData = styleXel.Element("LayerTableRecord");
                     style.LayerXmlData = layerData ?? null;
                     
+                    // get text style
+                    var textStyleData = styleXel.Element("TextStyleTableRecord");
+                    style.TextStyleXmlData = textStyleData ?? null;
+
                     // add style
                     styleMapItem.Styles.Add(style);
                 }

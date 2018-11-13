@@ -428,22 +428,5 @@
                 ExceptionBox.Show(exception);
             }
         }
-        
-        public static BreakLine GetBreakLineFromEntity(Entity ent)
-        {
-            using (ResultBuffer resBuf = ent.GetXDataForApplication(BreakLineFunction.MPCOEntName))
-            {
-                // В случае команды ОТМЕНА может вернуть null
-                if (resBuf == null) return null;
-                BreakLine breakLine = new BreakLine(ent.ObjectId);
-                // Получаем параметры из самого блока
-                // ОБЯЗАТЕЛЬНО СНАЧАЛА ИЗ БЛОКА!!!!!!
-                breakLine.GetParametersFromEntity(ent);
-                // Получаем параметры из XData
-                breakLine.GetParametersFromResBuf(resBuf);
-
-                return breakLine;
-            }
-        }
     }
 }

@@ -23,7 +23,7 @@ namespace mpESKD.Base.Properties
             StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
             AcadHelpers.Documents.DocumentCreated += Documents_DocumentCreated;
             AcadHelpers.Documents.DocumentActivated += Documents_DocumentActivated;
-            
+
             foreach (Document document in AcadHelpers.Documents)
             {
                 document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
@@ -31,7 +31,7 @@ namespace mpESKD.Base.Properties
             if (AcadHelpers.Document != null)
                 ShowPropertiesControlsBySelection();
         }
-        
+
         private void Documents_DocumentActivated(object sender, DocumentCollectionEventArgs e)
         {
             if (e.Document != null)
@@ -75,9 +75,9 @@ namespace mpESKD.Base.Properties
                     MainStaticSettings.Settings.MaxSelectedObjects >= psr.Value.Count)
                 {
                     StckMaxObjectsSelectedMessage.Visibility = Visibility.Collapsed;
-                    foreach (SelectedObject selectedObject in psr.Value)
+                    using (OpenCloseTransaction tr = new OpenCloseTransaction())
                     {
-                        using (OpenCloseTransaction tr = new OpenCloseTransaction())
+                        foreach (SelectedObject selectedObject in psr.Value)
                         {
                             var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                             if (obj is BlockReference)
@@ -85,6 +85,7 @@ namespace mpESKD.Base.Properties
                                 ShowPropertiesForObject(obj);
                             }
                         }
+                        tr.Commit();
                     }
                 }
                 else StckMaxObjectsSelectedMessage.Visibility = Visibility.Visible;

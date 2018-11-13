@@ -21,6 +21,11 @@
     {
         #region Constructor
 
+        public GroundLine()
+        {
+            
+        }
+
         /// <summary>Инициализация экземпляра класса для GroundLine без заполнения данными
         /// В данном случае уже все данные получены и нужно только "построить" 
         /// базовые примитивы</summary>
@@ -69,7 +74,7 @@
         }
 
         private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
-        
+
         #endregion
 
         #region Properties
@@ -103,6 +108,9 @@
         /// Отступ группы штрихов
         /// </summary>
         public int Space { get; set; } = GroundLineProperties.Space.DefaultValue;
+
+        [EntityProperty("Geometry", nameof(TestProperty), "Display name of prop", "some description", typeof(int), 15, 1, 20)]
+        public int TestProperty { get; set; } = 10;
 
         #endregion
 
@@ -336,9 +344,6 @@
 
         #region Style
 
-        /////// <summary>Идентификатор стиля</summary>
-        ////public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
-
         public override void ApplyStyle(MPCOStyle style)
         {
             // apply settings from style
@@ -359,28 +364,6 @@
             var lineType = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LineType.Name, GroundLineProperties.LineType.DefaultValue);
             AcadHelpers.SetLineType(BlockId, lineType);
         }
-
-        /////// <summary>Применение стиля по сути должно переопределять текущие параметры</summary>
-        ////public override void ApplyStyle(GroundLineStyle style)
-        ////{
-        ////    // apply settings from style
-        ////    FirstStrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(FirstStrokeOffset), GroundLineProperties.FirstStrokeOffset.DefaultValue);
-        ////    StrokeLength = StyleHelpers.GetPropertyValue(style, nameof(StrokeLength), GroundLineProperties.StrokeLength.DefaultValue);
-        ////    StrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(StrokeOffset), GroundLineProperties.StrokeOffset.DefaultValue);
-        ////    StrokeAngle = StyleHelpers.GetPropertyValue(style, nameof(StrokeAngle), GroundLineProperties.StrokeAngle.DefaultValue);
-        ////    Space = StyleHelpers.GetPropertyValue(style, nameof(Space), GroundLineProperties.Space.DefaultValue);
-        ////    // general
-        ////    Scale = MainStaticSettings.Settings.UseScaleFromStyle
-        ////        ? StyleHelpers.GetPropertyValue(style, nameof(Scale), GroundLineProperties.Scale.DefaultValue)
-        ////        : AcadHelpers.Database.Cannoscale;
-        ////    LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), GroundLineProperties.LineTypeScale.DefaultValue);
-        ////    // set layer
-        ////    var layerName = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LayerName.Name, GroundLineProperties.LayerName.DefaultValue);
-        ////    AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
-        ////    // set line type
-        ////    var lineType = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LineType.Name, GroundLineProperties.LineType.DefaultValue);
-        ////    AcadHelpers.SetLineType(BlockId, lineType);
-        ////}
 
         #endregion
 
@@ -420,6 +403,8 @@
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeOffset)); // 1
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeAngle)); // 2
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Space)); // 3
+                //todo test
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, TestProperty)); // 4
 
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
@@ -477,26 +462,30 @@
                                 break;
                             }
                         case DxfCode.ExtendedDataInteger16:
-                        {
-                            switch (index1070)
                             {
-                                case 0:
-                                    StrokeLength = (Int16)typedValue.Value;
-                                    break;
-                                case 1:
-                                    StrokeOffset = (Int16)typedValue.Value;
-                                    break;
-                                case 2:
-                                    StrokeAngle = (Int16)typedValue.Value;
-                                    break;
-                                case 3:
-                                    Space = (Int16)typedValue.Value;
-                                    break;
+                                switch (index1070)
+                                {
+                                    case 0:
+                                        StrokeLength = (Int16)typedValue.Value;
+                                        break;
+                                    case 1:
+                                        StrokeOffset = (Int16)typedValue.Value;
+                                        break;
+                                    case 2:
+                                        StrokeAngle = (Int16)typedValue.Value;
+                                        break;
+                                    case 3:
+                                        Space = (Int16)typedValue.Value;
+                                        break;
+                                    //todo test
+                                    case 4:
+                                        TestProperty = (Int16)typedValue.Value;
+                                        break;
                                 }
-                            //index
-                            index1070++;
-                            break;
-                        }
+                                //index
+                                index1070++;
+                                break;
+                            }
                         case DxfCode.ExtendedDataReal:
                             {
                                 if (index1040 == 0) // 0 - LineTypeScale
@@ -521,23 +510,6 @@
             catch (Exception exception)
             {
                 ExceptionBox.Show(exception);
-            }
-        }
-        
-        public static GroundLine GetGroundLineFromEntity(Entity ent)
-        {
-            using (ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineFunction.MPCOEntName))
-            {
-                // В случае команды ОТМЕНА может вернуть null
-                if (resBuf == null) return null;
-                GroundLine groundLine = new GroundLine(ent.ObjectId);
-                // Получаем параметры из самого блока
-                // ОБЯЗАТЕЛЬНО СНАЧАЛА ИЗ БЛОКА!!!!!!
-                groundLine.GetParametersFromEntity(ent);
-                // Получаем параметры из XData
-                groundLine.GetParametersFromResBuf(resBuf);
-
-                return groundLine;
             }
         }
     }

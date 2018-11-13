@@ -1,6 +1,8 @@
 ﻿// ReSharper disable InconsistentNaming
 namespace mpESKD.Base.Properties
 {
+    using System;
+
     public interface IGeneralProperties
     {
         /// <summary>
@@ -29,26 +31,15 @@ namespace mpESKD.Base.Properties
         string LayerName { get; set; }
     }
 
-    public class MPCOBaseProperty
+    public abstract class MPCOBaseProperty
     {
         public string Name { get; set; }
-        public string DisplayName { get; set; }
-        public string Description { get; set; }
-        public MPCOPropertyType PropertyType { get; set; }
 
-        public MPCOPropertyType GePropertyTypeByString(string type)
-        {
-            if (type == "Int")
-                return MPCOPropertyType.Int;
-            if (type == "Double")
-                return MPCOPropertyType.Double;
-            if (type == "Type")
-                return MPCOPropertyType.Type;
-            if (type == "Bool")
-                return MPCOPropertyType.Bool;
-            // or string
-            return MPCOPropertyType.String;
-        }
+        public string DisplayName { get; set; }
+        
+        public string Description { get; set; }
+        
+        public MPCOPropertyType PropertyType { get; set; }
     }
 
     public class MPCOStringProperty : MPCOBaseProperty
@@ -57,8 +48,22 @@ namespace mpESKD.Base.Properties
         {
             PropertyType = MPCOPropertyType.String;
         }
+
         public string Value { get; set; }
+        
         public string DefaultValue { get; set; }
+
+        public MPCOStringProperty Clone(bool useDefaultValue)
+        {
+            return new MPCOStringProperty
+            {
+                Name = Name,
+                DisplayName = DisplayName,
+                Description = Description,
+                Value = useDefaultValue ? DefaultValue : Value,
+                DefaultValue = DefaultValue
+            };
+        }
     }
 
     public class MPCOIntProperty : MPCOBaseProperty
@@ -67,10 +72,28 @@ namespace mpESKD.Base.Properties
         {
             PropertyType = MPCOPropertyType.Int;
         }
+        
         public int Value { get; set; }
+
         public int DefaultValue { get; set; }
+        
         public int Minimum { get; set; }
+        
         public int Maximum { get; set; }
+
+        public MPCOIntProperty Clone(bool useDefaultValue)
+        {
+            return new MPCOIntProperty
+            {
+                Name = Name,
+                DisplayName = DisplayName,
+                Description = Description,
+                Value = useDefaultValue ? DefaultValue : Value,
+                DefaultValue = DefaultValue,
+                Minimum = Minimum,
+                Maximum = Maximum
+            };
+        }
     }
 
     public class MPCODoubleProperty : MPCOBaseProperty
@@ -79,10 +102,28 @@ namespace mpESKD.Base.Properties
         {
             PropertyType = MPCOPropertyType.Double;
         }
+        
         public double Value { get; set; }
+        
         public double DefaultValue { get; set; }
+        
         public double Minimum { get; set; }
+        
         public double Maximum { get; set; }
+
+        public MPCODoubleProperty Clone(bool useDefaultValue)
+        {
+            return new MPCODoubleProperty
+            {
+                Name = Name,
+                DisplayName = DisplayName,
+                Description = Description,
+                Value = useDefaultValue ? DefaultValue : Value,
+                DefaultValue = DefaultValue,
+                Minimum = Minimum,
+                Maximum = Maximum
+            };
+        }
     }
 
     public class MPCOBoolProperty : MPCOBaseProperty
@@ -91,8 +132,22 @@ namespace mpESKD.Base.Properties
         {
             PropertyType = MPCOPropertyType.Bool;
         }
+
         public bool Value { get; set; }
+        
         public bool DefaultValue { get; set; }
+
+        public MPCOBoolProperty Clone(bool useDefaultValue)
+        {
+            return new MPCOBoolProperty
+            {
+                Name = Name,
+                DisplayName = DisplayName,
+                Description = Description,
+                Value = useDefaultValue ? DefaultValue : Value,
+                DefaultValue = DefaultValue
+            };
+        }
     }
 
     public class MPCOTypeProperty<T> : MPCOBaseProperty
@@ -101,13 +156,22 @@ namespace mpESKD.Base.Properties
         {
             PropertyType = MPCOPropertyType.Type;
         }
-        public T Value { get; set; }
-        public T DefaultValue { get; set; }
-    }
 
-    public class MPCOScaleProperty : MPCOBaseProperty
-    {
-        public string ScaleName { get; set; }
+        public T Value { get; set; }
+        
+        public T DefaultValue { get; set; }
+
+        public MPCOTypeProperty<T> Clone(bool useDefaultValue)
+        {
+            return new MPCOTypeProperty<T>
+            {
+                Name = Name,
+                DisplayName = DisplayName,
+                Description = Description,
+                Value = useDefaultValue ? DefaultValue : Value,
+                DefaultValue = DefaultValue
+            };
+        }
     }
 
     public enum MPCOPropertyType

@@ -31,8 +31,11 @@
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance(), true);
             Overrule.Overruling = true;
 
-            //// создание файла хранения стилей, если отсутствует
+            // создание файла хранения стилей, если отсутствует
             StyleManager.CheckStylesFile<AxisStyle>();
+            StyleManager.LoadStylesFromXmlFile(
+                AxisStyle.Instance.CreateSystemStyles<AxisStyle>(),
+                AxisStyle.Instance.ParseStyleFromXElement<AxisStyle>);
         }
 
         public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location, Transaction tr)
@@ -155,11 +158,13 @@
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(AxisFunction.MPCOEntName);
                 
-                // add layer from style
-                var style = AxisStyleManager.GetCurrentStyle();
-                
+                AxisStyle style = StyleManager.GetCurrentStyle(
+                    AxisStyle.Instance.CreateSystemStyles<AxisStyle>(),
+                    AxisStyle.Instance.ParseStyleFromXElement<AxisStyle>);
+
                 // создание текстового стиля в документе нужно произвести до создания примитива
                 AxisFunction.CreateTextStyleFromStyle(style);
+                // add layer from style
                 var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name,
                     AxisProperties.LayerName.DefaultValue);
                 var axisLastHorizontalValue = string.Empty;

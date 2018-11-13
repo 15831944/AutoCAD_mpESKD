@@ -81,8 +81,14 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\mpESKD_2013\Base\Attributes.cs">
+      <Link>Base\Attributes.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\BasePropertiesData.cs">
       <Link>Base\BasePropertiesData.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\EntityReaderFactory.cs">
+      <Link>Base\EntityReaderFactory.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\BreakLineType.cs">
       <Link>Base\Enums\BreakLineType.cs</Link>
@@ -156,6 +162,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Properties\Converters\ValueConverters.cs">
       <Link>Base\Properties\Converters\ValueConverters.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Properties\EntityPropertyData.cs">
+      <Link>Base\Properties\EntityPropertyData.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Properties\PaletteSettings.xaml.cs">
       <Link>Base\Properties\PaletteSettings.xaml.cs</Link>

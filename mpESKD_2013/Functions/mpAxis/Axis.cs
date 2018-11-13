@@ -1490,21 +1490,21 @@
             }
         }
         
-        public static Axis GetAxisFromEntity(Entity ent)
-        {
-            using (ResultBuffer resBuf = ent.GetXDataForApplication(AxisFunction.MPCOEntName))
-            {
-                // В случае команды ОТМЕНА может вернуть null
-                if (resBuf == null) return null;
-                Axis axis = new Axis(ent.ObjectId);
-                // Получаем параметры из самого блока
-                // ОБЯЗАТЕЛЬНО СНАЧАЛА ИЗ БЛОКА!!!!!!
-                axis.GetParametersFromEntity(ent);
-                // Получаем параметры из XData
-                axis.GetParametersFromResBuf(resBuf);
+        //public static Axis GetAxisFromEntity(Entity ent)
+        //{
+        //    using (ResultBuffer resBuf = ent.GetXDataForApplication(AxisFunction.MPCOEntName))
+        //    {
+        //        // В случае команды ОТМЕНА может вернуть null
+        //        if (resBuf == null) return null;
+        //        Axis axis = new Axis(ent.ObjectId);
+        //        // Получаем параметры из самого блока
+        //        // ОБЯЗАТЕЛЬНО СНАЧАЛА ИЗ БЛОКА!!!!!!
+        //        axis.GetParametersFromEntity(ent);
+        //        // Получаем параметры из XData
+        //        axis.GetParametersFromResBuf(resBuf);
 
-                return axis;
-            }
-        }
+        //        return axis;
+        //    }
+        //}
     }
 }
