@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS0618
+//todo remove it
 namespace mpESKD.Base
 {
     using System;

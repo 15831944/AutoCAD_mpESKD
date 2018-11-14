@@ -155,12 +155,16 @@
         public double AxisMinLength => 1.0;
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 3, nameof(LineType), "p19", "d19", "Continuous", null, null)]
+        [EntityProperty(PropertiesCategory.General, 4, nameof(LineType), "p19", "d19", "Continuous", null, null)]
         public override string LineType { get; set; }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 4, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99)]
+        [EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99)]
         public override double LineTypeScale { get; set; }
+
+        /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null)]
+        public override string TextStyle { get; set; }
 
         #endregion
 
@@ -184,7 +188,8 @@
         public int OrientMarkerType { get; set; } = 0;
 
         // текст и текстовые значения
-        public string TextStyle { get; set; } = AxisProperties.TextStyle.DefaultValue;
+        //todo remove
+        //public string TextStyle { get; set; } = AxisProperties.TextStyle.DefaultValue;
         public double TextHeight { get; set; }
         public string FirstTextPrefix { get; set; } = string.Empty;
         public string FirstText { get; set; } = string.Empty;

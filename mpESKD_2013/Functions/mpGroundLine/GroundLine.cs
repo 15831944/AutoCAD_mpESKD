@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Reflection;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
@@ -15,7 +16,7 @@
     using Properties;
     using Styles;
 
-    public class GroundLine : IntellectualEntity //todo implement : IGeneralProperties
+    public class GroundLine : IntellectualEntity
     {
         #region Constructor
         
@@ -109,12 +110,16 @@
         public int Space { get; set; } = GroundLineProperties.Space.DefaultValue;
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 3, nameof(LineType), "p35", "d35", "Continuous", null, null)]
+        [EntityProperty(PropertiesCategory.General, 4, nameof(LineType), "p35", "d35", "Continuous", null, null)]
         public override string LineType { get; set; }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 4, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99)]
+        [EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99)]
         public override double LineTypeScale { get; set; }
+
+        /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null, PropertyScope.None)]
+        public override string TextStyle { get; set; }
 
         #endregion
 
@@ -348,6 +353,7 @@
 
         #region Style
 
+        //todo remove after implement intellectual style
         public override void ApplyStyle(MPCOStyle style)
         {
             // apply settings from style

@@ -1,4 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
+//todo remove this all
 namespace mpESKD.Base.Properties
 {
     using System;

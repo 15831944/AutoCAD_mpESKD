@@ -1,4 +1,5 @@
-﻿namespace mpESKD.Base.Styles
+﻿//todo remove it all after full(!) implement intellectual style
+namespace mpESKD.Base.Styles
 {
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System;

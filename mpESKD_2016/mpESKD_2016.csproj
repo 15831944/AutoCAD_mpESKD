@@ -169,11 +169,14 @@
     <Compile Include="..\mpESKD_2013\Base\Properties\Converters\ValueConverters.cs">
       <Link>Base\Properties\Converters\ValueConverters.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\EntityPropertyData.cs">
-      <Link>Base\Properties\EntityPropertyData.cs</Link>
+    <Compile Include="..\mpESKD_2013\Base\Properties\EntityPropertyProvider.cs">
+      <Link>Base\Properties\EntityPropertyProvider.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Properties\EnumPropertyValueConverter.cs">
       <Link>Base\Properties\EnumPropertyValueConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Properties\IntellectualEntityProperty.cs">
+      <Link>Base\Properties\IntellectualEntityProperty.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Properties\PaletteSettings.xaml.cs">
       <Link>Base\Properties\PaletteSettings.xaml.cs</Link>
@@ -203,6 +206,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Styles\Helpers.cs">
       <Link>Base\Styles\Helpers.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Styles\IntellectualEntityStyle.cs">
+      <Link>Base\Styles\IntellectualEntityStyle.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Styles\StyleEditor.xaml.cs">
       <Link>Base\Styles\StyleEditor.xaml.cs</Link>

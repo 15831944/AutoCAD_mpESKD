@@ -96,29 +96,36 @@
                     StckMaxObjectsSelectedMessage.Visibility = System.Windows.Visibility.Collapsed;
 
                     List<ObjectId> objectIds = new List<ObjectId>();
-                    using (OpenCloseTransaction tr = new OpenCloseTransaction())
+                    using (AcadHelpers.Document.LockDocument())
                     {
-                        foreach (SelectedObject selectedObject in psr.Value)
+                        using (OpenCloseTransaction tr = new OpenCloseTransaction())
                         {
-                            //todo Возможно стоит убрать транзакцию и заменить на id.GetObject или как там
-                            var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
-                            if (obj is BlockReference)
+                            foreach (SelectedObject selectedObject in psr.Value)
                             {
-                                objectIds.Add(selectedObject.ObjectId);
+                                var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
+                                if (obj is BlockReference)
+                                {
+                                    objectIds.Add(selectedObject.ObjectId);
+                                }
                             }
+
+                            tr.Commit();
                         }
-                        tr.Commit();
                     }
+
                     if (objectIds.Any())
                     {
-                        var summaryPropertyData = new SummaryPropertyCollection(objectIds);
-                        SetData(summaryPropertyData);
+                        SetData(new SummaryPropertyCollection(objectIds));
                     }
                 }
                 else StckMaxObjectsSelectedMessage.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
+        /// <summary>
+        /// Построение элементов в палитре по данным коллекции свойств
+        /// </summary>
+        /// <param name="collection"><see cref="SummaryPropertyCollection"/></param>
         public void SetData(SummaryPropertyCollection collection)
         {
             var entityGroups =
@@ -140,26 +147,20 @@
                 {
                     mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-                    Grid grid = new Grid();
+                    var grid = new Grid();
                     Grid.SetRow(grid, categoryIndex);
 
-                    RowDefinition headerRowDefinition = new RowDefinition { Height = GridLength.Auto };
-                    ColumnDefinition propertyNameColumnDefinition = new ColumnDefinition();
-                    propertyNameColumnDefinition.MinWidth = 50;
-                    BindingOperations.SetBinding(propertyNameColumnDefinition, WidthProperty, CreateBindingForColumnWidth());
-
-                    ColumnDefinition gridSplitterColumnDefinition = new ColumnDefinition() { Width = GridLength.Auto };
-                    ColumnDefinition propertyValueColumnDefinition = new ColumnDefinition();
-                    propertyValueColumnDefinition.MinWidth = 50;
+                    var headerRowDefinition = new RowDefinition { Height = GridLength.Auto };
+                    var firstColumn = new ColumnDefinition { MinWidth = 50 };
+                    BindingOperations.SetBinding(firstColumn, ColumnDefinition.WidthProperty, CreateBindingForColumnWidth());
+                    var secondColumn = new ColumnDefinition { Width = GridLength.Auto };
+                    var thirdColumn = new ColumnDefinition { MinWidth = 50 };
                     grid.RowDefinitions.Add(headerRowDefinition);
-                    grid.ColumnDefinitions.Add(propertyNameColumnDefinition);
-                    grid.ColumnDefinitions.Add(gridSplitterColumnDefinition);
-                    grid.ColumnDefinitions.Add(propertyValueColumnDefinition);
+                    grid.ColumnDefinitions.Add(firstColumn);
+                    grid.ColumnDefinitions.Add(secondColumn);
+                    grid.ColumnDefinitions.Add(thirdColumn);
 
-                    TextBox categoryHeader = new TextBox
-                    {
-                        Text = GetCategoryLocalizationName(summaryPropertiesGroup.Key)
-                    };
+                    TextBox categoryHeader = new TextBox { Text = GetCategoryLocalizationName(summaryPropertiesGroup.Key) };
                     Grid.SetRow(categoryHeader, 0);
                     Grid.SetColumn(categoryHeader, 0);
                     Grid.SetColumnSpan(categoryHeader, 3);
@@ -174,39 +175,22 @@
                         grid.RowDefinitions.Add(rowDefinition);
 
                         // property name
-                        TextBox propertyHeader = new TextBox();
-                        propertyHeader.Text = GetPropertyDisplayName(summaryProperty);
-                        propertyHeader.Style = Resources["PropertyNameTextBoxBase"] as Style;
-                        propertyHeader.Tag = GetPropertyDescription(summaryProperty);
-                        propertyHeader.GotFocus += _OnGotFocus;
-                        propertyHeader.LostFocus += _OnLostFocus;
+                        var propertyDescription = GetPropertyDescription(summaryProperty);
+                        var propertyHeader = new TextBox
+                        {
+                            Text = GetPropertyDisplayName(summaryProperty),
+                            Style = Resources["PropertyNameTextBoxBase"] as Style
+                        };
+                        SetDescription(propertyHeader, propertyDescription);
                         Grid.SetColumn(propertyHeader, 0);
                         Grid.SetRow(propertyHeader, j);
                         grid.Children.Add(propertyHeader);
 
                         IntellectualEntityProperty intellectualEntityProperty = summaryProperty.EntityPropertyDataCollection.FirstOrDefault();
 
-                        //todo add tags
                         if (intellectualEntityProperty != null)
                         {
-                            if (summaryProperty.PropertyName == "Scale")
-                            {
-                                try
-                                {
-                                    ComboBox cb = new ComboBox();
-                                    Grid.SetColumn(cb, 2);
-                                    Grid.SetRow(cb, j);
-                                    cb.ItemsSource = AcadHelpers.Scales;
-                                    cb.Style = Resources["PropertyValueComboBox"] as Style;
-                                    BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
-                                    grid.Children.Add(cb);
-                                }
-                                catch (Exception exception)
-                                {
-                                    ExceptionBox.Show(exception);
-                                }
-                            }
-                            else if (summaryProperty.PropertyName == "Style")
+                            if (summaryProperty.PropertyName == "Style")
                             {
                                 try
                                 {
@@ -216,6 +200,43 @@
                                     cb.ItemsSource = StyleManager.GetStyles(intellectualEntityProperty.EntityType.Name + "Style")
                                         .Select(s => s.Name);
                                     cb.Style = Resources["PropertyValueComboBox"] as Style;
+                                    SetDescription(cb, propertyDescription);
+                                    BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
+                                    grid.Children.Add(cb);
+                                }
+                                catch (Exception exception)
+                                {
+                                    ExceptionBox.Show(exception);
+                                }
+                            }
+                            else if (summaryProperty.PropertyName == "LayerName")
+                            {
+                                try
+                                {
+                                    ComboBox cb = new ComboBox();
+                                    Grid.SetColumn(cb, 2);
+                                    Grid.SetRow(cb, j);
+                                    cb.ItemsSource = AcadHelpers.Layers;
+                                    cb.Style = Resources["PropertyValueComboBox"] as Style;
+                                    SetDescription(cb, propertyDescription);
+                                    BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
+                                    grid.Children.Add(cb);
+                                }
+                                catch (Exception exception)
+                                {
+                                    ExceptionBox.Show(exception);
+                                }
+                            }
+                            else if (summaryProperty.PropertyName == "Scale")
+                            {
+                                try
+                                {
+                                    ComboBox cb = new ComboBox();
+                                    Grid.SetColumn(cb, 2);
+                                    Grid.SetRow(cb, j);
+                                    cb.ItemsSource = AcadHelpers.Scales;
+                                    cb.Style = Resources["PropertyValueComboBox"] as Style;
+                                    SetDescription(cb, propertyDescription);
                                     BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
                                     grid.Children.Add(cb);
                                 }
@@ -234,6 +255,7 @@
                                     tb.Cursor = Cursors.Hand;
                                     tb.Style = Resources["PropertyValueTextBox"] as Style;
                                     tb.PreviewMouseDown += LineType_OnPreviewMouseDown;
+                                    SetDescription(tb, propertyDescription);
                                     BindingOperations.SetBinding(tb, TextBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
                                     grid.Children.Add(tb);
                                 }
@@ -251,6 +273,7 @@
                                     Grid.SetRow(cb, j);
                                     cb.Style = Resources["PropertyValueComboBox"] as Style;
                                     var type = intellectualEntityProperty.Value.GetType();
+                                    SetDescription(cb, propertyDescription);
 
                                     // При первом чтении локализованных значений для свойства типа Enum
                                     // запоминаю прочитанные значения в словарь, чтобы в следующий раз не читать повторно
@@ -291,6 +314,7 @@
                                     tb.Minimum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Minimum).Cast<int>().Max();
                                     tb.Maximum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Maximum).Cast<int>().Min();
                                     tb.Style = Resources["PropertyValueIntTextBox"] as Style;
+                                    SetDescription(tb, propertyDescription);
                                     BindingOperations.SetBinding(tb, IntTextBox.ValueProperty, CreateTwoWayBindingForProperty(summaryProperty));
 
                                     grid.Children.Add(tb);
@@ -310,6 +334,7 @@
                                     tb.Minimum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Minimum).Cast<double>().Max();
                                     tb.Maximum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Maximum).Cast<double>().Min();
                                     tb.Style = Resources["PropertyValueDoubleTextBox"] as Style;
+                                    SetDescription(tb, propertyDescription);
                                     BindingOperations.SetBinding(tb, DoubleTextBox.ValueProperty, CreateTwoWayBindingForProperty(summaryProperty));
 
                                     grid.Children.Add(tb);
@@ -336,17 +361,39 @@
             }
         }
 
+        /// <summary>
+        /// Добавление описания свойства в тэг элемента и подписывание на события
+        /// </summary>
+        /// <param name="e">Элемент</param>
+        /// <param name="description">Описание свойства</param>
+        private void SetDescription(FrameworkElement e, string description)
+        {
+            e.Tag = description;
+            e.GotFocus += _OnGotFocus;
+            e.LostFocus += _OnLostFocus;
+        }
+
+        /// <summary>
+        /// Отображение описания свойства при получении элементом фокуса
+        /// </summary>
         private void _OnGotFocus(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element)
                 ShowDescription(element.Tag.ToString());
         }
 
+        /// <summary>
+        /// Очистка поля вывода описания свойства при пропадании фокуса с элемента
+        /// </summary>
         private void _OnLostFocus(object sender, RoutedEventArgs e)
         {
             ShowDescription(string.Empty);
         }
 
+        /// <summary>
+        /// Получение локализованного имени категории
+        /// </summary>
+        /// <param name="category">Категория</param>
         private string GetCategoryLocalizationName(PropertiesCategory category)
         {
             if (_categoryLocalizationNames.ContainsKey(category.ToString()))
@@ -375,6 +422,10 @@
             return category.ToString();
         }
 
+        /// <summary>
+        /// Получение локализованного (отображаемого) имени свойства
+        /// </summary>
+        /// <param name="summaryProperty">Суммарное свойство</param>
         private string GetPropertyDisplayName(SummaryProperty summaryProperty)
         {
             try
@@ -391,6 +442,10 @@
             return string.Empty;
         }
 
+        /// <summary>
+        /// Получение локализованного описания свойства
+        /// </summary>
+        /// <param name="summaryProperty">Суммарное свойство</param>
         private string GetPropertyDescription(SummaryProperty summaryProperty)
         {
             try
@@ -407,6 +462,10 @@
             return string.Empty;
         }
 
+        /// <summary>
+        /// Добавление в Grid разделителя GridSplitter
+        /// </summary>
+        /// <param name="rowSpan">Количество пересекаемых строк</param>
         private GridSplitter CreateGridSplitter(int rowSpan)
         {
             GridSplitter gridSplitter = new GridSplitter
@@ -422,6 +481,12 @@
             return gridSplitter;
         }
 
+        /// <summary>
+        /// Создание двусторонней привязки к суммарному свойству
+        /// </summary>
+        /// <param name="summaryProperty">Суммарное свойство</param>
+        /// <param name="converter">Конвертер (при необходимости)</param>
+        /// <returns>Объект типа <see cref="Binding"/></returns>
         private Binding CreateTwoWayBindingForProperty(SummaryProperty summaryProperty, IValueConverter converter = null)
         {
             Binding binding = new Binding
@@ -436,12 +501,16 @@
             return binding;
         }
 
+        /// <summary>
+        /// Создание привязки для первой колонки в Grid. Позволяет менять ширину сразу всех колонок в текущем UserControl
+        /// </summary>
+        /// <returns>Объект типа <see cref="Binding"/></returns>
         private Binding CreateBindingForColumnWidth()
         {
             Binding b = new Binding
             {
                 Source = mpESKD.Properties.Settings.Default,
-                Path = new PropertyPath(mpESKD.Properties.Settings.Default.GridColumnWidth),
+                Path = new PropertyPath("GridColumnWidth"),
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
                 Converter = new ColumnWidthConverter()
@@ -449,12 +518,18 @@
             return b;
         }
 
+        /// <summary>
+        /// Отобразить описание свойства в специальном поле палитры
+        /// </summary>
+        /// <param name="description">Описание свойства</param>
         public void ShowDescription(string description)
         {
             TbDescription.Text = description;
         }
 
-        // set line type
+        /// <summary>
+        /// Отображение диалогового окна AutoCAD с выбором типа линии
+        /// </summary>
         private void LineType_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             using (AcadHelpers.Document.LockDocument())
@@ -464,8 +539,7 @@
                 {
                     if (!ltd.Linetype.IsNull)
                     {
-                        //todo openCloseTransaction or objectId.open()
-                        using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                        using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
                         {
                             using (var ltr = tr.GetObject(ltd.Linetype, OpenMode.ForRead) as LinetypeTableRecord)
                             {

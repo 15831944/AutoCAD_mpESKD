@@ -87,15 +87,19 @@
 
         /// <inheritdoc />
         /// В примитиве не используется!
-        [EntityProperty(PropertiesCategory.General, 3, nameof(LineType), null, null, "Continuous", null, null, PropertyScope.None)]
+        [EntityProperty(PropertiesCategory.General, 4, nameof(LineType), null, null, "Continuous", null, null, PropertyScope.None)]
         public override string LineType { get; set; }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 4, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99, PropertyScope.None)]
+        [EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99, PropertyScope.None)]
         public override double LineTypeScale { get; set; }
 
+        /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null, PropertyScope.None)]
+        public override string TextStyle { get; set; }
+
         #region Базовые примитивы ЕСКД объекта
-        
+
         private readonly Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
         
         public Polyline MainPolyline

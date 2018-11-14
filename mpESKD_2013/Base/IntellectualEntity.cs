@@ -41,22 +41,36 @@ namespace mpESKD.Base
         [EntityProperty(PropertiesCategory.General, 1, nameof(Style), "h50", "h52", null, null, null, PropertyScope.Palette)]
         public string Style { get; set; }
 
+        /// <summary>
+        /// Имя слоя
+        /// </summary>
+        [EntityProperty(PropertiesCategory.General, 2, nameof(LayerName), "p7", "d7", null, null, null)]
+        public string LayerName { get; set; }
+
         /// <summary>Масштаб примитива</summary>
-        [EntityProperty(PropertiesCategory.General, 2, nameof(Scale), "p5", "d5", "1:1", null, null)]
+        [EntityProperty(PropertiesCategory.General, 3, nameof(Scale), "p5", "d5", "1:1", null, null)]
         public AnnotationScale Scale { get; set; }
 
         /// <summary>
         /// Тип линии. Свойство является абстрактным, так как в зависимости от интеллектуального примитива
-        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 3
+        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 4
         /// </summary>
         public abstract string LineType { get; set; }
         
         /// <summary>
         /// Масштаб типа линии для примитивов, имеющих изменяемый тип линии.
         /// Свойство является абстрактным, так как в зависимости от интеллектуального примитива
-        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 4
+        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 5
         /// </summary>
         public abstract double LineTypeScale { get; set; }
+
+        /// <summary>
+        /// Текстовый стиль.
+        /// Свойство является абстрактным, так как в зависимости от интеллектуального примитива
+        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 1
+        /// Категория всегда Content
+        /// </summary>
+        public abstract string TextStyle { get; set; }
 
         /// <summary>Текущий масштаб</summary>
         public double GetScale()
@@ -238,10 +252,9 @@ namespace mpESKD.Base
         /// <summary>Идентификатор стиля</summary>
         public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
 
-        #region Abstract members
-
+        //todo remove after implement intellectual style
         public abstract void ApplyStyle(MPCOStyle style);
-
+        
         /// <summary>
         /// Перерисовка элементов блока по параметрам ЕСКД элемента
         /// </summary>
@@ -251,7 +264,6 @@ namespace mpESKD.Base
 
         public abstract void GetParametersFromResBuf(ResultBuffer resBuf);
 
-        #endregion
 
         public void Draw(WorldDraw draw)
         {

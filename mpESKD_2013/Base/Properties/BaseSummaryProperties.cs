@@ -1,4 +1,5 @@
-﻿namespace mpESKD.Base.Properties
+﻿//todo remove it all
+namespace mpESKD.Base.Properties
 {
     using System.Collections.ObjectModel;
     using System.ComponentModel;

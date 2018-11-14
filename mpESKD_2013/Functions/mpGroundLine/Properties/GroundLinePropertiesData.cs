@@ -1,4 +1,5 @@
-﻿// ReSharper disable InconsistentNaming
+﻿//todo remove it all
+// ReSharper disable InconsistentNaming
 #pragma warning disable CS0618
 namespace mpESKD.Functions.mpGroundLine.Properties
 {

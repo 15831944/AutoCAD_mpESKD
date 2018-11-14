@@ -1,4 +1,5 @@
-﻿namespace mpESKD.Functions.mpGroundLine.Properties
+﻿//todo remove it all
+namespace mpESKD.Functions.mpGroundLine.Properties
 {
     using System.Collections.Generic;
     using Autodesk.AutoCAD.DatabaseServices;

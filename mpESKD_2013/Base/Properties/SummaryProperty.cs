@@ -1,6 +1,7 @@
 ﻿namespace mpESKD.Base.Properties
 {
     using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -15,6 +16,18 @@
         {
             EntityName = entityName;
             EntityPropertyDataCollection = new ObservableCollection<IntellectualEntityProperty>();
+        }
+
+        public void AddProperty(IntellectualEntityProperty property)
+        {
+            property.PropertyChanged += Property_PropertyChanged;
+            EntityPropertyDataCollection.Add(property);
+        }
+
+        private void Property_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            AcadHelpers.WriteMessageInDebug($"\nPropertyChanged event - {e.PropertyName}");
+            OnPropertyChanged(nameof(SummaryValue));
         }
 
         public string EntityName { get; }

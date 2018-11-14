@@ -4,7 +4,9 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Xml.Linq;
+    using Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
 
@@ -43,7 +45,7 @@
             List<MPCOStyle> stylesNames = new List<MPCOStyle>();
             foreach (StyleMapItem styleMapItem in AllStyles)
             {
-                if(styleMapItem.StyleType.Name == type)
+                if (styleMapItem.StyleType.Name == type)
                     stylesNames.AddRange(styleMapItem.Styles);
             }
 
@@ -76,7 +78,7 @@
             var stopIteration = false;
             foreach (StyleMapItem styleMapItem in AllStyles)
             {
-                if(stopIteration)
+                if (stopIteration)
                     break;
                 for (var i = styleMapItem.Styles.Count - 1; i >= 0; i--)
                 {
@@ -175,7 +177,7 @@
                 foreach (XElement styleXel in fXel.Elements("UserStyle"))
                 {
                     var style = parseStylePropertiesFromXElementAction(styleXel);
-                    
+
                     style.Name = styleXel.Attribute(nameof(style.Name))?.Value;
                     style.Description = styleXel.Attribute(nameof(style.Description))?.Value;
 
@@ -189,7 +191,7 @@
                     // get layer
                     var layerData = styleXel.Element("LayerTableRecord");
                     style.LayerXmlData = layerData ?? null;
-                    
+
                     // get text style
                     var textStyleData = styleXel.Element("TextStyleTableRecord");
                     style.TextStyleXmlData = textStyleData ?? null;
@@ -264,7 +266,7 @@
                 fXel.Save(stylesFile);
             }
         }
-        
+
         /// <summary>
         /// Получение имени файла хранения стилей. Так как все классы имеют типичные имена ([entity]Style)
         /// то имя файла получаю по имени класса с прибавлением "s.xml". Типа GroundLineStyle + s.xml
@@ -323,5 +325,58 @@
             /// </summary>
             public List<MPCOStyle> Styles { get; }
         }
+
+        #region NEW
+
+        public static void ApplyStyle(IntellectualEntity entity, IntellectualEntityStyle style)
+        {
+            var type = entity.GetType();
+            foreach (PropertyInfo propertyInfo in type.GetProperties())
+            {
+                var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
+                if (attribute != null)
+                {
+                    var propertyFromStyle = style.Properties.FirstOrDefault(sp => sp.Name == attribute.Name);
+                    if (propertyFromStyle != null)
+                    {
+                        if (attribute.Name == "Scale")
+                        {
+                            propertyInfo.SetValue(
+                                entity, 
+                                MainStaticSettings.Settings.UseScaleFromStyle 
+                                    ? propertyFromStyle.Value 
+                                    : AcadHelpers.Database.Cannoscale);
+                        }
+                        else if (attribute.Name == "LayerName")
+                        {
+                            var layerName = propertyFromStyle.Value.ToString();
+                            if (string.IsNullOrEmpty(layerName))
+                                layerName = Language.GetItem(MainFunction.LangItem, "defl");
+                            AcadHelpers.SetLayerByName(entity.BlockId, layerName, style.LayerXmlData);
+                        }
+                        else if (attribute.Name == "LineType")
+                        {
+                            var lineType = propertyFromStyle.Value.ToString();
+                            AcadHelpers.SetLineType(entity.BlockId, lineType);
+                        }
+                        if (MainStaticSettings.Settings.UseTextStyleFromStyle)
+                        {
+                            var textStyleName = StyleHelpers.GetPropertyValue(style, AxisProperties.TextStyle.Name,
+                                AxisProperties.TextStyle.DefaultValue);
+                            if (TextStyleHelper.HasTextStyle(textStyleName))
+                                TextStyle = textStyleName;
+                            else
+                            {
+                                if (MainStaticSettings.Settings.IfNoTextStyle == 1 &&
+                                    TextStyleHelper.CreateTextStyle(((AxisStyle)style).TextStyleXmlData))
+                                    TextStyle = textStyleName;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 }

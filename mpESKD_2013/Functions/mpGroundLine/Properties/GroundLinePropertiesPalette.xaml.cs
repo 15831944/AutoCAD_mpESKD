@@ -1,4 +1,5 @@
-﻿namespace mpESKD.Functions.mpGroundLine.Properties
+﻿//todo remove it all
+namespace mpESKD.Functions.mpGroundLine.Properties
 {
     using System;
     using System.Collections.Generic;
@@ -78,9 +79,6 @@
                     Expander.Header = GroundLineFunction.MPCOEntDisplayName + " (" + objectIds.Count + ")";
                     _groundLineSummaryProperties = new GroundLineSummaryProperties(objectIds);
                     SetData(_groundLineSummaryProperties);
-
-                    //todo test
-                    EntityPropertyData entityPropertyData = new EntityPropertyData(objectIds[0]);
                 }
             }
         }
