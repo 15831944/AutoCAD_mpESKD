@@ -38,6 +38,35 @@
             return styles;
         }
 
+        public static List<MPCOStyle> GetStyles(string type)
+        {
+            List<MPCOStyle> stylesNames = new List<MPCOStyle>();
+            foreach (StyleMapItem styleMapItem in AllStyles)
+            {
+                if(styleMapItem.StyleType.Name == type)
+                    stylesNames.AddRange(styleMapItem.Styles);
+            }
+
+            return stylesNames;
+        }
+
+        public static string GetStyleNameByGuid(string type, string guid)
+        {
+            foreach (StyleMapItem styleMapItem in AllStyles)
+            {
+                if (styleMapItem.StyleType.Name != type)
+                    continue;
+
+                foreach (var mpcoStyle in styleMapItem.Styles)
+                {
+                    if (mpcoStyle.Guid == guid)
+                        return mpcoStyle.Name;
+                }
+            }
+
+            return string.Empty;
+        }
+
         /// <summary>
         /// Удаление стиля из списка по его идентификатору
         /// </summary>

@@ -2,7 +2,6 @@
 namespace mpESKD.Base.Properties
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
@@ -12,6 +11,7 @@ namespace mpESKD.Base.Properties
     using Enums;
     using Helpers;
     using ModPlusAPI.Annotations;
+    using Styles;
 
     public class EntityPropertyData
     {
@@ -26,12 +26,14 @@ namespace mpESKD.Base.Properties
                     if (blkRef != null)
                     {
                         blkRef.Modified += BlkRef_Modified;
-                        Update(blkRef);
+                        Create(blkRef);
                     }
                 }
             }
             else IsValid = false;
         }
+
+        public string EntityName { get; private set; }
 
         private ObjectId _blkRefObjectId;
 
@@ -56,6 +58,62 @@ namespace mpESKD.Base.Properties
                 Update(blkRef);
         }
 
+        private void Create(BlockReference blockReference)
+        {
+            if (blockReference == null)
+            {
+                _blkRefObjectId = ObjectId.Null;
+                return;
+            }
+            var intellectualEntity = new EntityReaderFactory().GetFromEntity(blockReference);
+            if (intellectualEntity != null)
+            {
+                _intellectualEntity = intellectualEntity;
+
+                var type = intellectualEntity.GetType();
+                EntityName = type.Name;
+                foreach (var propertyInfo in type.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
+                {
+                    var att = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
+                    if (att != null)
+                    {
+                        if (att.PropertyScope == PropertyScope.None)
+                            continue;
+                        if (att.Name == "Style")
+                        {
+                            IntellectualEntityProperty property = new IntellectualEntityProperty(
+                                att,
+                                type,
+                                StyleManager.GetStyleNameByGuid(type.Name + "Style",  _intellectualEntity.StyleGuid),
+                                _blkRefObjectId);
+                            property.PropertyChanged += Property_PropertyChanged;
+                            Properties.Add(property);
+                        }
+                        else if (att.Name == "LineType")
+                        {
+                            IntellectualEntityProperty property = new IntellectualEntityProperty(att, type, blockReference.Linetype, _blkRefObjectId);
+                            property.PropertyChanged += Property_PropertyChanged;
+                            Properties.Add(property);
+                        }
+                        else
+                        {
+                            var value = propertyInfo.GetValue(intellectualEntity);
+                            if (value != null)
+                            {
+                                IntellectualEntityProperty property = new IntellectualEntityProperty(att, type, value, _blkRefObjectId);
+                                property.PropertyChanged += Property_PropertyChanged;
+                                Properties.Add(property);
+                            }
+                        }
+                    }
+                }
+                
+                AnyPropertyChangedRaise();
+            }
+        }
+
+        //todo В методе обновления нужно повторно прочитать данные и заменить их, а не заполнить
+        // также нужно уведомить об этом палитру. Сейчас не работает никак
         private void Update(BlockReference blockReference)
         {
             if (blockReference == null)
@@ -73,12 +131,36 @@ namespace mpESKD.Base.Properties
                 foreach (var propertyInfo in type.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
                 {
                     var att = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
-                    var value = propertyInfo.GetValue(intellectualEntity);
-                    if (att != null && value != null)
+                    if (att != null)
                     {
-                        IntellectualEntityProperty property = new IntellectualEntityProperty(att, value);
-                        property.PropertyChanged += Property_PropertyChanged;
-                        Properties.Add(property);
+                        if (att.PropertyScope == PropertyScope.None)
+                            continue;
+                        if (att.Name == "Style")
+                        {
+                            IntellectualEntityProperty property = new IntellectualEntityProperty(
+                                att,
+                                type,
+                                StyleManager.GetStyleNameByGuid(type.Name + "Style",  _intellectualEntity.StyleGuid),
+                                _blkRefObjectId);
+                            property.PropertyChanged += Property_PropertyChanged;
+                            Properties.Add(property);
+                        }
+                        else if (att.Name == "LineType")
+                        {
+                            IntellectualEntityProperty property = new IntellectualEntityProperty(att, type, blockReference.Linetype, _blkRefObjectId);
+                            property.PropertyChanged += Property_PropertyChanged;
+                            Properties.Add(property);
+                        }
+                        else
+                        {
+                            var value = propertyInfo.GetValue(intellectualEntity);
+                            if (value != null)
+                            {
+                                IntellectualEntityProperty property = new IntellectualEntityProperty(att, type, value, _blkRefObjectId);
+                                property.PropertyChanged += Property_PropertyChanged;
+                                Properties.Add(property);
+                            }
+                        }
                     }
                 }
                 AnyPropertyChangedRaise();
@@ -87,22 +169,47 @@ namespace mpESKD.Base.Properties
 
         private void Property_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            IntellectualEntityProperty intellectualEntityProperty = (IntellectualEntityProperty) sender;
             using (AcadHelpers.Document.LockDocument())
             {
                 using (var blkRef = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                 {
-                    //todo wrong!
-                    _intellectualEntity.GetType().GetProperty(e.PropertyName).SetValue(_intellectualEntity, 10);
-                    _intellectualEntity.UpdateEntities();
-                    _intellectualEntity.GetBlockTableRecordWithoutTransaction(blkRef);
-                    using (var resBuf = _intellectualEntity.GetParametersForXData())
+                    Type type = _intellectualEntity.GetType();
+                    PropertyInfo propertyInfo = type.GetProperty(intellectualEntityProperty.Name);
+                    if (propertyInfo != null)
                     {
-                        if (blkRef != null) blkRef.XData = resBuf;
+                        if (intellectualEntityProperty.Name == "Style")
+                        {
+                            var style = StyleManager.GetStyles(type.Name + "Style")
+                                .FirstOrDefault(sn => sn.Name.Equals(intellectualEntityProperty.Value.ToString()));
+                            if (style != null)
+                            {
+                                _intellectualEntity.StyleGuid = style.Guid;
+                                _intellectualEntity.ApplyStyle(style);
+                            }
+                        }
+                        else if (intellectualEntityProperty.Name == "LineType")
+                        {
+                            if (blkRef != null)
+                                blkRef.Linetype = intellectualEntityProperty.Value.ToString();
+                        }
+                        else 
+                            propertyInfo.SetValue(_intellectualEntity, intellectualEntityProperty.Value);
+
+                        _intellectualEntity.UpdateEntities();
+                        _intellectualEntity.GetBlockTableRecordWithoutTransaction(blkRef);
+                        using (var resBuf = _intellectualEntity.GetParametersForXData())
+                        {
+                            if (blkRef != null)
+                                blkRef.XData = resBuf;
+                        }
+
+                        if (blkRef != null)
+                            blkRef.ResetBlock();
                     }
-                    if (blkRef != null)
-                        blkRef.ResetBlock();
                 }
             }
+
             Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
         }
 
@@ -120,30 +227,47 @@ namespace mpESKD.Base.Properties
     {
         private object _value;
 
-        public IntellectualEntityProperty(EntityPropertyAttribute attribute, object value)
+        public IntellectualEntityProperty(
+            EntityPropertyAttribute attribute,
+            Type entityType,
+            object value,
+            ObjectId ownerObjectId)
         {
+            EntityType = entityType;
+            OwnerObjectId = ownerObjectId;
             Category = attribute.Category;
+            OrderIndex = attribute.OrderIndex;
             Name = attribute.Name;
             DisplayNameLocalizationKey = attribute.DisplayNameLocalizationKey;
             DescriptionLocalizationKey = attribute.DescriptionLocalizationKey;
-            ValueType = typeof(object);
-            DefaultValue = attribute.DefaultValue;
+            if (value.GetType() == typeof(AnnotationScale))
+                DefaultValue = new AnnotationScale
+                {
+                    Name = attribute.DefaultValue.ToString(), 
+                    DrawingUnits = double.Parse(attribute.DefaultValue.ToString().Split(':')[0]), 
+                    PaperUnits = double.Parse(attribute.DefaultValue.ToString().Split(':')[1])
+                };
+            else DefaultValue = attribute.DefaultValue;
+
             Minimum = attribute.Minimum;
             Maximum = attribute.Maximum;
             Value = value;
         }
 
+        public Type EntityType { get; }
+        
+        public ObjectId OwnerObjectId { get; }
+
         public PropertiesCategory Category { get; }
+
+        public int OrderIndex { get; }
 
         public string Name { get; }
 
         public string DisplayNameLocalizationKey { get; }
 
         public string DescriptionLocalizationKey { get; }
-
-        //todo need?
-        public Type ValueType { get; }
-
+        
         public object DefaultValue { get; }
 
         //todo notify?!

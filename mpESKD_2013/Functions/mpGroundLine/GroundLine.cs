@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -11,9 +10,7 @@
     using Base;
     using Base.Enums;
     using Base.Helpers;
-    using Base.Properties;
     using Base.Styles;
-    using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Properties;
     using Styles;
@@ -83,34 +80,42 @@
         /// <summary>
         /// Отступ первого штриха в каждом сегменте полилинии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, nameof(FirstStrokeOffset), "p36", "d36", 
-            typeof(GroundLineFirstStrokeOffset), GroundLineFirstStrokeOffset.ByHalfSpace, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 1, nameof(FirstStrokeOffset), "p36", "d36", 
+            GroundLineFirstStrokeOffset.ByHalfSpace, null, null)]
         public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineProperties.FirstStrokeOffset.DefaultValue;
 
         /// <summary>
         /// Длина штриха
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, nameof(StrokeLength), "p37", "d37", typeof(int), 8, 1, 10)]
+        [EntityProperty(PropertiesCategory.Geometry, 2, nameof(StrokeLength), "p37", "d37", 8, 1, 10)]
         public int StrokeLength { get; set; } = GroundLineProperties.StrokeLength.DefaultValue;
 
         /// <summary>
         /// Расстояние между штрихами
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, nameof(StrokeOffset), "p38", "d38", typeof(int), 4, 1, 10)]
+        [EntityProperty(PropertiesCategory.Geometry, 3, nameof(StrokeOffset), "p38", "d38", 4, 1, 10)]
         public int StrokeOffset { get; set; } = GroundLineProperties.StrokeOffset.DefaultValue;
 
         /// <summary>
         /// Угол наклона штриха в градусах
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, nameof(StrokeAngle), "p39", "d39", typeof(int), 60, 30, 90)]
+        [EntityProperty(PropertiesCategory.Geometry, 4, nameof(StrokeAngle), "p39", "d39", 60, 30, 90)]
         public int StrokeAngle { get; set; } = GroundLineProperties.StrokeAngle.DefaultValue;
 
         /// <summary>
         /// Отступ группы штрихов
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, nameof(Space), "p40", "d40", typeof(int), 10, 1, 20)]
+        [EntityProperty(PropertiesCategory.Geometry, 5, nameof(Space), "p40", "d40", 10, 1, 20)]
         public int Space { get; set; } = GroundLineProperties.Space.DefaultValue;
-        
+
+        /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.General, 3, nameof(LineType), "p35", "d35", "Continuous", null, null)]
+        public override string LineType { get; set; }
+
+        /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.General, 4, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99)]
+        public override double LineTypeScale { get; set; }
+
         #endregion
 
         #region Примитивы ЕСКД объекта

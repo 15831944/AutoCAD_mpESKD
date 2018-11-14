@@ -8,41 +8,81 @@
     {
         public EntityPropertyAttribute(
             PropertiesCategory category, 
+            int orderIndex,
             string name,
             string displayNameLocalizationKey,
             string descriptionLocalizationKey,
-            Type valueType,
             object defaultValue,
             object minimum, 
-            object maximum)
+            object maximum, 
+            PropertyScope propertyScope = PropertyScope.PaletteAndStyleEditor)
         {
             Category = category;
+            OrderIndex = orderIndex;
             Name = name;
             DisplayNameLocalizationKey = displayNameLocalizationKey;
             DescriptionLocalizationKey = descriptionLocalizationKey;
-            ValueType = valueType;
             DefaultValue = defaultValue;
             Minimum = minimum;
             Maximum = maximum;
+            PropertyScope = propertyScope;
         }
         
+        /// <summary>
+        /// Категория свойства
+        /// </summary>
         public PropertiesCategory Category { get; }
 
+        /// <summary>
+        /// Имя свойства
+        /// </summary>
         public string Name { get;  }
 
+        /// <summary>
+        /// Индекс для сортировки
+        /// </summary>
+        public int OrderIndex { get; }
+
+        /// <summary>
+        /// Ключ локализации для отображаемого имени свойства
+        /// </summary>
         public string DisplayNameLocalizationKey { get; }
 
+        /// <summary>
+        /// Ключ локализации для описания свойства
+        /// </summary>
         public string DescriptionLocalizationKey { get;  }
-
-        //todo need?
-        public Type ValueType { get;  }
         
+        /// <summary>
+        /// Значение по умолчанию
+        /// </summary>
         public object DefaultValue { get;  }
 
+        /// <summary>
+        /// Минимальное значение. Для свойств типа int, double
+        /// </summary>
         [CanBeNull]
         public object Minimum { get;  }
 
+        /// <summary>
+        /// Максимальное значение. Для свойств типа int, double
+        /// </summary>
         [CanBeNull]
         public object Maximum { get;  }
+
+        /// <summary>
+        /// Область видимости свойства
+        /// </summary>
+        public PropertyScope PropertyScope { get; }
+    }
+
+    public class EnumPropertyDisplayValueKeyAttribute : Attribute
+    {
+        public EnumPropertyDisplayValueKeyAttribute(string localizationKey)
+        {
+            LocalizationKey = localizationKey;
+        }
+
+        public string LocalizationKey { get; }
     }
 }

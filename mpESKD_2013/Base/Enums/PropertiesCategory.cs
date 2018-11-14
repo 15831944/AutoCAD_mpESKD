@@ -2,9 +2,12 @@
 {
     public enum PropertiesCategory
     {
-        Undefined,
-        General,
-        Geometry,
-        Content
+        Undefined = -1,
+        [EnumPropertyDisplayValueKeyAttribute("h49")]
+        General = 1,
+        [EnumPropertyDisplayValueKeyAttribute("h51")]
+        Geometry = 2, 
+        [EnumPropertyDisplayValueKeyAttribute("h64")]
+        Content = 3
     }
 }

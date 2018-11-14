@@ -110,6 +110,9 @@
     <Compile Include="..\mpESKD_2013\Base\Enums\PropertiesCategory.cs">
       <Link>Base\Enums\PropertiesCategory.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\PropertyScope.cs">
+      <Link>Base\Enums\PropertyScope.cs</Link>
+    </Compile>
     <Compile Include="..\mpeskd_2013\base\enums\UpdateVariant.cs">
       <Link>Base\Enums\UpdateVariant.cs</Link>
     </Compile>
@@ -177,6 +180,9 @@
     <Compile Include="..\mpESKD_2013\Base\Properties\EntityPropertyData.cs">
       <Link>Base\Properties\EntityPropertyData.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Properties\EnumPropertyValueConverter.cs">
+      <Link>Base\Properties\EnumPropertyValueConverter.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\Properties\PaletteSettings.xaml.cs">
       <Link>Base\Properties\PaletteSettings.xaml.cs</Link>
       <DependentUpon>PaletteSettings.xaml</DependentUpon>
@@ -188,8 +194,14 @@
       <Link>Base\Properties\PropertiesPalette.xaml.cs</Link>
       <DependentUpon>PropertiesPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\SummaryPropertyData.cs">
-      <Link>Base\Properties\SummaryPropertyData.cs</Link>
+    <Compile Include="..\mpESKD_2013\Base\Properties\PropertiesPaletteFunction.cs">
+      <Link>Base\Properties\PropertiesPaletteFunction.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Properties\SummaryProperty.cs">
+      <Link>Base\Properties\SummaryProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Properties\SummaryPropertyCollection.cs">
+      <Link>Base\Properties\SummaryPropertyCollection.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Styles\BaseStyle.cs">
       <Link>Base\Styles\BaseStyle.cs</Link>

@@ -88,6 +88,7 @@
     <Compile Include="Base\Enums\EntityDirection.cs" />
     <Compile Include="Base\Enums\GroundLineFirstStrokeOffset.cs" />
     <Compile Include="Base\Enums\PropertiesCategory.cs" />
+    <Compile Include="Base\Enums\PropertyScope.cs" />
     <Compile Include="Base\Enums\UpdateVariant.cs" />
     <Compile Include="Base\Helpers\AcadHelpers.cs" />
     <Compile Include="Base\Helpers\GeometryHelpers.cs" />
@@ -117,11 +118,17 @@
     <Compile Include="Base\Properties\Converters\ValueConverters.cs" />
     <Compile Include="Base\Properties\Converters\TextInputToVisibilityConverterForInt.cs" />
     <Compile Include="Base\Properties\EntityPropertyData.cs" />
+    <Compile Include="Base\Properties\EnumPropertyValueConverter.cs" />
     <Compile Include="Base\Properties\PaletteSettings.xaml.cs">
       <DependentUpon>PaletteSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Base\Properties\PropertiesHelpers.cs" />
-    <Compile Include="Base\Properties\SummaryPropertyData.cs" />
+    <Compile Include="Base\Properties\PropertiesPalette.xaml.cs">
+      <DependentUpon>PropertiesPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Base\Properties\PropertiesPaletteFunction.cs" />
+    <Compile Include="Base\Properties\SummaryProperty.cs" />
+    <Compile Include="Base\Properties\SummaryPropertyCollection.cs" />
     <Compile Include="Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs" />
     <Compile Include="Base\Styles\StyleManager.cs" />
     <Compile Include="Functions\mpAxis\Axis.cs" />
@@ -147,9 +154,6 @@
     <Compile Include="Functions\mpBreakLine\Properties\BreakLineProperties.cs" />
     <Compile Include="Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs">
       <DependentUpon>BreakLinePropertiesPalette.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Base\Properties\PropertiesPalette.xaml.cs">
-      <DependentUpon>PropertiesPalette.xaml</DependentUpon>
     </Compile>
     <Compile Include="Base\Styles\Helpers.cs" />
     <Compile Include="Base\Styles\BaseStyle.cs" />
@@ -240,6 +244,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Base\Properties\PropertiesPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Functions\mpAxis\AxisValueEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -255,10 +263,6 @@
     <Page Include="Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Base\Properties\PropertiesPalette.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Base\Styles\StyleEditor.xaml">
       <Generator>MSBuild:Compile</Generator>

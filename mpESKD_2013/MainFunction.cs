@@ -55,9 +55,9 @@
                     }
                 }
             }
-            if (PropertiesFunction.PaletteSet != null)
+            if (PropertiesPaletteFunction.PaletteSet != null)
             {
-                PropertiesFunction.PaletteSet.Visible = false;
+                PropertiesPaletteFunction.PaletteSet.Visible = false;
             }
         }
         public static void RemoveFromMpPalette(bool fromSettings)
@@ -79,15 +79,15 @@
                     }
                 }
             }
-            if (PropertiesFunction.PaletteSet != null)
+            if (PropertiesPaletteFunction.PaletteSet != null)
             {
-                PropertiesFunction.PaletteSet.Visible = true;
+                PropertiesPaletteFunction.PaletteSet.Visible = true;
             }
             else if (fromSettings)
             {
                 if (AcApp.DocumentManager.MdiActiveDocument != null)
                 {
-                    PropertiesFunction.Start();
+                    PropertiesPaletteFunction.Start();
                 }
             }
         }
@@ -96,7 +96,7 @@
             if (args.Name.Contains("ModPlus_"))
             {
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-                PropertiesFunction.Start();
+                PropertiesPaletteFunction.Start();
             }
             return null;
         }
@@ -123,7 +123,7 @@
                 bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "AddToMpPalette"), out b) & b;
             if (loadPropertiesPalette & !addPropertiesPaletteToMpPalette)
             {
-                PropertiesFunction.Start();
+                PropertiesPaletteFunction.Start();
             }
             else if (loadPropertiesPalette & addPropertiesPaletteToMpPalette)
             {

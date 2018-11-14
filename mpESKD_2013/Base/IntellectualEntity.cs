@@ -11,6 +11,7 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Base
 {
+    using Enums;
     using Styles;
 
     public abstract class IntellectualEntity : IDisposable
@@ -25,24 +26,38 @@ namespace mpESKD.Base
         /// Должна соответствовать точке вставке блока
         /// </summary>
         public Point3d InsertionPoint { get; set; } = Point3d.Origin;
-        
+
         /// <summary>Коллекция базовых примитивов, входящих в примитив</summary>
-        public abstract IEnumerable<Entity> Entities
-        {
-            get;
-        }
+        public abstract IEnumerable<Entity> Entities { get; }
 
         public bool IsValueCreated { get; set; }
-        
+
         /// <summary>Матрица трансформации BlockReference</summary>
         public Matrix3d BlockTransform { get; set; }
-        
+
+        /// <summary>
+        /// Стиль примитива. Свойство используется для работы палитры, а стиль задается через свойство <see cref="StyleGuid"/>
+        /// </summary>
+        [EntityProperty(PropertiesCategory.General, 1, nameof(Style), "h50", "h52", null, null, null, PropertyScope.Palette)]
+        public string Style { get; set; }
+
         /// <summary>Масштаб примитива</summary>
+        [EntityProperty(PropertiesCategory.General, 2, nameof(Scale), "p5", "d5", "1:1", null, null)]
         public AnnotationScale Scale { get; set; }
+
+        /// <summary>
+        /// Тип линии. Свойство является абстрактным, так как в зависимости от интеллектуального примитива
+        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 3
+        /// </summary>
+        public abstract string LineType { get; set; }
         
-        /// <summary>Масштаб типа линии для примитивов, имеющих изменяемый тип линии</summary>
-        public double LineTypeScale { get; set; }
-        
+        /// <summary>
+        /// Масштаб типа линии для примитивов, имеющих изменяемый тип линии.
+        /// Свойство является абстрактным, так как в зависимости от интеллектуального примитива
+        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 4
+        /// </summary>
+        public abstract double LineTypeScale { get; set; }
+
         /// <summary>Текущий масштаб</summary>
         public double GetScale()
         {
@@ -50,13 +65,13 @@ namespace mpESKD.Base
         }
 
         #region Block
-        
+
         // ObjectId "примитива"
         public ObjectId BlockId { get; set; }
 
         // Описание блока
         private BlockTableRecord _blockRecord;
-        
+
         public BlockTableRecord BlockRecord
         {
             get
@@ -176,7 +191,7 @@ namespace mpESKD.Base
             _blockRecord = blockTableRecord;
             return blockTableRecord;
         }
-        
+
         public BlockTableRecord GetBlockTableRecordWithoutTransaction(BlockReference blkRef)
         {
             BlockTableRecord blockTableRecord;
@@ -206,9 +221,9 @@ namespace mpESKD.Base
             _blockRecord = blockTableRecord;
             return blockTableRecord;
         }
-        
+
         #endregion
-        
+
         /// <summary>Получение свойств блока, которые присуще примитиву</summary>
         public void GetParametersFromEntity(Entity entity)
         {
@@ -225,7 +240,7 @@ namespace mpESKD.Base
 
         #region Abstract members
 
-        public abstract void ApplyStyle (MPCOStyle style);
+        public abstract void ApplyStyle(MPCOStyle style);
 
         /// <summary>
         /// Перерисовка элементов блока по параметрам ЕСКД элемента
