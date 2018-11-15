@@ -25,6 +25,7 @@ namespace mpESKD.Base
         /// Первая точка примитива в мировой системе координат.
         /// Должна соответствовать точке вставке блока
         /// </summary>
+        [PointForOsnap]
         public Point3d InsertionPoint { get; set; } = Point3d.Origin;
 
         /// <summary>Коллекция базовых примитивов, входящих в примитив</summary>

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
@@ -14,7 +13,7 @@
     using Styles;
     using ModPlusAPI.Windows;
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [IntellectualEntityDisplayNameKeyAttribute("h48")]
     public class BreakLine : IntellectualEntity
     {
         /// <summary>Инициализация экземпляра класса для BreakLine без заполнения данными
@@ -58,6 +57,7 @@
         }
 
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
+        [PointForOsnap]
         public Point3d MiddlePoint => new Point3d
         (
             (InsertionPoint.X + EndPoint.X) / 2,
@@ -66,6 +66,7 @@
         );
 
         /// <summary>Вторая (конечная) точка примитива в мировой системе координат</summary>
+        [PointForOsnap]
         public Point3d EndPoint { get; set; } = Point3d.Origin;
         
         // Получение управляющих точек в системе координат блока для отрисовки содержимого

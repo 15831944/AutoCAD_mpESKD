@@ -19,20 +19,20 @@
                 {
                     foreach (IntellectualEntityProperty entityProperty in data.Properties)
                     {
-                        var allowableSummaryProperty = this.FirstOrDefault(si => si.EntityPropertyDataCollection
-                            .Any(ep => ep.Category == entityProperty.Category &&
-                                       ep.Name == entityProperty.Name &&
-                                       ep.Value.GetType() == entityProperty.Value.GetType()));
+                        var allowableSummaryProperty = this.FirstOrDefault(
+                            si => si.EntityPropertyDataCollection
+                                .Any(ep => ep.Category == entityProperty.Category &&
+                                           ep.EntityType.Name == entityProperty.EntityType.Name &&
+                                           ep.Name == entityProperty.Name &&
+                                           ep.Value.GetType() == entityProperty.Value.GetType()));
                         if (allowableSummaryProperty == null)
                         {
-                            SummaryProperty summaryProperty = new SummaryProperty(data.EntityName);
+                            SummaryProperty summaryProperty = new SummaryProperty(data.EntityType);
                             summaryProperty.AddProperty(entityProperty);
-                            //summaryProperty.EntityPropertyDataCollection.Add(entityProperty);
                             Add(summaryProperty);
                         }
                         else
                         {
-                            //allowableSummaryProperty.EntityPropertyDataCollection.Add(entityProperty);
                             allowableSummaryProperty.AddProperty(entityProperty);
                         }
                     }
@@ -48,7 +48,6 @@
 
         private void Data_AnyPropertyChanged(object sender, EventArgs e)
         {
-            AcadHelpers.WriteMessageInDebug($"\nSummaryPropertyCollection Data_AnyPropertyChanged = e {e.ToString()}, sender {sender}");
             foreach (SummaryProperty summaryProperty in this)
             {
                 foreach (IntellectualEntityProperty property in summaryProperty.EntityPropertyDataCollection)

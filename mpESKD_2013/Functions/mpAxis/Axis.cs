@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.Geometry;
@@ -14,7 +13,7 @@
     using Styles;
     using ModPlusAPI.Windows;
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [IntellectualEntityDisplayNameKeyAttribute("h41")]
     public class Axis : IntellectualEntity
     {
         #region Constructors

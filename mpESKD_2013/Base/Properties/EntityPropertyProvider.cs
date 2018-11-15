@@ -32,9 +32,9 @@ namespace mpESKD.Base.Properties
         }
 
         /// <summary>
-        /// Имя примитива. Соответствует имени типа (например, Axis, GroundLine и т.п.)
+        /// Тип примитива
         /// </summary>
-        public string EntityName { get; private set; }
+        public Type EntityType { get; private set; }
 
         /// <summary>
         /// Идентификатор вставки блока
@@ -75,7 +75,7 @@ namespace mpESKD.Base.Properties
                 _intellectualEntity = intellectualEntity;
 
                 var type = intellectualEntity.GetType();
-                EntityName = type.Name;
+                EntityType = type;
                 foreach (var propertyInfo in type.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
                 {
                     var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
@@ -88,6 +88,7 @@ namespace mpESKD.Base.Properties
                             IntellectualEntityProperty property = new IntellectualEntityProperty(
                                 attribute,
                                 type,
+                                //todo change
                                 StyleManager.GetStyleNameByGuid(type.Name + "Style",  _intellectualEntity.StyleGuid),
                                 _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
@@ -104,10 +105,6 @@ namespace mpESKD.Base.Properties
                             IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, type, blockReference.Linetype, _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
-                        }
-                        else if (attribute.Name.Contains("TextStyle"))
-                        {
-                            //todo release
                         }
                         else
                         {
@@ -164,6 +161,7 @@ namespace mpESKD.Base.Properties
                                 {
                                     if (attribute.Name == "Style")
                                     {
+                                        //todo change
                                         property.Value = StyleManager.GetStyleNameByGuid(type.Name + "Style", _intellectualEntity.StyleGuid);
                                     }
                                     else if (attribute.Name == "LayerName")

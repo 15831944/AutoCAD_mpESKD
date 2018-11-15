@@ -14,6 +14,7 @@
     using Autodesk.AutoCAD.Windows;
     using Base;
     using Base.Helpers;
+    using Base.Overrules;
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpGroundLine;
@@ -132,11 +133,16 @@
             // bedit watcher
             BeditCommandWatcher.Initialize();
             AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
+
+            // overrules
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), OsnapOverruleEx.Instance(), true);
         }
 
         public void Terminate()
         {
             _functions.ForEach(f => f.Terminate());
+
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), OsnapOverruleEx.Instance());
         }
 
         private List<IIntellectualEntityFunction> GetFunctions()

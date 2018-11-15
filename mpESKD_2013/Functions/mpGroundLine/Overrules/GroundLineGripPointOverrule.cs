@@ -7,6 +7,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
+    using Base.Enums;
     using Base.Helpers;
     using Base.Overrules;
     using ModPlusAPI;
@@ -263,13 +264,13 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
     /// <summary>
     /// Ручка вершин
     /// </summary>
-    public class GroundLineVertexGrip : MPCOGrips.MPCOGripData
+    public class GroundLineVertexGrip : IntellectualEntityGripData
     {
         public GroundLineVertexGrip(GroundLine groundLine, int index)
         {
             GroundLine = groundLine;
             GripIndex = index;
-            GripType = MPCOGrips.IntellectualEntityGripType.Point;
+            GripType = GripType.Point;
 
             // отключение контекстного меню и возможности менять команду
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
@@ -344,14 +345,14 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
     }
 
-    public class GroundLineAddVertexGrip : MPCOGrips.MPCOGripData
+    public class GroundLineAddVertexGrip : IntellectualEntityGripData
     {
         public GroundLineAddVertexGrip(GroundLine groundLine, Point3d? leftPoint, Point3d? rightPoint)
         {
             GroundLine = groundLine;
             GripLeftPoint = leftPoint;
             GripRightPoint = rightPoint;
-            GripType = MPCOGrips.IntellectualEntityGripType.Plus;
+            GripType = GripType.Plus;
             RubberBandLineDisabled = true;
 
             // отключение контекстного меню и возможности менять команду
@@ -471,13 +472,13 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
     }
 
-    public class GroundLineRemoveVertexGrip : MPCOGrips.MPCOGripData
+    public class GroundLineRemoveVertexGrip : IntellectualEntityGripData
     {
         public GroundLineRemoveVertexGrip(GroundLine groundLine, int index)
         {
             GroundLine = groundLine;
             GripIndex = index;
-            GripType = MPCOGrips.IntellectualEntityGripType.Minus;
+            GripType = GripType.Minus;
 
             // отключение контекстного меню и возможности менять команду
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
@@ -542,12 +543,12 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
     }
 
-    public class GroundLineReverseGrip : MPCOGrips.MPCOGripData
+    public class GroundLineReverseGrip : IntellectualEntityGripData
     {
         public GroundLineReverseGrip(GroundLine groundLine)
         {
             GroundLine = groundLine;
-            GripType = MPCOGrips.IntellectualEntityGripType.Mirror;
+            GripType = GripType.Mirror;
 
             // отключение контекстного меню и возможности менять команду
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool

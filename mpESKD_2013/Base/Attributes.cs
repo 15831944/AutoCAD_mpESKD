@@ -76,6 +76,22 @@
         public PropertyScope PropertyScope { get; }
     }
 
+    /// <summary>
+    /// Атрибут, указывающий ключ локализации для имени интеллектуального примитива
+    /// </summary>
+    public class IntellectualEntityDisplayNameKeyAttribute : Attribute
+    {
+        public IntellectualEntityDisplayNameKeyAttribute(string localizationKey)
+        {
+            LocalizationKey = localizationKey;
+        }
+
+        public string LocalizationKey { get; }
+    }
+
+    /// <summary>
+    /// Атрибут, указывающий ключ локализации для поля перечислителя, используемого в свойствах примитива
+    /// </summary>
     public class EnumPropertyDisplayValueKeyAttribute : Attribute
     {
         public EnumPropertyDisplayValueKeyAttribute(string localizationKey)
@@ -84,5 +100,21 @@
         }
 
         public string LocalizationKey { get; }
+    }
+
+    /// <summary>
+    /// Атрибут, указывающий, что точка является источником для привязки
+    /// </summary>
+    public class PointForOsnapAttribute : Attribute
+    {
+
+    }
+
+    /// <summary>
+    /// Атрибут, указывающий, что список точек является источником для привязки
+    /// </summary>
+    public class ListOfPointsForOsnapAttribute : Attribute
+    {
+
     }
 }

@@ -1,16 +1,16 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Runtime;
-using ModPlus.Helpers;
-using mpESKD.Base.Helpers;
-using mpESKD.Base.Overrules;
-using ModPlusAPI;
-using ModPlusAPI.Windows;
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Functions.mpBreakLine.Overrules
 {
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.Runtime;
+    using Base.Helpers;
+    using ModPlusAPI;
+    using ModPlusAPI.Windows;
     using Base;
+    using Base.Enums;
+    using Base.Overrules;
 
     /// <summary>Класс, создающий и обрабатывающий переопределение ручек</summary>
     public class BreakLineGripPointsOverrule : GripOverrule
@@ -58,7 +58,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         // Получаем первую ручку (совпадает с точкой вставки блока)
                         var gp = new BreakLineGrip
                         {
-                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                            GripType = GripType.Point,
                             BreakLine = breakLine,
                             GripName = BreakLineGripName.StartGrip,
                             GripPoint = breakLine.InsertionPoint // вот эта точка из экземпляра класса breakline
@@ -67,7 +67,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         // получаем среднюю ручку
                         gp = new BreakLineGrip
                         {
-                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                            GripType = GripType.Point,
                             BreakLine = breakLine,
                             GripName = BreakLineGripName.MiddleGrip,
                             GripPoint = breakLine.MiddlePoint
@@ -76,7 +76,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         // получаем конечную ручку
                         gp = new BreakLineGrip
                         {
-                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                            GripType = GripType.Point,
                             BreakLine = breakLine,
                             GripName = BreakLineGripName.EndGrip,
                             GripPoint = breakLine.EndPoint
@@ -186,7 +186,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
      * Если есть сильная разница, то можно создавать несколько GripData. Однако нужны тесты
      */
     /// <summary>Описание ручки линии обрыва</summary>
-    public class BreakLineGrip : MPCOGrips.MPCOGripData //<-- Там будут определены типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
+    public class BreakLineGrip : IntellectualEntityGripData //<-- Там будут определены типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
     {
         public BreakLineGrip()
         {

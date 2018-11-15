@@ -99,7 +99,9 @@
     <Compile Include="Base\Helpers\TextStyleHelper.cs" />
     <Compile Include="Base\IIntellectualEntityFunction.cs" />
     <Compile Include="Base\IntellectualEntity.cs" />
-    <Compile Include="Base\Overrules\MPCOGrips.cs" />
+    <Compile Include="Base\Overrules\IntellectualEntityGripData.cs" />
+    <Compile Include="Base\Enums\GripType.cs" />
+    <Compile Include="Base\Overrules\OsnapOverruleEx.cs" />
     <Compile Include="Base\Properties\BaseProperties.cs" />
     <Compile Include="Base\Properties\BaseSummaryProperties.cs" />
     <Compile Include="Base\Properties\Controls\ControlStylesForEditor.xaml.cs">

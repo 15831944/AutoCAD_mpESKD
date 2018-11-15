@@ -1,20 +1,18 @@
-﻿using System;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using mpESKD.Base.Helpers;
-using mpESKD.Base.Overrules;
-using ModPlusAPI.Windows;
-using Autodesk.AutoCAD.Runtime;
-using mpESKD.Functions.mpAxis.Properties;
-using ModPlus.Helpers;
-using ModPlusAPI;
-using Exception = Autodesk.AutoCAD.Runtime.Exception;
-
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Functions.mpAxis.Overrules
 {
+    using System;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using Base.Helpers;
+    using mpESKD.Base.Overrules;
+    using ModPlusAPI.Windows;
+    using Autodesk.AutoCAD.Runtime;
+    using Properties;
+    using ModPlusAPI;
     using Base;
+    using Base.Enums;
 
     public class AxisGripPointsOverrule : GripOverrule
     {
@@ -64,7 +62,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         // Получаем первую ручку (совпадает с точкой вставки блока)
                         var gp = new AxisGrip
                         {
-                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                            GripType = GripType.Point,
                             Axis = axis,
                             GripName = AxisGripName.StartGrip,
                             GripPoint = axis.InsertionPoint // вот эта точка из экземпляра класса axis
@@ -74,7 +72,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         // получаем среднюю ручку
                         gp = new AxisGrip
                         {
-                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                            GripType = GripType.Point,
                             Axis = axis,
                             GripName = AxisGripName.MiddleGrip,
                             GripPoint = axis.MiddlePoint
@@ -83,7 +81,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         // получаем конечную ручку
                         gp = new AxisGrip
                         {
-                            GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                            GripType = GripType.Point,
                             Axis = axis,
                             GripName = AxisGripName.EndGrip,
                             GripPoint = axis.EndPoint
@@ -96,7 +94,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             // other points
                             gp = new AxisGrip
                             {
-                                GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                                GripType = GripType.Point,
                                 Axis = axis,
                                 GripName = AxisGripName.BottomMarkerGrip,
                                 GripPoint = axis.BottomMarkerPoint
@@ -108,7 +106,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         {
                             gp = new AxisGrip
                             {
-                                GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                                GripType = GripType.Point,
                                 Axis = axis,
                                 GripName = AxisGripName.TopMarkerGrip,
                                 GripPoint = axis.TopMarkerPoint
@@ -121,7 +119,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             {
                                 gp = new AxisGrip
                                 {
-                                    GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                                    GripType = GripType.Point,
                                     Axis = axis,
                                     GripName = AxisGripName.BottomOrientGrip,
                                     GripPoint = axis.BottomOrientPoint
@@ -134,7 +132,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                             {
                                 gp = new AxisGrip
                                 {
-                                    GripType = MPCOGrips.IntellectualEntityGripType.Point,
+                                    GripType = GripType.Point,
                                     Axis = axis,
                                     GripName = AxisGripName.TopOrientGrip,
                                     GripPoint = axis.TopOrientPoint
@@ -145,7 +143,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                     }
                 }
             }
-            catch (Exception exception)
+            catch (System.Exception exception)
             {
                 ExceptionBox.Show(exception);
             }
@@ -317,7 +315,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                 }
                 else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
             }
-            catch (Exception exception)
+            catch (System.Exception exception)
             {
                 ExceptionBox.Show(exception);
             }
@@ -370,7 +368,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
      * Если есть сильная разница, то можно создавать несколько GripData. Однако нужны тесты
      */
     /// <summary>Описание ручки линии обрыва</summary>
-    public class AxisGrip : MPCOGrips.MPCOGripData //<-- Там будут определны типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
+    public class AxisGrip : IntellectualEntityGripData 
     {
         public AxisGrip()
         {
@@ -452,7 +450,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                 }
                 base.OnGripStatusChanged(entityId, newStatus);
             }
-            catch (Exception exception)
+            catch (System.Exception exception)
             {
                 ExceptionBox.Show(exception);
             }

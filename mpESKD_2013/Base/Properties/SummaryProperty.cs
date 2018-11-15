@@ -1,7 +1,7 @@
 ﻿namespace mpESKD.Base.Properties
 {
+    using System;
     using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -12,9 +12,9 @@
 
     public class SummaryProperty : INotifyPropertyChanged
     {
-        public SummaryProperty(string entityName)
+        public SummaryProperty(Type entityType)
         {
-            EntityName = entityName;
+            EntityType = entityType;
             EntityPropertyDataCollection = new ObservableCollection<IntellectualEntityProperty>();
         }
 
@@ -26,11 +26,10 @@
 
         private void Property_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            AcadHelpers.WriteMessageInDebug($"\nPropertyChanged event - {e.PropertyName}");
             OnPropertyChanged(nameof(SummaryValue));
         }
 
-        public string EntityName { get; }
+        public Type EntityType { get; }
 
         public ObservableCollection<IntellectualEntityProperty> EntityPropertyDataCollection { get; }
 

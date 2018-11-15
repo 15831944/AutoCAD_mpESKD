@@ -32,6 +32,7 @@
 
             _enumPropertiesLocalizationValues = new Dictionary<Type, List<string>>();
             _categoryLocalizationNames = new Dictionary<string, string>();
+            _entityLocalizationNames = new Dictionary<Type, string>();
 
             foreach (Document document in AcadHelpers.Documents)
             {
@@ -50,6 +51,11 @@
         /// Словарь хранения локализованных значений имени категории
         /// </summary>
         private readonly Dictionary<string, string> _categoryLocalizationNames;
+
+        /// <summary>
+        /// Словарь хранения локализованных значений имени интеллектуального примитива
+        /// </summary>
+        private readonly Dictionary<Type, string> _entityLocalizationNames;
 
         private void Documents_DocumentActivated(object sender, DocumentCollectionEventArgs e)
         {
@@ -77,12 +83,13 @@
         /// <summary>Добавление пользовательских элементов в палитру в зависимости от выбранных объектов</summary>
         private void ShowPropertiesControlsBySelection()
         {
+            // Удаляем контролы свойств
+            if (StackPanelProperties.Children.Count > 0)
+                StackPanelProperties.Children.Clear();
+
             PromptSelectionResult psr = AcadHelpers.Editor.SelectImplied();
             if (psr.Value == null || psr.Value.Count == 0)
             {
-                // Удаляем контролы свойств
-                if (StackPanelProperties.Children.Count > 0)
-                    StackPanelProperties.Children.Clear();
                 // Очищаем панель описания
                 ShowDescription(string.Empty);
                 // hide message
@@ -128,16 +135,16 @@
         /// <param name="collection"><see cref="SummaryPropertyCollection"/></param>
         public void SetData(SummaryPropertyCollection collection)
         {
-            var entityGroups =
-                collection.Where(sp => sp.EntityPropertyDataCollection.Any()).GroupBy(sp => sp.EntityName);
+            var entityGroups = collection.Where(sp => sp.EntityPropertyDataCollection.Any())
+                .GroupBy(sp => sp.EntityType);
 
-            foreach (IGrouping<string, SummaryProperty> entityGroup in entityGroups)
+            foreach (IGrouping<Type, SummaryProperty> entityGroup in entityGroups)
             {
                 var c = entityGroup.SelectMany(sp => sp.EntityPropertyDataCollection).Select(p => p.OwnerObjectId).Distinct().Count();
                 Expander entityExpander = new Expander
                 {
                     IsExpanded = true,
-                    Header = entityGroup.Key + " [" + c + "]"
+                    Header = GetEntityLocalizationName(entityGroup.Key) + " [" + c + "]"
                 };
                 Grid mainGrid = new Grid();
                 var categoryIndex = 0;
@@ -171,7 +178,7 @@
                     var j = 1;
                     foreach (SummaryProperty summaryProperty in summaryPropertiesGroup.OrderBy(sp => sp.OrderIndex))
                     {
-                        RowDefinition rowDefinition = new RowDefinition() { Height = GridLength.Auto };
+                        RowDefinition rowDefinition = new RowDefinition { Height = GridLength.Auto };
                         grid.RowDefinitions.Add(rowDefinition);
 
                         // property name
@@ -260,6 +267,24 @@
                                     grid.Children.Add(tb);
                                 }
                                 catch (Exception exception)
+                                {
+                                    ExceptionBox.Show(exception);
+                                }
+                            }
+                            else if (summaryProperty.PropertyName.Contains("TextStyle"))
+                            {
+                                try
+                                {
+                                    ComboBox cb = new ComboBox();
+                                    Grid.SetColumn(cb, 2);
+                                    Grid.SetRow(cb, j);
+                                    cb.ItemsSource = AcadHelpers.TextStyles;
+                                    cb.Style = Resources["PropertyValueComboBox"] as Style;
+                                    SetDescription(cb, propertyDescription);
+                                    BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
+                                    grid.Children.Add(cb);
+                                }
+                                catch(Exception exception)
                                 {
                                     ExceptionBox.Show(exception);
                                 }
@@ -390,6 +415,30 @@
             ShowDescription(string.Empty);
         }
 
+        private string GetEntityLocalizationName(Type entityType)
+        {
+            if (_entityLocalizationNames.ContainsKey(entityType))
+                return _entityLocalizationNames[entityType];
+
+            var attribute = entityType.GetCustomAttribute<IntellectualEntityDisplayNameKeyAttribute>();
+            if (attribute != null)
+            {
+                try
+                {
+                    var localName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, attribute.LocalizationKey);
+                    if (!_entityLocalizationNames.ContainsKey(entityType))
+                        _entityLocalizationNames.Add(entityType, localName);
+                    return localName;
+                }
+                catch
+                {
+                    // ignore
+                }
+            }
+
+            return entityType.Name;
+        }
+
         /// <summary>
         /// Получение локализованного имени категории
         /// </summary>
@@ -402,12 +451,14 @@
             var type = category.GetType();
             foreach (FieldInfo fieldInfo in type.GetFields().Where(f => f.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>() != null))
             {
-                var attr = fieldInfo.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>();
-                if (attr != null)
+                if (fieldInfo.Name != category.ToString())
+                    continue;
+                var attribute = fieldInfo.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>();
+                if (attribute != null)
                 {
                     try
                     {
-                        var localName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, attr.LocalizationKey);
+                        var localName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, attribute.LocalizationKey);
                         if (!_categoryLocalizationNames.ContainsKey(category.ToString()))
                             _categoryLocalizationNames.Add(category.ToString(), localName);
                         return localName;

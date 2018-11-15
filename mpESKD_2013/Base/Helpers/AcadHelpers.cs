@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Xml.Linq;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -460,10 +461,19 @@
         public static bool IsApplicable(RXObject rxObject, string appName)
         {
             DBObject dbObject = rxObject as DBObject;
-            if (dbObject == null) return false;
+            if (dbObject == null) 
+                return false;
             // Всегда нужно проверять по наличию расширенных данных
             // иначе может привести к фаталам при работе с динамическими блоками
             return IsMPCOentity(dbObject, appName);
+        }
+
+        public static bool IsApplicable(RXObject rxObject)
+        {
+            DBObject dbObject = rxObject as DBObject;
+            if (dbObject == null) 
+                return false;
+            return IsSupportedXData(dbObject);
         }
 
         /// <summary>
@@ -482,6 +492,20 @@
         {
             ResultBuffer rb = dbObject.GetXDataForApplication(appName);
             return rb != null;
+        }
+
+        public static bool IsSupportedXData(Entity entity)
+        {
+            return entity.XData.AsArray().Any(tv => 
+                tv.TypeCode == (int) DxfCode.ExtendedDataRegAppName && 
+                tv.Value.ToString().StartsWith("mp"));
+        }
+
+        public static bool IsSupportedXData(DBObject dbObject)
+        {
+            return dbObject.XData.AsArray().Any(tv => 
+                tv.TypeCode == (int) DxfCode.ExtendedDataRegAppName && 
+                tv.Value.ToString().StartsWith("mp"));
         }
     }
 

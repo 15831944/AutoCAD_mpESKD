@@ -16,6 +16,7 @@
     using Properties;
     using Styles;
 
+    [IntellectualEntityDisplayNameKeyAttribute("h73")]
     public class GroundLine : IntellectualEntity
     {
         #region Constructor

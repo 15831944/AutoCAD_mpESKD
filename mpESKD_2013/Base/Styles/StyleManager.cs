@@ -361,16 +361,17 @@
                         }
                         if (MainStaticSettings.Settings.UseTextStyleFromStyle)
                         {
-                            var textStyleName = StyleHelpers.GetPropertyValue(style, AxisProperties.TextStyle.Name,
-                                AxisProperties.TextStyle.DefaultValue);
-                            if (TextStyleHelper.HasTextStyle(textStyleName))
-                                TextStyle = textStyleName;
-                            else
-                            {
-                                if (MainStaticSettings.Settings.IfNoTextStyle == 1 &&
-                                    TextStyleHelper.CreateTextStyle(((AxisStyle)style).TextStyleXmlData))
-                                    TextStyle = textStyleName;
-                            }
+                            //todo release
+                            ////var textStyleName = StyleHelpers.GetPropertyValue(style, AxisProperties.TextStyle.Name,
+                            ////    AxisProperties.TextStyle.DefaultValue);
+                            ////if (TextStyleHelper.HasTextStyle(textStyleName))
+                            ////    TextStyle = textStyleName;
+                            ////else
+                            ////{
+                            ////    if (MainStaticSettings.Settings.IfNoTextStyle == 1 &&
+                            ////        TextStyleHelper.CreateTextStyle(((AxisStyle)style).TextStyleXmlData))
+                            ////        TextStyle = textStyleName;
+                            ////}
                         }
                     }
                 }

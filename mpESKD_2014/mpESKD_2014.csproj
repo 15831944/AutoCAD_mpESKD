@@ -96,6 +96,9 @@
     <Compile Include="..\mpESKD_2013\Base\Enums\EntityDirection.cs">
       <Link>Base\Enums\EntityDirection.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\GripType.cs">
+      <Link>Base\Enums\GripType.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\GroundLineFirstStrokeOffset.cs">
       <Link>Base\Enums\GroundLineFirstStrokeOffset.cs</Link>
     </Compile>
@@ -104,6 +107,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\PropertyScope.cs">
       <Link>Base\Enums\PropertyScope.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\StyleType.cs">
+      <Link>Base\Enums\StyleType.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\UpdateVariant.cs">
       <Link>Base\Enums\UpdateVariant.cs</Link>
@@ -132,8 +138,11 @@
     <Compile Include="..\mpESKD_2013\Base\IntellectualEntity.cs">
       <Link>Base\IntellectualEntity.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Overrules\MPCOGrips.cs">
-      <Link>Base\Overrules\MPCOGrips.cs</Link>
+    <Compile Include="..\mpESKD_2013\Base\Overrules\IntellectualEntityGripData.cs">
+      <Link>Base\Overrules\IntellectualEntityGripData.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Overrules\OsnapOverruleEx.cs">
+      <Link>Base\Overrules\OsnapOverruleEx.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Properties\BaseProperties.cs">
       <Link>Base\Properties\BaseProperties.cs</Link>
