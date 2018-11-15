@@ -1,10 +1,10 @@
-﻿namespace mpESKD.Functions.mpGroundLine
+﻿// ReSharper disable InconsistentNaming
+namespace mpESKD.Functions.mpGroundLine
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
-    using System.Reflection;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
@@ -14,7 +14,6 @@
     using Base.Styles;
     using ModPlusAPI.Windows;
     using Properties;
-    using Styles;
 
     [IntellectualEntityDisplayNameKeyAttribute("h73")]
     public class GroundLine : IntellectualEntity
@@ -29,7 +28,7 @@
             BlockId = objectId;
         }
 
-        public GroundLine(GroundLineStyle style)
+        public GroundLine()
         {
             var blockTableRecord = new BlockTableRecord
             {
@@ -37,10 +36,6 @@
                 BlockScaling = BlockScaling.Uniform
             };
             BlockRecord = blockTableRecord;
-            StyleGuid = style.Guid;
-
-            // Применяем текущий стиль к ЕСКД примитиву
-            ApplyStyle(style);
         }
 
         #endregion
@@ -351,41 +346,16 @@
         }
 
         #endregion
-
-        #region Style
-
-        //todo remove after implement intellectual style
-        public override void ApplyStyle(MPCOStyle style)
-        {
-            // apply settings from style
-            FirstStrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(FirstStrokeOffset), GroundLineProperties.FirstStrokeOffset.DefaultValue);
-            StrokeLength = StyleHelpers.GetPropertyValue(style, nameof(StrokeLength), GroundLineProperties.StrokeLength.DefaultValue);
-            StrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(StrokeOffset), GroundLineProperties.StrokeOffset.DefaultValue);
-            StrokeAngle = StyleHelpers.GetPropertyValue(style, nameof(StrokeAngle), GroundLineProperties.StrokeAngle.DefaultValue);
-            Space = StyleHelpers.GetPropertyValue(style, nameof(Space), GroundLineProperties.Space.DefaultValue);
-            // general
-            Scale = MainStaticSettings.Settings.UseScaleFromStyle
-                ? StyleHelpers.GetPropertyValue(style, nameof(Scale), GroundLineProperties.Scale.DefaultValue)
-                : AcadHelpers.Database.Cannoscale;
-            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), GroundLineProperties.LineTypeScale.DefaultValue);
-            // set layer
-            var layerName = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LayerName.Name, GroundLineProperties.LayerName.DefaultValue);
-            AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
-            // set line type
-            var lineType = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LineType.Name, GroundLineProperties.LineType.DefaultValue);
-            AcadHelpers.SetLineType(BlockId, lineType);
-        }
-
-        #endregion
-
+        
         public override ResultBuffer GetParametersForXData()
         {
             try
             {
                 // ReSharper disable once UseObjectOrCollectionInitializer
                 var resBuf = new ResultBuffer();
+
                 // 1001 - DxfCode.ExtendedDataRegAppName. AppName
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, GroundLineFunction.MPCOEntName));
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, GroundLineInterface.Name));
 
                 // 1010
                 // Векторы от средних точек до начальной точки
@@ -517,7 +487,5 @@
                 ExceptionBox.Show(exception);
             }
         }
-
-
     }
 }

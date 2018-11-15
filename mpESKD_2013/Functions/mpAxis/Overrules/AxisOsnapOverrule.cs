@@ -19,7 +19,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
             if (_axisOsnapOverrule != null) return _axisOsnapOverrule;
             _axisOsnapOverrule = new AxisOsnapOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _axisOsnapOverrule.SetXDataFilter(AxisFunction.MPCOEntName);
+            _axisOsnapOverrule.SetXDataFilter(AxisInterface.Name);
             return _axisOsnapOverrule;
         }
 
@@ -62,7 +62,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisFunction.MPCOEntName);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisInterface.Name);
         }
     }
 }

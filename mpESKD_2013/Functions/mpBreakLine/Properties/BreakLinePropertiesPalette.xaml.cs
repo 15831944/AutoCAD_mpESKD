@@ -63,7 +63,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                         var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference)
                         {
-                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineFunction.MPCOEntName))
+                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineInterface.Name))
                             {
                                 objectIds.Add(selectedObject.ObjectId);
                             }
@@ -72,7 +72,7 @@ namespace mpESKD.Functions.mpBreakLine.Properties
                 }
                 if (objectIds.Any())
                 {
-                    Expander.Header = BreakLineFunction.MPCOEntDisplayName + " (" + objectIds.Count + ")";
+                    Expander.Header = BreakLineInterface.LName + " (" + objectIds.Count + ")";
                     _breakLineSummaryProperties = new BreakLineSummaryProperties(objectIds);
                     SetData(_breakLineSummaryProperties);
                 }

@@ -39,13 +39,13 @@ namespace mpESKD.Base
         /// <summary>
         /// Стиль примитива. Свойство используется для работы палитры, а стиль задается через свойство <see cref="StyleGuid"/>
         /// </summary>
-        [EntityProperty(PropertiesCategory.General, 1, nameof(Style), "h50", "h52", null, null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.General, 1, nameof(Style), "h50", "h52", "", null, null, PropertyScope.Palette)]
         public string Style { get; set; }
 
         /// <summary>
         /// Имя слоя
         /// </summary>
-        [EntityProperty(PropertiesCategory.General, 2, nameof(LayerName), "p7", "d7", null, null, null)]
+        [EntityProperty(PropertiesCategory.General, 2, nameof(LayerName), "p7", "d7", "", null, null)]
         public string LayerName { get; set; }
 
         /// <summary>Масштаб примитива</summary>
@@ -252,9 +252,6 @@ namespace mpESKD.Base
 
         /// <summary>Идентификатор стиля</summary>
         public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
-
-        //todo remove after implement intellectual style
-        public abstract void ApplyStyle(MPCOStyle style);
         
         /// <summary>
         /// Перерисовка элементов блока по параметрам ЕСКД элемента

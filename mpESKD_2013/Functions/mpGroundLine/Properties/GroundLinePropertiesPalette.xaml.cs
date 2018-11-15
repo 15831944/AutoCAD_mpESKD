@@ -66,7 +66,7 @@ namespace mpESKD.Functions.mpGroundLine.Properties
                         var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference)
                         {
-                            if (ExtendedDataHelpers.IsApplicable(obj, GroundLineFunction.MPCOEntName))
+                            if (ExtendedDataHelpers.IsApplicable(obj, GroundLineInterface.Name))
                             {
                                 objectIds.Add(selectedObject.ObjectId);
                             }
@@ -76,7 +76,7 @@ namespace mpESKD.Functions.mpGroundLine.Properties
                 }
                 if (objectIds.Any())
                 {
-                    Expander.Header = GroundLineFunction.MPCOEntDisplayName + " (" + objectIds.Count + ")";
+                    Expander.Header = GroundLineInterface.LName + " (" + objectIds.Count + ")";
                     _groundLineSummaryProperties = new GroundLineSummaryProperties(objectIds);
                     SetData(_groundLineSummaryProperties);
                 }

@@ -22,7 +22,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             if (_groundLineGripPointOverrule != null) return _groundLineGripPointOverrule;
             _groundLineGripPointOverrule = new GroundLineGripPointOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _groundLineGripPointOverrule.SetXDataFilter(GroundLineFunction.MPCOEntName);
+            _groundLineGripPointOverrule.SetXDataFilter(GroundLineInterface.Name);
             return _groundLineGripPointOverrule;
         }
 
@@ -257,7 +257,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         // Проверка происходит по наличию XData с определенным AppName
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineFunction.MPCOEntName);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineInterface.Name);
         }
     }
 

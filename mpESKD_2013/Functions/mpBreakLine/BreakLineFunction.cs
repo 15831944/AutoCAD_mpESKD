@@ -1,6 +1,5 @@
 ﻿namespace mpESKD.Functions.mpBreakLine
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -10,40 +9,25 @@
     using Overrules;
     using Base.Helpers;
     using mpESKD.Base.Styles;
-    using Properties;
-    using Styles;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class BreakLineFunction : IIntellectualEntityFunction
     {
-        /// <summary>Имя примитива, помещаемое в XData</summary>
-        public static string MPCOEntName = BreakLineInterface.Name; // "mpBreakLine";
-        
-        /// <summary>Отображаемое имя примитива</summary>
-        public static string MPCOEntDisplayName = BreakLineInterface.LName; // "Линия обрыва";
-
         public void Initialize()
         {
             // Включение работы переопределения ручек (нужна регенерация в конце метода (?))
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance(), true);
-            //Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance(), true);
             Overrule.Overruling = true;
-
-            // создание файла хранения стилей, если отсутствует
-            StyleManager.CheckStylesFile<BreakLineStyle>();
-            StyleManager.LoadStylesFromXmlFile(
-                BreakLineStyle.Instance.CreateSystemStyles<BreakLineStyle>(),
-                BreakLineStyle.Instance.ParseStyleFromXElement<BreakLineStyle>);
         }
         public void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance());
-            //Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance());
         }
     }
@@ -69,7 +53,7 @@
         private static void CreateBreakLine(BreakLineType breakLineType)
         {
             // send statistic
-            Statistic.SendCommandStarting(BreakLineFunction.MPCOEntName, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(BreakLineInterface.Name, MpVersionData.CurCadVers);
             try
             {
                 Overrule.Overruling = false;
@@ -77,24 +61,17 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(BreakLineFunction.MPCOEntName);
-                // add layer from style
-                BreakLineStyle style = StyleManager.GetCurrentStyle(
-                    BreakLineStyle.Instance.CreateSystemStyles<BreakLineStyle>(),
-                    BreakLineStyle.Instance.ParseStyleFromXElement<BreakLineStyle>);
-
-                var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,
-                    BreakLineProperties.LayerName.DefaultValue);
-                var breakLine = new BreakLine(style)
-                {
-                    BreakLineType = breakLineType
-                };
+                ExtendedDataHelpers.AddRegAppTableRecord(BreakLineInterface.Name);
+                var style = StyleManager.GetCurrentStyle(typeof(BreakLine));
+                var breakLine = new BreakLine { BreakLineType = breakLineType };
+                breakLine.ApplyStyle(style);
                 var blockReference = MainFunction.CreateBlock(breakLine);
                 
                 // set layer
-                AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
+                AcadHelpers.SetLayerByName(blockReference.ObjectId, style.GetLayerNameProperty(), style.LayerXmlData);
 
                 var breakLoop = false;
+                //todo change it
                 while (!breakLoop)
                 {
                     var breakLineJig = new BreakLineJig(breakLine, blockReference);
@@ -145,7 +122,7 @@
                     }
                 }
             }
-            catch (Exception exception)
+            catch (System.Exception exception)
             {
                 ExceptionBox.Show(exception);
             }

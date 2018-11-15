@@ -77,7 +77,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                         var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference)
                         {
-                            if (ExtendedDataHelpers.IsApplicable(obj, AxisFunction.MPCOEntName))
+                            if (ExtendedDataHelpers.IsApplicable(obj, AxisInterface.Name))
                             {
                                 objectIds.Add(selectedObject.ObjectId);
                             }
@@ -86,7 +86,7 @@ namespace mpESKD.Functions.mpAxis.Properties
                 }
                 if (objectIds.Any())
                 {
-                    Expander.Header = AxisFunction.MPCOEntDisplayName + " (" + objectIds.Count + ")";
+                    Expander.Header = AxisInterface.LName + " (" + objectIds.Count + ")";
                     _axisSummaryProperties = new AxisSummaryProperties(objectIds, out int maxCount);
                     ChangeVisibilityByMarkerCount(maxCount);
                     SetData(_axisSummaryProperties);

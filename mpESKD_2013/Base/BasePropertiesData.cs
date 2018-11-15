@@ -122,7 +122,7 @@ namespace mpESKD.Base
                         if (style != null)
                         {
                             entity.StyleGuid = style.Guid;
-                            entity.ApplyStyle(style);
+                            //entity.ApplyStyle(style);
                             entity.UpdateEntities();
                             entity.GetBlockTableRecordWithoutTransaction(blkRef);
                             using (var resBuf = entity.GetParametersForXData())

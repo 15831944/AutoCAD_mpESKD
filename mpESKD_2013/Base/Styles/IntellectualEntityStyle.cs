@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Base.Styles
 {
+    using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
@@ -16,12 +17,18 @@
         private FontWeight _fontWeight;
         private bool _isCurrent;
 
-        public IntellectualEntityStyle()
+        public IntellectualEntityStyle(Type entityType)
         {
+            EntityType = entityType;
             Properties = new ObservableCollection<IntellectualEntityProperty>();
         }
 
         public ObservableCollection<IntellectualEntityProperty> Properties { get; }
+
+        /// <summary>
+        /// Тип интеллектуального примитива, к которому относится стиль
+        /// </summary>
+        public Type EntityType { get; }
 
         /// <summary>
         /// Имя стиля
@@ -36,12 +43,7 @@
                 OnPropertyChanged();
             }
         }
-
-        /// <summary>
-        /// Имя функции
-        /// </summary>
-        public string FunctionName { get; set; }
-
+        
         /// <summary>
         /// Описание стиля
         /// </summary>

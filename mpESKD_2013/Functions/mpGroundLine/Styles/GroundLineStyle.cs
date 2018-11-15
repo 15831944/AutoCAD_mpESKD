@@ -22,8 +22,8 @@
             var styles = new List<GroundLineStyle>();
             var style = new GroundLineStyle
             {
-                Name = GroundLineFunction.MPCOEntDisplayName,
-                FunctionName = GroundLineFunction.MPCOEntName,
+                Name = GroundLineInterface.LName,
+                FunctionName = GroundLineInterface.Name,
                 Description = Language.GetItem(MainFunction.LangItem, "h78"), // "Базовый стиль для линии грунта",
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
@@ -48,7 +48,7 @@
             var style = new T()
             {
                 StyleType = MPCOStyleType.User,
-                FunctionName = GroundLineFunction.MPCOEntName
+                FunctionName = GroundLineInterface.Name
             };
 
             // Properties

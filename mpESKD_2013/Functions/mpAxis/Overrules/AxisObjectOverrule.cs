@@ -17,7 +17,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
             if (_axisObjectOverrule != null) return _axisObjectOverrule;
             _axisObjectOverrule = new AxisObjectOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _axisObjectOverrule.SetXDataFilter(AxisFunction.MPCOEntName);
+            _axisObjectOverrule.SetXDataFilter(AxisInterface.Name);
             return _axisObjectOverrule;
         }
         public override void Close(DBObject dbObject)
@@ -49,7 +49,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisFunction.MPCOEntName);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisInterface.Name);
         }
     }
 }

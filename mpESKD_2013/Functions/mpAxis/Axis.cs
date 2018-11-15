@@ -8,9 +8,7 @@
     using Base;
     using Base.Enums;
     using Base.Helpers;
-    using mpESKD.Base.Styles;
     using Properties;
-    using Styles;
     using ModPlusAPI.Windows;
 
     [IntellectualEntityDisplayNameKeyAttribute("h41")]
@@ -25,7 +23,7 @@
             BlockId = objectId;
         }
         /// <summary>Инициализация экземпляра класса для BreakLine для создания</summary>
-        public Axis(AxisStyle style, string lastHorizontalValue, string lastVerticalValue)
+        public Axis(string lastHorizontalValue, string lastVerticalValue)
         {
             var blockTableRecord = new BlockTableRecord
             {
@@ -33,9 +31,7 @@
                 BlockScaling = BlockScaling.Uniform
             };
             BlockRecord = blockTableRecord;
-            StyleGuid = style.Guid;
-            // Применяем текущий стиль к ЕСКД примитиву
-            ApplyStyle(style);
+
             // last values
             LastHorizontalValue = lastHorizontalValue;
             LastVerticalValue = lastVerticalValue;
@@ -218,47 +214,47 @@
 
         #region Style
 
-        /// <summary>Применение стиля по сути должно переопределять текущие параметры</summary>
-        public override void ApplyStyle(MPCOStyle style)
-        {
-            // apply settings from style
-            Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture), AxisProperties.Fracture.DefaultValue);
-            MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition), AxisProperties.MarkersPosition.DefaultValue);
-            MarkersDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkersDiameter), AxisProperties.MarkersDiameter.DefaultValue);
-            MarkersCount = StyleHelpers.GetPropertyValue(style, nameof(MarkersCount), AxisProperties.MarkersCount.DefaultValue);
-            BottomFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(BottomFractureOffset), AxisProperties.BottomFractureOffset.DefaultValue);
-            FirstMarkerType = StyleHelpers.GetPropertyValue(style, nameof(FirstMarkerType), AxisProperties.FirstMarkerType.DefaultValue);
-            SecondMarkerType = StyleHelpers.GetPropertyValue(style, nameof(SecondMarkerType), AxisProperties.SecondMarkerType.DefaultValue);
-            ThirdMarkerType = StyleHelpers.GetPropertyValue(style, nameof(ThirdMarkerType), AxisProperties.ThirdMarkerType.DefaultValue);
-            TopFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(TopFractureOffset), AxisProperties.TopFractureOffset.DefaultValue);
-            OrientMarkerType = StyleHelpers.GetPropertyValue(style, nameof(OrientMarkerType), AxisProperties.OrientMarkerType.DefaultValue);
-            ArrowsSize = StyleHelpers.GetPropertyValue(style, nameof(ArrowsSize), AxisProperties.ArrowsSize.DefaultValue);
-            TextHeight = StyleHelpers.GetPropertyValue(style, nameof(TextHeight), AxisProperties.TextHeight.DefaultValue);
-            Scale = MainStaticSettings.Settings.UseScaleFromStyle
-                ? StyleHelpers.GetPropertyValue(style, nameof(Scale), AxisProperties.Scale.DefaultValue)
-                : AcadHelpers.Database.Cannoscale;
-            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), AxisProperties.LineTypeScale.DefaultValue);
-            // set layer
-            var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name, AxisProperties.LayerName.DefaultValue);
-            AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
-            // set line type
-            var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name, AxisProperties.LineType.DefaultValue);
-            AcadHelpers.SetLineType(BlockId, lineType);
-            // set text style
-            if (MainStaticSettings.Settings.UseTextStyleFromStyle)
-            {
-                var textStyleName = StyleHelpers.GetPropertyValue(style, AxisProperties.TextStyle.Name,
-                    AxisProperties.TextStyle.DefaultValue);
-                if (TextStyleHelper.HasTextStyle(textStyleName))
-                    TextStyle = textStyleName;
-                else
-                {
-                    if (MainStaticSettings.Settings.IfNoTextStyle == 1 &&
-                        TextStyleHelper.CreateTextStyle(((AxisStyle)style).TextStyleXmlData))
-                        TextStyle = textStyleName;
-                }
-            }
-        }
+        //todo remove
+        //public override void ApplyStyle(MPCOStyle style)
+        //{
+        //    // apply settings from style
+        //    Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture), AxisProperties.Fracture.DefaultValue);
+        //    MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition), AxisProperties.MarkersPosition.DefaultValue);
+        //    MarkersDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkersDiameter), AxisProperties.MarkersDiameter.DefaultValue);
+        //    MarkersCount = StyleHelpers.GetPropertyValue(style, nameof(MarkersCount), AxisProperties.MarkersCount.DefaultValue);
+        //    BottomFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(BottomFractureOffset), AxisProperties.BottomFractureOffset.DefaultValue);
+        //    FirstMarkerType = StyleHelpers.GetPropertyValue(style, nameof(FirstMarkerType), AxisProperties.FirstMarkerType.DefaultValue);
+        //    SecondMarkerType = StyleHelpers.GetPropertyValue(style, nameof(SecondMarkerType), AxisProperties.SecondMarkerType.DefaultValue);
+        //    ThirdMarkerType = StyleHelpers.GetPropertyValue(style, nameof(ThirdMarkerType), AxisProperties.ThirdMarkerType.DefaultValue);
+        //    TopFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(TopFractureOffset), AxisProperties.TopFractureOffset.DefaultValue);
+        //    OrientMarkerType = StyleHelpers.GetPropertyValue(style, nameof(OrientMarkerType), AxisProperties.OrientMarkerType.DefaultValue);
+        //    ArrowsSize = StyleHelpers.GetPropertyValue(style, nameof(ArrowsSize), AxisProperties.ArrowsSize.DefaultValue);
+        //    TextHeight = StyleHelpers.GetPropertyValue(style, nameof(TextHeight), AxisProperties.TextHeight.DefaultValue);
+        //    Scale = MainStaticSettings.Settings.UseScaleFromStyle
+        //        ? StyleHelpers.GetPropertyValue(style, nameof(Scale), AxisProperties.Scale.DefaultValue)
+        //        : AcadHelpers.Database.Cannoscale;
+        //    LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), AxisProperties.LineTypeScale.DefaultValue);
+        //    // set layer
+        //    var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name, AxisProperties.LayerName.DefaultValue);
+        //    AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
+        //    // set line type
+        //    var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name, AxisProperties.LineType.DefaultValue);
+        //    AcadHelpers.SetLineType(BlockId, lineType);
+        //    // set text style
+        //    if (MainStaticSettings.Settings.UseTextStyleFromStyle)
+        //    {
+        //        var textStyleName = StyleHelpers.GetPropertyValue(style, AxisProperties.TextStyle.Name,
+        //            AxisProperties.TextStyle.DefaultValue);
+        //        if (TextStyleHelper.HasTextStyle(textStyleName))
+        //            TextStyle = textStyleName;
+        //        else
+        //        {
+        //            if (MainStaticSettings.Settings.IfNoTextStyle == 1 &&
+        //                TextStyleHelper.CreateTextStyle(((AxisStyle)style).TextStyleXmlData))
+        //                TextStyle = textStyleName;
+        //        }
+        //    }
+        //}
 
         #endregion
 
@@ -1294,7 +1290,7 @@
                 // ReSharper disable once UseObjectOrCollectionInitializer
                 var resBuf = new ResultBuffer();
                 // 1001 - DxfCode.ExtendedDataRegAppName. AppName
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, AxisFunction.MPCOEntName));
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, AxisInterface.Name));
                 // 1010
                 // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
                 var vector = EndPointOCS - InsertionPointOCS;

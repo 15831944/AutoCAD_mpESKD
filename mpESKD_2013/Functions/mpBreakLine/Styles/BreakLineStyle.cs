@@ -22,7 +22,7 @@
             var style = new BreakLineStyle
             {
                 Name = Language.GetItem(MainFunction.LangItem, "h48") , // "Линия обрыва"
-                FunctionName = BreakLineFunction.MPCOEntName,
+                FunctionName = BreakLineInterface.Name,
                 Description = Language.GetItem(MainFunction.LangItem, "h53"), // "Базовый стиль для линии обрыва"
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
@@ -45,7 +45,7 @@
             var style = new T()
             {
                 StyleType = MPCOStyleType.User,
-                FunctionName = BreakLineFunction.MPCOEntName
+                FunctionName = BreakLineInterface.Name
             };
 
             // Properties

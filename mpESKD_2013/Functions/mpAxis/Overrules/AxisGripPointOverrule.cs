@@ -22,7 +22,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
             if (_axisGripPointOverrule != null) return _axisGripPointOverrule;
             _axisGripPointOverrule = new AxisGripPointsOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _axisGripPointOverrule.SetXDataFilter(AxisFunction.MPCOEntName);
+            _axisGripPointOverrule.SetXDataFilter(AxisInterface.Name);
             return _axisGripPointOverrule;
         }
         private Point3d InitEndPoint;
@@ -324,7 +324,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
         // Проверка происходит по наличию XData с определенным AppName
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisFunction.MPCOEntName);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisInterface.Name);
         }
 
         #region Helpers

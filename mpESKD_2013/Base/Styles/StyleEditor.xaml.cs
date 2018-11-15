@@ -63,8 +63,8 @@
             #region mpBreakLine
             var styleToBind = new StyleToBind
             {
-                FunctionLocalName = BreakLineFunction.MPCOEntDisplayName,
-                FunctionName = BreakLineFunction.MPCOEntName
+                FunctionLocalName = BreakLineInterface.LName,
+                FunctionName = BreakLineInterface.Name
             };
             var breakLineStyles = BreakLineStyleForEditor.GetStylesForEditor();
             foreach (BreakLineStyleForEditor style in breakLineStyles)
@@ -79,8 +79,8 @@
 
             styleToBind = new StyleToBind
             {
-                FunctionLocalName = AxisFunction.MPCOEntDisplayName,
-                FunctionName = AxisFunction.MPCOEntName
+                FunctionLocalName = AxisInterface.LName,
+                FunctionName = AxisInterface.Name
             };
             var axisStyles = AxisStyleForEditor.GetStylesForEditor();
             foreach (AxisStyleForEditor style in axisStyles)
@@ -96,8 +96,8 @@
 
             styleToBind = new StyleToBind()
             {
-                FunctionLocalName = GroundLineFunction.MPCOEntDisplayName,
-                FunctionName = GroundLineFunction.MPCOEntName
+                FunctionLocalName = GroundLineInterface.LName,
+                FunctionName = GroundLineInterface.Name
             };
             var groundLineStyles = GroundLineStyleForEditor.GetStylesForEditor();
             foreach (GroundLineStyleForEditor style in groundLineStyles)
@@ -131,19 +131,19 @@
                 if (styleForEditor is BreakLineStyleForEditor breakLineStyle)
                 {
                     BorderProperties.Child = new BreakLineStyleProperties(breakLineStyle.LayerName) { DataContext = item };
-                    SetImage(BreakLineFunction.MPCOEntName);
+                    SetImage(BreakLineInterface.Name);
                 }
                 // axis
                 if (styleForEditor is AxisStyleForEditor axisStyle)
                 {
                     BorderProperties.Child = new AxisStyleProperties(axisStyle.LayerName) { DataContext = item };
-                    SetImage(AxisFunction.MPCOEntName);
+                    SetImage(AxisInterface.Name);
                 }
                 // ground line
                 if (styleForEditor is GroundLineStyleForEditor groundLineStyle)
                 {
                     BorderProperties.Child = new GroundLineStyleProperties(groundLineStyle.LayerName) { DataContext = item };
-                    SetImage(GroundLineFunction.MPCOEntName);
+                    SetImage(GroundLineInterface.Name);
                 }
             }
             else SetImage(string.Empty);
@@ -155,11 +155,11 @@
             if (selected == null) return;
             if (selected is StyleToBind styleToBind)
             {
-                if (styleToBind.FunctionName == BreakLineFunction.MPCOEntName)
+                if (styleToBind.FunctionName == BreakLineInterface.Name)
                     styleToBind.Styles.Add(new BreakLineStyleForEditor(styleToBind));
-                if (styleToBind.FunctionName == AxisFunction.MPCOEntName)
+                if (styleToBind.FunctionName == AxisInterface.Name)
                     styleToBind.Styles.Add(new AxisStyleForEditor(styleToBind));
-                if (styleToBind.FunctionName == GroundLineFunction.MPCOEntName)
+                if (styleToBind.FunctionName == GroundLineInterface.Name)
                     styleToBind.Styles.Add(new GroundLineStyleForEditor(styleToBind));
             }
             // break line
@@ -276,20 +276,20 @@
             // save styles IsCurrent
             foreach (StyleToBind styleToBind in _styles)
             {
-                if (styleToBind.FunctionName == BreakLineFunction.MPCOEntName)
+                if (styleToBind.FunctionName == BreakLineInterface.Name)
                 {
                     var currentStyle = styleToBind.Styles.FirstOrDefault(s => s.IsCurrent);
                     if (currentStyle != null)
                         UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpBreakLine", "CurrentStyleGuid", currentStyle.Guid, true);
                 }
-                if (styleToBind.FunctionName == AxisFunction.MPCOEntName)
+                if (styleToBind.FunctionName == AxisInterface.Name)
                 {
                     var currentStyle = styleToBind.Styles.FirstOrDefault(s => s.IsCurrent);
                     if (currentStyle != null)
                         UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpAxis", "CurrentStyleGuid", currentStyle.Guid, true);
                 }
 
-                if (styleToBind.FunctionName == GroundLineFunction.MPCOEntName)
+                if (styleToBind.FunctionName == GroundLineInterface.Name)
                 {
                     var currentStyle = styleToBind.Styles.FirstOrDefault(s => s.IsCurrent);
                     if (currentStyle != null)
@@ -299,7 +299,7 @@
             // save styles
             // break line style
             StyleManager.SaveStylesToXml<BreakLineStyle, BreakLineStyleForEditor>(
-                _styles.Single(s => s.FunctionName == BreakLineFunction.MPCOEntName)
+                _styles.Single(s => s.FunctionName == BreakLineInterface.Name)
                     .Styles.Where(s => s.CanEdit).Cast<BreakLineStyleForEditor>().ToList(),
                 BreakLineStyleForEditor.ConvertStyleForEditorToXElement);
             StyleManager.ReloadStyles(
@@ -308,7 +308,7 @@
 
             // axis styles
             StyleManager.SaveStylesToXml<AxisStyle, AxisStyleForEditor>(
-                _styles.Single(s => s.FunctionName == AxisFunction.MPCOEntName)
+                _styles.Single(s => s.FunctionName == AxisInterface.Name)
                     .Styles.Where(s => s.CanEdit).Cast<AxisStyleForEditor>().ToList(),
                 AxisStyleForEditor.ConvertStyleForEditorToXElement);
             StyleManager.ReloadStyles(
@@ -317,7 +317,7 @@
             
             // ground line styles
             StyleManager.SaveStylesToXml<GroundLineStyle, GroundLineStyleForEditor>(
-                _styles.Single(s => s.FunctionName == GroundLineFunction.MPCOEntName)
+                _styles.Single(s => s.FunctionName == GroundLineInterface.Name)
                     .Styles.Where(s => s.CanEdit).Cast<GroundLineStyleForEditor>().ToList(),
                 GroundLineStyleForEditor.ConvertStyleForEditorToXElement);
             StyleManager.ReloadStyles(
@@ -389,13 +389,13 @@
                         if (obj is BlockReference blockReference)
                         {
                             // mpBreakLine
-                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineFunction.MPCOEntName))
+                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineInterface.Name))
                                 newStyleGuid = AddStyleFromBreakLine(blockReference);
                             // mpAxis
-                            if (ExtendedDataHelpers.IsApplicable(obj, AxisFunction.MPCOEntName))
+                            if (ExtendedDataHelpers.IsApplicable(obj, AxisInterface.Name))
                                 newStyleGuid = AddStyleFromAxis(blockReference);
                             // mpGroundLine
-                            if (ExtendedDataHelpers.IsApplicable(obj, GroundLineFunction.MPCOEntName))
+                            if (ExtendedDataHelpers.IsApplicable(obj, GroundLineInterface.Name))
                                 newStyleGuid = AddStyleFromGroundLine(blockReference);
                         }
                     }
@@ -419,7 +419,7 @@
             var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(blkReference);
             if (breakLine != null)
             {
-                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == BreakLineFunction.MPCOEntName);
+                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == BreakLineInterface.Name);
                 if (styleToBind != null)
                 {
                     var styleForEditor = new BreakLineStyleForEditor(styleToBind)
@@ -449,7 +449,7 @@
             var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blkReference);
             if (axis != null)
             {
-                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == AxisFunction.MPCOEntName);
+                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == AxisInterface.Name);
                 if (styleToBind != null)
                 {
                     var styleForEditor = new AxisStyleForEditor(styleToBind)
@@ -495,7 +495,7 @@
             var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(blkReference);
             if (groundLine != null)
             {
-                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == GroundLineFunction.MPCOEntName);
+                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == GroundLineInterface.Name);
                 if (styleToBind != null)
                 {
                     var styleForEditor = new GroundLineStyleForEditor(styleToBind)

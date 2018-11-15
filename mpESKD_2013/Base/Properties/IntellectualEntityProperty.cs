@@ -26,7 +26,7 @@
             Name = attribute.Name;
             DisplayNameLocalizationKey = attribute.DisplayNameLocalizationKey;
             DescriptionLocalizationKey = attribute.DescriptionLocalizationKey;
-            if (value.GetType() == typeof(AnnotationScale))
+            if (value != null && value.GetType() == typeof(AnnotationScale))
                 DefaultValue = new AnnotationScale
                 {
                     Name = attribute.DefaultValue.ToString(), 
@@ -42,6 +42,10 @@
 
         public Type EntityType { get; }
         
+        /// <summary>
+        /// Идентификатор блока-владельца. Свойство используется при работе палитры.
+        /// При работе со стилями свойство равно ObjectId.Null
+        /// </summary>
         public ObjectId OwnerObjectId { get; }
 
         public PropertiesCategory Category { get; }
@@ -56,15 +60,11 @@
         
         public object DefaultValue { get; }
 
-        //todo notify?!
         public object Value
         {
             get => _value;
             set
             {
-                AcadHelpers.WriteMessageInDebug("\nProperty set value " + value);
-                if(value.ToString() == "ByBlock")
-                    Debug.Print("!");
                 if (Equals(value, _value)) return;
                 _value = value;
                 OnPropertyChanged();

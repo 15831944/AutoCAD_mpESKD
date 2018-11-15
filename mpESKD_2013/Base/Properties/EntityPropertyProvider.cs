@@ -74,9 +74,9 @@ namespace mpESKD.Base.Properties
             {
                 _intellectualEntity = intellectualEntity;
 
-                var type = intellectualEntity.GetType();
-                EntityType = type;
-                foreach (var propertyInfo in type.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
+                var entityType = intellectualEntity.GetType();
+                EntityType = entityType;
+                foreach (var propertyInfo in entityType.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
                 {
                     var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                     if (attribute != null)
@@ -87,22 +87,21 @@ namespace mpESKD.Base.Properties
                         {
                             IntellectualEntityProperty property = new IntellectualEntityProperty(
                                 attribute,
-                                type,
-                                //todo change
-                                StyleManager.GetStyleNameByGuid(type.Name + "Style",  _intellectualEntity.StyleGuid),
+                                entityType,
+                                StyleManager.GetStyleNameByGuid(entityType, _intellectualEntity.StyleGuid),
                                 _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
                         else if (attribute.Name == "LayerName")
                         {
-                            IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, type, blockReference.Layer, _blkRefObjectId);
+                            IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, entityType, blockReference.Layer, _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
                         else if (attribute.Name == "LineType")
                         {
-                            IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, type, blockReference.Linetype, _blkRefObjectId);
+                            IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, entityType, blockReference.Linetype, _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
@@ -111,7 +110,7 @@ namespace mpESKD.Base.Properties
                             var value = propertyInfo.GetValue(intellectualEntity);
                             if (value != null)
                             {
-                                IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, type, value, _blkRefObjectId);
+                                IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, entityType, value, _blkRefObjectId);
                                 property.PropertyChanged += Property_PropertyChanged;
                                 Properties.Add(property);
                             }
@@ -146,9 +145,9 @@ namespace mpESKD.Base.Properties
                 {
                     _intellectualEntity = intellectualEntity;
 
-                    var type = intellectualEntity.GetType();
+                    var entityType = intellectualEntity.GetType();
 
-                    foreach (var propertyInfo in type.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
+                    foreach (var propertyInfo in entityType.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
                     {
                         var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                         if (attribute != null)
@@ -161,8 +160,7 @@ namespace mpESKD.Base.Properties
                                 {
                                     if (attribute.Name == "Style")
                                     {
-                                        //todo change
-                                        property.Value = StyleManager.GetStyleNameByGuid(type.Name + "Style", _intellectualEntity.StyleGuid);
+                                        property.Value = StyleManager.GetStyleNameByGuid(entityType, _intellectualEntity.StyleGuid);
                                     }
                                     else if (attribute.Name == "LayerName")
                                     {
@@ -199,18 +197,15 @@ namespace mpESKD.Base.Properties
             {
                 using (var blockReference = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                 {
-                    Type type = _intellectualEntity.GetType();
-                    PropertyInfo propertyInfo = type.GetProperty(intellectualEntityProperty.Name);
+                    Type entityType = _intellectualEntity.GetType();
+                    PropertyInfo propertyInfo = entityType.GetProperty(intellectualEntityProperty.Name);
                     if (propertyInfo != null)
                     {
-                        //todo change by intellectualStyle with StyleManager
                         if (intellectualEntityProperty.Name == "Style")
                         {
-                            var style = StyleManager.GetStyles(type.Name + "Style")
-                                .FirstOrDefault(sn => sn.Name.Equals(intellectualEntityProperty.Value.ToString()));
+                            var style = StyleManager.GetStyleByName(entityType, intellectualEntityProperty.Value.ToString());
                             if (style != null)
                             {
-                                _intellectualEntity.StyleGuid = style.Guid;
                                 _intellectualEntity.ApplyStyle(style);
                             }
                         }

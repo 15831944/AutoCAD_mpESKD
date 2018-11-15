@@ -1,4 +1,5 @@
-﻿namespace mpESKD.Functions.mpBreakLine
+﻿// ReSharper disable InconsistentNaming
+namespace mpESKD.Functions.mpBreakLine
 {
     using System;
     using System.Collections.Generic;
@@ -8,9 +9,7 @@
     using Base;
     using Base.Enums;
     using Base.Helpers;
-    using mpESKD.Base.Styles;
     using Properties;
-    using Styles;
     using ModPlusAPI.Windows;
 
     [IntellectualEntityDisplayNameKeyAttribute("h48")]
@@ -24,8 +23,8 @@
             BlockId = blockId;
         }
         
-        /// <summary>Инициализация экземпляра класса для BreakLine для создания</summary>
-        public BreakLine(BreakLineStyle style)
+        /// <summary>Инициализация экземпляра класса BreakLine для создания</summary>
+        public BreakLine()
         {
             var blockTableRecord = new BlockTableRecord
             {
@@ -33,10 +32,6 @@
                 BlockScaling = BlockScaling.Uniform
             };
             BlockRecord = blockTableRecord;
-            StyleGuid = style.Guid;
-            
-            // Применяем текущий стиль к ЕСКД примитиву
-            ApplyStyle(style);
         }
         
         // Основные свойства  примитива
@@ -317,22 +312,22 @@
         }
         #endregion
 
-        /// <summary>Применение стиля по сути должно переопределять текущие параметры</summary>
-        public override void ApplyStyle(MPCOStyle style)
-        {
-            // apply settings from style
-            Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.Overhang.DefaultValue);
-            BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), BreakLineProperties.BreakHeight.DefaultValue);
-            BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), BreakLineProperties.BreakWidth.DefaultValue);
-            Scale = MainStaticSettings.Settings.UseScaleFromStyle 
-                ? StyleHelpers.GetPropertyValue(style, nameof(Scale), BreakLineProperties.Scale.DefaultValue) 
-                : AcadHelpers.Database.Cannoscale;
-            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), BreakLineProperties.LineTypeScale.DefaultValue);
-            // set layer
-            var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,
-                BreakLineProperties.LayerName.DefaultValue);
-            AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
-        }
+        //todo remove
+        //public override void ApplyStyle(MPCOStyle style)
+        //{
+        //    // apply settings from style
+        //    Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.Overhang.DefaultValue);
+        //    BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), BreakLineProperties.BreakHeight.DefaultValue);
+        //    BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), BreakLineProperties.BreakWidth.DefaultValue);
+        //    Scale = MainStaticSettings.Settings.UseScaleFromStyle 
+        //        ? StyleHelpers.GetPropertyValue(style, nameof(Scale), BreakLineProperties.Scale.DefaultValue) 
+        //        : AcadHelpers.Database.Cannoscale;
+        //    LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), BreakLineProperties.LineTypeScale.DefaultValue);
+        //    // set layer
+        //    var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,
+        //        BreakLineProperties.LayerName.DefaultValue);
+        //    AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
+        //}
 
         public override ResultBuffer GetParametersForXData()
         {
@@ -341,7 +336,7 @@
                 // ReSharper disable once UseObjectOrCollectionInitializer
                 var resBuf = new ResultBuffer();
                 // 1001 - DxfCode.ExtendedDataRegAppName. AppName
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, BreakLineFunction.MPCOEntName));
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, BreakLineInterface.Name));
                 // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
                 var vector = EndPointOCS - InsertionPointOCS;
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z))); //1010
@@ -374,7 +369,7 @@
             {
                 TypedValue[] resBufArr = resBuf.AsArray();
                 /* indexes
-                 * Для каждого значения с повторяющимся кодом назначен свой индек (см. метод GetParametersForXData)
+                 * Для каждого значения с повторяющимся кодом назначен свой индекс (см. метод GetParametersForXData)
                  */
                 var index1000 = 0;
                 var index1070 = 0;

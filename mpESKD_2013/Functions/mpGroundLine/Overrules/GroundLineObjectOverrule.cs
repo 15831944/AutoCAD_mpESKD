@@ -16,7 +16,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             if (_groundLineObjectOverrule != null) return _groundLineObjectOverrule;
             _groundLineObjectOverrule = new GroundLineObjectOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _groundLineObjectOverrule.SetXDataFilter(GroundLineFunction.MPCOEntName);
+            _groundLineObjectOverrule.SetXDataFilter(GroundLineInterface.Name);
             return _groundLineObjectOverrule;
         }
 
@@ -51,7 +51,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineFunction.MPCOEntName);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineInterface.Name);
         }
     }
 }

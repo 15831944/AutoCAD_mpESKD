@@ -1,28 +1,18 @@
 ﻿namespace mpESKD.Functions.mpAxis
 {
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Helpers;
-    using Properties;
-    using Styles;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using mpESKD.Base.Styles;
     using Overrules;
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class AxisFunction : IIntellectualEntityFunction
     {
-        /// <summary>Имя примитива, помещаемое в XData</summary>
-        public static string MPCOEntName = AxisInterface.Name; // "mpAxis";
-        
-        /// <summary>Отображаемое имя примитива</summary>
-        public static string MPCOEntDisplayName = AxisInterface.LName; // "Прямая ось".;
-
         public void Initialize()
         {
             // Включение работы переопределения ручек (нужна регенерация в конце метода (?))
@@ -30,12 +20,6 @@
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance(), true);
             Overrule.Overruling = true;
-
-            // создание файла хранения стилей, если отсутствует
-            StyleManager.CheckStylesFile<AxisStyle>();
-            StyleManager.LoadStylesFromXmlFile(
-                AxisStyle.Instance.CreateSystemStyles<AxisStyle>(),
-                AxisStyle.Instance.ParseStyleFromXElement<AxisStyle>);
         }
 
         public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location, Transaction tr)
@@ -121,16 +105,15 @@
         };
 
         /// <summary>Создание текстового стиля из стиля оси, согласно настройкам плагина</summary>
-        public static void CreateTextStyleFromStyle(AxisStyle style)
+        public static void CreateTextStyleFromStyle(IntellectualEntityStyle style)
         {
             if (MainStaticSettings.Settings.UseTextStyleFromStyle)
             {
-                var textStyleName = StyleHelpers.GetPropertyValue(style, AxisProperties.TextStyle.Name,
-                    AxisProperties.TextStyle.DefaultValue);
-                if (!TextStyleHelper.HasTextStyle(textStyleName) &&
+                if (!TextStyleHelper.HasTextStyle(style.GetTextStyleProperty()) &&
                     MainStaticSettings.Settings.IfNoTextStyle == 1)
                 {
                     TextStyleHelper.CreateTextStyle(style.TextStyleXmlData);
+                    //todo текстовый стиль создается, но не применяется?!
                 }
             }
         }
@@ -147,7 +130,7 @@
         private static void CreateAxis()
         {
             // send statistic
-            Statistic.SendCommandStarting(AxisFunction.MPCOEntName, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(AxisInterface.Name, MpVersionData.CurCadVers);
             try
             {
                 Overrule.Overruling = false;
@@ -156,17 +139,14 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(AxisFunction.MPCOEntName);
-                
-                AxisStyle style = StyleManager.GetCurrentStyle(
-                    AxisStyle.Instance.CreateSystemStyles<AxisStyle>(),
-                    AxisStyle.Instance.ParseStyleFromXElement<AxisStyle>);
+                ExtendedDataHelpers.AddRegAppTableRecord(AxisInterface.Name);
+
+                var style = StyleManager.GetCurrentStyle(typeof(Axis));
 
                 // создание текстового стиля в документе нужно произвести до создания примитива
+                //todo release in style manager
                 AxisFunction.CreateTextStyleFromStyle(style);
                 // add layer from style
-                var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name,
-                    AxisProperties.LayerName.DefaultValue);
                 var axisLastHorizontalValue = string.Empty;
                 var axisLastVerticalValue = string.Empty;
                 if (MainStaticSettings.Settings.AxisSaveLastTextAndContinueNew)
@@ -174,19 +154,18 @@
                     axisLastHorizontalValue = ModPlus.Helpers.XDataHelpers.GetStringXData("AxisLastValueForHorizontal");
                     axisLastVerticalValue = ModPlus.Helpers.XDataHelpers.GetStringXData("AxisLastValueForVertical");
                 }
-                var axis = new Axis(style, axisLastHorizontalValue, axisLastVerticalValue);
+                var axis = new Axis(axisLastHorizontalValue, axisLastVerticalValue);
                 var blockReference = MainFunction.CreateBlock(axis);
                 
                 // set layer
-                AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
+                AcadHelpers.SetLayerByName(blockReference.ObjectId, style.GetLayerNameProperty(), style.LayerXmlData);
                 
                 // set linetype
-                var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name,
-                    AxisProperties.LineType.DefaultValue);
-                AcadHelpers.SetLineType(blockReference.ObjectId, lineType);
+                AcadHelpers.SetLineType(blockReference.ObjectId, style.GetLineTypeProperty());
 
 
                 var breakLoop = false;
+                //todo change
                 while (!breakLoop)
                 {
                     var axisJig = new AxisJig(axis, blockReference);

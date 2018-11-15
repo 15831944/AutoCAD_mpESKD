@@ -30,10 +30,6 @@
             AcadHelpers.Documents.DocumentCreated += Documents_DocumentCreated;
             AcadHelpers.Documents.DocumentActivated += Documents_DocumentActivated;
 
-            _enumPropertiesLocalizationValues = new Dictionary<Type, List<string>>();
-            _categoryLocalizationNames = new Dictionary<string, string>();
-            _entityLocalizationNames = new Dictionary<Type, string>();
-
             foreach (Document document in AcadHelpers.Documents)
             {
                 document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
@@ -41,21 +37,6 @@
             if (AcadHelpers.Document != null)
                 ShowPropertiesControlsBySelection();
         }
-
-        /// <summary>
-        /// Словарь хранения локализованных значений для свойств типа Enum чтобы не читать их из атрибутов много раз
-        /// </summary>
-        private readonly Dictionary<Type, List<string>> _enumPropertiesLocalizationValues;
-
-        /// <summary>
-        /// Словарь хранения локализованных значений имени категории
-        /// </summary>
-        private readonly Dictionary<string, string> _categoryLocalizationNames;
-
-        /// <summary>
-        /// Словарь хранения локализованных значений имени интеллектуального примитива
-        /// </summary>
-        private readonly Dictionary<Type, string> _entityLocalizationNames;
 
         private void Documents_DocumentActivated(object sender, DocumentCollectionEventArgs e)
         {
@@ -144,7 +125,7 @@
                 Expander entityExpander = new Expander
                 {
                     IsExpanded = true,
-                    Header = GetEntityLocalizationName(entityGroup.Key) + " [" + c + "]"
+                    Header = LocalizationHelper.GetEntityLocalizationName(entityGroup.Key) + " [" + c + "]"
                 };
                 Grid mainGrid = new Grid();
                 var categoryIndex = 0;
@@ -167,7 +148,7 @@
                     grid.ColumnDefinitions.Add(secondColumn);
                     grid.ColumnDefinitions.Add(thirdColumn);
 
-                    TextBox categoryHeader = new TextBox { Text = GetCategoryLocalizationName(summaryPropertiesGroup.Key) };
+                    TextBox categoryHeader = new TextBox { Text = LocalizationHelper.GetCategoryLocalizationName(summaryPropertiesGroup.Key) };
                     Grid.SetRow(categoryHeader, 0);
                     Grid.SetColumn(categoryHeader, 0);
                     Grid.SetColumnSpan(categoryHeader, 3);
@@ -204,8 +185,7 @@
                                     ComboBox cb = new ComboBox();
                                     Grid.SetColumn(cb, 2);
                                     Grid.SetRow(cb, j);
-                                    cb.ItemsSource = StyleManager.GetStyles(intellectualEntityProperty.EntityType.Name + "Style")
-                                        .Select(s => s.Name);
+                                    cb.ItemsSource = StyleManager.GetStyles(intellectualEntityProperty.EntityType).Select(s => s.Name);
                                     cb.Style = Resources["PropertyValueComboBox"] as Style;
                                     SetDescription(cb, propertyDescription);
                                     BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
@@ -297,27 +277,9 @@
                                     Grid.SetColumn(cb, 2);
                                     Grid.SetRow(cb, j);
                                     cb.Style = Resources["PropertyValueComboBox"] as Style;
-                                    var type = intellectualEntityProperty.Value.GetType();
+                                    Type type = intellectualEntityProperty.Value.GetType();
                                     SetDescription(cb, propertyDescription);
-
-                                    // При первом чтении локализованных значений для свойства типа Enum
-                                    // запоминаю прочитанные значения в словарь, чтобы в следующий раз не читать повторно
-                                    if (_enumPropertiesLocalizationValues.ContainsKey(type))
-                                        cb.ItemsSource = _enumPropertiesLocalizationValues[type];
-                                    else
-                                    {
-                                        List<string> enumPropertyLocalizationValues = new List<string>();
-                                        foreach (FieldInfo fieldInfo in type.GetFields().Where(f => f.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>() != null))
-                                        {
-                                            var attr = fieldInfo.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>();
-                                            if (attr != null)
-                                            {
-                                                enumPropertyLocalizationValues.Add(ModPlusAPI.Language.GetItem(MainFunction.LangItem, attr.LocalizationKey));
-                                            }
-                                        }
-                                        _enumPropertiesLocalizationValues.Add(type, enumPropertyLocalizationValues);
-                                        cb.ItemsSource = enumPropertyLocalizationValues;
-                                    }
+                                    cb.ItemsSource = LocalizationHelper.GetEnumPropertyLocalizationFields(type);
 
                                     BindingOperations.SetBinding(cb, ComboBox.TextProperty,
                                         CreateTwoWayBindingForProperty(summaryProperty, new EnumPropertyValueConverter()));
@@ -413,64 +375,6 @@
         private void _OnLostFocus(object sender, RoutedEventArgs e)
         {
             ShowDescription(string.Empty);
-        }
-
-        private string GetEntityLocalizationName(Type entityType)
-        {
-            if (_entityLocalizationNames.ContainsKey(entityType))
-                return _entityLocalizationNames[entityType];
-
-            var attribute = entityType.GetCustomAttribute<IntellectualEntityDisplayNameKeyAttribute>();
-            if (attribute != null)
-            {
-                try
-                {
-                    var localName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, attribute.LocalizationKey);
-                    if (!_entityLocalizationNames.ContainsKey(entityType))
-                        _entityLocalizationNames.Add(entityType, localName);
-                    return localName;
-                }
-                catch
-                {
-                    // ignore
-                }
-            }
-
-            return entityType.Name;
-        }
-
-        /// <summary>
-        /// Получение локализованного имени категории
-        /// </summary>
-        /// <param name="category">Категория</param>
-        private string GetCategoryLocalizationName(PropertiesCategory category)
-        {
-            if (_categoryLocalizationNames.ContainsKey(category.ToString()))
-                return _categoryLocalizationNames[category.ToString()];
-
-            var type = category.GetType();
-            foreach (FieldInfo fieldInfo in type.GetFields().Where(f => f.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>() != null))
-            {
-                if (fieldInfo.Name != category.ToString())
-                    continue;
-                var attribute = fieldInfo.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>();
-                if (attribute != null)
-                {
-                    try
-                    {
-                        var localName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, attribute.LocalizationKey);
-                        if (!_categoryLocalizationNames.ContainsKey(category.ToString()))
-                            _categoryLocalizationNames.Add(category.ToString(), localName);
-                        return localName;
-                    }
-                    catch
-                    {
-                        // ignore
-                    }
-                }
-            }
-
-            return category.ToString();
         }
 
         /// <summary>

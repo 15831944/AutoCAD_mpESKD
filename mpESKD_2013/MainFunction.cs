@@ -2,7 +2,6 @@
 {
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
     using System.Windows.Forms;
@@ -15,9 +14,8 @@
     using Base;
     using Base.Helpers;
     using Base.Overrules;
+    using Base.Styles;
     using Functions.mpAxis;
-    using Functions.mpBreakLine;
-    using Functions.mpGroundLine;
     using mpESKD.Base.Properties;
     using ModPlus;
     using ModPlusAPI;
@@ -103,17 +101,13 @@
         }
         #endregion
 
-        private List<IIntellectualEntityFunction> _functions;
-
         public void Initialize()
         {
             StartUpInitialize();
 
-            _functions = GetFunctions();
-            
             // Functions Init
-            _functions.ForEach(f => f.Initialize());
-
+            TypeFactory.Instance.GetEntityFunctionTypes().ForEach(f => f.Initialize());
+            
             // ribbon build for
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
             
@@ -133,28 +127,13 @@
             // bedit watcher
             BeditCommandWatcher.Initialize();
             AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
-
-            // overrules
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), OsnapOverruleEx.Instance(), true);
         }
 
         public void Terminate()
         {
-            _functions.ForEach(f => f.Terminate());
-
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), OsnapOverruleEx.Instance());
+            TypeFactory.Instance.GetEntityFunctionTypes().ForEach(f => f.Terminate());
         }
-
-        private List<IIntellectualEntityFunction> GetFunctions()
-        {
-            return new List<IIntellectualEntityFunction>
-            {
-                new AxisFunction(),
-                new BreakLineFunction(),
-                new GroundLineFunction()
-            };
-        }
-
+        
         [CommandMethod("ModPlus", "mpESKDCreateRibbonTab", CommandFlags.Modal)]
         public void CreateRibbon()
         {
@@ -200,13 +179,12 @@
         /// <summary>Обработка двойного клика по блоку</summary>
         private static void AcApp_BeginDoubleClick(object sender, Autodesk.AutoCAD.ApplicationServices.BeginDoubleClickEventArgs e)
         {
-            //PromptSelectionResult allSelected = AcadHelpers.Editor.SelectImplied();
             var pt = e.Location;
-            //PromptSelectionResult psr = AcadHelpers.Editor.SelectAtPickBox(pt);
+            
             PromptSelectionResult psr = AcadHelpers.Editor.SelectImplied();
             if (psr.Status != PromptStatus.OK) return;
             ObjectId[] ids = psr.Value.GetObjectIds();
-            //if (allSelected.Value.Count == 1)
+            
             if (ids.Length == 1)
             {
                 Point3d location = pt;
@@ -216,7 +194,7 @@
                     {
                         var obj = tr.GetObject(ids[0], OpenMode.ForWrite);
                         // if axis
-                        if (obj is BlockReference blockReference && ExtendedDataHelpers.IsMPCOentity(blockReference, AxisFunction.MPCOEntName))
+                        if (obj is BlockReference blockReference && ExtendedDataHelpers.IsIntellectualEntity(blockReference, AxisInterface.Name))
                         {
                             BeditCommandWatcher.UseBedit = false;
                             AxisFunction.DoubleClickEdit(blockReference, location, tr);
@@ -243,6 +221,8 @@
                         using (var blockTableRecord = AcadHelpers.Database.CurrentSpaceId.Write<BlockTableRecord>())
                         {
                             blockTableRecord.BlockScaling = BlockScaling.Uniform;
+                            //todo need?
+                            blockTableRecord.Units = AcadHelpers.Database.Insunits;
                             objectId = blockTableRecord.AppendEntity(blockReference);
                         }
                         transaction.AddNewlyCreatedDBObject(blockReference, true);

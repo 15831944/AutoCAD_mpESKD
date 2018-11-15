@@ -126,6 +126,9 @@
     <Compile Include="..\mpESKD_2013\Base\Helpers\LayerHelper.cs">
       <Link>Base\Helpers\LayerHelper.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Helpers\LocalizationHelper.cs">
+      <Link>Base\Helpers\LocalizationHelper.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\Helpers\MathExtensions.cs">
       <Link>Base\Helpers\MathExtensions.cs</Link>
     </Compile>
@@ -140,9 +143,6 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Overrules\IntellectualEntityGripData.cs">
       <Link>Base\Overrules\IntellectualEntityGripData.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Overrules\OsnapOverruleEx.cs">
-      <Link>Base\Overrules\OsnapOverruleEx.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Properties\BaseProperties.cs">
       <Link>Base\Properties\BaseProperties.cs</Link>
@@ -225,6 +225,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Styles\StyleManager.cs">
       <Link>Base\Styles\StyleManager.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\TypeFactory.cs">
+      <Link>Base\TypeFactory.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpAxis\Axis.cs">
       <Link>Functions\mpAxis\Axis.cs</Link>

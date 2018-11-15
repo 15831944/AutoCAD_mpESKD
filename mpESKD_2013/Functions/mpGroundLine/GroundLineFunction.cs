@@ -12,28 +12,16 @@
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Overrules;
-    using Properties;
-    using Styles;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class GroundLineFunction : IIntellectualEntityFunction
     {
-        /// <summary>Имя примитива, помещаемое в XData</summary>
-        public static readonly string MPCOEntName = GroundLineInterface.Name; // mpGroundLine
-
-        /// <summary>Отображаемое имя примитива</summary>
-        public static string MPCOEntDisplayName = GroundLineInterface.LName; // Линия грунта
-
         public void Initialize()
         {
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance(), true);
-
-            StyleManager.CheckStylesFile<GroundLineStyle>();
-            StyleManager.LoadStylesFromXmlFile(
-                GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(),
-                GroundLineStyle.Instance.ParseStyleFromXElement<GroundLineStyle>);
+            Overrule.Overruling = true;
         }
 
         public void Terminate()
@@ -42,8 +30,6 @@
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance());
         }
-
-        
     }
 
     public class GroundLineCommands
@@ -63,7 +49,7 @@
         private void CreateGroundLine()
         {
             // send statistic
-            Statistic.SendCommandStarting(GroundLineFunction.MPCOEntName, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(GroundLineInterface.Name, MpVersionData.CurCadVers);
             
             try
             {
@@ -73,18 +59,16 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineFunction.MPCOEntName);
+                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineInterface.Name);
                 // style
-                GroundLineStyle style = StyleManager.GetCurrentStyle(
-                    GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(),
-                    GroundLineStyle.Instance.ParseStyleFromXElement<GroundLineStyle>);
-                var layerName = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LayerName.Name,
-                    GroundLineProperties.LayerName.DefaultValue);
-                var groundLine = new GroundLine(style);
+                var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
+                var groundLine = new GroundLine();
+                groundLine.ApplyStyle(style);
+
                 var blockReference = MainFunction.CreateBlock(groundLine);
 
                 // set layer
-                AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
+                AcadHelpers.SetLayerByName(blockReference.ObjectId, style.GetLayerNameProperty(), style.LayerXmlData);
 
                 var breakLoop = false;
                 while (!breakLoop)
@@ -176,20 +160,16 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineFunction.MPCOEntName);
+                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineInterface.Name);
                 //style
-                GroundLineStyle style = StyleManager.GetCurrentStyle(
-                    GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(),
-                    GroundLineStyle.Instance.ParseStyleFromXElement<GroundLineStyle>);
-                var layerName = StyleHelpers.GetPropertyValue(style, GroundLineProperties.LayerName.Name,
-                    GroundLineProperties.LayerName.DefaultValue);
-                var groundLine = new GroundLine(style);
+                var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
+                var groundLine = new GroundLine();
+                groundLine.ApplyStyle(style);
+
                 var blockReference = MainFunction.CreateBlock(groundLine);
 
-                blockReference.BlockUnit = AcadHelpers.Database.Insunits;
-
                 // set layer
-                AcadHelpers.SetLayerByName(blockReference.ObjectId, layerName, style.LayerXmlData);
+                AcadHelpers.SetLayerByName(blockReference.ObjectId, style.GetLayerNameProperty(), style.LayerXmlData);
 
                 var plineId = per.ObjectId;
 

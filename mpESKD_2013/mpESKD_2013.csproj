@@ -95,13 +95,13 @@
     <Compile Include="Base\Helpers\GeometryHelpers.cs" />
     <Compile Include="Base\Helpers\JigHelper.cs" />
     <Compile Include="Base\Helpers\LayerHelper.cs" />
+    <Compile Include="Base\Helpers\LocalizationHelper.cs" />
     <Compile Include="Base\Helpers\MathExtensions.cs" />
     <Compile Include="Base\Helpers\TextStyleHelper.cs" />
     <Compile Include="Base\IIntellectualEntityFunction.cs" />
     <Compile Include="Base\IntellectualEntity.cs" />
     <Compile Include="Base\Overrules\IntellectualEntityGripData.cs" />
     <Compile Include="Base\Enums\GripType.cs" />
-    <Compile Include="Base\Overrules\OsnapOverruleEx.cs" />
     <Compile Include="Base\Properties\BaseProperties.cs" />
     <Compile Include="Base\Properties\BaseSummaryProperties.cs" />
     <Compile Include="Base\Properties\Controls\ControlStylesForEditor.xaml.cs">
@@ -136,6 +136,7 @@
     <Compile Include="Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs" />
     <Compile Include="Base\Styles\IntellectualEntityStyle.cs" />
     <Compile Include="Base\Styles\StyleManager.cs" />
+    <Compile Include="Base\TypeFactory.cs" />
     <Compile Include="Functions\mpAxis\Axis.cs" />
     <Compile Include="Functions\mpAxis\AxisFunction.cs" />
     <Compile Include="Functions\mpAxis\AxisInterface.cs" />

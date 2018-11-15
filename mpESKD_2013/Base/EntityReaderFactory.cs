@@ -10,19 +10,15 @@
     public class EntityReaderFactory
     {
         private static EntityReaderFactory _entityReaderFactory;
-
-        public EntityReaderFactory()
-        {
-
-        }
-
+        
         public static EntityReaderFactory Instance => _entityReaderFactory ?? (_entityReaderFactory = new EntityReaderFactory());
 
         [CanBeNull]
         public IntellectualEntity GetFromEntity(Entity entity)
         {
+            var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
             var appName = entity.XData.AsArray()
-                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString().StartsWith("mp"))
+                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()))
                 .Value.ToString();
 
             return GetFromEntity(entity, appName);
@@ -52,7 +48,7 @@
 
         private BreakLine GetBreakLineFromEntity(Entity ent)
         {
-            using (ResultBuffer resBuf = ent.GetXDataForApplication(BreakLineFunction.MPCOEntName))
+            using (ResultBuffer resBuf = ent.GetXDataForApplication(BreakLineInterface.Name))
             {
                 // В случае команды ОТМЕНА может вернуть null
                 if (resBuf == null) return null;
@@ -69,7 +65,7 @@
 
         private Axis GetAxisFromEntity(Entity ent)
         {
-            using (ResultBuffer resBuf = ent.GetXDataForApplication(AxisFunction.MPCOEntName))
+            using (ResultBuffer resBuf = ent.GetXDataForApplication(AxisInterface.Name))
             {
                 // В случае команды ОТМЕНА может вернуть null
                 if (resBuf == null) return null;
@@ -86,7 +82,7 @@
 
         private GroundLine GetGroundLineFromEntity(Entity ent)
         {
-            using (ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineFunction.MPCOEntName))
+            using (ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineInterface.Name))
             {
                 // В случае команды ОТМЕНА может вернуть null
                 if (resBuf == null)

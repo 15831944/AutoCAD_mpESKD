@@ -25,7 +25,7 @@
             var style = new AxisStyle
             {
                 Name = Language.GetItem(MainFunction.LangItem, "h41"), // "Прямая ось",
-                FunctionName = AxisFunction.MPCOEntName,
+                FunctionName = AxisInterface.Name,
                 Description = Language.GetItem(MainFunction.LangItem, "h68"), // "Базовый стиль для прямой оси",
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
@@ -59,7 +59,7 @@
             var style = new T()
             {
                 StyleType = MPCOStyleType.User,
-                FunctionName = AxisFunction.MPCOEntName
+                FunctionName = AxisInterface.Name
             };
 
             // Properties

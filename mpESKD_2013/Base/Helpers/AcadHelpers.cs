@@ -212,8 +212,8 @@
         /// <param name="layerXmlData">Данные слоя</param>
         public static void SetLayerByName(ObjectId blkRefObjectId, string layerName, XElement layerXmlData)
         {
-            //var mainSettings = new MainSettings();
-            if (blkRefObjectId == ObjectId.Null) return;
+            if (blkRefObjectId == ObjectId.Null)
+                return;
             if (MainStaticSettings.Settings.UseLayerFromStyle)
             {
                 if (!layerName.Equals(Language.GetItem(MainFunction.LangItem, "defl"))) // "По умолчанию"
@@ -465,15 +465,7 @@
                 return false;
             // Всегда нужно проверять по наличию расширенных данных
             // иначе может привести к фаталам при работе с динамическими блоками
-            return IsMPCOentity(dbObject, appName);
-        }
-
-        public static bool IsApplicable(RXObject rxObject)
-        {
-            DBObject dbObject = rxObject as DBObject;
-            if (dbObject == null) 
-                return false;
-            return IsSupportedXData(dbObject);
+            return IsIntellectualEntity(dbObject, appName);
         }
 
         /// <summary>
@@ -482,72 +474,16 @@
         /// <param name="blkRef">Вхождение блока</param>
         /// <param name="appName"></param>
         /// <returns></returns>
-        public static bool IsMPCOentity(Entity blkRef, string appName)
+        public static bool IsIntellectualEntity(Entity blkRef, string appName)
         {
             ResultBuffer rb = blkRef.GetXDataForApplication(appName);
             return rb != null;
         }
 
-        public static bool IsMPCOentity(DBObject dbObject, string appName)
+        public static bool IsIntellectualEntity(DBObject dbObject, string appName)
         {
             ResultBuffer rb = dbObject.GetXDataForApplication(appName);
             return rb != null;
         }
-
-        public static bool IsSupportedXData(Entity entity)
-        {
-            return entity.XData.AsArray().Any(tv => 
-                tv.TypeCode == (int) DxfCode.ExtendedDataRegAppName && 
-                tv.Value.ToString().StartsWith("mp"));
-        }
-
-        public static bool IsSupportedXData(DBObject dbObject)
-        {
-            return dbObject.XData.AsArray().Any(tv => 
-                tv.TypeCode == (int) DxfCode.ExtendedDataRegAppName && 
-                tv.Value.ToString().StartsWith("mp"));
-        }
     }
-
-    public static class EditorSelectionExtension
-    {
-        // http://drive-cad-with-code.blogspot.ru/2013/03/update-custom-double-click-action-using.html
-        public static PromptSelectionResult SelectAtPickBox(this Editor ed, Point3d pickBoxCentre)
-        {
-            //Get pick box's size on screen
-            System.Windows.Point screenPt = AcadHelpers.Editor.PointToScreen(pickBoxCentre, 1);
-
-            //Get pickbox's size. Note, the number obtained from
-            //system variable "PICKBOX" is actually the half of
-            //pickbox's width/height
-            object pBox = AcApp.GetSystemVariable("PICKBOX");
-
-            int pSize = Convert.ToInt32(pBox);
-
-            //Define a Point3dCollection for CrossingWindow selecting
-            Point3dCollection points = new Point3dCollection();
-
-            System.Windows.Point p;
-            Point3d pt;
-
-            p = new System.Windows.Point(screenPt.X - pSize, screenPt.Y - pSize);
-            pt = ed.PointToWorld(p, 1);
-            points.Add(pt);
-
-            p = new System.Windows.Point(screenPt.X + pSize, screenPt.Y - pSize);
-            pt = ed.PointToWorld(p, 1);
-            points.Add(pt);
-
-            p = new System.Windows.Point(screenPt.X + pSize, screenPt.Y + pSize);
-            pt = ed.PointToWorld(p, 1);
-            points.Add(pt);
-
-            p = new System.Windows.Point(screenPt.X - pSize, screenPt.Y + pSize);
-            pt = ed.PointToWorld(p, 1);
-            points.Add(pt);
-
-            return ed.SelectCrossingPolygon(points);
-        }
-    }
-
 }

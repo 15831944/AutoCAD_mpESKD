@@ -56,6 +56,7 @@
         /// <summary>
         /// Значение по умолчанию
         /// </summary>
+        [NotNull]
         public object DefaultValue { get;  }
 
         /// <summary>

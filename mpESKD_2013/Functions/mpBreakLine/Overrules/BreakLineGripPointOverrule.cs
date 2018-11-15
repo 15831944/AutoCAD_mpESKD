@@ -21,7 +21,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             if (_breakLineGripPointOverrule != null) return _breakLineGripPointOverrule;
             _breakLineGripPointOverrule = new BreakLineGripPointsOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineGripPointOverrule.SetXDataFilter(BreakLineFunction.MPCOEntName);
+            _breakLineGripPointOverrule.SetXDataFilter(BreakLineInterface.Name);
             return _breakLineGripPointOverrule;
         }
 
@@ -179,7 +179,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         // Проверка происходит по наличию XData с определенным AppName
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineFunction.MPCOEntName);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineInterface.Name);
         }
     }
     /* Так как у линии обрыва все точки одинаковы, то достаточно создать одно переопределение
