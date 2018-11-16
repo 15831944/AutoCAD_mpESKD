@@ -12,7 +12,6 @@ using ModPlusAPI.Windows;
 namespace mpESKD.Base
 {
     using Enums;
-    using Styles;
 
     public abstract class IntellectualEntity : IDisposable
     {
@@ -25,8 +24,27 @@ namespace mpESKD.Base
         /// Первая точка примитива в мировой системе координат.
         /// Должна соответствовать точке вставке блока
         /// </summary>
-        [PointForOsnap]
         public Point3d InsertionPoint { get; set; } = Point3d.Origin;
+
+        /// <summary>
+        /// Первая точка примитива в системе координат блока для работы с геометрией в
+        /// методе <see cref="UpdateEntities"/> ("внутри" блока)
+        /// </summary>
+        public Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
+
+        /// <summary>
+        /// Конечная точка примитива в мировой системе координат. Свойство содержится в базовом классе для
+        /// работы <see cref="DefaultEntityJig"/>. Имеется в каждом примитиве, но
+        /// если не требуется, то просто не использовать её
+        /// </summary>
+        public Point3d EndPoint { get; set; } = Point3d.Origin;
+
+        /// <summary>
+        /// Конечная точка примитива в системе координат блока для работы с геометрией в
+        /// методе <see cref="UpdateEntities"/> ("внутри" блока). Имеется в каждом примитиве, но
+        /// если не требуется, то просто не использовать её
+        /// </summary>
+        public Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
 
         /// <summary>Коллекция базовых примитивов, входящих в примитив</summary>
         public abstract IEnumerable<Entity> Entities { get; }
@@ -40,17 +58,28 @@ namespace mpESKD.Base
         /// Стиль примитива. Свойство используется для работы палитры, а стиль задается через свойство <see cref="StyleGuid"/>
         /// </summary>
         [EntityProperty(PropertiesCategory.General, 1, nameof(Style), "h50", "h52", "", null, null, PropertyScope.Palette)]
-        public string Style { get; set; }
+        public string Style { get; set; } = string.Empty;
 
         /// <summary>
         /// Имя слоя
         /// </summary>
         [EntityProperty(PropertiesCategory.General, 2, nameof(LayerName), "p7", "d7", "", null, null)]
-        public string LayerName { get; set; }
+        public string LayerName { get; set; } = string.Empty;
 
+        private AnnotationScale _scale;
         /// <summary>Масштаб примитива</summary>
         [EntityProperty(PropertiesCategory.General, 3, nameof(Scale), "p5", "d5", "1:1", null, null)]
-        public AnnotationScale Scale { get; set; }
+        public AnnotationScale Scale
+        {
+            get
+            {
+                if (_scale != null)
+                    return _scale;
+                _scale = new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1};
+                return _scale;
+            }
+            set => _scale = value;
+        }
 
         /// <summary>
         /// Тип линии. Свойство является абстрактным, так как в зависимости от интеллектуального примитива
@@ -86,7 +115,7 @@ namespace mpESKD.Base
 
         // Описание блока
         private BlockTableRecord _blockRecord;
-
+        
         public BlockTableRecord BlockRecord
         {
             get
@@ -156,11 +185,6 @@ namespace mpESKD.Base
                                 _blockRecord.AppendEntity(transformedCopy);
                             }
                         }
-                        //foreach (var ent in Entities)
-                        //{
-                        //    var transformedCopy = ent.GetTransformedCopy(matrix3D);
-                        //    _blockRecord.AppendEntity(transformedCopy);
-                        //}
                         IsValueCreated = true;
                     }
                 }
@@ -280,7 +304,7 @@ namespace mpESKD.Base
             }
         }
         /// <summary>
-        /// Расчлинение ЕСКД примитива
+        /// Расчлинение интеллектуального примитива
         /// </summary>
         /// <param name="entitySet"></param>
         public void Explode(DBObjectCollection entitySet)

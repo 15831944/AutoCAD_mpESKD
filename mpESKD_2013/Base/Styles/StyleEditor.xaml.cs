@@ -461,19 +461,19 @@
                         //
                         LineType = blkReference.Linetype,
                         //
-                        MarkersPosition = axis.MarkersPosition,
+                        //MarkersPosition = axis.MarkersPosition,
                         MarkersDiameter = axis.MarkersDiameter,
                         MarkersCount = axis.MarkersCount,
-                        FirstMarkerType = axis.FirstMarkerType,
-                        SecondMarkerType = axis.SecondMarkerType,
-                        ThirdMarkerType = axis.ThirdMarkerType,
-                        OrientMarkerType = axis.OrientMarkerType,
-                        Fracture = axis.Fracture,
-                        BottomFractureOffset = axis.BottomFractureOffset,
-                        TopFractureOffset = axis.TopFractureOffset,
-                        ArrowsSize = axis.ArrowsSize,
-                        TextStyle = axis.TextStyle,
-                        TextHeight = axis.TextHeight
+                        ////FirstMarkerType = axis.FirstMarkerType,
+                        ////SecondMarkerType = axis.SecondMarkerType,
+                        ////ThirdMarkerType = axis.ThirdMarkerType,
+                        ////OrientMarkerType = axis.OrientMarkerType,
+                        //Fracture = axis.Fracture,
+                        //BottomFractureOffset = axis.BottomFractureOffset,
+                        //TopFractureOffset = axis.TopFractureOffset,
+                        //ArrowsSize = axis.ArrowsSize,
+                        ////TextStyle = axis.TextStyle,
+                        ////TextHeight = axis.TextHeight
                     };
                     styleGuid = styleForEditor.Guid;
                     styleToBind.Styles.Add(styleForEditor);

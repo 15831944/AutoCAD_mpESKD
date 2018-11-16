@@ -85,8 +85,17 @@
     <Compile Include="..\mpESKD_2013\Base\BasePropertiesData.cs">
       <Link>Base\BasePropertiesData.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\DefaultEntityJig.cs">
+      <Link>Base\DefaultEntityJig.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\EntityReaderFactory.cs">
       <Link>Base\EntityReaderFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\AxisMarkersPosition.cs">
+      <Link>Base\Enums\AxisMarkersPosition.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\AxisMarkerType.cs">
+      <Link>Base\Enums\AxisMarkerType.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\BreakLineType.cs">
       <Link>Base\Enums\BreakLineType.cs</Link>
@@ -99,6 +108,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\GroundLineFirstStrokeOffset.cs">
       <Link>Base\Enums\GroundLineFirstStrokeOffset.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\JigState.cs">
+      <Link>Base\Enums\JigState.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\PropertiesCategory.cs">
       <Link>Base\Enums\PropertiesCategory.cs</Link>
@@ -129,6 +141,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Helpers\MathExtensions.cs">
       <Link>Base\Helpers\MathExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Helpers\RibbonBuilder.cs">
+      <Link>Base\Helpers\RibbonBuilder.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Helpers\TextStyleHelper.cs">
       <Link>Base\Helpers\TextStyleHelper.cs</Link>
@@ -236,9 +251,6 @@
     <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisInterface.cs">
       <Link>Functions\mpAxis\AxisInterface.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisJig.cs">
-      <Link>Functions\mpAxis\AxisJig.cs</Link>
-    </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisValueEditor.xaml.cs">
       <Link>Functions\mpAxis\AxisValueEditor.xaml.cs</Link>
       <DependentUpon>AxisValueEditor.xaml</DependentUpon>
@@ -251,19 +263,6 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpAxis\Overrules\AxisOsnapOverrule.cs">
       <Link>Functions\mpAxis\Overrules\AxisOsnapOverrule.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisProperties.cs">
-      <Link>Functions\mpAxis\Properties\AxisProperties.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisPropertiesData.cs">
-      <Link>Functions\mpAxis\Properties\AxisPropertiesData.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs">
-      <Link>Functions\mpAxis\Properties\AxisPropertiesPalette.xaml.cs</Link>
-      <DependentUpon>AxisPropertiesPalette.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisSummaryProperties.cs">
-      <Link>Functions\mpAxis\Properties\AxisSummaryProperties.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpAxis\Styles\AxisStyle.cs">
       <Link>Functions\mpAxis\Styles\AxisStyle.cs</Link>
@@ -281,9 +280,6 @@
     <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineInterface.cs">
       <Link>Functions\mpBreakLine\BreakLineInterface.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineJig.cs">
-      <Link>Functions\mpBreakLine\BreakLineJig.cs</Link>
-    </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs</Link>
     </Compile>
@@ -292,19 +288,6 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLineProperties.cs">
-      <Link>Functions\mpBreakLine\Properties\BreakLineProperties.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs">
-      <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesData.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs">
-      <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml.cs</Link>
-      <DependentUpon>BreakLinePropertiesPalette.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs">
-      <Link>Functions\mpBreakLine\Properties\BreakLineSummaryProperties.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Styles\BreakLineStyle.cs">
       <Link>Functions\mpBreakLine\Styles\BreakLineStyle.cs</Link>
@@ -322,9 +305,6 @@
     <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLineInterface.cs">
       <Link>Functions\mpGroundLine\GroundLineInterface.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\GroundLineJig.cs">
-      <Link>Functions\mpGroundLine\GroundLineJig.cs</Link>
-    </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs">
       <Link>Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs</Link>
     </Compile>
@@ -333,19 +313,6 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs">
       <Link>Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLineProperties.cs">
-      <Link>Functions\mpGroundLine\Properties\GroundLineProperties.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLinePropertiesData.cs">
-      <Link>Functions\mpGroundLine\Properties\GroundLinePropertiesData.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml.cs">
-      <Link>Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml.cs</Link>
-      <DependentUpon>GroundLinePropertiesPalette.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLineSummaryProperties.cs">
-      <Link>Functions\mpGroundLine\Properties\GroundLineSummaryProperties.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Styles\GroundLineStyle.cs">
       <Link>Functions\mpGroundLine\Styles\GroundLineStyle.cs</Link>
@@ -363,19 +330,6 @@
     <Compile Include="..\mpeskd_2013\functions\mpsection\overrules\SectionOsnapOverrule.cs">
       <Link>Functions\mpSection\Overrules\SectionOsnapOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpeskd_2013\functions\mpsection\properties\SectionProperties.cs">
-      <Link>Functions\mpSection\Properties\SectionProperties.cs</Link>
-    </Compile>
-    <Compile Include="..\mpeskd_2013\functions\mpsection\properties\SectionPropertiesData.cs">
-      <Link>Functions\mpSection\Properties\SectionPropertiesData.cs</Link>
-    </Compile>
-    <Compile Include="..\mpeskd_2013\functions\mpsection\properties\SectionPropertiesPalatte.xaml.cs">
-      <Link>Functions\mpSection\Properties\SectionPropertiesPalatte.xaml.cs</Link>
-      <DependentUpon>SectionPropertiesPalatte.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\mpeskd_2013\functions\mpsection\properties\SectionSummaryProperties.cs">
-      <Link>Functions\mpSection\Properties\SectionSummaryProperties.cs</Link>
-    </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpsection\Section.cs">
       <Link>Functions\mpSection\Section.cs</Link>
     </Compile>
@@ -385,18 +339,12 @@
     <Compile Include="..\mpeskd_2013\functions\mpsection\SectionInterface.cs">
       <Link>Functions\mpSection\SectionInterface.cs</Link>
     </Compile>
-    <Compile Include="..\mpeskd_2013\functions\mpsection\SectionJig.cs">
-      <Link>Functions\mpSection\SectionJig.cs</Link>
-    </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpsection\styles\SectionStyle.cs">
       <Link>Functions\mpSection\Styles\SectionStyle.cs</Link>
     </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpsection\styles\SectionStyleProperties.xaml.cs">
       <Link>Functions\mpSection\Styles\SectionStyleProperties.xaml.cs</Link>
       <DependentUpon>SectionStyleProperties.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\LoadHelpers\RibbonBuilder.cs">
-      <Link>LoadHelpers\RibbonBuilder.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\MainFunction.cs">
       <Link>MainFunction.cs</Link>
@@ -459,18 +407,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2013\Functions\mpAxis\Properties\AxisPropertiesPalette.xaml">
-      <Link>Functions\mpAxis\Properties\AxisPropertiesPalette.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="..\mpESKD_2013\Functions\mpAxis\Styles\AxisStyleProperties.xaml">
       <Link>Functions\mpAxis\Styles\AxisStyleProperties.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpESKD_2013\Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml">
-      <Link>Functions\mpBreakLine\Properties\BreakLinePropertiesPalette.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -479,18 +417,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\mpESKD_2013\Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml">
-      <Link>Functions\mpGroundLine\Properties\GroundLinePropertiesPalette.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="..\mpESKD_2013\Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml">
       <Link>Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpeskd_2013\functions\mpsection\properties\SectionPropertiesPalatte.xaml">
-      <Link>Functions\mpSection\Properties\SectionPropertiesPalatte.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

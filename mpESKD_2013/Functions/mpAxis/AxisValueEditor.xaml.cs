@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Input;
-using mpESKD.Functions.mpAxis.Properties;
 
 namespace mpESKD.Functions.mpAxis
 {
@@ -13,7 +12,8 @@ namespace mpESKD.Functions.mpAxis
             InitializeComponent();
             Title = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h67");
             // markers positions
-            CbMarkersPosition.ItemsSource = AxisPropertiesHelpers.AxisMarkersTypeLocalNames;
+            //todo do do
+            //CbMarkersPosition.ItemsSource = AxisPropertiesHelpers.AxisMarkersTypeLocalNames;
         }
 
         private void AxisValueEditor_OnLoaded(object sender, RoutedEventArgs e)
@@ -46,8 +46,8 @@ namespace mpESKD.Functions.mpAxis
             TbBottomOrientText.Text = Axis.BottomOrientText;
             TbTopOrientText.Text = Axis.TopOrientText;
             // markers position
-            CbMarkersPosition.SelectedItem =
-                AxisPropertiesHelpers.GetLocalAxisMarkersPositionName(Axis.MarkersPosition);
+            //todo do do
+            //CbMarkersPosition.SelectedItem = AxisPropertiesHelpers.GetLocalAxisMarkersPositionName(Axis.MarkersPosition);
             // focus
             TbFirstText.Focus();
         }
@@ -76,21 +76,23 @@ namespace mpESKD.Functions.mpAxis
             Axis.BottomOrientText = TbBottomOrientText.Text;
             Axis.TopOrientText = TbTopOrientText.Text;
             // markers position
-            Axis.MarkersPosition = AxisPropertiesHelpers.GetAxisMarkersPositionByLocalName(CbMarkersPosition.SelectedItem.ToString());
+            //todo do do
+            //Axis.MarkersPosition = AxisPropertiesHelpers.GetAxisMarkersPositionByLocalName(CbMarkersPosition.SelectedItem.ToString());
         }
 
         #region Visibility
 
         void ChangeOrientVisibility()
         {
-            if (Axis.MarkersPosition == AxisMarkersPosition.Both || Axis.MarkersPosition == AxisMarkersPosition.Top)
-                TbTopOrientText.Visibility = Axis.TopOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
-            else TbTopOrientText.Visibility = Visibility.Collapsed;
+            //todo do do
+            //if (Axis.MarkersPosition == AxisMarkersPosition.Both || Axis.MarkersPosition == AxisMarkersPosition.Top)
+            //    TbTopOrientText.Visibility = Axis.TopOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
+            //else TbTopOrientText.Visibility = Visibility.Collapsed;
 
-            if (Axis.MarkersPosition == AxisMarkersPosition.Both || Axis.MarkersPosition == AxisMarkersPosition.Bottom)
-                TbBottomOrientText.Visibility =
-                    Axis.BottomOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
-            else TbBottomOrientText.Visibility = Visibility.Collapsed;
+            //if (Axis.MarkersPosition == AxisMarkersPosition.Both || Axis.MarkersPosition == AxisMarkersPosition.Bottom)
+            //    TbBottomOrientText.Visibility =
+            //        Axis.BottomOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
+            //else TbBottomOrientText.Visibility = Visibility.Collapsed;
         }
 
         void ChangeSecondVisibility(bool show)

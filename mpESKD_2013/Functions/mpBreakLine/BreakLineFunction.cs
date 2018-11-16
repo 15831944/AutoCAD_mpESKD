@@ -4,6 +4,7 @@
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Geometry;
     using Base;
     using Base.Enums;
     using Overrules;
@@ -74,21 +75,26 @@
                 //todo change it
                 while (!breakLoop)
                 {
-                    var breakLineJig = new BreakLineJig(breakLine, blockReference);
+                    //var breakLineJig = new BreakLineJig(breakLine, blockReference);
+                    var breakLineJig = new DefaultEntityJig(
+                        breakLine, 
+                        blockReference,
+                        new Point3d(15, 0, 0),
+                        Language.GetItem(MainFunction.LangItem, "msg2"));
                     do
                     {
                         label0:
                         var status = AcadHelpers.Editor.Drag(breakLineJig).Status;
                         if (status == PromptStatus.OK)
                         {
-                            if (breakLineJig.JigState != BreakLineJigState.PromptInsertPoint)
+                            if (breakLineJig.JigState != JigState.PromptInsertPoint)
                             {
                                 breakLoop = true;
                                 status = PromptStatus.Other;
                             }
                             else
                             {
-                                breakLineJig.JigState = BreakLineJigState.PromptEndPoint;
+                                breakLineJig.JigState = JigState.PromptNextPoint;
                                 goto label0;
                             }
                         }

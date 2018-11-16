@@ -15,6 +15,8 @@ namespace mpESKD.Functions.mpBreakLine
     [IntellectualEntityDisplayNameKeyAttribute("h48")]
     public class BreakLine : IntellectualEntity
     {
+        #region Constructors
+
         /// <summary>Инициализация экземпляра класса для BreakLine без заполнения данными
         /// В данном случае уже все данные получены и нужно только "построить" 
         /// базовые примитивы</summary>
@@ -22,7 +24,7 @@ namespace mpESKD.Functions.mpBreakLine
         {
             BlockId = blockId;
         }
-        
+
         /// <summary>Инициализация экземпляра класса BreakLine для создания</summary>
         public BreakLine()
         {
@@ -33,8 +35,23 @@ namespace mpESKD.Functions.mpBreakLine
             };
             BlockRecord = blockTableRecord;
         }
-        
-        // Основные свойства  примитива
+
+        #endregion
+
+        #region Properties
+
+        /// <inheritdoc />
+        /// В примитиве не используется!
+        //[EntityProperty(PropertiesCategory.General, 4, nameof(LineType), null, null, "Continuous", null, null, PropertyScope.None)]
+        public override string LineType { get; set; }
+
+        /// <inheritdoc />
+        //[EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99, PropertyScope.None)]
+        public override double LineTypeScale { get; set; }
+
+        /// <inheritdoc />
+        //[EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null, PropertyScope.None)]
+        public override string TextStyle { get; set; }
 
         /// <summary>Минимальная длина линии обрыва от точки вставки до конечной точки</summary>
         public double BreakLineMinLength
@@ -51,53 +68,40 @@ namespace mpESKD.Functions.mpBreakLine
             }
         }
 
+        /// <summary>Тип линии обрыва: линейный, криволинейный, цилиндрический</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 1, nameof(BreakLineType), "p1", "d1", BreakLineType.Linear, null, null)]
+        public BreakLineType BreakLineType { get; set; } = BreakLineType.Linear;
+
+        /// <summary>Выступ линии обрыва за границы "обрываемого" объекта</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 2, nameof(Overhang), "p2", "d2", 2, 0, 10)]
+        public int Overhang { get; set; } = 2;
+
+        /// <summary>Ширина Обрыва для линейного обрыва</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 3, nameof(BreakWidth), "p3", "d3", 5, 1, 10)]
+        public int BreakWidth { get; set; } = 5;
+
+        /// <summary>Длина обрыва для линейного обрыва</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 4, nameof(BreakHeight), "p4", "d4", 10, 1, 13)]
+        public int BreakHeight { get; set; } = 10;
+        
+        #endregion
+
+        #region Geometry
+
+        #region Points
+
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
-        [PointForOsnap]
         public Point3d MiddlePoint => new Point3d
         (
             (InsertionPoint.X + EndPoint.X) / 2,
             (InsertionPoint.Y + EndPoint.Y) / 2,
             (InsertionPoint.Z + EndPoint.Z) / 2
         );
-
-        /// <summary>Вторая (конечная) точка примитива в мировой системе координат</summary>
-        [PointForOsnap]
-        public Point3d EndPoint { get; set; } = Point3d.Origin;
         
-        // Получение управляющих точек в системе координат блока для отрисовки содержимого
-        private Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
-        
-        private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
-
-        /// <summary>Выступ линии обрыва за границы "обрываемого" объекта</summary>
-        public int Overhang { get; set; } = BreakLineProperties.Overhang.DefaultValue;
-        
-        /// <summary>Ширина Обрыва для линейного обрыва</summary>
-        public int BreakWidth { get; set; } = BreakLineProperties.BreakWidth.DefaultValue;
-        
-        /// <summary>Длина обрыва для линейного обрыва</summary>
-        public int BreakHeight { get; set; } = BreakLineProperties.BreakHeight.DefaultValue;
-        
-        /// <summary>Тип линии обрыва: линейный, криволинейный, цилиндрический</summary>
-        public BreakLineType BreakLineType { get; set; } = BreakLineProperties.BreakLineType.DefaultValue;
-
-        /// <inheritdoc />
-        /// В примитиве не используется!
-        [EntityProperty(PropertiesCategory.General, 4, nameof(LineType), null, null, "Continuous", null, null, PropertyScope.None)]
-        public override string LineType { get; set; }
-
-        /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99, PropertyScope.None)]
-        public override double LineTypeScale { get; set; }
-
-        /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null, PropertyScope.None)]
-        public override string TextStyle { get; set; }
-
-        #region Базовые примитивы ЕСКД объекта
+        #endregion
 
         private readonly Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
-        
+
         public Polyline MainPolyline
         {
             get
@@ -118,7 +122,7 @@ namespace mpESKD.Functions.mpBreakLine
                 //yield return other entities
             }
         }
-        
+
         /// <inheritdoc />
         public override void UpdateEntities()
         {
@@ -170,7 +174,7 @@ namespace mpESKD.Functions.mpBreakLine
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var tmpEndPoint =ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, BreakLineMinLength * scale /** BlockTransform.GetScale()*/);
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, BreakLineMinLength * scale /** BlockTransform.GetScale()*/);
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
@@ -287,7 +291,7 @@ namespace mpESKD.Functions.mpBreakLine
             }
             return pts;
         }
-        
+
         /// <summary>Изменение точек полилинии</summary>
         /// <param name="pts">Коллекция 2Д точек</param>
         /// <param name="bulges">Список выпуклостей</param>
@@ -310,24 +314,8 @@ namespace mpESKD.Functions.mpBreakLine
                     MainPolyline.AddVertexAt(i, pts[i], bulges[i], 0.0, 0.0);
             }
         }
-        #endregion
 
-        //todo remove
-        //public override void ApplyStyle(MPCOStyle style)
-        //{
-        //    // apply settings from style
-        //    Overhang = StyleHelpers.GetPropertyValue(style, nameof(Overhang), BreakLineProperties.Overhang.DefaultValue);
-        //    BreakHeight = StyleHelpers.GetPropertyValue(style, nameof(BreakHeight), BreakLineProperties.BreakHeight.DefaultValue);
-        //    BreakWidth = StyleHelpers.GetPropertyValue(style, nameof(BreakWidth), BreakLineProperties.BreakWidth.DefaultValue);
-        //    Scale = MainStaticSettings.Settings.UseScaleFromStyle 
-        //        ? StyleHelpers.GetPropertyValue(style, nameof(Scale), BreakLineProperties.Scale.DefaultValue) 
-        //        : AcadHelpers.Database.Cannoscale;
-        //    LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), BreakLineProperties.LineTypeScale.DefaultValue);
-        //    // set layer
-        //    var layerName = StyleHelpers.GetPropertyValue(style, BreakLineProperties.LayerName.Name,
-        //        BreakLineProperties.LayerName.DefaultValue);
-        //    AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
-        //}
+        #endregion
 
         public override ResultBuffer GetParametersForXData()
         {
@@ -394,7 +382,7 @@ namespace mpESKD.Functions.mpBreakLine
                                         StyleGuid = typedValue.Value.ToString();
                                         break;
                                     case 1:
-                                        BreakLineType = BreakLineTypeHelper.Parse(typedValue.Value.ToString());
+                                        BreakLineType = Enum.TryParse(typedValue.Value.ToString(), out BreakLineType blt) ? blt : BreakLineType.Linear;
                                         break;
                                     case 2:
                                         Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());

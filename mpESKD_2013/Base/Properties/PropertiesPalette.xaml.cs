@@ -6,6 +6,7 @@
     using System.Reflection;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Controls.Primitives;
     using System.Windows.Data;
     using System.Windows.Input;
     using System.Windows.Media;
@@ -331,6 +332,47 @@
                                     ExceptionBox.Show(exception);
                                 }
                             }
+                            else if (intellectualEntityProperty.Value is bool)
+                            {
+                                try
+                                {
+                                    CheckBox chb = new CheckBox();
+                                    chb.Style = Resources["PropertyValueCheckBox"] as Style;
+                                    SetDescription(chb, propertyDescription);
+                                    BindingOperations.SetBinding(chb, ToggleButton.IsCheckedProperty, CreateTwoWayBindingForProperty(summaryProperty));
+
+                                    Border outterBorder = new Border();
+                                    outterBorder.Style = Resources["BorderForValueCheckBox"] as Style;
+                                    Grid.SetColumn(outterBorder, 2);
+                                    Grid.SetRow(outterBorder, j);
+
+                                    outterBorder.Child = chb;
+                                    grid.Children.Add(outterBorder);
+                                }
+                                catch (Exception exception)
+                                {
+                                    ExceptionBox.Show(exception);
+                                }
+                            }
+                            else if (intellectualEntityProperty.Value is string)
+                            {
+                                try
+                                {
+                                    TextBox tb = new TextBox();
+                                    Grid.SetColumn(tb, 2);
+                                    Grid.SetRow(tb, j);
+                                    tb.Style = Resources["PropertyValueTextBox"] as Style;
+                                    SetDescription(tb, propertyDescription);
+                                    BindingOperations.SetBinding(tb, TextBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
+
+                                    grid.Children.Add(tb);
+                                }
+                                catch (Exception exception)
+                                {
+                                    ExceptionBox.Show(exception);
+                                }
+                            }
+
                             j++;
                         }
                     }

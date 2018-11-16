@@ -3,8 +3,10 @@
     using System.Collections.Generic;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
+    using Base.Enums;
     using Base.Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
@@ -85,8 +87,6 @@
                 }
                 axis.UpdateEntities();
                 axis.BlockRecord.UpdateAnonymousBlocks();
-                //blockReference.ResetBlock();
-                //Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
             }
             axis.Dispose();
         }
@@ -168,21 +168,25 @@
                 //todo change
                 while (!breakLoop)
                 {
-                    var axisJig = new AxisJig(axis, blockReference);
+                    var axisJig = new DefaultEntityJig(
+                        axis,
+                        blockReference,
+                        new Point3d(0, -1, 0),
+                        Language.GetItem(MainFunction.LangItem, "msg2"));
                     do
                     {
                         label0:
                         var status = AcadHelpers.Editor.Drag(axisJig).Status;
                         if (status == PromptStatus.OK)
                         {
-                            if (axisJig.JigState != AxisJigState.PromptInsertPoint)
+                            if (axisJig.JigState != JigState.PromptInsertPoint)
                             {
                                 breakLoop = true;
                                 status = PromptStatus.Other;
                             }
                             else
                             {
-                                axisJig.JigState = AxisJigState.PromptEndPoint;
+                                axisJig.JigState = JigState.PromptNextPoint;
                                 goto label0;
                             }
                         }

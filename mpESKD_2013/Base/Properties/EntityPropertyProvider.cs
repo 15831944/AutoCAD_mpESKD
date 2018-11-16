@@ -81,8 +81,6 @@ namespace mpESKD.Base.Properties
                     var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                     if (attribute != null)
                     {
-                        if (attribute.PropertyScope == PropertyScope.None)
-                            continue;
                         if (attribute.Name == "Style")
                         {
                             IntellectualEntityProperty property = new IntellectualEntityProperty(
@@ -152,8 +150,6 @@ namespace mpESKD.Base.Properties
                         var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                         if (attribute != null)
                         {
-                            if (attribute.PropertyScope == PropertyScope.None)
-                                continue;
                             foreach (IntellectualEntityProperty property in Properties)
                             {
                                 if (property.Name == attribute.Name)

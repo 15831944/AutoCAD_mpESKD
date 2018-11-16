@@ -639,7 +639,7 @@
                             propertyInfo.SetValue(
                                 entity,
                                 MainStaticSettings.Settings.UseScaleFromStyle
-                                    ? propertyFromStyle.Value
+                                    ? AcadHelpers.GetAnnotationScaleByName(propertyFromStyle.Value.ToString())
                                     : AcadHelpers.Database.Cannoscale);
                         }
                         else if (attribute.Name == "LayerName")

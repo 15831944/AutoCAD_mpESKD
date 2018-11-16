@@ -1,4 +1,5 @@
-﻿namespace mpESKD.Functions.mpAxis
+﻿// ReSharper disable InconsistentNaming
+namespace mpESKD.Functions.mpAxis
 {
     using System;
     using System.Collections.Generic;
@@ -15,6 +16,7 @@
     public class Axis : IntellectualEntity
     {
         #region Constructors
+
         /// <summary>Инициализация экземпляра класса для Axis без заполнения данными
         /// В данном случае уже все данные получены и нужно только "построить" 
         /// базовые примитивы</summary>
@@ -36,7 +38,172 @@
             LastHorizontalValue = lastHorizontalValue;
             LastVerticalValue = lastVerticalValue;
         }
+
         #endregion
+
+        #region General Properties
+
+        /// <summary>Минимальная длина от точки вставки до конечной точки</summary>
+        public double AxisMinLength => 1.0;
+
+        private AnnotationScale _scale;
+
+        [EntityProperty(PropertiesCategory.General, 3, nameof(Scale), "p5", "d5", "1:1", null, null)]
+        public new AnnotationScale Scale
+        {
+            get
+            {
+                if (_scale != null)
+                    return _scale;
+                _scale = new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1};
+                return _scale;
+            }
+            set
+            {
+                var oldScale = GetScale();
+                _scale = value;
+                if (MainStaticSettings.Settings.AxisLineTypeScaleProportionScale)
+                {
+                    var newScale = GetScale();
+                    LineTypeScale = LineTypeScale * newScale / oldScale;
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.General, 4, nameof(LineType), "p19", "d19", "осевая", null, null)]
+        public override string LineType { get; set; } = "осевая";
+
+        /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99)]
+        public override double LineTypeScale { get; set; }
+
+        /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null)]
+        public override string TextStyle { get; set; }
+
+        #endregion
+
+        #region Axis Properties
+
+        private int _bottomFractureOffset = 0;
+
+        /// <summary>Положение маркеров</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 1, nameof(MarkersPosition), "p8", "d8", AxisMarkersPosition.Bottom, null, null)]
+        public AxisMarkersPosition MarkersPosition { get; set; } = AxisMarkersPosition.Bottom;
+
+        /// <summary>Излом</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 2, nameof(Fracture), "p9", "d9", 10, 1, 20)]
+        public int Fracture { get; set; } = 10;
+
+        /// <summary>Нижний отступ излома</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 3, nameof(BottomFractureOffset), "p15", "d15", 0, 0, 30)]
+        public int BottomFractureOffset
+        {
+            get => _bottomFractureOffset;
+            set
+            {
+                //todo check it
+                var oldFracture = BottomFractureOffset;
+                _bottomFractureOffset = value;
+                // нужно сместить зависимые точки
+                var vecNorm = (EndPoint - InsertionPoint).GetNormal() * (value - oldFracture) * GetScale();
+                BottomOrientPoint = BottomOrientPoint + vecNorm;
+            }
+        }
+
+        /// <summary>Верхний отступ излома</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 4, nameof(TopFractureOffset), "p16", "d16", 0, 0, 30)]
+        public int TopFractureOffset { get; set; } = 0;
+
+        /// <summary>Диаметр маркеров</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 5, nameof(MarkersDiameter), "p10", "d10", 10, 6, 12)]
+        public int MarkersDiameter { get; set; } = 10;
+
+        /// <summary>Количество маркеров</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 6, nameof(MarkersCount), "p11", "d11", 1, 1, 3)]
+        public int MarkersCount { get; set; } = 1;
+
+        // Типы маркеров: Type 1 - один кружок, Type 2 - два кружка
+        [EntityProperty(PropertiesCategory.Geometry, 7, nameof(FirstMarkerType), "p12", "d12", AxisMarkerType.Type1, null, null)]
+        public AxisMarkerType FirstMarkerType { get; set; } = AxisMarkerType.Type1;
+
+        [EntityProperty(PropertiesCategory.Geometry, 8, nameof(SecondMarkerType), "p13", "d13", AxisMarkerType.Type1, null, null)]
+        public AxisMarkerType SecondMarkerType { get; set; } = AxisMarkerType.Type1;
+
+        [EntityProperty(PropertiesCategory.Geometry, 8, nameof(ThirdMarkerType), "p14", "d14", AxisMarkerType.Type1, null, null)]
+        public AxisMarkerType ThirdMarkerType { get; set; } = AxisMarkerType.Type1;
+
+        // Orient markers
+
+        /// <summary>Видимость нижнего бокового кружка</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 9, nameof(BottomOrientMarkerVisible), "p32", "d32", false, null, null)]
+        public bool BottomOrientMarkerVisible { get; set; }
+
+        /// <summary>Видимость верхнего бокового кружка</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 10, nameof(TopOrientMarkerVisible), "p33", "d33", false, null, null)]
+        public bool TopOrientMarkerVisible { get; set; }
+
+        [EntityProperty(PropertiesCategory.Geometry, 11, nameof(OrientMarkerType), "p34", "d34", AxisMarkerType.Type1, null, null)]
+        //todo visibility
+        public AxisMarkerType OrientMarkerType { get; set; } = AxisMarkerType.Type1;
+
+        /// <summary>Размер стрелок</summary>
+        [EntityProperty(PropertiesCategory.Geometry, 12, nameof(ArrowsSize), "p29", "d29", 3, 0, 10)]
+        //todo visibility
+        public int ArrowsSize { get; set; } = 3;
+
+        // Отступы маркеров-ориентиров
+        private double BottomOrientMarkerOffset { get; set; } = double.NaN;
+
+        private double TopOrientMarkerOffset { get; set; } = double.NaN;
+
+        //todo visibility
+        // текст и текстовые значения
+        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextHeight), "p18", "d18", 3.5, 0.000000001, 1.0000E+99)]
+        public double TextHeight { get; set; } = 3.5;
+
+        [EntityProperty(PropertiesCategory.Content, 2, nameof(FirstTextPrefix), "p20", "d20", "", null, null, PropertyScope.Palette)]
+        public string FirstTextPrefix { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 3, nameof(FirstText), "p22", "d22", "", null, null, PropertyScope.Palette)]
+        public string FirstText { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 4, nameof(FirstTextSuffix), "p21", "d21", "", null, null, PropertyScope.Palette)]
+        public string FirstTextSuffix { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 5, nameof(SecondTextPrefix), "p23", "d23", "", null, null, PropertyScope.Palette)]
+        public string SecondTextPrefix { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 6, nameof(SecondText), "p25", "d25", "", null, null, PropertyScope.Palette)]
+        public string SecondText { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 7, nameof(SecondTextSuffix), "p24", "d24", "", null, null, PropertyScope.Palette)]
+        public string SecondTextSuffix { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 8, nameof(ThirdTextPrefix), "p26", "d26", "", null, null, PropertyScope.Palette)]
+        public string ThirdTextPrefix { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 9, nameof(ThirdText), "p28", "d28", "", null, null, PropertyScope.Palette)]
+        public string ThirdText { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 10, nameof(ThirdTextSuffix), "p27", "d27", "", null, null, PropertyScope.Palette)]
+        public string ThirdTextSuffix { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 11, nameof(BottomOrientText), "p30", "d30", "", null, null, PropertyScope.Palette)]
+        public string BottomOrientText { get; set; } = string.Empty;
+
+        [EntityProperty(PropertiesCategory.Content, 12, nameof(TopOrientText), "p31", "d31", "", null, null, PropertyScope.Palette)]
+        public string TopOrientText { get; set; } = string.Empty;
+
+        // last values
+        private readonly string LastHorizontalValue = string.Empty;
+
+        private readonly string LastVerticalValue = string.Empty;
+
+        #endregion
+
+        #region Geometry
 
         #region Points and Grips
 
@@ -47,10 +214,7 @@
             (InsertionPoint.Y + EndPoint.Y) / 2,
             (InsertionPoint.Z + EndPoint.Z) / 2
         );
-
-        /// <summary>Вторая (конечная) точка примитива в мировой системе координат</summary>
-        public Point3d EndPoint { get; set; } = Point3d.Origin;
-
+        
         public double BottomLineAngle { get; set; } = 0.0;
 
         private Point3d _bottomMarkerPoint;
@@ -135,131 +299,13 @@
         }
 
         // Получение управляющих точек в системе координат блока для отрисовки содержимого
-        private Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
-        private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
         private Point3d BottomMarkerPointOCS => BottomMarkerPoint.TransformBy(BlockTransform.Inverse());
         private Point3d TopMarkerPointOCS => TopMarkerPoint.TransformBy(BlockTransform.Inverse());
         private Point3d BottomOrientPointOCS => BottomOrientPoint.TransformBy(BlockTransform.Inverse());
         private Point3d TopOrientPointOCS => TopOrientPoint.TransformBy(BlockTransform.Inverse());
-        
-        #endregion
-
-        #region General Properties
-
-        /// <summary>Минимальная длина от точки вставки до конечной точки</summary>
-        public double AxisMinLength => 1.0;
-
-        /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 4, nameof(LineType), "p19", "d19", "Continuous", null, null)]
-        public override string LineType { get; set; }
-
-        /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99)]
-        public override double LineTypeScale { get; set; }
-
-        /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null)]
-        public override string TextStyle { get; set; }
 
         #endregion
 
-        #region Axis Properties
-        /// <summary>Диаметр маркеров</summary>
-        public int MarkersDiameter { get; set; } = AxisProperties.MarkersDiameter.DefaultValue;
-        /// <summary>Количество маркеров</summary>
-        public int MarkersCount { get; set; } = AxisProperties.MarkersCount.DefaultValue;
-        /// <summary>Положение маркеров</summary>
-        public AxisMarkersPosition MarkersPosition { get; set; } = AxisProperties.MarkersPosition.DefaultValue;
-        /// <summary>Излом</summary>
-        public int Fracture { get; set; } = 10;
-        /// <summary>Нижний отступ излома</summary>
-        public int BottomFractureOffset { get; set; } = 0;
-        /// <summary>Верхний отступ излома</summary>
-        public int TopFractureOffset { get; set; } = 0;
-        // Типы маркеров: 0 - один кружок, 1 - два кружка
-        public int FirstMarkerType { get; set; } = 0;
-        public int SecondMarkerType { get; set; } = 0;
-        public int ThirdMarkerType { get; set; } = 0;
-        public int OrientMarkerType { get; set; } = 0;
-
-        // текст и текстовые значения
-        //todo remove
-        //public string TextStyle { get; set; } = AxisProperties.TextStyle.DefaultValue;
-        public double TextHeight { get; set; }
-        public string FirstTextPrefix { get; set; } = string.Empty;
-        public string FirstText { get; set; } = string.Empty;
-        public string FirstTextSuffix { get; set; } = string.Empty;
-        public string SecondTextPrefix { get; set; } = string.Empty;
-        public string SecondText { get; set; } = string.Empty;
-        public string SecondTextSuffix { get; set; } = string.Empty;
-        public string ThirdTextPrefix { get; set; } = string.Empty;
-        public string ThirdText { get; set; } = string.Empty;
-        public string ThirdTextSuffix { get; set; } = string.Empty;
-        public string BottomOrientText { get; set; } = string.Empty;
-        public string TopOrientText { get; set; } = string.Empty;
-        // Orient markers
-        /// <summary>Размер стрелок</summary>
-        public int ArrowsSize { get; set; } = 3;
-        /// <summary>Видимость нижнего бокового кружка</summary>
-        public bool BottomOrientMarkerVisible { get; set; } = false;
-        /// <summary>Видимость верхнего бокового кружка</summary>
-        public bool TopOrientMarkerVisible { get; set; } = false;
-        // Отступы маркеров-ориентиров
-        private double BottomOrientMarkerOffset { get; set; } = double.NaN;
-        private double TopOrientMarkerOffset { get; set; } = double.NaN;
-        // last values
-        private string LastHorizontalValue = string.Empty;
-        private string LastVerticalValue = string.Empty;
-        #endregion
-
-        #region Style
-
-        //todo remove
-        //public override void ApplyStyle(MPCOStyle style)
-        //{
-        //    // apply settings from style
-        //    Fracture = StyleHelpers.GetPropertyValue(style, nameof(Fracture), AxisProperties.Fracture.DefaultValue);
-        //    MarkersPosition = StyleHelpers.GetPropertyValue(style, nameof(MarkersPosition), AxisProperties.MarkersPosition.DefaultValue);
-        //    MarkersDiameter = StyleHelpers.GetPropertyValue(style, nameof(MarkersDiameter), AxisProperties.MarkersDiameter.DefaultValue);
-        //    MarkersCount = StyleHelpers.GetPropertyValue(style, nameof(MarkersCount), AxisProperties.MarkersCount.DefaultValue);
-        //    BottomFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(BottomFractureOffset), AxisProperties.BottomFractureOffset.DefaultValue);
-        //    FirstMarkerType = StyleHelpers.GetPropertyValue(style, nameof(FirstMarkerType), AxisProperties.FirstMarkerType.DefaultValue);
-        //    SecondMarkerType = StyleHelpers.GetPropertyValue(style, nameof(SecondMarkerType), AxisProperties.SecondMarkerType.DefaultValue);
-        //    ThirdMarkerType = StyleHelpers.GetPropertyValue(style, nameof(ThirdMarkerType), AxisProperties.ThirdMarkerType.DefaultValue);
-        //    TopFractureOffset = StyleHelpers.GetPropertyValue(style, nameof(TopFractureOffset), AxisProperties.TopFractureOffset.DefaultValue);
-        //    OrientMarkerType = StyleHelpers.GetPropertyValue(style, nameof(OrientMarkerType), AxisProperties.OrientMarkerType.DefaultValue);
-        //    ArrowsSize = StyleHelpers.GetPropertyValue(style, nameof(ArrowsSize), AxisProperties.ArrowsSize.DefaultValue);
-        //    TextHeight = StyleHelpers.GetPropertyValue(style, nameof(TextHeight), AxisProperties.TextHeight.DefaultValue);
-        //    Scale = MainStaticSettings.Settings.UseScaleFromStyle
-        //        ? StyleHelpers.GetPropertyValue(style, nameof(Scale), AxisProperties.Scale.DefaultValue)
-        //        : AcadHelpers.Database.Cannoscale;
-        //    LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale), AxisProperties.LineTypeScale.DefaultValue);
-        //    // set layer
-        //    var layerName = StyleHelpers.GetPropertyValue(style, AxisProperties.LayerName.Name, AxisProperties.LayerName.DefaultValue);
-        //    AcadHelpers.SetLayerByName(BlockId, layerName, style.LayerXmlData);
-        //    // set line type
-        //    var lineType = StyleHelpers.GetPropertyValue(style, AxisProperties.LineType.Name, AxisProperties.LineType.DefaultValue);
-        //    AcadHelpers.SetLineType(BlockId, lineType);
-        //    // set text style
-        //    if (MainStaticSettings.Settings.UseTextStyleFromStyle)
-        //    {
-        //        var textStyleName = StyleHelpers.GetPropertyValue(style, AxisProperties.TextStyle.Name,
-        //            AxisProperties.TextStyle.DefaultValue);
-        //        if (TextStyleHelper.HasTextStyle(textStyleName))
-        //            TextStyle = textStyleName;
-        //        else
-        //        {
-        //            if (MainStaticSettings.Settings.IfNoTextStyle == 1 &&
-        //                TextStyleHelper.CreateTextStyle(((AxisStyle)style).TextStyleXmlData))
-        //                TextStyle = textStyleName;
-        //        }
-        //    }
-        //}
-
-        #endregion
-
-        #region Entities
-        
         /// <summary>Установка свойств для примитивов, которые не меняются</summary>
         /// <param name="entity">Примитив автокада</param>
         private static void SetPropertiesToCadEntity(Entity entity)
@@ -269,7 +315,7 @@
             entity.Linetype = "Continuous";
             entity.LinetypeScale = 1.0;
         }
-        
+
         /// <summary>Установка свойств для однострочного текста</summary>
         /// <param name="dbText"></param>
         private void SetPropertiesToDBText(DBText dbText)
@@ -283,7 +329,7 @@
             dbText.TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
         }
         private readonly Lazy<Line> _mainLine = new Lazy<Line>(() => new Line());
-        
+
         /// <summary>Средняя (основная) линия оси</summary>
         public Line MainLine
         {
@@ -722,7 +768,7 @@
                 ExceptionBox.Show(exception);
             }
         }
-        
+
         /// <summary>
         /// Построение "базового" простого варианта ЕСКД примитива
         /// Тот вид, который висит на мышке при создании и указании точки вставки
@@ -751,7 +797,7 @@
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
         }
-        
+
         /// <summary>Изменение примитивов по точкам</summary>
         private void SetEntitiesPoints(Point3d insertionPoint, Point3d endPoint, Point3d bottomMarkerPoint, Point3d topMarkerPoint, double scale)
         {
@@ -792,7 +838,7 @@
                     BottomFirstDBText.AlignmentPoint = firstMarkerCenter;
                 }
                 // Второй кружок первого маркера
-                if (FirstMarkerType == 1)
+                if (FirstMarkerType == AxisMarkerType.Type2)
                 {
                     _bottomFirstMarkerType2.Value.Center = firstMarkerCenter;
                     _bottomFirstMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
@@ -817,7 +863,7 @@
                         BottomSecondDBText.AlignmentPoint = secontMarkerCenter;
                     }
                     // второй кружок второго маркера
-                    if (SecondMarkerType == 1)
+                    if (SecondMarkerType == AxisMarkerType.Type2)
                     {
                         _bottomSecondMarkerType2.Value.Center = secontMarkerCenter;
                         _bottomSecondMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
@@ -841,7 +887,7 @@
                             BottomThirdDBText.AlignmentPoint = thirdMarkerCenter;
                         }
                         // второй кружок третьего маркера
-                        if (ThirdMarkerType == 1)
+                        if (ThirdMarkerType == AxisMarkerType.Type2)
                         {
                             _bottomThirdMarkerType2.Value.Center = thirdMarkerCenter;
                             _bottomThirdMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
@@ -934,7 +980,7 @@
                         BottomOrientDBText.AlignmentPoint = bottomOrientMarkerCenter;
                     }
                     // type2
-                    if (OrientMarkerType == 1)
+                    if (OrientMarkerType == AxisMarkerType.Type2)
                     {
                         _bottomOrientMarkerType2.Value.Center = bottomOrientMarkerCenter;
                         _bottomOrientMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
@@ -972,6 +1018,7 @@
                 _bottomOrientMarkerType2.Value.Visible = false;
             }
             #endregion
+
             #region Top
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Top)
@@ -1005,7 +1052,7 @@
                     TopFirstDBText.AlignmentPoint = firstMarkerCenter;
                 }
                 // Второй кружок первого маркера
-                if (FirstMarkerType == 1)
+                if (FirstMarkerType == AxisMarkerType.Type2)
                 {
                     _topFirstMarkerType2.Value.Center = firstMarkerCenter;
                     _topFirstMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
@@ -1030,7 +1077,7 @@
                         TopSecondDBText.AlignmentPoint = secontMarkerCenter;
                     }
                     // второй кружок второго маркера
-                    if (SecondMarkerType == 1)
+                    if (SecondMarkerType == AxisMarkerType.Type2)
                     {
                         _topSecondMarkerType2.Value.Center = secontMarkerCenter;
                         _topSecondMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
@@ -1054,7 +1101,7 @@
                             TopThirdDBText.AlignmentPoint = thirdMarkerCenter;
                         }
                         // второй кружок третьего маркера
-                        if (ThirdMarkerType == 1)
+                        if (ThirdMarkerType == AxisMarkerType.Type2)
                         {
                             _topThirdMarkerType2.Value.Center = thirdMarkerCenter;
                             _topThirdMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
@@ -1147,7 +1194,7 @@
                         TopOrientDBText.AlignmentPoint = topOrientMarkerCenter;
                     }
                     // type2
-                    if (OrientMarkerType == 1)
+                    if (OrientMarkerType == AxisMarkerType.Type2)
                     {
                         _topOrientMarkerType2.Value.Center = topOrientMarkerCenter;
                         _topOrientMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
@@ -1213,8 +1260,10 @@
                     FirstText = GetFirstTextValueByLastAxis("Vertical");
             }
         }
+
         // Чтобы не вычислять каждый раз заново создам переменные
         private string _newVerticalMarkValue = string.Empty;
+
         private string _newHorizontalMarkValue = string.Empty;
 
         private string GetFirstTextValueByLastAxis(string direction)
@@ -1319,10 +1368,10 @@
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersCount)); // 2
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BottomFractureOffset)); // 3
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, TopFractureOffset)); // 4
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, FirstMarkerType)); // 5
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, SecondMarkerType)); // 6
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, ThirdMarkerType)); // 7
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, OrientMarkerType)); // 8
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)FirstMarkerType)); // 5
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)SecondMarkerType)); // 6
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)ThirdMarkerType)); // 7
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)OrientMarkerType)); // 8
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, ArrowsSize)); // 9
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
@@ -1372,7 +1421,7 @@
                                         StyleGuid = typedValue.Value.ToString();
                                         break;
                                     case 1:
-                                        MarkersPosition = AxisPropertiesHelpers.GetAxisMarkersPositionFromString(typedValue.Value.ToString());
+                                        MarkersPosition = Enum.TryParse(typedValue.Value.ToString(), out AxisMarkersPosition p) ? p : AxisMarkersPosition.Bottom;
                                         break;
                                     case 2:
                                         Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
@@ -1444,16 +1493,16 @@
                                         TopFractureOffset = (Int16)typedValue.Value;
                                         break;
                                     case 5:
-                                        FirstMarkerType = (Int16)typedValue.Value;
+                                        FirstMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
                                         break;
                                     case 6:
-                                        SecondMarkerType = (Int16)typedValue.Value;
+                                        SecondMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
                                         break;
                                     case 7:
-                                        ThirdMarkerType = (Int16)typedValue.Value;
+                                        ThirdMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
                                         break;
                                     case 8:
-                                        OrientMarkerType = (Int16)typedValue.Value;
+                                        OrientMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
                                         break;
                                     case 9:
                                         ArrowsSize = (Int16)typedValue.Value;

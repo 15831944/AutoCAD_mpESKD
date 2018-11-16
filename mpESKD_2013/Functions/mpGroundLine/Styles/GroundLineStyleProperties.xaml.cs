@@ -20,7 +20,7 @@
             ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
             ModPlusAPI.Windows.Helpers.WindowHelpers.ChangeStyleForResourceDictionary(Resources);
             // FirstStrokeOffset
-            CbFirstStrokeOffset.ItemsSource = GroundLinePropertiesHelpers.FirstStrokeOffsetNames;
+            //CbFirstStrokeOffset.ItemsSource = GroundLinePropertiesHelpers.FirstStrokeOffsetNames;
             // get list of scales
             CbScale.ItemsSource = AcadHelpers.Scales;
             // layers
@@ -32,23 +32,23 @@
         }
         private void FrameworkElement_OnGotFocus(object sender, RoutedEventArgs e)
         {
-            if (!(sender is FrameworkElement fe)) return;
-            if (fe.Name.Equals("TbFirstStrokeOffset"))
-                StyleEditorWork.ShowDescription(GroundLineProperties.FirstStrokeOffset.Description);
-            if (fe.Name.Equals("TbStrokeLength"))
-                StyleEditorWork.ShowDescription(GroundLineProperties.StrokeLength.Description);
-            if (fe.Name.Equals("TbStrokeOffset"))
-                StyleEditorWork.ShowDescription(GroundLineProperties.StrokeOffset.Description);
-            if (fe.Name.Equals("TbStrokeAngle"))
-                StyleEditorWork.ShowDescription(GroundLineProperties.StrokeAngle.Description);
-            if (fe.Name.Equals("TbSpace"))
-                StyleEditorWork.ShowDescription(GroundLineProperties.Space.Description);
-            if (fe.Name.Equals("CbScale"))
-                StyleEditorWork.ShowDescription(GroundLineProperties.Scale.Description);
-            if (fe.Name.Equals("TbLineTypeScale"))
-                StyleEditorWork.ShowDescription(GroundLineProperties.LineTypeScale.Description);
-            if (fe.Name.Equals("CbLayerName"))
-                StyleEditorWork.ShowDescription(GroundLineProperties.LayerName.Description);
+            //if (!(sender is FrameworkElement fe)) return;
+            //if (fe.Name.Equals("TbFirstStrokeOffset"))
+            //    StyleEditorWork.ShowDescription(GroundLineProperties.FirstStrokeOffset.Description);
+            //if (fe.Name.Equals("TbStrokeLength"))
+            //    StyleEditorWork.ShowDescription(GroundLineProperties.StrokeLength.Description);
+            //if (fe.Name.Equals("TbStrokeOffset"))
+            //    StyleEditorWork.ShowDescription(GroundLineProperties.StrokeOffset.Description);
+            //if (fe.Name.Equals("TbStrokeAngle"))
+            //    StyleEditorWork.ShowDescription(GroundLineProperties.StrokeAngle.Description);
+            //if (fe.Name.Equals("TbSpace"))
+            //    StyleEditorWork.ShowDescription(GroundLineProperties.Space.Description);
+            //if (fe.Name.Equals("CbScale"))
+            //    StyleEditorWork.ShowDescription(GroundLineProperties.Scale.Description);
+            //if (fe.Name.Equals("TbLineTypeScale"))
+            //    StyleEditorWork.ShowDescription(GroundLineProperties.LineTypeScale.Description);
+            //if (fe.Name.Equals("CbLayerName"))
+            //    StyleEditorWork.ShowDescription(GroundLineProperties.LayerName.Description);
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)
@@ -83,14 +83,23 @@
 
     public class GroundLineFirstStrokeOffsetValueConverter : IValueConverter
     {
+        //public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        //{
+        //    return GroundLinePropertiesHelpers.GetLocalFirstStrokeOffsetName((GroundLineFirstStrokeOffset)value);
+        //}
+
+        //public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        //{
+        //    return GroundLinePropertiesHelpers.GetFirstStrokeOffsetByLocalName((string)value);
+        //}
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return GroundLinePropertiesHelpers.GetLocalFirstStrokeOffsetName((GroundLineFirstStrokeOffset)value);
+            throw new NotImplementedException();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return GroundLinePropertiesHelpers.GetFirstStrokeOffsetByLocalName((string)value);
+            throw new NotImplementedException();
         }
     }
 }

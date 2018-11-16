@@ -6,11 +6,6 @@
     public enum PropertyScope
     {
         /// <summary>
-        /// Нигде не отображать
-        /// </summary>
-        None,
-
-        /// <summary>
         /// Только на палитре
         /// </summary>
         Palette,

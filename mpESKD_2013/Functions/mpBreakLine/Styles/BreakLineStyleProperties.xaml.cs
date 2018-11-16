@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using mpESKD.Base.Helpers;
 using mpESKD.Base.Styles;
-using mpESKD.Functions.mpBreakLine.Properties;
 
 namespace mpESKD.Functions.mpBreakLine.Styles
 {
@@ -23,21 +22,7 @@ namespace mpESKD.Functions.mpBreakLine.Styles
         }
         private void FrameworkElement_OnGotFocus(object sender, RoutedEventArgs e)
         {
-            if (!(sender is FrameworkElement fe)) return;
-            if (fe.Name.Equals("TbOverhang"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.Overhang.Description);
-            if (fe.Name.Equals("TbBreakHeight"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.BreakHeight.Description);
-            if (fe.Name.Equals("TbBreakWidth"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.BreakWidth.Description);
-            if (fe.Name.Equals("CbBreakLineType"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.BreakLineType.Description);
-            if (fe.Name.Equals("CbScale"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.Scale.Description);
-            if (fe.Name.Equals("TbLineTypeScale"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.LineTypeScale.Description);
-            if (fe.Name.Equals("CbLayerName"))
-                StyleEditorWork.ShowDescription(BreakLineProperties.LayerName.Description);
+            
         }
 
         private void FrameworkElement_OnLostFocus(object sender, RoutedEventArgs e)

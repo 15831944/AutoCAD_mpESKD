@@ -33,9 +33,8 @@
         {
             return new List<IIntellectualEntityFunction>
             {
-                //todo uncomment
-                //new BreakLineFunction(),
-                //new AxisFunction(),
+                new BreakLineFunction(),
+                new AxisFunction(),
                 new GroundLineFunction()
             };
         }

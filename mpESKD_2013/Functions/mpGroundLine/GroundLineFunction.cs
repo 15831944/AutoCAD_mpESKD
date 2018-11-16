@@ -5,8 +5,10 @@
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
+    using Base.Enums;
     using Base.Helpers;
     using Base.Styles;
     using ModPlusAPI;
@@ -73,13 +75,18 @@
                 var breakLoop = false;
                 while (!breakLoop)
                 {
-                    var breakLineJig = new GroundLineJig(groundLine, blockReference);
+                    //var breakLineJig = new GroundLineJig(groundLine, blockReference);
+                    var breakLineJig = new DefaultEntityJig(
+                        groundLine, 
+                        blockReference,
+                        new Point3d(20, 0, 0), 
+                        Language.GetItem(MainFunction.LangItem, "msg5"));
                     do
                     {
                         var status = AcadHelpers.Editor.Drag(breakLineJig).Status;
                         if (status == PromptStatus.OK)
                         {
-                            breakLineJig.JigState = GroundLineJigState.PromptNextPoint;
+                            breakLineJig.JigState = JigState.PromptNextPoint;
                             if (breakLineJig.PreviousPoint == null)
                             {
                                 breakLineJig.PreviousPoint = groundLine.MiddlePoints.Any()

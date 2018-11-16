@@ -28,15 +28,15 @@
                 Guid = "00000000-0000-0000-0000-000000000000",
                 StyleType = MPCOStyleType.System
             };
-            style.Properties.Add(GroundLineProperties.FirstStrokeOffset.Clone(true));
-            style.Properties.Add(GroundLineProperties.StrokeLength.Clone(true));
-            style.Properties.Add(GroundLineProperties.StrokeOffset.Clone(true));
-            style.Properties.Add(GroundLineProperties.StrokeAngle.Clone(true));
-            style.Properties.Add(GroundLineProperties.Space.Clone(true));
-            style.Properties.Add(GroundLineProperties.LineType.Clone(true));
-            style.Properties.Add(GroundLineProperties.LineTypeScale.Clone(true));
-            style.Properties.Add(GroundLineProperties.Scale.Clone(true));
-            style.Properties.Add(GroundLineProperties.LayerName.Clone(true));
+            //style.Properties.Add(GroundLineProperties.FirstStrokeOffset.Clone(true));
+            //style.Properties.Add(GroundLineProperties.StrokeLength.Clone(true));
+            //style.Properties.Add(GroundLineProperties.StrokeOffset.Clone(true));
+            //style.Properties.Add(GroundLineProperties.StrokeAngle.Clone(true));
+            //style.Properties.Add(GroundLineProperties.Space.Clone(true));
+            //style.Properties.Add(GroundLineProperties.LineType.Clone(true));
+            //style.Properties.Add(GroundLineProperties.LineTypeScale.Clone(true));
+            //style.Properties.Add(GroundLineProperties.Scale.Clone(true));
+            //style.Properties.Add(GroundLineProperties.LayerName.Clone(true));
 
             styles.Add(style);
 
@@ -59,36 +59,36 @@
                 {
                     switch (nameAttr.Value)
                     {
-                        case "FirstStrokeOffset":
-                            style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.FirstStrokeOffset,
-                                GroundLinePropertiesHelpers.GetFirstStrokeOffsetFromString(propXel.Attribute("Value")?.Value)));
-                            break;
-                        case "StrokeLength":
-                            style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.StrokeLength));
-                            break;
-                        case "StrokeOffset":
-                            style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.StrokeOffset));
-                            break;
-                        case "StrokeAngle":
-                            style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.StrokeAngle));
-                            break;
-                        case "Space":
-                            style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.Space));
-                            break;
-                        // general
-                        case "LineType":
-                            style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.LineType));
-                            break;
-                        case "LineTypeScale":
-                            style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.LineTypeScale));
-                            break;
-                        case "LayerName":
-                            style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.LayerName));
-                            break;
-                        case "Scale":
-                            style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.Scale,
-                                Parsers.AnnotationScaleFromString(propXel.Attribute("Value")?.Value)));
-                            break;
+                        //case "FirstStrokeOffset":
+                        //    style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.FirstStrokeOffset,
+                        //        GroundLinePropertiesHelpers.GetFirstStrokeOffsetFromString(propXel.Attribute("Value")?.Value)));
+                        //    break;
+                        //case "StrokeLength":
+                        //    style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.StrokeLength));
+                        //    break;
+                        //case "StrokeOffset":
+                        //    style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.StrokeOffset));
+                        //    break;
+                        //case "StrokeAngle":
+                        //    style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.StrokeAngle));
+                        //    break;
+                        //case "Space":
+                        //    style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.Space));
+                        //    break;
+                        //// general
+                        //case "LineType":
+                        //    style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.LineType));
+                        //    break;
+                        //case "LineTypeScale":
+                        //    style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.LineTypeScale));
+                        //    break;
+                        //case "LayerName":
+                        //    style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.LayerName));
+                        //    break;
+                        //case "Scale":
+                        //    style.Properties.Add(StyleHelpers.CreatePropertyFromXml(propXel, GroundLineProperties.Scale,
+                        //        Parsers.AnnotationScaleFromString(propXel.Attribute("Value")?.Value)));
+                        //    break;
                     }
                 }
             }
@@ -102,39 +102,39 @@
         public GroundLineStyleForEditor(MPCOStyle style, string currentStyleGuid, StyleToBind parent) 
             : base(style, currentStyleGuid, parent)
         {
-            FirstStrokeOffset = StyleHelpers.GetPropertyValue<GroundLineFirstStrokeOffset>(
-                style, nameof(FirstStrokeOffset), GroundLineProperties.FirstStrokeOffset.DefaultValue);
-            StrokeLength = StyleHelpers.GetPropertyValue(style, nameof(StrokeLength),
-                GroundLineProperties.StrokeLength.DefaultValue);
-            StrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(StrokeOffset),
-                GroundLineProperties.StrokeOffset.DefaultValue);
-            StrokeAngle = StyleHelpers.GetPropertyValue(style, nameof(StrokeAngle),
-                GroundLineProperties.StrokeAngle.DefaultValue);
-            Space = StyleHelpers.GetPropertyValue(style, nameof(Space),
-                GroundLineProperties.Space.DefaultValue);
-            LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale),
-                GroundLineProperties.LineTypeScale.DefaultValue);
-            LineType = StyleHelpers.GetPropertyValue(style, nameof(LineType),
-                GroundLineProperties.LineType.DefaultValue);
-            LayerName = StyleHelpers.GetPropertyValue(style, nameof(LayerName),
-                GroundLineProperties.LayerName.DefaultValue);
-            Scale = StyleHelpers.GetPropertyValue<AnnotationScale>(style, nameof(Scale),
-                GroundLineProperties.Scale.DefaultValue);
+            //FirstStrokeOffset = StyleHelpers.GetPropertyValue<GroundLineFirstStrokeOffset>(
+            //    style, nameof(FirstStrokeOffset), GroundLineProperties.FirstStrokeOffset.DefaultValue);
+            //StrokeLength = StyleHelpers.GetPropertyValue(style, nameof(StrokeLength),
+            //    GroundLineProperties.StrokeLength.DefaultValue);
+            //StrokeOffset = StyleHelpers.GetPropertyValue(style, nameof(StrokeOffset),
+            //    GroundLineProperties.StrokeOffset.DefaultValue);
+            //StrokeAngle = StyleHelpers.GetPropertyValue(style, nameof(StrokeAngle),
+            //    GroundLineProperties.StrokeAngle.DefaultValue);
+            //Space = StyleHelpers.GetPropertyValue(style, nameof(Space),
+            //    GroundLineProperties.Space.DefaultValue);
+            //LineTypeScale = StyleHelpers.GetPropertyValue(style, nameof(LineTypeScale),
+            //    GroundLineProperties.LineTypeScale.DefaultValue);
+            //LineType = StyleHelpers.GetPropertyValue(style, nameof(LineType),
+            //    GroundLineProperties.LineType.DefaultValue);
+            //LayerName = StyleHelpers.GetPropertyValue(style, nameof(LayerName),
+            //    GroundLineProperties.LayerName.DefaultValue);
+            //Scale = StyleHelpers.GetPropertyValue<AnnotationScale>(style, nameof(Scale),
+            //    GroundLineProperties.Scale.DefaultValue);
         }
 
         public GroundLineStyleForEditor(StyleToBind parent) : base(parent)
         {
-            FirstStrokeOffset = GroundLineProperties.FirstStrokeOffset.DefaultValue;
-            StrokeLength = GroundLineProperties.StrokeLength.DefaultValue;
-            StrokeOffset = GroundLineProperties.StrokeOffset.DefaultValue;
-            StrokeAngle = GroundLineProperties.StrokeAngle.DefaultValue;
-            Space = GroundLineProperties.Space.DefaultValue;
+            //FirstStrokeOffset = GroundLineProperties.FirstStrokeOffset.DefaultValue;
+            //StrokeLength = GroundLineProperties.StrokeLength.DefaultValue;
+            //StrokeOffset = GroundLineProperties.StrokeOffset.DefaultValue;
+            //StrokeAngle = GroundLineProperties.StrokeAngle.DefaultValue;
+            //Space = GroundLineProperties.Space.DefaultValue;
 
-            // general
-            LineTypeScale = GroundLineProperties.LineTypeScale.DefaultValue;
-            LineType = GroundLineProperties.LineType.DefaultValue;
-            LayerName = GroundLineProperties.LayerName.DefaultValue;
-            Scale = GroundLineProperties.Scale.DefaultValue;
+            //// general
+            //LineTypeScale = GroundLineProperties.LineTypeScale.DefaultValue;
+            //LineType = GroundLineProperties.LineType.DefaultValue;
+            //LayerName = GroundLineProperties.LayerName.DefaultValue;
+            //Scale = GroundLineProperties.Scale.DefaultValue;
         }
 
         /// <summary>

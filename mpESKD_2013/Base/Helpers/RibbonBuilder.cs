@@ -1,16 +1,14 @@
-﻿namespace mpESKD.LoadHelpers
+﻿namespace mpESKD.Base.Helpers
 {
-    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System;
     using System.Linq;
+    using System.Windows.Controls;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.Windows;
-    using RibbonPanelSource = Autodesk.Windows.RibbonPanelSource;
-    using RibbonRowPanel = Autodesk.Windows.RibbonRowPanel;
-    using System.Windows.Controls;
     using ModPlus.Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
     public class RibbonBuilder
     {
@@ -20,8 +18,8 @@
             {
                 GetColorTheme();
                 CreateRibbon();
-                AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
-                AcApp.SystemVariableChanged += AcadApp_SystemVariableChanged;
+                Application.SystemVariableChanged -= AcadApp_SystemVariableChanged;
+                Application.SystemVariableChanged += AcadApp_SystemVariableChanged;
             }
         }
         private static bool IsLoaded()
@@ -62,7 +60,7 @@
                         tab => tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName)))
                     {
                         ribCntrl.Tabs.Remove(tab);
-                        AcApp.SystemVariableChanged -= AcadApp_SystemVariableChanged;
+                        Application.SystemVariableChanged -= AcadApp_SystemVariableChanged;
                         break;
                     }
                 }
@@ -91,7 +89,7 @@
         {
             try
             {
-                var sv = AcApp.GetSystemVariable("COLORTHEME").ToString();
+                var sv = Application.GetSystemVariable("COLORTHEME").ToString();
                 if (int.TryParse(sv, out int i))
                     _colorTheme = i;
                 else _colorTheme = 1; // light

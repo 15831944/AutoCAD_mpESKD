@@ -11,9 +11,7 @@ namespace mpESKD.Functions.mpGroundLine
     using Base;
     using Base.Enums;
     using Base.Helpers;
-    using Base.Styles;
     using ModPlusAPI.Windows;
-    using Properties;
 
     [IntellectualEntityDisplayNameKeyAttribute("h73")]
     public class GroundLine : IntellectualEntity
@@ -46,13 +44,7 @@ namespace mpESKD.Functions.mpGroundLine
         /// Промежуточные точки
         /// </summary>
         public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
-
-        /// <summary>Конечная точка</summary>
-        public Point3d EndPoint { get; set; } = Point3d.Origin;
-
-        // Получение управляющих точек в системе координат блока для отрисовки содержимого
-        private Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
-
+        
         private List<Point3d> MiddlePointsOCS
         {
             get
@@ -62,8 +54,6 @@ namespace mpESKD.Functions.mpGroundLine
                 return points;
             }
         }
-
-        private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
 
         #endregion
 
@@ -79,31 +69,31 @@ namespace mpESKD.Functions.mpGroundLine
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 1, nameof(FirstStrokeOffset), "p36", "d36", 
             GroundLineFirstStrokeOffset.ByHalfSpace, null, null)]
-        public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineProperties.FirstStrokeOffset.DefaultValue;
+        public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineFirstStrokeOffset.ByHalfSpace;
 
         /// <summary>
         /// Длина штриха
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 2, nameof(StrokeLength), "p37", "d37", 8, 1, 10)]
-        public int StrokeLength { get; set; } = GroundLineProperties.StrokeLength.DefaultValue;
+        public int StrokeLength { get; set; } = 8;
 
         /// <summary>
         /// Расстояние между штрихами
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 3, nameof(StrokeOffset), "p38", "d38", 4, 1, 10)]
-        public int StrokeOffset { get; set; } = GroundLineProperties.StrokeOffset.DefaultValue;
+        public int StrokeOffset { get; set; } = 4;
 
         /// <summary>
         /// Угол наклона штриха в градусах
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 4, nameof(StrokeAngle), "p39", "d39", 60, 30, 90)]
-        public int StrokeAngle { get; set; } = GroundLineProperties.StrokeAngle.DefaultValue;
+        public int StrokeAngle { get; set; } = 60;
 
         /// <summary>
         /// Отступ группы штрихов
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 5, nameof(Space), "p40", "d40", 10, 1, 20)]
-        public int Space { get; set; } = GroundLineProperties.Space.DefaultValue;
+        public int Space { get; set; } = 10;
 
         /// <inheritdoc />
         [EntityProperty(PropertiesCategory.General, 4, nameof(LineType), "p35", "d35", "Continuous", null, null)]
@@ -114,7 +104,6 @@ namespace mpESKD.Functions.mpGroundLine
         public override double LineTypeScale { get; set; }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null, PropertyScope.None)]
         public override string TextStyle { get; set; }
 
         #endregion
@@ -433,7 +422,9 @@ namespace mpESKD.Functions.mpGroundLine
                                         Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
                                         break;
                                     case 2:
-                                        FirstStrokeOffset = GroundLinePropertiesHelpers.GetFirstStrokeOffsetFromString(typedValue.Value.ToString());
+                                        FirstStrokeOffset = Enum.TryParse(typedValue.Value.ToString(), out GroundLineFirstStrokeOffset so)
+                                            ? so 
+                                            : GroundLineFirstStrokeOffset.ByHalfSpace;
                                         break;
                                 }
                                 // index

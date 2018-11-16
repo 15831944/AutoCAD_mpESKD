@@ -139,7 +139,7 @@
         {
             if (Autodesk.Windows.ComponentManager.Ribbon == null)
                 return;
-            LoadHelpers.RibbonBuilder.BuildRibbon();
+            RibbonBuilder.BuildRibbon();
         }
 
         private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
@@ -148,7 +148,7 @@
             //may not be available yet, so check if before
             if (Autodesk.Windows.ComponentManager.Ribbon == null)
                 return;
-            LoadHelpers.RibbonBuilder.BuildRibbon();
+            RibbonBuilder.BuildRibbon();
             
             //and remove the event handler
             Autodesk.Windows.ComponentManager.ItemInitialized -= ComponentManager_ItemInitialized;
