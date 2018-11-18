@@ -1,4 +1,5 @@
-﻿namespace mpESKD.Base.Styles
+﻿// Редактор стилей реализую без использования паттерна Mvvm, так как на событиях в данном случае удобней
+namespace mpESKD.Base.Styles
 {
     using System;
     using System.Collections.Generic;
@@ -7,18 +8,18 @@
     using System.Linq;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Controls.Primitives;
+    using System.Windows.Data;
     using System.Windows.Input;
+    using System.Windows.Media;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
+    using Autodesk.AutoCAD.Windows;
+    using Enums;
     using Helpers;
-    using Functions.mpAxis;
-    using Functions.mpAxis.Styles;
-    using Functions.mpBreakLine;
-    using Functions.mpBreakLine.Styles;
-    using Functions.mpGroundLine;
-    using Functions.mpGroundLine.Styles;
-    using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using ModPlusStyle.Controls;
+    using Properties;
 
     public partial class StyleEditor
     {
@@ -28,10 +29,6 @@
             Title = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "tab4");
             Loaded += StyleEditor_OnLoaded;
             ContentRendered += StyleEditor_ContentRendered;
-            // check style files
-            StyleManager.CheckStylesFile<BreakLineStyle>();
-            StyleManager.CheckStylesFile<AxisStyle>();
-            StyleManager.CheckStylesFile<GroundLineStyle>();
         }
 
         private void StyleEditor_OnLoaded(object sender, RoutedEventArgs e)
@@ -39,13 +36,25 @@
             SizeToContent = SizeToContent.Manual;
         }
 
-        private ObservableCollection<StyleToBind> _styles;
+        private ObservableCollection<EntityStyles> _styles;
+
         private void StyleEditor_ContentRendered(object sender, EventArgs e)
         {
             try
             {
-                _styles = new ObservableCollection<StyleToBind>();
-                GetSyles();
+                _styles = new ObservableCollection<EntityStyles>();
+                TypeFactory.Instance.GetEntityTypes().ForEach(entityType =>
+                {
+                    var currentStyleGuidForEntity = StyleManager.GetCurrentStyleGuidForEntity(entityType);
+                    var entityStyles = new EntityStyles(entityType);
+                    StyleManager.GetStyles(entityType).ForEach(style =>
+                    {
+                        if (style.Guid == currentStyleGuidForEntity)
+                            style.IsCurrent = true;
+                        entityStyles.Styles.Add(style);
+                    });
+                    _styles.Add(entityStyles);
+                });
                 TvStyles.ItemsSource = _styles;
                 if (_styles.Any())
                     BtCreateStyleFromEntity.IsEnabled = true;
@@ -55,175 +64,567 @@
                 ExceptionBox.Show(exception);
             }
         }
-        /// <summary>Получение списка стилей. Системных и пользовательских</summary>
-        private void GetSyles()
-        {
-            // т.к. подфункции у меня явные, то для каждой подфункции добавляем стили
-
-            #region mpBreakLine
-            var styleToBind = new StyleToBind
-            {
-                FunctionLocalName = BreakLineInterface.LName,
-                FunctionName = BreakLineInterface.Name
-            };
-            var breakLineStyles = BreakLineStyleForEditor.GetStylesForEditor();
-            foreach (BreakLineStyleForEditor style in breakLineStyles)
-            {
-                style.Parent = styleToBind;
-                styleToBind.Styles.Add(style);
-            }
-            _styles.Add(styleToBind);
-            #endregion
-
-            #region Axis
-
-            styleToBind = new StyleToBind
-            {
-                FunctionLocalName = AxisInterface.LName,
-                FunctionName = AxisInterface.Name
-            };
-            var axisStyles = AxisStyleForEditor.GetStylesForEditor();
-            foreach (AxisStyleForEditor style in axisStyles)
-            {
-                style.Parent = styleToBind;
-                styleToBind.Styles.Add(style);
-            }
-            _styles.Add(styleToBind);
-
-            #endregion
-
-            #region Ground line
-
-            styleToBind = new StyleToBind()
-            {
-                FunctionLocalName = GroundLineInterface.LName,
-                FunctionName = GroundLineInterface.Name
-            };
-            var groundLineStyles = GroundLineStyleForEditor.GetStylesForEditor();
-            foreach (GroundLineStyleForEditor style in groundLineStyles)
-            {
-                style.Parent = styleToBind;
-                styleToBind.Styles.Add(style);
-            }
-            _styles.Add(styleToBind);
-
-            #endregion
-        }
 
         private void TvStyles_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (BorderProperties.Child != null) BorderProperties.Child = null;
+            if (BorderProperties.Child != null)
+                BorderProperties.Child = null;
 
             var item = e.NewValue;
             if (item != null)
                 BtAddNewStyle.IsEnabled = true;
-            if (item is StyleToBind styleToBind)
+            if (item is EntityStyles entityStyles)
             {
                 BtRemoveStyle.IsEnabled = false;
+
                 // image
-                SetImage(styleToBind.FunctionName);
+                SetImage(entityStyles.EntityType.Name);
             }
-            else if (item is MPCOStyleForEditor styleForEditor)
+            else if (item is IntellectualEntityStyle style)
             {
-                BtRemoveStyle.IsEnabled = styleForEditor.CanEdit;
-                BtSetCurrentStyle.IsEnabled = !styleForEditor.IsCurrent;
-                // break line
-                if (styleForEditor is BreakLineStyleForEditor breakLineStyle)
-                {
-                    BorderProperties.Child = new BreakLineStyleProperties(breakLineStyle.LayerName) { DataContext = item };
-                    SetImage(BreakLineInterface.Name);
-                }
-                // axis
-                if (styleForEditor is AxisStyleForEditor axisStyle)
-                {
-                    BorderProperties.Child = new AxisStyleProperties(axisStyle.LayerName) { DataContext = item };
-                    SetImage(AxisInterface.Name);
-                }
-                // ground line
-                if (styleForEditor is GroundLineStyleForEditor groundLineStyle)
-                {
-                    BorderProperties.Child = new GroundLineStyleProperties(groundLineStyle.LayerName) { DataContext = item };
-                    SetImage(GroundLineInterface.Name);
-                }
+                BtRemoveStyle.IsEnabled = style.CanEdit;
+                BtSetCurrentStyle.IsEnabled = !style.IsCurrent;
+
+                ShowStyleProperties(style);
+                SetImage(style.EntityType.Name);
             }
             else SetImage(string.Empty);
         }
+
+        private void ShowStyleProperties(IntellectualEntityStyle style)
+        {
+            Grid topGrid = new Grid();
+            topGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            topGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            topGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            topGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            topGrid.RowDefinitions.Add(new RowDefinition());
+
+            #region Set main data
+
+            TextBlock headerName = new TextBlock
+            {
+                Margin = (Thickness)FindResource("ModPlusDefaultMargin"),
+                Text = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h54")
+            };
+            Grid.SetRow(headerName, 0);
+            topGrid.Children.Add(headerName);
+
+            TextBox tbName = new TextBox { IsEnabled = style.StyleType == StyleType.User };
+            Grid.SetRow(tbName, 1);
+            Binding binding = new Binding
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                Source = style,
+                Path = new PropertyPath("Name")
+            };
+            BindingOperations.SetBinding(tbName, TextBox.TextProperty, binding);
+            topGrid.Children.Add(tbName);
+
+            TextBlock headerDescription = new TextBlock
+            {
+                Margin = (Thickness)FindResource("ModPlusDefaultMargin"),
+                Text = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h55")
+            };
+            Grid.SetRow(headerDescription, 2);
+            topGrid.Children.Add(headerDescription);
+
+            TextBox tbDescription = new TextBox { IsEnabled = style.StyleType == StyleType.User };
+            Grid.SetRow(tbDescription, 3);
+            binding = new Binding
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                Source = style,
+                Path = new PropertyPath("Description")
+            };
+            BindingOperations.SetBinding(tbDescription, TextBox.TextProperty, binding);
+            topGrid.Children.Add(tbDescription);
+
+            #endregion
+
+            Grid propertiesGrid = new Grid();
+            propertiesGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            propertiesGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            propertiesGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            Grid.SetRow(propertiesGrid, 4);
+
+            List<IGrouping<PropertiesCategory, IntellectualEntityProperty>> groupsByCategory = style.Properties.GroupBy(p => p.Category).ToList();
+            groupsByCategory.Sort((g1, g2) => g1.Key.CompareTo(g2.Key));
+            var rowIndex = 0;
+            foreach (IGrouping<PropertiesCategory, IntellectualEntityProperty> categoryGroup in groupsByCategory)
+            {
+                propertiesGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                TextBox categoryHeader = new TextBox { Text = LocalizationHelper.GetCategoryLocalizationName(categoryGroup.Key) };
+                Grid.SetRow(categoryHeader, rowIndex);
+                Grid.SetColumn(categoryHeader, 0);
+                Grid.SetColumnSpan(categoryHeader, 3);
+                categoryHeader.Style = Resources["HeaderTextBoxForStyleEditor"] as Style;
+                propertiesGrid.Children.Add(categoryHeader);
+                rowIndex++;
+                var gridSplitterStartIndex = rowIndex;
+                foreach (IntellectualEntityProperty property in categoryGroup.OrderBy(p => p.OrderIndex))
+                {
+                    propertiesGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                    // property name
+                    var propertyDescription = GetPropertyDescription(property);
+                    var propertyHeader = new TextBox
+                    {
+                        Text = GetPropertyDisplayName(property),
+                        Style = Resources["PropertyHeaderInStyleEditor"] as Style
+                    };
+                    SetDescription(propertyHeader, propertyDescription);
+                    Grid.SetColumn(propertyHeader, 0);
+                    Grid.SetRow(propertyHeader, rowIndex);
+                    propertiesGrid.Children.Add(propertyHeader);
+
+                    if (property.Name == "LayerName")
+                    {
+                        try
+                        {
+                            ComboBox cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
+                            Grid.SetColumn(cb, 2);
+                            Grid.SetRow(cb, rowIndex);
+                            var layers = AcadHelpers.Layers;
+                            layers.Insert(0, ModPlusAPI.Language.GetItem(MainFunction.LangItem, "defl")); // "По умолчанию"
+                            if (!layers.Contains(style.GetLayerNameProperty()))
+                                layers.Insert(1, style.GetLayerNameProperty());
+                            cb.ItemsSource = layers;
+                            cb.Style = Resources["PropertyValueComboBoxForStyleEditor"] as Style;
+                            SetDescription(cb, propertyDescription);
+                            BindingOperations.SetBinding(cb, Selector.SelectedItemProperty, CreateTwoWayBindingForProperty(property));
+                            propertiesGrid.Children.Add(cb);
+                        }
+                        catch (Exception exception)
+                        {
+                            ExceptionBox.Show(exception);
+                        }
+                    }
+                    else if (property.Name == "Scale")
+                    {
+                        try
+                        {
+                            ComboBox cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
+                            Grid.SetColumn(cb, 2);
+                            Grid.SetRow(cb, rowIndex);
+                            cb.ItemsSource = AcadHelpers.Scales;
+                            cb.Style = Resources["PropertyValueComboBoxForStyleEditor"] as Style;
+                            SetDescription(cb, propertyDescription);
+                            BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(property, new AnnotationScaleValueConverter()));
+                            propertiesGrid.Children.Add(cb);
+                        }
+                        catch (Exception exception)
+                        {
+                            ExceptionBox.Show(exception);
+                        }
+                    }
+                    else if (property.Name == "LineType")
+                    {
+                        try
+                        {
+                            TextBox tb = new TextBox { IsEnabled = style.StyleType == StyleType.User };
+                            Grid.SetColumn(tb, 2);
+                            Grid.SetRow(tb, rowIndex);
+                            tb.Cursor = Cursors.Hand;
+                            tb.Style = Resources["PropertyValueTextBoxForStyleEditor"] as Style;
+                            tb.PreviewMouseDown += LineType_OnPreviewMouseDown;
+                            SetDescription(tb, propertyDescription);
+                            BindingOperations.SetBinding(tb, TextBox.TextProperty, CreateTwoWayBindingForProperty(property));
+                            propertiesGrid.Children.Add(tb);
+                        }
+                        catch (Exception exception)
+                        {
+                            ExceptionBox.Show(exception);
+                        }
+                    }
+                    else if (property.Name.Contains("TextStyle"))
+                    {
+                        try
+                        {
+                            ComboBox cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
+                            Grid.SetColumn(cb, 2);
+                            Grid.SetRow(cb, rowIndex);
+                            cb.ItemsSource = AcadHelpers.TextStyles;
+                            cb.Style = Resources["PropertyValueComboBoxForStyleEditor"] as Style;
+                            SetDescription(cb, propertyDescription);
+                            BindingOperations.SetBinding(cb, Selector.SelectedItemProperty, CreateTwoWayBindingForProperty(property));
+                            propertiesGrid.Children.Add(cb);
+                        }
+                        catch (Exception exception)
+                        {
+                            ExceptionBox.Show(exception);
+                        }
+                    }
+                    else if (property.Value is Enum)
+                    {
+                        try
+                        {
+                            ComboBox cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
+                            Grid.SetColumn(cb, 2);
+                            Grid.SetRow(cb, rowIndex);
+                            cb.Style = Resources["PropertyValueComboBoxForStyleEditor"] as Style;
+                            Type type = property.Value.GetType();
+                            SetDescription(cb, propertyDescription);
+                            cb.ItemsSource = LocalizationHelper.GetEnumPropertyLocalizationFields(type);
+
+                            BindingOperations.SetBinding(cb, ComboBox.TextProperty,
+                                CreateTwoWayBindingForProperty(property, new EnumPropertyValueConverter()));
+
+                            propertiesGrid.Children.Add(cb);
+                        }
+                        catch (Exception exception)
+                        {
+                            ExceptionBox.Show(exception);
+                        }
+                    }
+                    else if (property.Value is int)
+                    {
+                        try
+                        {
+                            NumericBox tb = new NumericBox { IsEnabled = style.StyleType == StyleType.User };
+                            Grid.SetColumn(tb, 2);
+                            Grid.SetRow(tb, rowIndex);
+                            tb.Minimum = (int)property.Minimum;
+                            tb.Maximum = (int)property.Maximum;
+                            tb.Style = Resources["PropertyValueIntTextBoxForStyleEditor"] as Style;
+                            SetDescription(tb, propertyDescription);
+                            BindingOperations.SetBinding(tb, NumericBox.ValueProperty, CreateTwoWayBindingForPropertyForNumericValue(property, true));
+                            propertiesGrid.Children.Add(tb);
+                        }
+                        catch (Exception exception)
+                        {
+                            ExceptionBox.Show(exception);
+                        }
+                    }
+                    else if (property.Value is double)
+                    {
+                        try
+                        {
+                            NumericBox tb = new NumericBox { IsEnabled = style.StyleType == StyleType.User };
+                            Grid.SetColumn(tb, 2);
+                            Grid.SetRow(tb, rowIndex);
+                            tb.Minimum = (double)property.Minimum;
+                            tb.Maximum = (double)property.Maximum;
+                            tb.Style = Resources["PropertyValueDoubleTextBoxForStyleEditor"] as Style;
+                            SetDescription(tb, propertyDescription);
+                            BindingOperations.SetBinding(tb, NumericBox.ValueProperty, CreateTwoWayBindingForPropertyForNumericValue(property, false));
+
+                            propertiesGrid.Children.Add(tb);
+                        }
+                        catch (Exception exception)
+                        {
+                            ExceptionBox.Show(exception);
+                        }
+                    }
+                    else if (property.Value is bool)
+                    {
+                        try
+                        {
+                            CheckBox chb = new CheckBox { IsEnabled = style.StyleType == StyleType.User };
+                            SetDescription(chb, propertyDescription);
+                            BindingOperations.SetBinding(chb, ToggleButton.IsCheckedProperty, CreateTwoWayBindingForProperty(property));
+
+                            Border outterBorder = new Border();
+                            outterBorder.Style = Resources["PropertyBorderForCheckBoxForStyleEditor"] as Style;
+                            Grid.SetColumn(outterBorder, 2);
+                            Grid.SetRow(outterBorder, rowIndex);
+
+                            outterBorder.Child = chb;
+                            propertiesGrid.Children.Add(outterBorder);
+                        }
+                        catch (Exception exception)
+                        {
+                            ExceptionBox.Show(exception);
+                        }
+                    }
+                    else if (property.Value is string)
+                    {
+                        try
+                        {
+                            TextBox tb = new TextBox { IsEnabled = style.StyleType == StyleType.User };
+                            Grid.SetColumn(tb, 2);
+                            Grid.SetRow(tb, rowIndex);
+                            tb.Style = Resources["PropertyValueTextBoxForStyleEditor"] as Style;
+                            SetDescription(tb, propertyDescription);
+                            BindingOperations.SetBinding(tb, TextBox.TextProperty, CreateTwoWayBindingForProperty(property));
+
+                            propertiesGrid.Children.Add(tb);
+                        }
+                        catch (Exception exception)
+                        {
+                            ExceptionBox.Show(exception);
+                        }
+                    }
+
+                    rowIndex++;
+                }
+
+                propertiesGrid.Children.Add(CreateGridSplitter(gridSplitterStartIndex, rowIndex - gridSplitterStartIndex));
+            }
+
+            topGrid.Children.Add(propertiesGrid);
+            BorderProperties.Child = topGrid;
+        }
+
+        /// <summary>
+        /// Добавление в Grid разделителя GridSplitter
+        /// </summary>
+        /// <param name="startRowIndex">Индекс первой строки</param>
+        /// <param name="rowSpan">Количество пересекаемых строк</param>
+        private GridSplitter CreateGridSplitter(int startRowIndex, int rowSpan)
+        {
+            GridSplitter gridSplitter = new GridSplitter
+            {
+                BorderThickness = new Thickness(2, 0, 0, 0),
+                BorderBrush = (Brush)Resources["MidGrayBrush"],
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Stretch
+            };
+            Grid.SetColumn(gridSplitter, 1);
+            Grid.SetRow(gridSplitter, startRowIndex);
+            Grid.SetRowSpan(gridSplitter, rowSpan);
+            return gridSplitter;
+        }
+
+        /// <summary>
+        /// Получение локализованного (отображаемого) имени свойства с учётом двух атрибутов
+        /// </summary>
+        /// <param name="property">Свойство</param>
+        private string GetPropertyDisplayName(IntellectualEntityProperty property)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(property.DisplayNameLocalizationKeyForStyleEditor))
+                {
+                    var displayName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, property.DisplayNameLocalizationKeyForStyleEditor);
+                    if (!string.IsNullOrEmpty(displayName))
+                        return displayName;
+                }
+
+                {
+                    var displayName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, property.DisplayNameLocalizationKey);
+                    if (!string.IsNullOrEmpty(displayName))
+                        return displayName;
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Получение локализованного описания свойства
+        /// </summary>
+        /// <param name="property">Свойство</param>
+        private string GetPropertyDescription(IntellectualEntityProperty property)
+        {
+            try
+            {
+                var description = ModPlusAPI.Language.GetItem(MainFunction.LangItem, property.DescriptionLocalizationKey);
+                if (!string.IsNullOrEmpty(description))
+                    return description;
+            }
+            catch
+            {
+                // ignore
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Создание двусторонней привязки к свойству
+        /// </summary>
+        /// <param name="entityProperty">Свойство</param>
+        /// <param name="converter">Конвертер (при необходимости)</param>
+        /// <returns>Объект типа <see cref="Binding"/></returns>
+        private Binding CreateTwoWayBindingForProperty(IntellectualEntityProperty entityProperty, IValueConverter converter = null)
+        {
+            Binding binding = new Binding
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                Source = entityProperty,
+                Path = new PropertyPath("Value")
+            };
+            if (converter != null)
+                binding.Converter = converter;
+            return binding;
+        }
+
+        /// <summary>
+        /// Создание двусторонней привязки для использования в элементе <see cref="NumericBox"/>
+        /// По какой-то причине при привязке к типу object не работает. В связи с этим делаю такой вот
+        /// лайфхак - добавляю в класс <see cref="IntellectualEntityProperty"/> два свойства конкретного типа.
+        /// Это нужно, чтобы решить эту специфическую проблему в данном проекте и не менять из-за этого
+        /// библиотеку оформления
+        /// </summary>
+        /// <param name="entityProperty"></param>
+        /// <param name="isInteger"></param>
+        /// <returns></returns>
+        private Binding CreateTwoWayBindingForPropertyForNumericValue(IntellectualEntityProperty entityProperty, bool isInteger)
+        {
+            Binding binding = new Binding
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                Source = entityProperty,
+                Path = isInteger ? new PropertyPath("IntValue") : new PropertyPath("DoubleValue")
+            };
+            return binding;
+        }
+
+        /// <summary>
+        /// Добавление описания свойства в тэг элемента и подписывание на события
+        /// </summary>
+        /// <param name="e">Элемент</param>
+        /// <param name="description">Описание свойства</param>
+        private void SetDescription(FrameworkElement e, string description)
+        {
+            e.Tag = description;
+            e.GotFocus += _OnGotFocus;
+            e.LostFocus += _OnLostFocus;
+        }
+
+        /// <summary>
+        /// Отображение описания свойства при получении элементом фокуса
+        /// </summary>
+        private void _OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element)
+                ShowDescription(element.Tag.ToString());
+        }
+
+        /// <summary>
+        /// Очистка поля вывода описания свойства при пропадании фокуса с элемента
+        /// </summary>
+        private void _OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            ShowDescription(string.Empty);
+        }
+
+        /// <summary>
+        /// Отобразить описание свойства в специальном поле
+        /// </summary>
+        /// <param name="description">Описание свойства</param>
+        public void ShowDescription(string description)
+        {
+            TbPropertyDescription.Text = description;
+        }
+
+        /// <summary>
+        /// Отображение диалогового окна AutoCAD с выбором типа линии
+        /// </summary>
+        private void LineType_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            using (AcadHelpers.Document.LockDocument())
+            {
+                var ltd = new LinetypeDialog { IncludeByBlockByLayer = false };
+                if (ltd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    if (!ltd.Linetype.IsNull)
+                    {
+                        using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
+                        {
+                            using (var ltr = tr.GetObject(ltd.Linetype, OpenMode.ForRead) as LinetypeTableRecord)
+                            {
+                                if (ltr != null)
+                                {
+                                    ((TextBox)sender).Text = ltr.Name;
+                                }
+                            }
+                            tr.Commit();
+                        }
+                    }
+                }
+            }
+        }
+
         // add new style
         private void BtAddNewStyle_OnClick(object sender, RoutedEventArgs e)
         {
             var selected = TvStyles.SelectedItem;
-            if (selected == null) return;
-            if (selected is StyleToBind styleToBind)
+            if (selected == null)
+                return;
+            if (selected is EntityStyles entityStyles)
             {
-                if (styleToBind.FunctionName == BreakLineInterface.Name)
-                    styleToBind.Styles.Add(new BreakLineStyleForEditor(styleToBind));
-                if (styleToBind.FunctionName == AxisInterface.Name)
-                    styleToBind.Styles.Add(new AxisStyleForEditor(styleToBind));
-                if (styleToBind.FunctionName == GroundLineInterface.Name)
-                    styleToBind.Styles.Add(new GroundLineStyleForEditor(styleToBind));
+                var newStyle = new IntellectualEntityStyle(entityStyles.EntityType, true)
+                {
+                    Name = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h13"),
+                    StyleType = StyleType.User
+                };
+                entityStyles.Styles.Add(newStyle);
+                StyleManager.AddStyle(newStyle);
             }
-            // break line
-            if (selected is BreakLineStyleForEditor breakLineStyleForEditor)
+            else if (selected is IntellectualEntityStyle style)
             {
-                breakLineStyleForEditor.Parent.Styles.Add(new BreakLineStyleForEditor(breakLineStyleForEditor.Parent));
-            }
-            // axis
-            if (selected is AxisStyleForEditor axisStyleForEditor)
-            {
-                axisStyleForEditor.Parent.Styles.Add(new AxisStyleForEditor(axisStyleForEditor.Parent));
-            }
-            // ground line
-            if (selected is GroundLineStyleForEditor groundLineStyleForEditor)
-            {
-                groundLineStyleForEditor.Parent.Styles.Add(new GroundLineStyleForEditor(groundLineStyleForEditor.Parent));
+                var newStyle = new IntellectualEntityStyle(style.EntityType, true)
+                {
+                    Name = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h13"),
+                    StyleType = StyleType.User
+                };
+                _styles.Single(es => es.Styles.Contains(style)).Styles.Add(newStyle);
+                StyleManager.AddStyle(newStyle);
             }
         }
 
-        private void SetImage(string imageName)
+        private void SetImage(string entityTypeName)
         {
-            if (string.IsNullOrEmpty(imageName)) VbImage.Child = null;
+            if (string.IsNullOrEmpty(entityTypeName)) VbImage.Child = null;
             else
             {
                 {
-                    if (Resources["Image" + imageName] is Canvas imgResource)
+                    if (Resources["Image" + entityTypeName] is Canvas imgResource)
                         VbImage.Child = imgResource;
                 }
                 {
-                    if (Resources["Image" + imageName] is Viewbox imgResource)
+                    if (Resources["Image" + entityTypeName] is Viewbox imgResource)
                         VbImage.Child = imgResource;
                 }
             }
         }
+
         // delete style
         private void BtRemoveStyle_OnClick(object sender, RoutedEventArgs e)
         {
             var selected = TvStyles.SelectedItem;
-            if (selected == null) return;
-            if (selected is MPCOStyleForEditor style && style.CanEdit)
+            if (selected == null)
+                return;
+            if (selected is IntellectualEntityStyle style && style.CanEdit)
                 if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h69"), MessageBoxIcon.Question))
                 {
-                    if (style.IsCurrent)
-                    {
-                        var selectedIndex = style.Parent.Styles.IndexOf(style);
-                        // set current to previous
-                        SetCurrentStyle(style.Parent.Styles[selectedIndex - 1]);
-                    }
+                    //todo release
+                    //if (style.IsCurrent)
+                    //{
+                    //    var selectedIndex = style.Parent.Styles.IndexOf(style);
 
-                    // remove from style manager
-                    StyleManager.RemoveStyle(style.Guid);
+                    //    // set current to previous
+                    //    SetCurrentStyle(style.Parent.Styles[selectedIndex - 1]);
+                    //}
 
-                    // remove from collection
-                    style.Parent.Styles.Remove(style);
+                    //// remove from style manager
+                    //StyleManager.RemoveStyle(style.Guid);
+
+                    //// remove from collection
+                    //style.Parent.Styles.Remove(style);
                 }
         }
+
         // set current style
         private void BtSetCurrentStyle_OnClick(object sender, RoutedEventArgs e)
         {
             var selected = TvStyles.SelectedItem;
-            if (selected == null) return;
-            if (selected is MPCOStyleForEditor style)
+            if (selected == null)
+                return;
+            if (selected is IntellectualEntityStyle style)
             {
-                SetCurrentStyle(style);
+                _styles.Single(es => es.EntityType == style.EntityType).SetCurrent(style);
                 BtSetCurrentStyle.IsEnabled = false;
             }
         }
@@ -231,98 +632,49 @@
         private void TvStyles_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var selected = TvStyles.SelectedItem;
-            if (selected == null) return;
-            if (selected is MPCOStyleForEditor style)
+            if (selected == null)
+                return;
+            if (selected is IntellectualEntityStyle style)
             {
-                SetCurrentStyle(style);
+                _styles.Single(es => es.EntityType == style.EntityType).SetCurrent(style);
                 BtSetCurrentStyle.IsEnabled = false;
             }
         }
-        private void SetCurrentStyle(MPCOStyleForEditor style)
-        {
-            foreach (MPCOStyleForEditor styleForEditor in style.Parent.Styles)
-            {
-                styleForEditor.IsCurrent = false;
-            }
-            style.IsCurrent = true;
-        }
+
         private void StyleEditor_OnClosing(object sender, CancelEventArgs e)
         {
-            foreach (StyleToBind styleToBind in _styles)
+            foreach (EntityStyles entityStyles in _styles)
             {
-                var styleNames = new List<string>();
-                foreach (var style in styleToBind.Styles)
+                if (entityStyles.HasStylesWithSameName)
                 {
-                    if (!styleNames.Contains(style.Name))
-                        styleNames.Add(style.Name);
-                    else
-                    {
-                        ModPlusAPI.Windows.MessageBox.Show(
-                            ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h70") + " \"" + styleToBind.FunctionLocalName +
-                            "\" " + ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h71") + " \"" + style.Name +
-                            "\"!" + Environment.NewLine +
-                            ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h72"), MessageBoxIcon.Alert);
-                        e.Cancel = true;
-                        return;
-                    }
+                    ModPlusAPI.Windows.MessageBox.Show(
+                        ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h70") + " \"" + entityStyles.DisplayName +
+                        "\" " + ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h71") + "\"!" + Environment.NewLine +
+                        ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h72"), MessageBoxIcon.Alert);
+                    e.Cancel = true;
+                    return;
                 }
             }
         }
+
         // При закрытии сохраняю все стили в файлы
         private void StyleEditor_OnClosed(object sender, EventArgs e)
         {
             // reload static settings
             MainStaticSettings.ReloadSettings();
-            // save styles IsCurrent
-            foreach (StyleToBind styleToBind in _styles)
-            {
-                if (styleToBind.FunctionName == BreakLineInterface.Name)
-                {
-                    var currentStyle = styleToBind.Styles.FirstOrDefault(s => s.IsCurrent);
-                    if (currentStyle != null)
-                        UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpBreakLine", "CurrentStyleGuid", currentStyle.Guid, true);
-                }
-                if (styleToBind.FunctionName == AxisInterface.Name)
-                {
-                    var currentStyle = styleToBind.Styles.FirstOrDefault(s => s.IsCurrent);
-                    if (currentStyle != null)
-                        UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpAxis", "CurrentStyleGuid", currentStyle.Guid, true);
-                }
 
-                if (styleToBind.FunctionName == GroundLineInterface.Name)
+            // save styles
+            foreach (EntityStyles entityStyles in _styles)
+            {
+                StyleManager.SaveStylesToXml(entityStyles.EntityType);
+                foreach (IntellectualEntityStyle style in entityStyles.Styles)
                 {
-                    var currentStyle = styleToBind.Styles.FirstOrDefault(s => s.IsCurrent);
-                    if (currentStyle != null)
-                        UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpGroundLine", "CurrentStyleGuid", currentStyle.Guid, true);
+                    if (style.IsCurrent)
+                    {
+                        StyleManager.SaveCurrentStyleToSettings(style);
+                    }
                 }
             }
-            // save styles
-            // break line style
-            StyleManager.SaveStylesToXml<BreakLineStyle, BreakLineStyleForEditor>(
-                _styles.Single(s => s.FunctionName == BreakLineInterface.Name)
-                    .Styles.Where(s => s.CanEdit).Cast<BreakLineStyleForEditor>().ToList(),
-                BreakLineStyleForEditor.ConvertStyleForEditorToXElement);
-            StyleManager.ReloadStyles(
-                BreakLineStyle.Instance.CreateSystemStyles<BreakLineStyle>(),
-                BreakLineStyle.Instance.ParseStyleFromXElement<BreakLineStyle>);
-
-            // axis styles
-            StyleManager.SaveStylesToXml<AxisStyle, AxisStyleForEditor>(
-                _styles.Single(s => s.FunctionName == AxisInterface.Name)
-                    .Styles.Where(s => s.CanEdit).Cast<AxisStyleForEditor>().ToList(),
-                AxisStyleForEditor.ConvertStyleForEditorToXElement);
-            StyleManager.ReloadStyles(
-                AxisStyle.Instance.CreateSystemStyles<AxisStyle>(),
-                AxisStyle.Instance.ParseStyleFromXElement<AxisStyle>);
-            
-            // ground line styles
-            StyleManager.SaveStylesToXml<GroundLineStyle, GroundLineStyleForEditor>(
-                _styles.Single(s => s.FunctionName == GroundLineInterface.Name)
-                    .Styles.Where(s => s.CanEdit).Cast<GroundLineStyleForEditor>().ToList(),
-                GroundLineStyleForEditor.ConvertStyleForEditorToXElement);
-            StyleManager.ReloadStyles(
-                GroundLineStyle.Instance.CreateSystemStyles<GroundLineStyle>(), 
-                GroundLineStyle.Instance.ParseStyleFromXElement<GroundLineStyle>);
         }
 
         private void BtExpandCollapseImage_OnMouseEnter(object sender, MouseEventArgs e)
@@ -337,6 +689,7 @@
 
         private GridLength _topRowHeight;
         private GridLength _rightColumnWidth;
+
         private void BtExpandImage_OnClick(object sender, RoutedEventArgs e)
         {
             _topRowHeight = TopRow.Height;
@@ -388,15 +741,16 @@
                         var obj = tr.GetObject(selectionResult.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference blockReference)
                         {
-                            // mpBreakLine
-                            if (ExtendedDataHelpers.IsApplicable(obj, BreakLineInterface.Name))
-                                newStyleGuid = AddStyleFromBreakLine(blockReference);
-                            // mpAxis
-                            if (ExtendedDataHelpers.IsApplicable(obj, AxisInterface.Name))
-                                newStyleGuid = AddStyleFromAxis(blockReference);
-                            // mpGroundLine
-                            if (ExtendedDataHelpers.IsApplicable(obj, GroundLineInterface.Name))
-                                newStyleGuid = AddStyleFromGroundLine(blockReference);
+                            //todo release
+                            //// mpBreakLine
+                            //if (ExtendedDataHelpers.IsApplicable(obj, BreakLineInterface.Name))
+                            //    newStyleGuid = AddStyleFromBreakLine(blockReference);
+                            //// mpAxis
+                            //if (ExtendedDataHelpers.IsApplicable(obj, AxisInterface.Name))
+                            //    newStyleGuid = AddStyleFromAxis(blockReference);
+                            //// mpGroundLine
+                            //if (ExtendedDataHelpers.IsApplicable(obj, GroundLineInterface.Name))
+                            //    newStyleGuid = AddStyleFromGroundLine(blockReference);
                         }
                     }
                     if (!string.IsNullOrEmpty(newStyleGuid))
@@ -410,126 +764,126 @@
             finally { Show(); }
         }
 
-        /// <summary>Создание нового стиля из BreakLine</summary>
-        /// <param name="blkReference">Блок, представляющий BreakLine</param>
-        /// <returns>Guid нового стиля</returns>
-        private string AddStyleFromBreakLine(BlockReference blkReference)
-        {
-            var styleGuid = string.Empty;
-            var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(blkReference);
-            if (breakLine != null)
-            {
-                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == BreakLineInterface.Name);
-                if (styleToBind != null)
-                {
-                    var styleForEditor = new BreakLineStyleForEditor(styleToBind)
-                    {
-                        // general
-                        LayerName = blkReference.Layer,
-                        Overhang = breakLine.Overhang,
-                        Scale = breakLine.Scale,
-                        //
-                        BreakHeight = breakLine.BreakHeight,
-                        BreakWidth = breakLine.BreakWidth,
-                        LineTypeScale = breakLine.LineTypeScale
-                    };
-                    styleGuid = styleForEditor.Guid;
-                    styleToBind.Styles.Add(styleForEditor);
-                }
-            }
-            return styleGuid;
-        }
+        ///// <summary>Создание нового стиля из BreakLine</summary>
+        ///// <param name="blkReference">Блок, представляющий BreakLine</param>
+        ///// <returns>Guid нового стиля</returns>
+        //private string AddStyleFromBreakLine(BlockReference blkReference)
+        //{
+        //    var styleGuid = string.Empty;
+        //    var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(blkReference);
+        //    if (breakLine != null)
+        //    {
+        //        var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == BreakLineInterface.Name);
+        //        if (styleToBind != null)
+        //        {
+        //            var styleForEditor = new BreakLineStyleForEditor(styleToBind)
+        //            {
+        //                // general
+        //                LayerName = blkReference.Layer,
+        //                Overhang = breakLine.Overhang,
+        //                Scale = breakLine.Scale,
+        //                //
+        //                BreakHeight = breakLine.BreakHeight,
+        //                BreakWidth = breakLine.BreakWidth,
+        //                LineTypeScale = breakLine.LineTypeScale
+        //            };
+        //            styleGuid = styleForEditor.Guid;
+        //            styleToBind.Styles.Add(styleForEditor);
+        //        }
+        //    }
+        //    return styleGuid;
+        //}
 
-        /// <summary>Создание нового стиля из Axis</summary>
-        /// <param name="blkReference">Блок, представляющий BreakLine</param>
-        /// <returns>Guid нового стиля</returns>
-        private string AddStyleFromAxis(BlockReference blkReference)
-        {
-            var styleGuid = string.Empty;
-            var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blkReference);
-            if (axis != null)
-            {
-                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == AxisInterface.Name);
-                if (styleToBind != null)
-                {
-                    var styleForEditor = new AxisStyleForEditor(styleToBind)
-                    {
-                        // general
-                        LayerName = blkReference.Layer,
-                        LineTypeScale = axis.LineTypeScale,
-                        Scale = axis.Scale,
-                        //
-                        LineType = blkReference.Linetype,
-                        //
-                        //MarkersPosition = axis.MarkersPosition,
-                        MarkersDiameter = axis.MarkersDiameter,
-                        MarkersCount = axis.MarkersCount,
-                        ////FirstMarkerType = axis.FirstMarkerType,
-                        ////SecondMarkerType = axis.SecondMarkerType,
-                        ////ThirdMarkerType = axis.ThirdMarkerType,
-                        ////OrientMarkerType = axis.OrientMarkerType,
-                        //Fracture = axis.Fracture,
-                        //BottomFractureOffset = axis.BottomFractureOffset,
-                        //TopFractureOffset = axis.TopFractureOffset,
-                        //ArrowsSize = axis.ArrowsSize,
-                        ////TextStyle = axis.TextStyle,
-                        ////TextHeight = axis.TextHeight
-                    };
-                    styleGuid = styleForEditor.Guid;
-                    styleToBind.Styles.Add(styleForEditor);
-                }
-            }
-            return styleGuid;
-        }
+        ///// <summary>Создание нового стиля из Axis</summary>
+        ///// <param name="blkReference">Блок, представляющий BreakLine</param>
+        ///// <returns>Guid нового стиля</returns>
+        //private string AddStyleFromAxis(BlockReference blkReference)
+        //{
+        //    var styleGuid = string.Empty;
+        //    var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blkReference);
+        //    if (axis != null)
+        //    {
+        //        var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == AxisInterface.Name);
+        //        if (styleToBind != null)
+        //        {
+        //            var styleForEditor = new AxisStyleForEditor(styleToBind)
+        //            {
+        //                // general
+        //                LayerName = blkReference.Layer,
+        //                LineTypeScale = axis.LineTypeScale,
+        //                Scale = axis.Scale,
+        //                //
+        //                LineType = blkReference.Linetype,
+        //                //
+        //                //MarkersPosition = axis.MarkersPosition,
+        //                MarkersDiameter = axis.MarkersDiameter,
+        //                MarkersCount = axis.MarkersCount,
+        //                ////FirstMarkerType = axis.FirstMarkerType,
+        //                ////SecondMarkerType = axis.SecondMarkerType,
+        //                ////ThirdMarkerType = axis.ThirdMarkerType,
+        //                ////OrientMarkerType = axis.OrientMarkerType,
+        //                //Fracture = axis.Fracture,
+        //                //BottomFractureOffset = axis.BottomFractureOffset,
+        //                //TopFractureOffset = axis.TopFractureOffset,
+        //                //ArrowsSize = axis.ArrowsSize,
+        //                ////TextStyle = axis.TextStyle,
+        //                ////TextHeight = axis.TextHeight
+        //            };
+        //            styleGuid = styleForEditor.Guid;
+        //            styleToBind.Styles.Add(styleForEditor);
+        //        }
+        //    }
+        //    return styleGuid;
+        //}
 
-        /// <summary>
-        /// Создание нового стиля из GroundLine
-        /// </summary>
-        /// <param name="blkReference">Блок, представляющий GroundLine</param>
-        /// <returns>Guid нового стиля</returns>
-        private string AddStyleFromGroundLine(BlockReference blkReference)
-        {
-            var styleGuid = string.Empty;
-            //todo old
-            //var groundLine = GroundLine.GetGroundLineFromEntity(blkReference);
-            var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(blkReference);
-            if (groundLine != null)
-            {
-                var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == GroundLineInterface.Name);
-                if (styleToBind != null)
-                {
-                    var styleForEditor = new GroundLineStyleForEditor(styleToBind)
-                    {
-                        // general
-                        LayerName = blkReference.Layer,
-                        LineTypeScale = groundLine.LineTypeScale,
-                        Scale = groundLine.Scale,
-                        //
-                        LineType = blkReference.Linetype,
-                        //
-                        FirstStrokeOffset = groundLine.FirstStrokeOffset,
-                        StrokeLength = groundLine.StrokeLength,
-                        StrokeOffset = groundLine.StrokeOffset,
-                        StrokeAngle = groundLine.StrokeAngle,
-                        Space = groundLine.Space
-                    };
-                    styleGuid = styleForEditor.Guid;
-                    styleToBind.Styles.Add(styleForEditor);
-                }
-            }
+        ///// <summary>
+        ///// Создание нового стиля из GroundLine
+        ///// </summary>
+        ///// <param name="blkReference">Блок, представляющий GroundLine</param>
+        ///// <returns>Guid нового стиля</returns>
+        //private string AddStyleFromGroundLine(BlockReference blkReference)
+        //{
+        //    var styleGuid = string.Empty;
+        //    //todo old
+        //    //var groundLine = GroundLine.GetGroundLineFromEntity(blkReference);
+        //    var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(blkReference);
+        //    if (groundLine != null)
+        //    {
+        //        var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == GroundLineInterface.Name);
+        //        if (styleToBind != null)
+        //        {
+        //            var styleForEditor = new GroundLineStyleForEditor(styleToBind)
+        //            {
+        //                // general
+        //                LayerName = blkReference.Layer,
+        //                LineTypeScale = groundLine.LineTypeScale,
+        //                Scale = groundLine.Scale,
+        //                //
+        //                LineType = blkReference.Linetype,
+        //                //
+        //                FirstStrokeOffset = groundLine.FirstStrokeOffset,
+        //                StrokeLength = groundLine.StrokeLength,
+        //                StrokeOffset = groundLine.StrokeOffset,
+        //                StrokeAngle = groundLine.StrokeAngle,
+        //                Space = groundLine.Space
+        //            };
+        //            styleGuid = styleForEditor.Guid;
+        //            styleToBind.Styles.Add(styleForEditor);
+        //        }
+        //    }
 
-            return styleGuid;
-        }
+        //    return styleGuid;
+        //}
 
         /// <summary>Поиск и выбор в TreeView стиля по Guid</summary>
         private void SearchInTreeViewByGuid(string styleGuid)
         {
             foreach (object item in TvStyles.Items)
             {
-                if (item is StyleToBind styleToBind)
+                if (item is EntityStyles entityStyles)
                 {
                     var collapseIt = true;
-                    foreach (var style in styleToBind.Styles)
+                    foreach (IntellectualEntityStyle style in entityStyles.Styles)
                     {
                         if (style.Guid == styleGuid)
                         {
@@ -549,23 +903,7 @@
                 }
             }
         }
+
         #endregion
-    }
-
-    /// <summary>
-    /// Класс, описывающий Стиль (группу стилей для каждого примитива) для использования в биндинге
-    /// </summary>
-    public class StyleToBind
-    {
-        public StyleToBind()
-        {
-            Styles = new ObservableCollection<MPCOStyleForEditor>();
-        }
-
-        public string FunctionLocalName { get; set; }
-
-        public string FunctionName { get; set; }
-
-        public ObservableCollection<MPCOStyleForEditor> Styles { get; set; }
     }
 }

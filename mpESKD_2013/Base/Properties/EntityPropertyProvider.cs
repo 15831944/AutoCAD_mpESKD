@@ -7,7 +7,6 @@ namespace mpESKD.Base.Properties
     using System.Linq;
     using System.Reflection;
     using Autodesk.AutoCAD.DatabaseServices;
-    using Enums;
     using Helpers;
     using Styles;
 
@@ -79,12 +78,14 @@ namespace mpESKD.Base.Properties
                 foreach (var propertyInfo in entityType.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
                 {
                     var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
+                    var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
                     if (attribute != null)
                     {
                         if (attribute.Name == "Style")
                         {
                             IntellectualEntityProperty property = new IntellectualEntityProperty(
                                 attribute,
+                                keyForEditorAttribute,
                                 entityType,
                                 StyleManager.GetStyleNameByGuid(entityType, _intellectualEntity.StyleGuid),
                                 _blkRefObjectId);
@@ -93,13 +94,15 @@ namespace mpESKD.Base.Properties
                         }
                         else if (attribute.Name == "LayerName")
                         {
-                            IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, entityType, blockReference.Layer, _blkRefObjectId);
+                            IntellectualEntityProperty property =
+                                new IntellectualEntityProperty(attribute, keyForEditorAttribute, entityType, blockReference.Layer, _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
                         else if (attribute.Name == "LineType")
                         {
-                            IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, entityType, blockReference.Linetype, _blkRefObjectId);
+                            IntellectualEntityProperty property = 
+                                new IntellectualEntityProperty(attribute, keyForEditorAttribute, entityType, blockReference.Linetype, _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
@@ -108,7 +111,8 @@ namespace mpESKD.Base.Properties
                             var value = propertyInfo.GetValue(intellectualEntity);
                             if (value != null)
                             {
-                                IntellectualEntityProperty property = new IntellectualEntityProperty(attribute, entityType, value, _blkRefObjectId);
+                                IntellectualEntityProperty property = 
+                                    new IntellectualEntityProperty(attribute, keyForEditorAttribute, entityType, value, _blkRefObjectId);
                                 property.PropertyChanged += Property_PropertyChanged;
                                 Properties.Add(property);
                             }
@@ -202,7 +206,7 @@ namespace mpESKD.Base.Properties
                             var style = StyleManager.GetStyleByName(entityType, intellectualEntityProperty.Value.ToString());
                             if (style != null)
                             {
-                                _intellectualEntity.ApplyStyle(style);
+                                _intellectualEntity.ApplyStyle(style, false);
                             }
                         }
                         else if (intellectualEntityProperty.Name == "LayerName")

@@ -42,15 +42,14 @@ namespace mpESKD.Functions.mpBreakLine
 
         /// <inheritdoc />
         /// В примитиве не используется!
-        //[EntityProperty(PropertiesCategory.General, 4, nameof(LineType), null, null, "Continuous", null, null, PropertyScope.None)]
         public override string LineType { get; set; }
 
         /// <inheritdoc />
-        //[EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99, PropertyScope.None)]
+        /// В примитиве не используется!
         public override double LineTypeScale { get; set; }
 
         /// <inheritdoc />
-        //[EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null, PropertyScope.None)]
+        /// В примитиве не используется!
         public override string TextStyle { get; set; }
 
         /// <summary>Минимальная длина линии обрыва от точки вставки до конечной точки</summary>
@@ -74,14 +73,17 @@ namespace mpESKD.Functions.mpBreakLine
 
         /// <summary>Выступ линии обрыва за границы "обрываемого" объекта</summary>
         [EntityProperty(PropertiesCategory.Geometry, 2, nameof(Overhang), "p2", "d2", 2, 0, 10)]
+        [PropertyNameKeyInStyleEditor("p2-1")]
         public int Overhang { get; set; } = 2;
 
         /// <summary>Ширина Обрыва для линейного обрыва</summary>
         [EntityProperty(PropertiesCategory.Geometry, 3, nameof(BreakWidth), "p3", "d3", 5, 1, 10)]
+        [PropertyNameKeyInStyleEditor("p3-1")]
         public int BreakWidth { get; set; } = 5;
 
         /// <summary>Длина обрыва для линейного обрыва</summary>
         [EntityProperty(PropertiesCategory.Geometry, 4, nameof(BreakHeight), "p4", "d4", 10, 1, 13)]
+        [PropertyNameKeyInStyleEditor("p4-1")]
         public int BreakHeight { get; set; } = 10;
         
         #endregion

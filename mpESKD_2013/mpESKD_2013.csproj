@@ -82,7 +82,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\Attributes.cs" />
-    <Compile Include="Base\BasePropertiesData.cs" />
     <Compile Include="Base\DefaultEntityJig.cs" />
     <Compile Include="Base\EntityReaderFactory.cs" />
     <Compile Include="Base\Enums\AxisMarkersPosition.cs" />
@@ -101,13 +100,12 @@
     <Compile Include="Base\Helpers\LayerHelper.cs" />
     <Compile Include="Base\Helpers\LocalizationHelper.cs" />
     <Compile Include="Base\Helpers\MathExtensions.cs" />
+    <Compile Include="Base\Helpers\RelayCommand.cs" />
     <Compile Include="Base\Helpers\TextStyleHelper.cs" />
     <Compile Include="Base\IIntellectualEntityFunction.cs" />
     <Compile Include="Base\IntellectualEntity.cs" />
     <Compile Include="Base\Overrules\IntellectualEntityGripData.cs" />
     <Compile Include="Base\Enums\GripType.cs" />
-    <Compile Include="Base\Properties\BaseProperties.cs" />
-    <Compile Include="Base\Properties\BaseSummaryProperties.cs" />
     <Compile Include="Base\Properties\Controls\ControlStylesForEditor.xaml.cs">
       <DependentUpon>ControlStylesForEditor.xaml</DependentUpon>
     </Compile>
@@ -137,7 +135,7 @@
     <Compile Include="Base\Properties\PropertiesPaletteFunction.cs" />
     <Compile Include="Base\Properties\SummaryProperty.cs" />
     <Compile Include="Base\Properties\SummaryPropertyCollection.cs" />
-    <Compile Include="Base\Styles\Behaviors\AllowableCharactersTextBoxBehavior.cs" />
+    <Compile Include="Base\Styles\EntityStyles.cs" />
     <Compile Include="Base\Styles\IntellectualEntityStyle.cs" />
     <Compile Include="Base\Styles\StyleManager.cs" />
     <Compile Include="Base\TypeFactory.cs" />
@@ -150,45 +148,28 @@
     <Compile Include="Functions\mpAxis\Overrules\AxisGripPointOverrule.cs" />
     <Compile Include="Functions\mpAxis\Overrules\AxisObjectOverrule.cs" />
     <Compile Include="Functions\mpAxis\Overrules\AxisOsnapOverrule.cs" />
-    <Compile Include="Functions\mpAxis\Styles\AxisStyle.cs" />
-    <Compile Include="Functions\mpAxis\Styles\AxisStyleProperties.xaml.cs">
-      <DependentUpon>AxisStyleProperties.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Base\Styles\Helpers.cs" />
-    <Compile Include="Base\Styles\BaseStyle.cs" />
     <Compile Include="Base\Styles\StyleEditor.xaml.cs">
       <DependentUpon>StyleEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Functions\mpBreakLine\BreakLine.cs" />
     <Compile Include="Functions\mpBreakLine\BreakLineFunction.cs" />
     <Compile Include="Functions\mpBreakLine\BreakLineInterface.cs" />
-    <Compile Include="Functions\mpBreakLine\Styles\BreakLineStyle.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs" />
-    <Compile Include="Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml.cs">
-      <DependentUpon>BreakLineStyleProperties.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Functions\mpGroundLine\GroundLine.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLineFunction.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLineInterface.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs" />
-    <Compile Include="Functions\mpGroundLine\Styles\GroundLineStyle.cs" />
-    <Compile Include="Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml.cs">
-      <DependentUpon>GroundLineStyleProperties.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Functions\mpSection\Overrules\SectionGripPointOverrule.cs" />
     <Compile Include="Functions\mpSection\Overrules\SectionObjectOverrule.cs" />
     <Compile Include="Functions\mpSection\Overrules\SectionOsnapOverrule.cs" />
     <Compile Include="Functions\mpSection\Section.cs" />
     <Compile Include="Functions\mpSection\SectionFunction.cs" />
     <Compile Include="Functions\mpSection\SectionInterface.cs" />
-    <Compile Include="Functions\mpSection\Styles\SectionStyle.cs" />
-    <Compile Include="Functions\mpSection\Styles\SectionStyleProperties.xaml.cs">
-      <DependentUpon>SectionStyleProperties.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Interface.cs" />
     <Compile Include="Base\Helpers\RibbonBuilder.cs" />
     <Compile Include="MainFunction.cs" />
@@ -231,25 +212,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Functions\mpAxis\Styles\AxisStyleProperties.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Base\Styles\StyleEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Functions\mpBreakLine\Styles\BreakLineStyleProperties.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Functions\mpGroundLine\Styles\GroundLineStyleProperties.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Functions\mpSection\Styles\SectionStyleProperties.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

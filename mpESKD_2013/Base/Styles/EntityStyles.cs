@@ -1,0 +1,53 @@
+﻿namespace mpESKD.Base.Styles
+{
+    using System;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using Helpers;
+
+    public class EntityStyles
+    {
+        public EntityStyles(Type entityType)
+        {
+            EntityType = entityType;
+            Styles = new ObservableCollection<IntellectualEntityStyle>();
+        }
+
+        /// <summary>
+        /// Тип примитива
+        /// </summary>
+        public Type EntityType { get; }
+
+        /// <summary>
+        /// Отображаемое имя примитива
+        /// </summary>
+        public string DisplayName => LocalizationHelper.GetEntityLocalizationName(EntityType);
+
+        /// <summary>
+        /// Коллекция стилей для указанного типа примитива
+        /// </summary>
+        public ObservableCollection<IntellectualEntityStyle> Styles { get; }
+
+        /// <summary>
+        /// Есть ли в списке стили с одинаковыми именами
+        /// </summary>
+        public bool HasStylesWithSameName => Styles.Select(s => s.Name).Distinct().Count() != Styles.Count;
+
+        /// <summary>
+        /// Сделать слой текущим
+        /// </summary>
+        public void SetCurrent(IntellectualEntityStyle style)
+        {
+            foreach (IntellectualEntityStyle entityStyle in Styles)
+            {
+                if (entityStyle != style)
+                {
+                    if (entityStyle.IsCurrent)
+                        entityStyle.IsCurrent = false;
+                }
+            }
+
+            style.IsCurrent = true;
+        }
+    }
+}

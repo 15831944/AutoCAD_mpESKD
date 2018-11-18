@@ -1,6 +1,7 @@
 ﻿namespace mpESKD.Base
 {
     using System;
+    using System.Collections.Generic;
     using Enums;
     using ModPlusAPI.Annotations;
 
@@ -122,5 +123,33 @@
         /// Ключ получения локализованного значения
         /// </summary>
         public string LocalizationKey { get; }
+    }
+
+    /// <summary>
+    /// Атрибут, указывающий зависимость видимости свойства от другого свойства.
+    /// Принцип работы: в классе примитива нужно создать специальное свойство типа bool к которому
+    /// нужно указать данный атрибут. В значение BooleanProperty нужно записать имя этого свойства.
+    /// В список зависимых свойств DependencyProperties нужно внести имена тех свойств, видимость которых
+    /// зависит от свойства, указанного в BooleanProperty.
+    /// Самой свойство, указанное в BooleanProperty должно менять внутри класса примитива
+    /// </summary>
+    public class PropertyVisibilityDependencyAttribute : Attribute
+    {
+        public PropertyVisibilityDependencyAttribute(string booleanProperty, string[] dependencyProperties)
+        {
+            DependencyProperties = dependencyProperties;
+            BooleanProperty = booleanProperty;
+        }
+
+        /// <summary>
+        /// Свойство, которое меняет видимость свойства DependencyProperties
+        /// </summary>
+        public string BooleanProperty { get; }
+
+        /// <summary>
+        /// Свойства, видимость которых зависит от свойства BooleanProperty
+        /// </summary>
+        public string[] DependencyProperties { get; }
+
     }
 }

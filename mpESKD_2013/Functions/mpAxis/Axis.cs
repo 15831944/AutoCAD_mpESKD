@@ -9,7 +9,6 @@ namespace mpESKD.Functions.mpAxis
     using Base;
     using Base.Enums;
     using Base.Helpers;
-    using Properties;
     using ModPlusAPI.Windows;
 
     [IntellectualEntityDisplayNameKeyAttribute("h41")]
@@ -48,6 +47,10 @@ namespace mpESKD.Functions.mpAxis
 
         private AnnotationScale _scale;
 
+        /// <summary>
+        /// Масштаб примитива. Свойство создано в данном классе с модификатором new, так как при его изменении
+        /// должно меняться свойство LineTypeScale
+        /// </summary>
         [EntityProperty(PropertiesCategory.General, 3, nameof(Scale), "p5", "d5", "1:1", null, null)]
         public new AnnotationScale Scale
         {
@@ -55,7 +58,7 @@ namespace mpESKD.Functions.mpAxis
             {
                 if (_scale != null)
                     return _scale;
-                _scale = new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1};
+                _scale = new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1 };
                 return _scale;
             }
             set
@@ -64,10 +67,19 @@ namespace mpESKD.Functions.mpAxis
                 _scale = value;
                 if (MainStaticSettings.Settings.AxisLineTypeScaleProportionScale)
                 {
-                    var newScale = GetScale();
+                    var newScale = value.DrawingUnits / value.PaperUnits;
                     LineTypeScale = LineTypeScale * newScale / oldScale;
                 }
             }
+        }
+
+        /// <summary>
+        /// Метод добавлен с модификатором new, так как при обращении к методу базового класса будет
+        /// возвращать и масштаб базового класса
+        /// </summary>
+        public new double GetScale()
+        {
+            return Scale.DrawingUnits / Scale.PaperUnits;
         }
 
         /// <inheritdoc />
@@ -94,10 +106,12 @@ namespace mpESKD.Functions.mpAxis
 
         /// <summary>Излом</summary>
         [EntityProperty(PropertiesCategory.Geometry, 2, nameof(Fracture), "p9", "d9", 10, 1, 20)]
+        [PropertyNameKeyInStyleEditor("p9-1")]
         public int Fracture { get; set; } = 10;
 
         /// <summary>Нижний отступ излома</summary>
         [EntityProperty(PropertiesCategory.Geometry, 3, nameof(BottomFractureOffset), "p15", "d15", 0, 0, 30)]
+        [PropertyNameKeyInStyleEditor("p15-1")]
         public int BottomFractureOffset
         {
             get => _bottomFractureOffset;
@@ -114,10 +128,12 @@ namespace mpESKD.Functions.mpAxis
 
         /// <summary>Верхний отступ излома</summary>
         [EntityProperty(PropertiesCategory.Geometry, 4, nameof(TopFractureOffset), "p16", "d16", 0, 0, 30)]
+        [PropertyNameKeyInStyleEditor("p16-1")]
         public int TopFractureOffset { get; set; } = 0;
 
         /// <summary>Диаметр маркеров</summary>
         [EntityProperty(PropertiesCategory.Geometry, 5, nameof(MarkersDiameter), "p10", "d10", 10, 6, 12)]
+        [PropertyNameKeyInStyleEditor("p10-1")]
         public int MarkersDiameter { get; set; } = 10;
 
         /// <summary>Количество маркеров</summary>
@@ -136,21 +152,52 @@ namespace mpESKD.Functions.mpAxis
 
         // Orient markers
 
+        private bool _bottomOrientMarkerVisible;
+
         /// <summary>Видимость нижнего бокового кружка</summary>
         [EntityProperty(PropertiesCategory.Geometry, 9, nameof(BottomOrientMarkerVisible), "p32", "d32", false, null, null)]
-        public bool BottomOrientMarkerVisible { get; set; }
+        public bool BottomOrientMarkerVisible
+        {
+            get => _bottomOrientMarkerVisible;
+            set
+            {
+                _bottomOrientMarkerVisible = value;
+                if (value)
+                    OrientMarkerVisibilityDependency = true;
+                else if(!TopOrientMarkerVisible)
+                    OrientMarkerVisibilityDependency = false;
+            }
+        }
+
+        private bool _topOrientMarkerVisible;
 
         /// <summary>Видимость верхнего бокового кружка</summary>
         [EntityProperty(PropertiesCategory.Geometry, 10, nameof(TopOrientMarkerVisible), "p33", "d33", false, null, null)]
-        public bool TopOrientMarkerVisible { get; set; }
+        public bool TopOrientMarkerVisible
+        {
+            get => _topOrientMarkerVisible;
+            set
+            {
+                _topOrientMarkerVisible = value;
+                if (value)
+                    OrientMarkerVisibilityDependency = true;
+                else if (!BottomOrientMarkerVisible)
+                    OrientMarkerVisibilityDependency = false;
+            }
+        }
+
+        [EntityProperty(PropertiesCategory.Geometry, 10, nameof(OrientMarkerVisibilityDependency), "", "", "", null, null, PropertyScope.Hidden)]
+        [PropertyVisibilityDependency(
+            nameof(OrientMarkerVisibilityDependency),
+            new [] { nameof(OrientMarkerType), nameof(ArrowsSize) })]
+        public bool OrientMarkerVisibilityDependency { get; private set; }
 
         [EntityProperty(PropertiesCategory.Geometry, 11, nameof(OrientMarkerType), "p34", "d34", AxisMarkerType.Type1, null, null)]
-        //todo visibility
         public AxisMarkerType OrientMarkerType { get; set; } = AxisMarkerType.Type1;
 
         /// <summary>Размер стрелок</summary>
         [EntityProperty(PropertiesCategory.Geometry, 12, nameof(ArrowsSize), "p29", "d29", 3, 0, 10)]
-        //todo visibility
+        [PropertyNameKeyInStyleEditor("p29-1")]
         public int ArrowsSize { get; set; } = 3;
 
         // Отступы маркеров-ориентиров
@@ -161,6 +208,7 @@ namespace mpESKD.Functions.mpAxis
         //todo visibility
         // текст и текстовые значения
         [EntityProperty(PropertiesCategory.Content, 1, nameof(TextHeight), "p18", "d18", 3.5, 0.000000001, 1.0000E+99)]
+        [PropertyNameKeyInStyleEditor("p18-1")]
         public double TextHeight { get; set; } = 3.5;
 
         [EntityProperty(PropertiesCategory.Content, 2, nameof(FirstTextPrefix), "p20", "d20", "", null, null, PropertyScope.Palette)]
@@ -214,7 +262,7 @@ namespace mpESKD.Functions.mpAxis
             (InsertionPoint.Y + EndPoint.Y) / 2,
             (InsertionPoint.Z + EndPoint.Z) / 2
         );
-        
+
         public double BottomLineAngle { get; set; } = 0.0;
 
         private Point3d _bottomMarkerPoint;
@@ -1265,7 +1313,7 @@ namespace mpESKD.Functions.mpAxis
         private string _newVerticalMarkValue = string.Empty;
 
         private string _newHorizontalMarkValue = string.Empty;
-
+        
         private string GetFirstTextValueByLastAxis(string direction)
         {
             if (direction.Equals("Horizontal"))

@@ -144,7 +144,6 @@
                 var style = StyleManager.GetCurrentStyle(typeof(Axis));
 
                 // создание текстового стиля в документе нужно произвести до создания примитива
-                //todo release in style manager
                 AxisFunction.CreateTextStyleFromStyle(style);
                 // add layer from style
                 var axisLastHorizontalValue = string.Empty;
@@ -155,15 +154,10 @@
                     axisLastVerticalValue = ModPlus.Helpers.XDataHelpers.GetStringXData("AxisLastValueForVertical");
                 }
                 var axis = new Axis(axisLastHorizontalValue, axisLastVerticalValue);
+
                 var blockReference = MainFunction.CreateBlock(axis);
-                
-                // set layer
-                AcadHelpers.SetLayerByName(blockReference.ObjectId, style.GetLayerNameProperty(), style.LayerXmlData);
-                
-                // set linetype
-                AcadHelpers.SetLineType(blockReference.ObjectId, style.GetLineTypeProperty());
-
-
+                axis.ApplyStyle(style, true);
+               
                 var breakLoop = false;
                 //todo change
                 while (!breakLoop)

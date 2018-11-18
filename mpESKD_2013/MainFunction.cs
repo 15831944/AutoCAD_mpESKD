@@ -206,7 +206,7 @@
             }
         }
 
-        public static BlockReference CreateBlock(IntellectualEntity mpcoEntity)
+        public static BlockReference CreateBlock(IntellectualEntity intellectualEntity)
         {
             BlockReference blockReference;
             using (AcadHelpers.Document.LockDocument())
@@ -216,8 +216,8 @@
                 {
                     using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
                     {
-                        var blockTableRecordObjectId = blockTable.Add(mpcoEntity.BlockRecord);
-                        blockReference = new BlockReference(mpcoEntity.InsertionPoint, blockTableRecordObjectId);
+                        var blockTableRecordObjectId = blockTable.Add(intellectualEntity.BlockRecord);
+                        blockReference = new BlockReference(intellectualEntity.InsertionPoint, blockTableRecordObjectId);
                         using (var blockTableRecord = AcadHelpers.Database.CurrentSpaceId.Write<BlockTableRecord>())
                         {
                             blockTableRecord.BlockScaling = BlockScaling.Uniform;
@@ -226,11 +226,11 @@
                             objectId = blockTableRecord.AppendEntity(blockReference);
                         }
                         transaction.AddNewlyCreatedDBObject(blockReference, true);
-                        transaction.AddNewlyCreatedDBObject(mpcoEntity.BlockRecord, true);
+                        transaction.AddNewlyCreatedDBObject(intellectualEntity.BlockRecord, true);
                     }
                     transaction.Commit();
                 }
-                mpcoEntity.BlockId = objectId;
+                intellectualEntity.BlockId = objectId;
             }
             return blockReference;
         }

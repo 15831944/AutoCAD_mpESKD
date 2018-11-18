@@ -69,30 +69,35 @@ namespace mpESKD.Functions.mpGroundLine
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 1, nameof(FirstStrokeOffset), "p36", "d36", 
             GroundLineFirstStrokeOffset.ByHalfSpace, null, null)]
+        [PropertyNameKeyInStyleEditor("p36-1")]
         public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineFirstStrokeOffset.ByHalfSpace;
 
         /// <summary>
         /// Длина штриха
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 2, nameof(StrokeLength), "p37", "d37", 8, 1, 10)]
+        [PropertyNameKeyInStyleEditor("p37-1")]
         public int StrokeLength { get; set; } = 8;
 
         /// <summary>
         /// Расстояние между штрихами
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 3, nameof(StrokeOffset), "p38", "d38", 4, 1, 10)]
+        [PropertyNameKeyInStyleEditor("p38-1")]
         public int StrokeOffset { get; set; } = 4;
 
         /// <summary>
         /// Угол наклона штриха в градусах
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 4, nameof(StrokeAngle), "p39", "d39", 60, 30, 90)]
+        [PropertyNameKeyInStyleEditor("p39-1")]
         public int StrokeAngle { get; set; } = 60;
 
         /// <summary>
         /// Отступ группы штрихов
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 5, nameof(Space), "p40", "d40", 10, 1, 20)]
+        [PropertyNameKeyInStyleEditor("p40-1")]
         public int Space { get; set; } = 10;
 
         /// <inheritdoc />

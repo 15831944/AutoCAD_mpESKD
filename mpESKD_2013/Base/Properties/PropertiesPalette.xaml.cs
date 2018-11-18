@@ -122,6 +122,11 @@
 
             foreach (IGrouping<Type, SummaryProperty> entityGroup in entityGroups)
             {
+                // Тип примитива может содержать атрибуты указывающие зависимость видимости свойств
+                // Собираю их в список для последующей работы
+                List<PropertyVisibilityDependencyAttribute> visibilityDependencyAttributes =
+                    entityGroup.Key.GetCustomAttributes<PropertyVisibilityDependencyAttribute>().ToList();
+
                 var c = entityGroup.SelectMany(sp => sp.EntityPropertyDataCollection).Select(p => p.OwnerObjectId).Distinct().Count();
                 Expander entityExpander = new Expander
                 {
@@ -134,6 +139,8 @@
                 summaryPropertiesGroups.Sort((sp1, sp2) => sp1.Key.CompareTo(sp2.Key));
                 foreach (IGrouping<PropertiesCategory, SummaryProperty> summaryPropertiesGroup in summaryPropertiesGroups)
                 {
+                    List<SummaryProperty> hiddenProperties = summaryPropertiesGroup.Where(p => p.PropertyScope == PropertyScope.Hidden).ToList();
+
                     mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
                     var grid = new Grid();
@@ -171,6 +178,7 @@
                             Style = Resources["PropertyNameTextBoxBase"] as Style
                         };
                         SetDescription(propertyHeader, propertyDescription);
+                        SetVisibilityDependency(visibilityDependencyAttributes, hiddenProperties, summaryProperty.PropertyName, propertyHeader);
                         Grid.SetColumn(propertyHeader, 0);
                         Grid.SetRow(propertyHeader, j);
                         grid.Children.Add(propertyHeader);
@@ -400,6 +408,34 @@
             e.Tag = description;
             e.GotFocus += _OnGotFocus;
             e.LostFocus += _OnLostFocus;
+        }
+
+        //todo release it correct!!!
+        /// <summary>
+        /// Установка зависимости видимости в случае, если имеется специальный атрибут
+        /// </summary>
+        /// <param name="visibilityDependencyAttributes">Список атрибутов зависимостей видимости для читаемого типа примитива</param>
+        /// <param name="element">Элемент палитры</param>
+        /// <param name="propertyName">Имя свойства, которое отображается текущим элементом палитры (заголовок или значение)</param>
+        private void SetVisibilityDependency(
+            List<PropertyVisibilityDependencyAttribute> visibilityDependencyAttributes,
+            List<SummaryProperty> hiddenProperties, string propertyName,
+            FrameworkElement element)
+        {
+            var attribute = visibilityDependencyAttributes.FirstOrDefault(a => a.DependencyProperties.Contains(propertyName));
+            if (attribute != null)
+            {
+                Binding binding = new Binding
+                {
+                    Mode = BindingMode.OneWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                    ElementName = attribute.BooleanProperty,
+                    Source = hiddenProperties.FirstOrDefault(sp => sp.PropertyName == attribute.BooleanProperty),
+                    Path = new PropertyPath("SummaryValue"),
+                    Converter = new ModPlusStyle.Converters.BooleanToVisibilityConverter()
+                };
+                BindingOperations.SetBinding(element, VisibilityProperty, binding);
+            }
         }
 
         /// <summary>

@@ -17,14 +17,16 @@
         private FontWeight _fontWeight;
         private bool _isCurrent;
 
-        public IntellectualEntityStyle(Type entityType)
+        public IntellectualEntityStyle(Type entityType, bool fillDefaultProperties = false)
         {
             EntityType = entityType;
             Properties = new ObservableCollection<IntellectualEntityProperty>();
+            if (fillDefaultProperties)
+                this.FillStyleDefaultProperties(EntityType);
         }
 
         public ObservableCollection<IntellectualEntityProperty> Properties { get; }
-
+        
         /// <summary>
         /// Тип интеллектуального примитива, к которому относится стиль
         /// </summary>

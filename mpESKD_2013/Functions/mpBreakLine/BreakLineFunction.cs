@@ -65,17 +65,14 @@
                 ExtendedDataHelpers.AddRegAppTableRecord(BreakLineInterface.Name);
                 var style = StyleManager.GetCurrentStyle(typeof(BreakLine));
                 var breakLine = new BreakLine { BreakLineType = breakLineType };
-                breakLine.ApplyStyle(style);
-                var blockReference = MainFunction.CreateBlock(breakLine);
-                
-                // set layer
-                AcadHelpers.SetLayerByName(blockReference.ObjectId, style.GetLayerNameProperty(), style.LayerXmlData);
 
+                var blockReference = MainFunction.CreateBlock(breakLine);
+                breakLine.ApplyStyle(style, true);
+                
                 var breakLoop = false;
                 //todo change it
                 while (!breakLoop)
                 {
-                    //var breakLineJig = new BreakLineJig(breakLine, blockReference);
                     var breakLineJig = new DefaultEntityJig(
                         breakLine, 
                         blockReference,

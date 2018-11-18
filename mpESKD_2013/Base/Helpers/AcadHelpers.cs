@@ -212,51 +212,48 @@
         {
             if (blkRefObjectId == ObjectId.Null)
                 return;
-            if (MainStaticSettings.Settings.UseLayerFromStyle)
+            if (!layerName.Equals(Language.GetItem(MainFunction.LangItem, "defl"))) // "По умолчанию"
             {
-                if (!layerName.Equals(Language.GetItem(MainFunction.LangItem, "defl"))) // "По умолчанию"
+                if (LayerHelper.HasLayer(layerName))
                 {
-                    if (LayerHelper.HasLayer(layerName))
+                    using (Document.LockDocument())
                     {
-                        using (Document.LockDocument())
+                        using (Transaction tr = Database.TransactionManager.StartTransaction())
                         {
-                            using (Transaction tr = Database.TransactionManager.StartTransaction())
-                            {
-                                var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
-                                if (blockReference != null) blockReference.Layer = layerName;
-                                tr.Commit();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (MainStaticSettings.Settings.IfNoLayer == 1)
-                        {
-                            if (LayerHelper.AddLayerFromXelement(layerXmlData))
-                                using (Document.LockDocument())
-                                {
-                                    using (Transaction tr = Database.TransactionManager.StartTransaction())
-                                    {
-                                        var blockReference =
-                                            tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
-                                        if (blockReference != null) blockReference.Layer = layerName;
-                                        tr.Commit();
-                                    }
-                                }
+                            var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                            if (blockReference != null) blockReference.Layer = layerName;
+                            tr.Commit();
                         }
                     }
                 }
                 else
                 {
-                    if (Database.Clayer != ObjectId.Null && blkRefObjectId != ObjectId.Null)
-                        using (Transaction tr = Database.TransactionManager.StartTransaction())
-                        {
-                            var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
-                            var layer = tr.GetObject(Database.Clayer, OpenMode.ForRead) as LayerTableRecord;
-                            if (blockReference != null) blockReference.Layer = layer?.Name;
-                            tr.Commit();
-                        }
+                    if (MainStaticSettings.Settings.IfNoLayer == 1)
+                    {
+                        if (LayerHelper.AddLayerFromXelement(layerXmlData))
+                            using (Document.LockDocument())
+                            {
+                                using (Transaction tr = Database.TransactionManager.StartTransaction())
+                                {
+                                    var blockReference =
+                                        tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                                    if (blockReference != null) blockReference.Layer = layerName;
+                                    tr.Commit();
+                                }
+                            }
+                    }
                 }
+            }
+            else
+            {
+                if (Database.Clayer != ObjectId.Null && blkRefObjectId != ObjectId.Null)
+                    using (Transaction tr = Database.TransactionManager.StartTransaction())
+                    {
+                        var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                        var layer = tr.GetObject(Database.Clayer, OpenMode.ForRead) as LayerTableRecord;
+                        if (blockReference != null) blockReference.Layer = layer?.Name;
+                        tr.Commit();
+                    }
             }
         }
 
@@ -459,7 +456,7 @@
         public static bool IsApplicable(RXObject rxObject, string appName)
         {
             DBObject dbObject = rxObject as DBObject;
-            if (dbObject == null) 
+            if (dbObject == null)
                 return false;
             // Всегда нужно проверять по наличию расширенных данных
             // иначе может привести к фаталам при работе с динамическими блоками

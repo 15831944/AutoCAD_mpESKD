@@ -60,6 +60,8 @@
 
         public string DescriptionLocalizationKey => EntityPropertyDataCollection.FirstOrDefault()?.DescriptionLocalizationKey;
 
+        public PropertyScope? PropertyScope => EntityPropertyDataCollection.FirstOrDefault()?.PropertyScope;
+
         public object SummaryValue
         {
             get

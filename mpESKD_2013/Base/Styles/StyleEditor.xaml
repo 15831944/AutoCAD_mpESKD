@@ -3,8 +3,9 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-                      xmlns:local="clr-namespace:mpESKD"
+                      xmlns:local="clr-namespace:mpESKD.Base.Styles"
                       xmlns:mps="https://modplus.org/winfx/xaml/controls"
+                      xmlns:mpEskd="clr-namespace:mpESKD"
                       mc:Ignorable="d" SizeToContent="WidthAndHeight" 
                       ResizeMode="CanResizeWithGrip"
                       MinHeight="410" MinWidth="580" Closed="StyleEditor_OnClosed"
@@ -13,11 +14,12 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+                <ResourceDictionary Source="../Properties/Controls/ControlStylesForEditor.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
-            <!--Images-->
-            <Canvas x:Key="ImagempBreakLine" Width="190" Height="150">
+            <!-- images -->
+            <Canvas x:Key="ImageBreakLine" Width="190" Height="150">
                 <Canvas.RenderTransform>
                     <MatrixTransform Matrix="0 -0.02 -0.02 0 190 150"/>
                 </Canvas.RenderTransform>
@@ -155,7 +157,7 @@
                     </TextBlock.RenderTransform>
                 </TextBlock>
             </Canvas>
-            <Canvas x:Key="ImagempAxis" Width="190" Height="150">
+            <Canvas x:Key="ImageAxis" Width="190" Height="150">
                 <Canvas.RenderTransform>
                     <MatrixTransform Matrix="0 -0.02 -0.02 0 580 455"/>
                 </Canvas.RenderTransform>
@@ -353,7 +355,7 @@
                     </TextBlock.RenderTransform>
                 </TextBlock>
             </Canvas>
-            <Viewbox x:Key="ImagempGroundLine" Width="190" Height="150">
+            <Viewbox x:Key="ImageGroundLine" Width="190" Height="150">
                 <Canvas Width="178.250" Height="119.620">
                     <Path StrokeThickness="1.5" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 150.457,0.000 L 150.457,75.981 L 18.847,75.981"/>
                     <Path StrokeThickness="0.75" Stroke="{DynamicResource BlackBrush}" StrokeMiterLimit="1.0" Data="F1 M 43.270,75.448 L 26.988,103.649"/>
@@ -398,7 +400,7 @@
             </Viewbox>
         </ResourceDictionary>
     </Window.Resources>
-    <TabControl Padding="5,10,5,5">
+    <TabControl>
         <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h14}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -475,22 +477,22 @@
                 </Grid>
 
                 <!--Styles-->
-                <TreeView Grid.Row="1" Grid.Column="0" MinHeight="50"
-                          Name="TvStyles" SelectedItemChanged="TvStyles_OnSelectedItemChanged"
-                          MouseDoubleClick="TvStyles_OnMouseDoubleClick">
+                <TreeView Grid.Row="1" Grid.Column="0" MinHeight="50" SelectedItemChanged="TvStyles_OnSelectedItemChanged"
+                          MouseDoubleClick="TvStyles_OnMouseDoubleClick"
+                          Name="TvStyles" ItemsSource="{Binding Path=Styles}">
                     <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Styles}">
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Styles}" DataType="local:EntityStyles">
                             <StackPanel Orientation="Horizontal">
                                 <Rectangle Width="16" Height="16" Fill="{DynamicResource AccentColorBrush}">
                                     <Rectangle.OpacityMask>
                                         <VisualBrush Visual="{StaticResource Folder}" Stretch="Uniform"></VisualBrush>
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <TextBlock Text="{Binding FunctionLocalName}" Margin="5,0,0,0"></TextBlock>
+                                <TextBlock Text="{Binding Path=DisplayName}" Margin="5,0,0,0"></TextBlock>
                             </StackPanel>
                             <HierarchicalDataTemplate.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" FontWeight="{Binding FontWeight}" ></TextBlock>
+                                <DataTemplate DataType="local:IntellectualEntityStyle">
+                                    <TextBlock Text="{Binding Path=Name}" FontWeight="{Binding Path=FontWeight}" ></TextBlock>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
                         </HierarchicalDataTemplate>
@@ -572,7 +574,7 @@
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.DataContext>
-                    <local:MainSettings></local:MainSettings>
+                    <mpEskd:MainSettings></mpEskd:MainSettings>
                 </Grid.DataContext>
                 <TextBlock Grid.Row="0" HorizontalAlignment="Center" FontSize="16" Margin="2"
                            Text="{Binding Source={StaticResource Lang}, XPath=h21}"

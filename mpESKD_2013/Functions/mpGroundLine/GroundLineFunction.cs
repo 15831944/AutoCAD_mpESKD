@@ -65,17 +65,13 @@
                 // style
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();
-                groundLine.ApplyStyle(style);
-
+                
                 var blockReference = MainFunction.CreateBlock(groundLine);
-
-                // set layer
-                AcadHelpers.SetLayerByName(blockReference.ObjectId, style.GetLayerNameProperty(), style.LayerXmlData);
+                groundLine.ApplyStyle(style, true);
 
                 var breakLoop = false;
                 while (!breakLoop)
                 {
-                    //var breakLineJig = new GroundLineJig(groundLine, blockReference);
                     var breakLineJig = new DefaultEntityJig(
                         groundLine, 
                         blockReference,
@@ -171,12 +167,9 @@
                 //style
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();
-                groundLine.ApplyStyle(style);
 
-                var blockReference = MainFunction.CreateBlock(groundLine);
-
-                // set layer
-                AcadHelpers.SetLayerByName(blockReference.ObjectId, style.GetLayerNameProperty(), style.LayerXmlData);
+                MainFunction.CreateBlock(groundLine);
+                groundLine.ApplyStyle(style, true);
 
                 var plineId = per.ObjectId;
 
