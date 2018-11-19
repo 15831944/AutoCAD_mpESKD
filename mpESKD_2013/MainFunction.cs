@@ -221,8 +221,6 @@
                         using (var blockTableRecord = AcadHelpers.Database.CurrentSpaceId.Write<BlockTableRecord>())
                         {
                             blockTableRecord.BlockScaling = BlockScaling.Uniform;
-                            //todo need?
-                            blockTableRecord.Units = AcadHelpers.Database.Insunits;
                             objectId = blockTableRecord.AppendEntity(blockReference);
                         }
                         transaction.AddNewlyCreatedDBObject(blockReference, true);

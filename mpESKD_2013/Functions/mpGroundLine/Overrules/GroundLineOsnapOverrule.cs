@@ -30,8 +30,6 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             {
                 try
                 {
-                    // todo old
-                    // GroundLine.GetGroundLineFromEntity(entity);
                     var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(entity); 
                     if (groundLine != null)
                     {

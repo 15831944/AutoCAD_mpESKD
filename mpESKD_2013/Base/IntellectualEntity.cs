@@ -11,6 +11,7 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Base
 {
+    using Autodesk.AutoCAD.Colors;
     using Enums;
 
     public abstract class IntellectualEntity : IDisposable
@@ -57,18 +58,18 @@ namespace mpESKD.Base
         /// <summary>
         /// Стиль примитива. Свойство используется для работы палитры, а стиль задается через свойство <see cref="StyleGuid"/>
         /// </summary>
-        [EntityProperty(PropertiesCategory.General, 1, nameof(Style), "h50", "h52", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.General, 1, "h50", "h52", "", null, null, PropertyScope.Palette)]
         public string Style { get; set; } = string.Empty;
 
         /// <summary>
         /// Имя слоя
         /// </summary>
-        [EntityProperty(PropertiesCategory.General, 2, nameof(LayerName), "p7", "d7", "", null, null)]
+        [EntityProperty(PropertiesCategory.General, 2, "p7", "d7", "", null, null)]
         public string LayerName { get; set; } = string.Empty;
 
         private AnnotationScale _scale;
         /// <summary>Масштаб примитива</summary>
-        [EntityProperty(PropertiesCategory.General, 3, nameof(Scale), "p5", "d5", "1:1", null, null)]
+        [EntityProperty(PropertiesCategory.General, 3, "p5", "d5", "1:1", null, null)]
         public AnnotationScale Scale
         {
             get
@@ -286,6 +287,15 @@ namespace mpESKD.Base
 
         public abstract void GetParametersFromResBuf(ResultBuffer resBuf);
 
+        /// <summary>Установка свойств для примитивов, которые не меняются</summary>
+        /// <param name="entity">Примитив автокада</param>
+        public void SetPropertiesToCadEntity(Entity entity)
+        {
+            entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+            entity.LineWeight = LineWeight.ByBlock;
+            entity.Linetype = "Continuous";
+            entity.LinetypeScale = 1.0;
+        }
 
         public void Draw(WorldDraw draw)
         {

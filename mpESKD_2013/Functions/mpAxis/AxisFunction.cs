@@ -10,7 +10,7 @@
     using Base.Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using mpESKD.Base.Styles;
+    using Base.Styles;
     using Overrules;
 
     public class AxisFunction : IIntellectualEntityFunction
@@ -103,20 +103,6 @@
             "А","Б","В","Г","Д","Е","Ж","И","К","Л","М","Н","П","Р","С","Т","У","Ф","Ш","Э","Ю","Я",
             "АА","ББ","ВВ","ГГ","ДД","ЕЕ","ЖЖ","ИИ","КК","ЛЛ","ММ","НН","ПП","РР","СС","ТТ","УУ","ФФ","ШШ","ЭЭ","ЮЮ","ЯЯ"
         };
-
-        /// <summary>Создание текстового стиля из стиля оси, согласно настройкам плагина</summary>
-        public static void CreateTextStyleFromStyle(IntellectualEntityStyle style)
-        {
-            if (MainStaticSettings.Settings.UseTextStyleFromStyle)
-            {
-                if (!TextStyleHelper.HasTextStyle(style.GetTextStyleProperty()) &&
-                    MainStaticSettings.Settings.IfNoTextStyle == 1)
-                {
-                    TextStyleHelper.CreateTextStyle(style.TextStyleXmlData);
-                    //todo текстовый стиль создается, но не применяется?!
-                }
-            }
-        }
     }
 
     public class AxisCommands
@@ -143,8 +129,6 @@
 
                 var style = StyleManager.GetCurrentStyle(typeof(Axis));
 
-                // создание текстового стиля в документе нужно произвести до создания примитива
-                AxisFunction.CreateTextStyleFromStyle(style);
                 // add layer from style
                 var axisLastHorizontalValue = string.Empty;
                 var axisLastVerticalValue = string.Empty;
@@ -158,33 +142,21 @@
                 var blockReference = MainFunction.CreateBlock(axis);
                 axis.ApplyStyle(style, true);
                
-                var breakLoop = false;
-                //todo change
-                while (!breakLoop)
-                {
-                    var axisJig = new DefaultEntityJig(
+                    var entityJig = new DefaultEntityJig(
                         axis,
                         blockReference,
                         new Point3d(0, -1, 0),
                         Language.GetItem(MainFunction.LangItem, "msg2"));
                     do
                     {
-                        label0:
-                        var status = AcadHelpers.Editor.Drag(axisJig).Status;
+                        var status = AcadHelpers.Editor.Drag(entityJig).Status;
                         if (status == PromptStatus.OK)
                         {
-                            if (axisJig.JigState != JigState.PromptInsertPoint)
-                            {
-                                breakLoop = true;
-                                status = PromptStatus.Other;
-                            }
-                            else
-                            {
-                                axisJig.JigState = JigState.PromptNextPoint;
-                                goto label0;
-                            }
+                            if (entityJig.JigState == JigState.PromptInsertPoint)
+                                entityJig.JigState = JigState.PromptNextPoint;
+                            else break;
                         }
-                        else if (status != PromptStatus.Other)
+                        else
                         {
                             using (AcadHelpers.Document.LockDocument())
                             {
@@ -195,15 +167,10 @@
                                     tr.Commit();
                                 }
                             }
-                            breakLoop = true;
+                            break;
                         }
-                        else
-                        {
-                            axis.UpdateEntities();
-                            axis.BlockRecord.UpdateAnonymousBlocks();
-                        }
-                    } while (!breakLoop);
-                }
+                    } while (true);
+                
                 if (!axis.BlockId.IsErased)
                 {
                     using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())

@@ -31,8 +31,6 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                         {
-                            //todo old
-                            //GroundLine groundLine = GroundLine.GetGroundLineFromEntity((Entity)dbObject);
                             var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>((Entity)dbObject);
                             if (groundLine != null)
                             {

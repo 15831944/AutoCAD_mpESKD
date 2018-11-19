@@ -1,5 +1,4 @@
-﻿//todo implement attributes
-namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Base.Enums
 {
     public enum StyleType
     {

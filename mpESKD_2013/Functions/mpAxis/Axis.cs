@@ -11,7 +11,7 @@ namespace mpESKD.Functions.mpAxis
     using Base.Helpers;
     using ModPlusAPI.Windows;
 
-    [IntellectualEntityDisplayNameKeyAttribute("h41")]
+    [IntellectualEntityDisplayNameKey("h41")]
     public class Axis : IntellectualEntity
     {
         #region Constructors
@@ -51,7 +51,7 @@ namespace mpESKD.Functions.mpAxis
         /// Масштаб примитива. Свойство создано в данном классе с модификатором new, так как при его изменении
         /// должно меняться свойство LineTypeScale
         /// </summary>
-        [EntityProperty(PropertiesCategory.General, 3, nameof(Scale), "p5", "d5", "1:1", null, null)]
+        [EntityProperty(PropertiesCategory.General, 3, "p5", "d5", "1:1", null, null)]
         public new AnnotationScale Scale
         {
             get
@@ -83,15 +83,15 @@ namespace mpESKD.Functions.mpAxis
         }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 4, nameof(LineType), "p19", "d19", "осевая", null, null)]
+        [EntityProperty(PropertiesCategory.General, 4, "p19", "d19", "осевая", null, null)]
         public override string LineType { get; set; } = "осевая";
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99)]
+        [EntityProperty(PropertiesCategory.General, 5, "p6", "d6", 1.0, 0.0, 1.0000E+99)]
         public override double LineTypeScale { get; set; }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextStyle), "p17", "d17", "Standard", null, null)]
+        [EntityProperty(PropertiesCategory.Content, 1, "p17", "d17", "Standard", null, null)]
         public override string TextStyle { get; set; }
 
         #endregion
@@ -101,23 +101,22 @@ namespace mpESKD.Functions.mpAxis
         private int _bottomFractureOffset = 0;
 
         /// <summary>Положение маркеров</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, nameof(MarkersPosition), "p8", "d8", AxisMarkersPosition.Bottom, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p8", "d8", AxisMarkersPosition.Bottom, null, null)]
         public AxisMarkersPosition MarkersPosition { get; set; } = AxisMarkersPosition.Bottom;
 
         /// <summary>Излом</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 2, nameof(Fracture), "p9", "d9", 10, 1, 20)]
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p9", "d9", 10, 1, 20)]
         [PropertyNameKeyInStyleEditor("p9-1")]
         public int Fracture { get; set; } = 10;
 
         /// <summary>Нижний отступ излома</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, nameof(BottomFractureOffset), "p15", "d15", 0, 0, 30)]
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p15", "d15", 0, 0, 30)]
         [PropertyNameKeyInStyleEditor("p15-1")]
         public int BottomFractureOffset
         {
             get => _bottomFractureOffset;
             set
             {
-                //todo check it
                 var oldFracture = BottomFractureOffset;
                 _bottomFractureOffset = value;
                 // нужно сместить зависимые точки
@@ -127,27 +126,51 @@ namespace mpESKD.Functions.mpAxis
         }
 
         /// <summary>Верхний отступ излома</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, nameof(TopFractureOffset), "p16", "d16", 0, 0, 30)]
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p16", "d16", 0, 0, 30)]
         [PropertyNameKeyInStyleEditor("p16-1")]
         public int TopFractureOffset { get; set; } = 0;
 
         /// <summary>Диаметр маркеров</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, nameof(MarkersDiameter), "p10", "d10", 10, 6, 12)]
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p10", "d10", 10, 6, 12)]
         [PropertyNameKeyInStyleEditor("p10-1")]
         public int MarkersDiameter { get; set; } = 10;
 
+        private int _markersCount = 1;
+
         /// <summary>Количество маркеров</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 6, nameof(MarkersCount), "p11", "d11", 1, 1, 3)]
-        public int MarkersCount { get; set; } = 1;
+        [EntityProperty(PropertiesCategory.Geometry, 6, "p11", "d11", 1, 1, 3)]
+        public int MarkersCount
+        {
+            get => _markersCount;
+            set
+            {
+                _markersCount = value;
+                if (value == 1)
+                {
+                    SecondTextVisibility = false;
+                    ThirdTextVisibility = false;
+                }
+                else if (value == 2)
+                {
+                    SecondTextVisibility = true;
+                    ThirdTextVisibility = false;
+                }
+                else if (value == 3)
+                {
+                    SecondTextVisibility = true;
+                    ThirdTextVisibility = true;
+                }
+            }
+        }
 
         // Типы маркеров: Type 1 - один кружок, Type 2 - два кружка
-        [EntityProperty(PropertiesCategory.Geometry, 7, nameof(FirstMarkerType), "p12", "d12", AxisMarkerType.Type1, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 7, "p12", "d12", AxisMarkerType.Type1, null, null)]
         public AxisMarkerType FirstMarkerType { get; set; } = AxisMarkerType.Type1;
 
-        [EntityProperty(PropertiesCategory.Geometry, 8, nameof(SecondMarkerType), "p13", "d13", AxisMarkerType.Type1, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 8, "p13", "d13", AxisMarkerType.Type1, null, null)]
         public AxisMarkerType SecondMarkerType { get; set; } = AxisMarkerType.Type1;
 
-        [EntityProperty(PropertiesCategory.Geometry, 8, nameof(ThirdMarkerType), "p14", "d14", AxisMarkerType.Type1, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 8, "p14", "d14", AxisMarkerType.Type1, null, null)]
         public AxisMarkerType ThirdMarkerType { get; set; } = AxisMarkerType.Type1;
 
         // Orient markers
@@ -155,7 +178,8 @@ namespace mpESKD.Functions.mpAxis
         private bool _bottomOrientMarkerVisible;
 
         /// <summary>Видимость нижнего бокового кружка</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 9, nameof(BottomOrientMarkerVisible), "p32", "d32", false, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 9, "p32", "d32", false, null, null)]
+        [PropertyVisibilityDependency(new[] { nameof(BottomOrientText) })]
         public bool BottomOrientMarkerVisible
         {
             get => _bottomOrientMarkerVisible;
@@ -163,16 +187,21 @@ namespace mpESKD.Functions.mpAxis
             {
                 _bottomOrientMarkerVisible = value;
                 if (value)
+                {
                     OrientMarkerVisibilityDependency = true;
-                else if(!TopOrientMarkerVisible)
+                }
+                else if (!TopOrientMarkerVisible)
+                {
                     OrientMarkerVisibilityDependency = false;
+                }
             }
         }
 
         private bool _topOrientMarkerVisible;
 
         /// <summary>Видимость верхнего бокового кружка</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 10, nameof(TopOrientMarkerVisible), "p33", "d33", false, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 10, "p33", "d33", false, null, null)]
+        [PropertyVisibilityDependency(new[] { nameof(TopOrientText) })]
         public bool TopOrientMarkerVisible
         {
             get => _topOrientMarkerVisible;
@@ -180,23 +209,25 @@ namespace mpESKD.Functions.mpAxis
             {
                 _topOrientMarkerVisible = value;
                 if (value)
+                {
                     OrientMarkerVisibilityDependency = true;
+                }
                 else if (!BottomOrientMarkerVisible)
+                {
                     OrientMarkerVisibilityDependency = false;
+                }
             }
         }
 
-        [EntityProperty(PropertiesCategory.Geometry, 10, nameof(OrientMarkerVisibilityDependency), "", "", "", null, null, PropertyScope.Hidden)]
-        [PropertyVisibilityDependency(
-            nameof(OrientMarkerVisibilityDependency),
-            new [] { nameof(OrientMarkerType), nameof(ArrowsSize) })]
+        [EntityProperty(PropertiesCategory.Geometry, 10, "", "", "", null, null, PropertyScope.Hidden)]
+        [PropertyVisibilityDependency(new[] { nameof(OrientMarkerType), nameof(ArrowsSize) })]
         public bool OrientMarkerVisibilityDependency { get; private set; }
 
-        [EntityProperty(PropertiesCategory.Geometry, 11, nameof(OrientMarkerType), "p34", "d34", AxisMarkerType.Type1, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 11, "p34", "d34", AxisMarkerType.Type1, null, null)]
         public AxisMarkerType OrientMarkerType { get; set; } = AxisMarkerType.Type1;
 
         /// <summary>Размер стрелок</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 12, nameof(ArrowsSize), "p29", "d29", 3, 0, 10)]
+        [EntityProperty(PropertiesCategory.Geometry, 12, "p29", "d29", 3, 0, 10)]
         [PropertyNameKeyInStyleEditor("p29-1")]
         public int ArrowsSize { get; set; } = 3;
 
@@ -205,45 +236,52 @@ namespace mpESKD.Functions.mpAxis
 
         private double TopOrientMarkerOffset { get; set; } = double.NaN;
 
-        //todo visibility
         // текст и текстовые значения
-        [EntityProperty(PropertiesCategory.Content, 1, nameof(TextHeight), "p18", "d18", 3.5, 0.000000001, 1.0000E+99)]
+        [EntityProperty(PropertiesCategory.Content, 1, "p18", "d18", 3.5, 0.000000001, 1.0000E+99)]
         [PropertyNameKeyInStyleEditor("p18-1")]
         public double TextHeight { get; set; } = 3.5;
 
-        [EntityProperty(PropertiesCategory.Content, 2, nameof(FirstTextPrefix), "p20", "d20", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 2, "p20", "d20", "", null, null, PropertyScope.Palette)]
         public string FirstTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 3, nameof(FirstText), "p22", "d22", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 3,  "p22", "d22", "", null, null, PropertyScope.Palette)]
         public string FirstText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 4, nameof(FirstTextSuffix), "p21", "d21", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 4,  "p21", "d21", "", null, null, PropertyScope.Palette)]
         public string FirstTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 5, nameof(SecondTextPrefix), "p23", "d23", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 4,  "", "", "", null, null, PropertyScope.Hidden)]
+        [PropertyVisibilityDependency(new[] { nameof(SecondText), nameof(SecondTextPrefix), nameof(SecondTextSuffix), nameof(SecondMarkerType) })]
+        public bool SecondTextVisibility { get; set; }
+
+        [EntityProperty(PropertiesCategory.Content, 5, "p23", "d23", "", null, null, PropertyScope.Palette)]
         public string SecondTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 6, nameof(SecondText), "p25", "d25", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 6, "p25", "d25", "", null, null, PropertyScope.Palette)]
         public string SecondText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 7, nameof(SecondTextSuffix), "p24", "d24", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 7,  "p24", "d24", "", null, null, PropertyScope.Palette)]
         public string SecondTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 8, nameof(ThirdTextPrefix), "p26", "d26", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 7, "", "", "", null, null, PropertyScope.Hidden)]
+        [PropertyVisibilityDependency(new[] { nameof(ThirdText), nameof(ThirdTextPrefix), nameof(ThirdTextSuffix), nameof(ThirdMarkerType) })]
+        public bool ThirdTextVisibility { get; set; }
+
+        [EntityProperty(PropertiesCategory.Content, 8, "p26", "d26", "", null, null, PropertyScope.Palette)]
         public string ThirdTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 9, nameof(ThirdText), "p28", "d28", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 9, "p28", "d28", "", null, null, PropertyScope.Palette)]
         public string ThirdText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 10, nameof(ThirdTextSuffix), "p27", "d27", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 10, "p27", "d27", "", null, null, PropertyScope.Palette)]
         public string ThirdTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 11, nameof(BottomOrientText), "p30", "d30", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 11, "p30", "d30", "", null, null, PropertyScope.Palette)]
         public string BottomOrientText { get; set; } = string.Empty;
-
-        [EntityProperty(PropertiesCategory.Content, 12, nameof(TopOrientText), "p31", "d31", "", null, null, PropertyScope.Palette)]
+        
+        [EntityProperty(PropertiesCategory.Content, 12, "p31", "d31", "", null, null, PropertyScope.Palette)]
         public string TopOrientText { get; set; } = string.Empty;
-
+        
         // last values
         private readonly string LastHorizontalValue = string.Empty;
 
@@ -316,7 +354,7 @@ namespace mpESKD.Functions.mpAxis
             get
             {
                 var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
-                if (double.IsNaN(BottomOrientMarkerOffset))
+                if (double.IsNaN(BottomOrientMarkerOffset) || Math.Abs(BottomOrientMarkerOffset) < 0.0001)
                     BottomOrientMarkerOffset = MarkersDiameter + 10.0;
                 return BottomMarkerPoint + mainLineVectorNormal * BottomOrientMarkerOffset * GetScale() * BlockTransform.GetScale();
             }
@@ -334,7 +372,7 @@ namespace mpESKD.Functions.mpAxis
             get
             {
                 var mainLineVectorNormal = (InsertionPoint - EndPoint).GetPerpendicularVector().GetNormal();
-                if (double.IsNaN(TopOrientMarkerOffset))
+                if (double.IsNaN(TopOrientMarkerOffset) || Math.Abs(TopOrientMarkerOffset) < 0.0001)
                     TopOrientMarkerOffset = MarkersDiameter + 10.0;
                 return TopMarkerPoint - mainLineVectorNormal * TopOrientMarkerOffset * GetScale() * BlockTransform.GetScale();
             }
@@ -353,17 +391,7 @@ namespace mpESKD.Functions.mpAxis
         private Point3d TopOrientPointOCS => TopOrientPoint.TransformBy(BlockTransform.Inverse());
 
         #endregion
-
-        /// <summary>Установка свойств для примитивов, которые не меняются</summary>
-        /// <param name="entity">Примитив автокада</param>
-        private static void SetPropertiesToCadEntity(Entity entity)
-        {
-            entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-            entity.LineWeight = LineWeight.ByBlock;
-            entity.Linetype = "Continuous";
-            entity.LinetypeScale = 1.0;
-        }
-
+        
         /// <summary>Установка свойств для однострочного текста</summary>
         /// <param name="dbText"></param>
         private void SetPropertiesToDBText(DBText dbText)
@@ -853,6 +881,7 @@ namespace mpESKD.Functions.mpAxis
             _mainLine.Value.StartPoint = insertionPoint;
             _mainLine.Value.EndPoint = endPoint;
             var mainVector = endPoint - insertionPoint;
+
             #region Bottom
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Bottom)
@@ -1313,7 +1342,7 @@ namespace mpESKD.Functions.mpAxis
         private string _newVerticalMarkValue = string.Empty;
 
         private string _newHorizontalMarkValue = string.Empty;
-        
+
         private string GetFirstTextValueByLastAxis(string direction)
         {
             if (direction.Equals("Horizontal"))
@@ -1408,8 +1437,9 @@ namespace mpESKD.Functions.mpAxis
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdTextSuffix)); // 12
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BottomOrientText)); // 13
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TopOrientText)); // 14
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BottomOrientMarkerVisible.ToString()));//15
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TopOrientMarkerVisible.ToString()));//16
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BottomOrientMarkerVisible.ToString())); // 15
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TopOrientMarkerVisible.ToString())); // 16
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, OrientMarkerVisibilityDependency.ToString())); // 17
                 // Целочисленные значения (код 1070)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersDiameter)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Fracture)); // 1
@@ -1421,6 +1451,8 @@ namespace mpESKD.Functions.mpAxis
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)ThirdMarkerType)); // 7
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)OrientMarkerType)); // 8
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, ArrowsSize)); // 9
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Convert.ToInt16(SecondTextVisibility))); // 10
+                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Convert.ToInt16(ThirdTextVisibility))); // 11
                 // Значения типа double (dxfCode 1040)
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
                 resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomLineAngle)); // 1
@@ -1516,6 +1548,9 @@ namespace mpESKD.Functions.mpAxis
                                     case 16:
                                         TopOrientMarkerVisible = bool.TryParse(typedValue.Value.ToString(), out b) && b;//false
                                         break;
+                                    case 17:
+                                        OrientMarkerVisibilityDependency = bool.TryParse(typedValue.Value.ToString(), out b) && b;//false
+                                        break;
                                 }
                                 // index
                                 index1000++;
@@ -1554,6 +1589,12 @@ namespace mpESKD.Functions.mpAxis
                                         break;
                                     case 9:
                                         ArrowsSize = (Int16)typedValue.Value;
+                                        break;
+                                    case 10:
+                                        SecondTextVisibility = Convert.ToBoolean(typedValue.Value);
+                                        break;
+                                    case 11:
+                                        ThirdTextVisibility = Convert.ToBoolean(typedValue.Value);
                                         break;
                                 }
                                 //index

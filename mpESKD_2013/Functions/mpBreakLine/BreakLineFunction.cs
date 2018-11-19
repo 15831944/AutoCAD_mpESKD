@@ -68,53 +68,38 @@
 
                 var blockReference = MainFunction.CreateBlock(breakLine);
                 breakLine.ApplyStyle(style, true);
-                
-                var breakLoop = false;
-                //todo change it
-                while (!breakLoop)
-                {
-                    var breakLineJig = new DefaultEntityJig(
-                        breakLine, 
+
+                var entityJig = new DefaultEntityJig(
+                        breakLine,
                         blockReference,
                         new Point3d(15, 0, 0),
                         Language.GetItem(MainFunction.LangItem, "msg2"));
-                    do
+                do
+                {
+                    var status = AcadHelpers.Editor.Drag(entityJig).Status;
+                    if (status == PromptStatus.OK)
                     {
-                        label0:
-                        var status = AcadHelpers.Editor.Drag(breakLineJig).Status;
-                        if (status == PromptStatus.OK)
+                        if (entityJig.JigState == JigState.PromptInsertPoint)
+                            entityJig.JigState = JigState.PromptNextPoint;
+                        else break;
+                    }
+                    else
+                    {
+                        // mark to remove
+                        using (AcadHelpers.Document.LockDocument())
                         {
-                            if (breakLineJig.JigState != JigState.PromptInsertPoint)
+                            using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                             {
-                                breakLoop = true;
-                                status = PromptStatus.Other;
-                            }
-                            else
-                            {
-                                breakLineJig.JigState = JigState.PromptNextPoint;
-                                goto label0;
+                                var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite);
+                                obj.Erase(true);
+                                tr.Commit();
                             }
                         }
-                        else if (status != PromptStatus.Other)
-                        {
-                            using (AcadHelpers.Document.LockDocument())
-                            {
-                                using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
-                                {
-                                    var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite);
-                                    obj.Erase(true);
-                                    tr.Commit();
-                                }
-                            }
-                            breakLoop = true;
-                        }
-                        else
-                        {
-                            breakLine.UpdateEntities();
-                            breakLine.BlockRecord.UpdateAnonymousBlocks();
-                        }
-                    } while (!breakLoop);
-                }
+
+                        break;
+                    }
+                } while (true);
+
                 if (!breakLine.BlockId.IsErased)
                 {
                     using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())

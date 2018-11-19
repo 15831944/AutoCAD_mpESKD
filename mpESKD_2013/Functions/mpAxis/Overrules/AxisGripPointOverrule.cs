@@ -148,12 +148,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                 ExceptionBox.Show(exception);
             }
         }
-
-        public override void MoveGripPointsAt(Entity entity, IntegerCollection indices, Vector3d offset)
-        {
-            base.MoveGripPointsAt(entity, indices, offset);
-        }
-
+        
         /// <summary>Перемещение ручек</summary>
         public override void MoveGripPointsAt(Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
         {

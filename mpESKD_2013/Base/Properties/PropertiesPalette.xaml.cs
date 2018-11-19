@@ -124,8 +124,8 @@
             {
                 // Тип примитива может содержать атрибуты указывающие зависимость видимости свойств
                 // Собираю их в список для последующей работы
-                List<PropertyVisibilityDependencyAttribute> visibilityDependencyAttributes =
-                    entityGroup.Key.GetCustomAttributes<PropertyVisibilityDependencyAttribute>().ToList();
+                var visibilityDependencyAttributes = GetVisibilityDependencyAttributes(entityGroup.Key);
+                List<SummaryProperty> allEntitySummaryProperties = entityGroup.Select(g => g).ToList();
 
                 var c = entityGroup.SelectMany(sp => sp.EntityPropertyDataCollection).Select(p => p.OwnerObjectId).Distinct().Count();
                 Expander entityExpander = new Expander
@@ -133,14 +133,14 @@
                     IsExpanded = true,
                     Header = LocalizationHelper.GetEntityLocalizationName(entityGroup.Key) + " [" + c + "]"
                 };
+
                 Grid mainGrid = new Grid();
                 var categoryIndex = 0;
                 List<IGrouping<PropertiesCategory, SummaryProperty>> summaryPropertiesGroups = entityGroup.GroupBy(sp => sp.Category).ToList();
                 summaryPropertiesGroups.Sort((sp1, sp2) => sp1.Key.CompareTo(sp2.Key));
+
                 foreach (IGrouping<PropertiesCategory, SummaryProperty> summaryPropertiesGroup in summaryPropertiesGroups)
                 {
-                    List<SummaryProperty> hiddenProperties = summaryPropertiesGroup.Where(p => p.PropertyScope == PropertyScope.Hidden).ToList();
-
                     mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
                     var grid = new Grid();
@@ -167,6 +167,8 @@
                     var j = 1;
                     foreach (SummaryProperty summaryProperty in summaryPropertiesGroup.OrderBy(sp => sp.OrderIndex))
                     {
+                        if(summaryProperty.PropertyScope == PropertyScope.Hidden)
+                            continue;
                         RowDefinition rowDefinition = new RowDefinition { Height = GridLength.Auto };
                         grid.RowDefinitions.Add(rowDefinition);
 
@@ -178,7 +180,7 @@
                             Style = Resources["PropertyNameTextBoxBase"] as Style
                         };
                         SetDescription(propertyHeader, propertyDescription);
-                        SetVisibilityDependency(visibilityDependencyAttributes, hiddenProperties, summaryProperty.PropertyName, propertyHeader);
+                        SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, propertyHeader);
                         Grid.SetColumn(propertyHeader, 0);
                         Grid.SetRow(propertyHeader, j);
                         grid.Children.Add(propertyHeader);
@@ -197,6 +199,7 @@
                                     cb.ItemsSource = StyleManager.GetStyles(intellectualEntityProperty.EntityType).Select(s => s.Name);
                                     cb.Style = Resources["PropertyValueComboBox"] as Style;
                                     SetDescription(cb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, cb);
                                     BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
                                     grid.Children.Add(cb);
                                 }
@@ -215,6 +218,7 @@
                                     cb.ItemsSource = AcadHelpers.Layers;
                                     cb.Style = Resources["PropertyValueComboBox"] as Style;
                                     SetDescription(cb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, cb);
                                     BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
                                     grid.Children.Add(cb);
                                 }
@@ -233,6 +237,7 @@
                                     cb.ItemsSource = AcadHelpers.Scales;
                                     cb.Style = Resources["PropertyValueComboBox"] as Style;
                                     SetDescription(cb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, cb);
                                     BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
                                     grid.Children.Add(cb);
                                 }
@@ -252,6 +257,7 @@
                                     tb.Style = Resources["PropertyValueTextBox"] as Style;
                                     tb.PreviewMouseDown += LineType_OnPreviewMouseDown;
                                     SetDescription(tb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, tb);
                                     BindingOperations.SetBinding(tb, TextBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
                                     grid.Children.Add(tb);
                                 }
@@ -270,6 +276,7 @@
                                     cb.ItemsSource = AcadHelpers.TextStyles;
                                     cb.Style = Resources["PropertyValueComboBox"] as Style;
                                     SetDescription(cb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, cb);
                                     BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
                                     grid.Children.Add(cb);
                                 }
@@ -288,6 +295,7 @@
                                     cb.Style = Resources["PropertyValueComboBox"] as Style;
                                     Type type = intellectualEntityProperty.Value.GetType();
                                     SetDescription(cb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, cb);
                                     cb.ItemsSource = LocalizationHelper.GetEnumPropertyLocalizationFields(type);
 
                                     BindingOperations.SetBinding(cb, ComboBox.TextProperty,
@@ -311,6 +319,7 @@
                                     tb.Maximum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Maximum).Cast<int>().Min();
                                     tb.Style = Resources["PropertyValueIntTextBox"] as Style;
                                     SetDescription(tb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, tb);
                                     BindingOperations.SetBinding(tb, IntTextBox.ValueProperty, CreateTwoWayBindingForProperty(summaryProperty));
 
                                     grid.Children.Add(tb);
@@ -331,6 +340,7 @@
                                     tb.Maximum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Maximum).Cast<double>().Min();
                                     tb.Style = Resources["PropertyValueDoubleTextBox"] as Style;
                                     SetDescription(tb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, tb);
                                     BindingOperations.SetBinding(tb, DoubleTextBox.ValueProperty, CreateTwoWayBindingForProperty(summaryProperty));
 
                                     grid.Children.Add(tb);
@@ -347,6 +357,7 @@
                                     CheckBox chb = new CheckBox();
                                     chb.Style = Resources["PropertyValueCheckBox"] as Style;
                                     SetDescription(chb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, chb);
                                     BindingOperations.SetBinding(chb, ToggleButton.IsCheckedProperty, CreateTwoWayBindingForProperty(summaryProperty));
 
                                     Border outterBorder = new Border();
@@ -371,6 +382,7 @@
                                     Grid.SetRow(tb, j);
                                     tb.Style = Resources["PropertyValueTextBox"] as Style;
                                     SetDescription(tb, propertyDescription);
+                                    SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, tb);
                                     BindingOperations.SetBinding(tb, TextBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
 
                                     grid.Children.Add(tb);
@@ -410,32 +422,51 @@
             e.LostFocus += _OnLostFocus;
         }
 
-        //todo release it correct!!!
         /// <summary>
         /// Установка зависимости видимости в случае, если имеется специальный атрибут
         /// </summary>
         /// <param name="visibilityDependencyAttributes">Список атрибутов зависимостей видимости для читаемого типа примитива</param>
         /// <param name="element">Элемент палитры</param>
+        /// <param name="allEntitySummaryProperties">Список всех свойств примитива</param>
         /// <param name="propertyName">Имя свойства, которое отображается текущим элементом палитры (заголовок или значение)</param>
         private void SetVisibilityDependency(
-            List<PropertyVisibilityDependencyAttribute> visibilityDependencyAttributes,
-            List<SummaryProperty> hiddenProperties, string propertyName,
+            Dictionary<string, PropertyVisibilityDependencyAttribute> visibilityDependencyAttributes,
+            List<SummaryProperty> allEntitySummaryProperties, string propertyName,
             FrameworkElement element)
         {
-            var attribute = visibilityDependencyAttributes.FirstOrDefault(a => a.DependencyProperties.Contains(propertyName));
-            if (attribute != null)
+            try
             {
-                Binding binding = new Binding
+                KeyValuePair<string, PropertyVisibilityDependencyAttribute> attribute = 
+                    visibilityDependencyAttributes.FirstOrDefault(a => a.Value.DependencyProperties.Contains(propertyName));
+                if (attribute.Key != null)
                 {
-                    Mode = BindingMode.OneWay,
-                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                    ElementName = attribute.BooleanProperty,
-                    Source = hiddenProperties.FirstOrDefault(sp => sp.PropertyName == attribute.BooleanProperty),
-                    Path = new PropertyPath("SummaryValue"),
-                    Converter = new ModPlusStyle.Converters.BooleanToVisibilityConverter()
-                };
-                BindingOperations.SetBinding(element, VisibilityProperty, binding);
+                    Binding binding = new Binding
+                    {
+                        Mode = BindingMode.OneWay,
+                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                        Source = allEntitySummaryProperties.FirstOrDefault(sp => sp.PropertyName == attribute.Key),
+                        Path = new PropertyPath("SummaryValue"),
+                        Converter = new ModPlusStyle.Converters.BooleanToVisibilityConverter()
+                    };
+                    BindingOperations.SetBinding(element, FrameworkElement.VisibilityProperty, binding);
+                }
             }
+            catch (Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
+        }
+
+        private Dictionary<string, PropertyVisibilityDependencyAttribute> GetVisibilityDependencyAttributes(Type entityType)
+        {
+            Dictionary<string, PropertyVisibilityDependencyAttribute> dictionary = new Dictionary<string, PropertyVisibilityDependencyAttribute>();
+            foreach (PropertyInfo propertyInfo in entityType.GetProperties())
+            {
+                var attribute = propertyInfo.GetCustomAttribute<PropertyVisibilityDependencyAttribute>();
+                if (attribute != null)
+                    dictionary.Add(propertyInfo.Name, attribute);
+            }
+            return dictionary;
         }
 
         /// <summary>

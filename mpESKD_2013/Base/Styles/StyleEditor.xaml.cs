@@ -599,20 +599,20 @@ namespace mpESKD.Base.Styles
             if (selected is IntellectualEntityStyle style && style.CanEdit)
                 if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h69"), MessageBoxIcon.Question))
                 {
-                    //todo release
-                    //if (style.IsCurrent)
-                    //{
-                    //    var selectedIndex = style.Parent.Styles.IndexOf(style);
-
-                    //    // set current to previous
-                    //    SetCurrentStyle(style.Parent.Styles[selectedIndex - 1]);
-                    //}
-
-                    //// remove from style manager
-                    //StyleManager.RemoveStyle(style.Guid);
-
-                    //// remove from collection
-                    //style.Parent.Styles.Remove(style);
+                    foreach (EntityStyles entityStyles in _styles)
+                    {
+                        if (entityStyles.Styles.Contains(style))
+                        {
+                            if (style.IsCurrent)
+                            {
+                                var index = entityStyles.Styles.IndexOf(style);
+                                entityStyles.Styles[index - 1].IsCurrent = true;
+                            }
+                            entityStyles.Styles.Remove(style);
+                            break;
+                        }
+                    }
+                    StyleManager.RemoveStyle(style);
                 }
         }
 
@@ -741,18 +741,27 @@ namespace mpESKD.Base.Styles
                         var obj = tr.GetObject(selectionResult.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference blockReference)
                         {
-                            //todo release
-                            //// mpBreakLine
-                            //if (ExtendedDataHelpers.IsApplicable(obj, BreakLineInterface.Name))
-                            //    newStyleGuid = AddStyleFromBreakLine(blockReference);
-                            //// mpAxis
-                            //if (ExtendedDataHelpers.IsApplicable(obj, AxisInterface.Name))
-                            //    newStyleGuid = AddStyleFromAxis(blockReference);
-                            //// mpGroundLine
-                            //if (ExtendedDataHelpers.IsApplicable(obj, GroundLineInterface.Name))
-                            //    newStyleGuid = AddStyleFromGroundLine(blockReference);
+                            var entity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
+                            var newStyle = new IntellectualEntityStyle(entity.GetType())
+                            {
+                                Name = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h13"),
+                                StyleType = StyleType.User,
+                                Guid = Guid.NewGuid().ToString()
+                            };
+                            newStyle.GetPropertiesFromEntity(entity, blockReference);
+                            newStyleGuid = newStyle.Guid;
+                            foreach (EntityStyles entityStyles in _styles)
+                            {
+                                if (entityStyles.EntityType == entity.GetType())
+                                {
+                                    entityStyles.Styles.Add(newStyle);
+                                    StyleManager.AddStyle(newStyle);
+                                    break;
+                                }
+                            }
                         }
                     }
+
                     if (!string.IsNullOrEmpty(newStyleGuid))
                         SearchInTreeViewByGuid(newStyleGuid);
                 }
@@ -761,119 +770,11 @@ namespace mpESKD.Base.Styles
             {
                 ExceptionBox.Show(exception);
             }
-            finally { Show(); }
+            finally
+            {
+                Show();
+            }
         }
-
-        ///// <summary>Создание нового стиля из BreakLine</summary>
-        ///// <param name="blkReference">Блок, представляющий BreakLine</param>
-        ///// <returns>Guid нового стиля</returns>
-        //private string AddStyleFromBreakLine(BlockReference blkReference)
-        //{
-        //    var styleGuid = string.Empty;
-        //    var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(blkReference);
-        //    if (breakLine != null)
-        //    {
-        //        var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == BreakLineInterface.Name);
-        //        if (styleToBind != null)
-        //        {
-        //            var styleForEditor = new BreakLineStyleForEditor(styleToBind)
-        //            {
-        //                // general
-        //                LayerName = blkReference.Layer,
-        //                Overhang = breakLine.Overhang,
-        //                Scale = breakLine.Scale,
-        //                //
-        //                BreakHeight = breakLine.BreakHeight,
-        //                BreakWidth = breakLine.BreakWidth,
-        //                LineTypeScale = breakLine.LineTypeScale
-        //            };
-        //            styleGuid = styleForEditor.Guid;
-        //            styleToBind.Styles.Add(styleForEditor);
-        //        }
-        //    }
-        //    return styleGuid;
-        //}
-
-        ///// <summary>Создание нового стиля из Axis</summary>
-        ///// <param name="blkReference">Блок, представляющий BreakLine</param>
-        ///// <returns>Guid нового стиля</returns>
-        //private string AddStyleFromAxis(BlockReference blkReference)
-        //{
-        //    var styleGuid = string.Empty;
-        //    var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blkReference);
-        //    if (axis != null)
-        //    {
-        //        var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == AxisInterface.Name);
-        //        if (styleToBind != null)
-        //        {
-        //            var styleForEditor = new AxisStyleForEditor(styleToBind)
-        //            {
-        //                // general
-        //                LayerName = blkReference.Layer,
-        //                LineTypeScale = axis.LineTypeScale,
-        //                Scale = axis.Scale,
-        //                //
-        //                LineType = blkReference.Linetype,
-        //                //
-        //                //MarkersPosition = axis.MarkersPosition,
-        //                MarkersDiameter = axis.MarkersDiameter,
-        //                MarkersCount = axis.MarkersCount,
-        //                ////FirstMarkerType = axis.FirstMarkerType,
-        //                ////SecondMarkerType = axis.SecondMarkerType,
-        //                ////ThirdMarkerType = axis.ThirdMarkerType,
-        //                ////OrientMarkerType = axis.OrientMarkerType,
-        //                //Fracture = axis.Fracture,
-        //                //BottomFractureOffset = axis.BottomFractureOffset,
-        //                //TopFractureOffset = axis.TopFractureOffset,
-        //                //ArrowsSize = axis.ArrowsSize,
-        //                ////TextStyle = axis.TextStyle,
-        //                ////TextHeight = axis.TextHeight
-        //            };
-        //            styleGuid = styleForEditor.Guid;
-        //            styleToBind.Styles.Add(styleForEditor);
-        //        }
-        //    }
-        //    return styleGuid;
-        //}
-
-        ///// <summary>
-        ///// Создание нового стиля из GroundLine
-        ///// </summary>
-        ///// <param name="blkReference">Блок, представляющий GroundLine</param>
-        ///// <returns>Guid нового стиля</returns>
-        //private string AddStyleFromGroundLine(BlockReference blkReference)
-        //{
-        //    var styleGuid = string.Empty;
-        //    //todo old
-        //    //var groundLine = GroundLine.GetGroundLineFromEntity(blkReference);
-        //    var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(blkReference);
-        //    if (groundLine != null)
-        //    {
-        //        var styleToBind = _styles.FirstOrDefault(s => s.FunctionName == GroundLineInterface.Name);
-        //        if (styleToBind != null)
-        //        {
-        //            var styleForEditor = new GroundLineStyleForEditor(styleToBind)
-        //            {
-        //                // general
-        //                LayerName = blkReference.Layer,
-        //                LineTypeScale = groundLine.LineTypeScale,
-        //                Scale = groundLine.Scale,
-        //                //
-        //                LineType = blkReference.Linetype,
-        //                //
-        //                FirstStrokeOffset = groundLine.FirstStrokeOffset,
-        //                StrokeLength = groundLine.StrokeLength,
-        //                StrokeOffset = groundLine.StrokeOffset,
-        //                StrokeAngle = groundLine.StrokeAngle,
-        //                Space = groundLine.Space
-        //            };
-        //            styleGuid = styleForEditor.Guid;
-        //            styleToBind.Styles.Add(styleForEditor);
-        //        }
-        //    }
-
-        //    return styleGuid;
-        //}
 
         /// <summary>Поиск и выбор в TreeView стиля по Guid</summary>
         private void SearchInTreeViewByGuid(string styleGuid)

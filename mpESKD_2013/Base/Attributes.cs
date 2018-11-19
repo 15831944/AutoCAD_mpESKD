@@ -1,7 +1,7 @@
 ﻿namespace mpESKD.Base
 {
     using System;
-    using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
     using Enums;
     using ModPlusAPI.Annotations;
 
@@ -10,13 +10,13 @@
         public EntityPropertyAttribute(
             PropertiesCategory category, 
             int orderIndex,
-            string name,
             string displayNameLocalizationKey,
             string descriptionLocalizationKey,
             object defaultValue,
             object minimum, 
             object maximum, 
-            PropertyScope propertyScope = PropertyScope.PaletteAndStyleEditor)
+            PropertyScope propertyScope = PropertyScope.PaletteAndStyleEditor,
+            [CallerMemberName] string name = null)
         {
             Category = category;
             OrderIndex = orderIndex;
@@ -128,26 +128,20 @@
     /// <summary>
     /// Атрибут, указывающий зависимость видимости свойства от другого свойства.
     /// Принцип работы: в классе примитива нужно создать специальное свойство типа bool к которому
-    /// нужно указать данный атрибут. В значение BooleanProperty нужно записать имя этого свойства.
+    /// нужно указать данный атрибут. 
     /// В список зависимых свойств DependencyProperties нужно внести имена тех свойств, видимость которых
-    /// зависит от свойства, указанного в BooleanProperty.
-    /// Самой свойство, указанное в BooleanProperty должно менять внутри класса примитива
+    /// зависит от свойства, для которого установлен атрибут
+    /// Самой свойство, для которого установлен атрибут, должно менять внутри класса примитива
     /// </summary>
     public class PropertyVisibilityDependencyAttribute : Attribute
     {
-        public PropertyVisibilityDependencyAttribute(string booleanProperty, string[] dependencyProperties)
+        public PropertyVisibilityDependencyAttribute(string[] dependencyProperties)
         {
             DependencyProperties = dependencyProperties;
-            BooleanProperty = booleanProperty;
         }
-
+        
         /// <summary>
-        /// Свойство, которое меняет видимость свойства DependencyProperties
-        /// </summary>
-        public string BooleanProperty { get; }
-
-        /// <summary>
-        /// Свойства, видимость которых зависит от свойства BooleanProperty
+        /// Свойства, видимость которых зависит от свойства, для которого установлен атрибут
         /// </summary>
         public string[] DependencyProperties { get; }
 

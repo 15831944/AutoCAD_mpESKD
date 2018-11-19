@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -123,6 +124,52 @@
                             keyForEditorAttribute,
                             entityType,
                             attribute.DefaultValue,
+                            ObjectId.Null));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Чтение свойств из примитива и запись их в стиль примитива
+        /// </summary>
+        /// <param name="style">Стиль примитива</param>
+        /// <param name="entity">Интеллектуальный примитив</param>
+        /// <param name="blockReference">Вставка блока, представляющая интеллектуальный примитив в AutoCAD</param>
+        public static void GetPropertiesFromEntity(this IntellectualEntityStyle style, IntellectualEntity entity, BlockReference blockReference)
+        {
+            Type entityType = entity.GetType();
+            foreach (PropertyInfo propertyInfo in entityType.GetProperties())
+            {
+                var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
+                var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
+                if (attribute != null && attribute.Name != "Style")
+                {
+                    if (attribute.PropertyScope != PropertyScope.PaletteAndStyleEditor)
+                        continue;
+                    if (attribute.Name == "LayerName")
+                    {
+                        style.Properties.Add(new IntellectualEntityProperty(
+                            attribute, keyForEditorAttribute, entityType,
+                            blockReference.Layer,
+                            ObjectId.Null));
+                    }
+                    else if (attribute.Name == "LineType")
+                    {
+                        style.Properties.Add(new IntellectualEntityProperty(
+                            attribute, 
+                            keyForEditorAttribute,
+                            entityType,
+                            blockReference.Linetype,
+                            ObjectId.Null));
+                    }
+                    else
+                    {
+                        style.Properties.Add(new IntellectualEntityProperty(
+                            attribute, 
+                            keyForEditorAttribute,
+                            entityType,
+                            propertyInfo.GetValue(entity),
                             ObjectId.Null));
                     }
                 }
@@ -440,22 +487,7 @@
         {
             EntityStyles.Remove(style);
         }
-
-        /// <summary>
-        /// Перезагрузка стилей указанного типа примитива: из списка удаляются все стили типа, а затем грузятся заново
-        /// </summary>
-        public static void ReloadStyles(Type entityType)
-        {
-            for (var i = EntityStyles.Count - 1; i >= 0; i--)
-            {
-                var style = EntityStyles[i];
-                if (style.EntityType == entityType && style.StyleType != StyleType.System)
-                    EntityStyles.RemoveAt(i);
-            }
-
-            LoadStylesFromXmlFile(entityType);
-        }
-
+        
         /// <summary>
         /// Возвращает значение свойства "Имя слоя" из стиля
         /// </summary>
@@ -518,7 +550,6 @@
                     var propertyFromStyle = style.Properties.FirstOrDefault(sp => sp.Name == attribute.Name);
                     if (propertyFromStyle != null)
                     {
-                        //todo check with settings
                         if (attribute.Name == "Scale")
                         {
                             if (isOnEntityCreation)

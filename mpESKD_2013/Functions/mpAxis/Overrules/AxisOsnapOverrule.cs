@@ -1,14 +1,15 @@
-﻿using System;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Runtime;
-using mpESKD.Base.Helpers;
-using ModPlusAPI.Windows;
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Functions.mpAxis.Overrules
 {
+    using System;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.Runtime;
+    using Base.Helpers;
+    using ModPlusAPI.Windows;
     using Base;
+    using Base.Enums;
 
     public class AxisOsnapOverrule : OsnapOverrule
     {
@@ -35,21 +36,20 @@ namespace mpESKD.Functions.mpAxis.Overrules
                     {
                         snapPoints.Add(axis.InsertionPoint);
                         snapPoints.Add(axis.EndPoint);
-                        //todo implement
-                        ////if (axis.MarkersPosition == AxisMarkersPosition.Both ||
-                        ////    axis.MarkersPosition == AxisMarkersPosition.Bottom)
-                        ////{
-                        ////    snapPoints.Add(axis.BottomMarkerPoint);
-                        ////    if (axis.BottomOrientMarkerVisible)
-                        ////        snapPoints.Add(axis.BottomOrientPoint);
-                        ////}
-                        ////if (axis.MarkersPosition == AxisMarkersPosition.Both ||
-                        ////    axis.MarkersPosition == AxisMarkersPosition.Top)
-                        ////{
-                        ////    snapPoints.Add(axis.TopMarkerPoint);
-                        ////    if (axis.TopOrientMarkerVisible)
-                        ////        snapPoints.Add(axis.TopOrientPoint);
-                        ////}
+                        if (axis.MarkersPosition == AxisMarkersPosition.Both ||
+                            axis.MarkersPosition == AxisMarkersPosition.Bottom)
+                        {
+                            snapPoints.Add(axis.BottomMarkerPoint);
+                            if (axis.BottomOrientMarkerVisible)
+                                snapPoints.Add(axis.BottomOrientPoint);
+                        }
+                        if (axis.MarkersPosition == AxisMarkersPosition.Both ||
+                            axis.MarkersPosition == AxisMarkersPosition.Top)
+                        {
+                            snapPoints.Add(axis.TopMarkerPoint);
+                            if (axis.TopOrientMarkerVisible)
+                                snapPoints.Add(axis.TopOrientPoint);
+                        }
                     }
                 }
                 catch (Autodesk.AutoCAD.Runtime.Exception exception)

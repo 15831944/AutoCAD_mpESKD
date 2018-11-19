@@ -13,7 +13,7 @@ namespace mpESKD.Functions.mpGroundLine
     using Base.Helpers;
     using ModPlusAPI.Windows;
 
-    [IntellectualEntityDisplayNameKeyAttribute("h73")]
+    [IntellectualEntityDisplayNameKey("h73")]
     public class GroundLine : IntellectualEntity
     {
         #region Constructor
@@ -67,7 +67,7 @@ namespace mpESKD.Functions.mpGroundLine
         /// <summary>
         /// Отступ первого штриха в каждом сегменте полилинии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, nameof(FirstStrokeOffset), "p36", "d36", 
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p36", "d36", 
             GroundLineFirstStrokeOffset.ByHalfSpace, null, null)]
         [PropertyNameKeyInStyleEditor("p36-1")]
         public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineFirstStrokeOffset.ByHalfSpace;
@@ -75,37 +75,37 @@ namespace mpESKD.Functions.mpGroundLine
         /// <summary>
         /// Длина штриха
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 2, nameof(StrokeLength), "p37", "d37", 8, 1, 10)]
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p37", "d37", 8, 1, 10)]
         [PropertyNameKeyInStyleEditor("p37-1")]
         public int StrokeLength { get; set; } = 8;
 
         /// <summary>
         /// Расстояние между штрихами
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, nameof(StrokeOffset), "p38", "d38", 4, 1, 10)]
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p38", "d38", 4, 1, 10)]
         [PropertyNameKeyInStyleEditor("p38-1")]
         public int StrokeOffset { get; set; } = 4;
 
         /// <summary>
         /// Угол наклона штриха в градусах
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, nameof(StrokeAngle), "p39", "d39", 60, 30, 90)]
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p39", "d39", 60, 30, 90)]
         [PropertyNameKeyInStyleEditor("p39-1")]
         public int StrokeAngle { get; set; } = 60;
 
         /// <summary>
         /// Отступ группы штрихов
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, nameof(Space), "p40", "d40", 10, 1, 20)]
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p40", "d40", 10, 1, 20)]
         [PropertyNameKeyInStyleEditor("p40-1")]
         public int Space { get; set; } = 10;
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 4, nameof(LineType), "p35", "d35", "Continuous", null, null)]
+        [EntityProperty(PropertiesCategory.General, 4, "p35", "d35", "Continuous", null, null)]
         public override string LineType { get; set; }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 5, nameof(LineTypeScale), "p6", "d6", 1.0, 0.0, 1.0000E+99)]
+        [EntityProperty(PropertiesCategory.General, 5, "p6", "d6", 1.0, 0.0, 1.0000E+99)]
         public override double LineTypeScale { get; set; }
 
         /// <inheritdoc />
@@ -113,7 +113,7 @@ namespace mpESKD.Functions.mpGroundLine
 
         #endregion
 
-        #region Примитивы ЕСКД объекта
+        #region Geometry
 
         private readonly Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
 
@@ -143,16 +143,6 @@ namespace mpESKD.Functions.mpGroundLine
             }
         }
         
-        /// <summary>Установка свойств для примитивов, которые не меняются</summary>
-        /// <param name="entity">Примитив автокада</param>
-        private static void SetPropertiesToCadEntity(Entity entity)
-        {
-            entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-            entity.LineWeight = LineWeight.ByBlock;
-            entity.Linetype = "Continuous";
-            entity.LinetypeScale = 1.0;
-        }
-
         /// <summary>
         /// Перестроение точек - помещение EndPoint в список
         /// </summary>

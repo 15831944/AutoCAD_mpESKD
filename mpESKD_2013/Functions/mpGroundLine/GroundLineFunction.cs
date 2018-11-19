@@ -52,7 +52,7 @@
         {
             // send statistic
             Statistic.SendCommandStarting(GroundLineInterface.Name, MpVersionData.CurCadVers);
-            
+
             try
             {
                 Overrule.Overruling = false;
@@ -62,65 +62,63 @@
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(GroundLineInterface.Name);
+                
                 // style
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();
-                
+
                 var blockReference = MainFunction.CreateBlock(groundLine);
                 groundLine.ApplyStyle(style, true);
 
-                var breakLoop = false;
-                while (!breakLoop)
+                var entityJig = new DefaultEntityJig(
+                    groundLine,
+                    blockReference,
+                    new Point3d(20, 0, 0),
+                    Language.GetItem(MainFunction.LangItem, "msg5"));
+                do
                 {
-                    var breakLineJig = new DefaultEntityJig(
-                        groundLine, 
-                        blockReference,
-                        new Point3d(20, 0, 0), 
-                        Language.GetItem(MainFunction.LangItem, "msg5"));
-                    do
+                    var status = AcadHelpers.Editor.Drag(entityJig).Status;
+                    if (status == PromptStatus.OK)
                     {
-                        var status = AcadHelpers.Editor.Drag(breakLineJig).Status;
-                        if (status == PromptStatus.OK)
+                        entityJig.JigState = JigState.PromptNextPoint;
+                        if (entityJig.PreviousPoint == null)
                         {
-                            breakLineJig.JigState = JigState.PromptNextPoint;
-                            if (breakLineJig.PreviousPoint == null)
-                            {
-                                breakLineJig.PreviousPoint = groundLine.MiddlePoints.Any()
-                                    ? groundLine.MiddlePoints.Last()
-                                    : groundLine.InsertionPoint;
-                            }
-                            else
-                            {
-                                groundLine.RebasePoints();
-                                breakLineJig.PreviousPoint = groundLine.MiddlePoints.Last();
-                            }
+                            entityJig.PreviousPoint = groundLine.MiddlePoints.Any()
+                                ? groundLine.MiddlePoints.Last()
+                                : groundLine.InsertionPoint;
                         }
                         else
                         {
-                            if (groundLine.MiddlePoints.Any())
+                            groundLine.RebasePoints();
+                            entityJig.PreviousPoint = groundLine.MiddlePoints.Last();
+                        }
+                    }
+                    else
+                    {
+                        if (groundLine.MiddlePoints.Any())
+                        {
+                            groundLine.EndPoint = groundLine.MiddlePoints.Last();
+                            groundLine.MiddlePoints.RemoveAt(groundLine.MiddlePoints.Count - 1);
+                            groundLine.UpdateEntities();
+                            groundLine.BlockRecord.UpdateAnonymousBlocks();
+                        }
+                        else
+                        {
+                            // if no middle points - remove entity
+                            using (AcadHelpers.Document.LockDocument())
                             {
-                                groundLine.EndPoint = groundLine.MiddlePoints.Last();
-                                groundLine.MiddlePoints.RemoveAt(groundLine.MiddlePoints.Count - 1);
-                                groundLine.UpdateEntities();
-                                groundLine.BlockRecord.UpdateAnonymousBlocks();
-                            }
-                            else
-                            {
-                                // if no middle points - remove entity
-                                using (AcadHelpers.Document.LockDocument())
+                                using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                                 {
-                                    using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
-                                    {
-                                        var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite);
-                                        obj.Erase(true);
-                                        tr.Commit();
-                                    }
+                                    var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite);
+                                    obj.Erase(true);
+                                    tr.Commit();
                                 }
                             }
-                            breakLoop = true;
                         }
-                    } while (!breakLoop);
-                }
+
+                        break;
+                    }
+                } while (true);
 
                 if (!groundLine.BlockId.IsErased)
                 {
@@ -193,7 +191,7 @@
                             groundLine.UpdateEntities();
                             groundLine.BlockRecord.UpdateAnonymousBlocks();
 
-                            var ent = (BlockReference) tr.GetObject(groundLine.BlockId, OpenMode.ForWrite);
+                            var ent = (BlockReference)tr.GetObject(groundLine.BlockId, OpenMode.ForWrite);
                             ent.Position = pline.GetPoint3dAt(0);
 
                             ent.XData = groundLine.GetParametersForXData();

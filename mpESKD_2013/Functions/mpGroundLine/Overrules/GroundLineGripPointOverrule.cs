@@ -39,8 +39,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     // Получаем экземпляр класса, который описывает как должен выглядеть примитив
                     // т.е. правила построения графики внутри блока
                     // Информация собирается по XData и свойствам самого блока
-                    //todo old
-                    //var groundLine = GroundLine.GetGroundLineFromEntity(entity);
+                    
                     var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(entity);
                     if (groundLine != null)
                     {
@@ -146,7 +145,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                                 addVertexGrip = new GroundLineAddVertexGrip(groundLine, null, groundLine.InsertionPoint)
                                 {
                                     GripPoint = groundLine.InsertionPoint +
-                                                (groundLine.MiddlePoints.First() - groundLine.InsertionPoint).GetNormal() * 4 * scale
+                                                (groundLine.InsertionPoint - groundLine.MiddlePoints.First()).GetNormal() * 4 * scale
                                 };
                                 grips.Add(addVertexGrip);
                             }

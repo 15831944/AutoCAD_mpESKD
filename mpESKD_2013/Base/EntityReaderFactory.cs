@@ -1,10 +1,11 @@
 ﻿namespace mpESKD.Base
 {
     using System.Linq;
-    using Autodesk.AutoCAD.DatabaseServices;
+    using AcDd = Autodesk.AutoCAD.DatabaseServices;
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpGroundLine;
+    using Functions.mpSection;
     using ModPlusAPI.Annotations;
 
     public class EntityReaderFactory
@@ -14,18 +15,18 @@
         public static EntityReaderFactory Instance => _entityReaderFactory ?? (_entityReaderFactory = new EntityReaderFactory());
 
         [CanBeNull]
-        public IntellectualEntity GetFromEntity(Entity entity)
+        public IntellectualEntity GetFromEntity(AcDd.Entity entity)
         {
             var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
             var appName = entity.XData.AsArray()
-                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()))
+                .FirstOrDefault(tv => tv.TypeCode == (int)AcDd.DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()))
                 .Value.ToString();
 
             return GetFromEntity(entity, appName);
         }
 
         [CanBeNull]
-        public IntellectualEntity GetFromEntity(Entity entity, string appName)
+        public IntellectualEntity GetFromEntity(AcDd.Entity entity, string appName)
         {
             switch (appName)
             {
@@ -35,20 +36,22 @@
                     return GetAxisFromEntity(entity);
                 case "mpGroundLine":
                     return GetGroundLineFromEntity(entity);
+                case "mpSection":
+                    return GetSectionFromEntity(entity);
             }
 
             return null;
         }
 
         [CanBeNull]
-        public T GetFromEntity<T>(Entity entity) where T : IntellectualEntity
+        public T GetFromEntity<T>(AcDd.Entity entity) where T : IntellectualEntity
         {
             return GetFromEntity(entity, "mp" + typeof(T).Name) as T;
         }
 
-        private BreakLine GetBreakLineFromEntity(Entity ent)
+        private BreakLine GetBreakLineFromEntity(AcDd.Entity ent)
         {
-            using (ResultBuffer resBuf = ent.GetXDataForApplication(BreakLineInterface.Name))
+            using (AcDd.ResultBuffer resBuf = ent.GetXDataForApplication(BreakLineInterface.Name))
             {
                 // В случае команды ОТМЕНА может вернуть null
                 if (resBuf == null) return null;
@@ -63,9 +66,9 @@
             }
         }
 
-        private Axis GetAxisFromEntity(Entity ent)
+        private Axis GetAxisFromEntity(AcDd.Entity ent)
         {
-            using (ResultBuffer resBuf = ent.GetXDataForApplication(AxisInterface.Name))
+            using (AcDd.ResultBuffer resBuf = ent.GetXDataForApplication(AxisInterface.Name))
             {
                 // В случае команды ОТМЕНА может вернуть null
                 if (resBuf == null) return null;
@@ -80,9 +83,9 @@
             }
         }
 
-        private GroundLine GetGroundLineFromEntity(Entity ent)
+        private GroundLine GetGroundLineFromEntity(AcDd.Entity ent)
         {
-            using (ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineInterface.Name))
+            using (AcDd.ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineInterface.Name))
             {
                 // В случае команды ОТМЕНА может вернуть null
                 if (resBuf == null)
@@ -95,6 +98,24 @@
                 groundLine.GetParametersFromResBuf(resBuf);
 
                 return groundLine;
+            }
+        }
+
+        private Section GetSectionFromEntity(AcDd.Entity ent)
+        {
+            using (AcDd.ResultBuffer resBuf = ent.GetXDataForApplication(GroundLineInterface.Name))
+            {
+                // В случае команды ОТМЕНА может вернуть null
+                if (resBuf == null)
+                    return null;
+                Section section = new Section(ent.ObjectId);
+                // Получаем параметры из самого блока
+                // ОБЯЗАТЕЛЬНО СНАЧАЛА ИЗ БЛОКА!!!!!!
+                section.GetParametersFromEntity(ent);
+                // Получаем параметры из XData
+                section.GetParametersFromResBuf(resBuf);
+
+                return section;
             }
         }
     }

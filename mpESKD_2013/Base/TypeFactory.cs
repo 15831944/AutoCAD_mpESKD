@@ -6,6 +6,7 @@
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpGroundLine;
+    using Functions.mpSection;
 
     public class TypeFactory
     {
@@ -22,7 +23,8 @@
             {
                 typeof(BreakLine),
                 typeof(Axis),
-                typeof(GroundLine)
+                typeof(GroundLine),
+                typeof(Section)
             };
         }
 
@@ -35,7 +37,8 @@
             {
                 new BreakLineFunction(),
                 new AxisFunction(),
-                new GroundLineFunction()
+                new GroundLineFunction(),
+                new SectionFunction()
             };
         }
 
@@ -58,6 +61,9 @@
                     return TryGetLocalizationValue("h68");
                 case nameof(GroundLine):
                     return TryGetLocalizationValue("h78");
+                case nameof(Section):
+                    //todo translate
+                    return "Section";
             }
 
             return string.Empty;

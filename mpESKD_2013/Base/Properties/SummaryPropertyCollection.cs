@@ -22,7 +22,7 @@
                         var allowableSummaryProperty = this.FirstOrDefault(
                             si => si.EntityPropertyDataCollection
                                 .Any(ep => ep.Category == entityProperty.Category &&
-                                           ep.EntityType.Name == entityProperty.EntityType.Name &&
+                                           ep.EntityType == entityProperty.EntityType &&
                                            ep.Name == entityProperty.Name &&
                                            ep.Value.GetType() == entityProperty.Value.GetType()));
                         if (allowableSummaryProperty == null)

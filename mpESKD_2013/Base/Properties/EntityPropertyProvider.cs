@@ -7,7 +7,9 @@ namespace mpESKD.Base.Properties
     using System.Linq;
     using System.Reflection;
     using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Runtime;
     using Helpers;
+    using ModPlusAPI.Windows;
     using Styles;
 
     public class EntityPropertyProvider
@@ -191,52 +193,61 @@ namespace mpESKD.Base.Properties
         {
             if(_isModifiedFromAutocad)
                 return;
-
-            IntellectualEntityProperty intellectualEntityProperty = (IntellectualEntityProperty) sender;
-            using (AcadHelpers.Document.LockDocument())
+            Overrule.Overruling = false;
+            try
             {
-                using (var blockReference = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                IntellectualEntityProperty intellectualEntityProperty = (IntellectualEntityProperty) sender;
+                using (AcadHelpers.Document.LockDocument())
                 {
-                    Type entityType = _intellectualEntity.GetType();
-                    PropertyInfo propertyInfo = entityType.GetProperty(intellectualEntityProperty.Name);
-                    if (propertyInfo != null)
+                    using (var blockReference = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
                     {
-                        if (intellectualEntityProperty.Name == "Style")
+                        Type entityType = _intellectualEntity.GetType();
+                        PropertyInfo propertyInfo = entityType.GetProperty(intellectualEntityProperty.Name);
+                        if (propertyInfo != null)
                         {
-                            var style = StyleManager.GetStyleByName(entityType, intellectualEntityProperty.Value.ToString());
-                            if (style != null)
+                            if (intellectualEntityProperty.Name == "Style")
                             {
-                                _intellectualEntity.ApplyStyle(style, false);
+                                var style = StyleManager.GetStyleByName(entityType, intellectualEntityProperty.Value.ToString());
+                                if (style != null)
+                                {
+                                    _intellectualEntity.ApplyStyle(style, false);
+                                }
                             }
-                        }
-                        else if (intellectualEntityProperty.Name == "LayerName")
-                        {
-                            if (blockReference != null)
-                                blockReference.Layer = intellectualEntityProperty.Value.ToString();
-                        }
-                        else if (intellectualEntityProperty.Name == "LineType")
-                        {
-                            if (blockReference != null)
-                                blockReference.Linetype = intellectualEntityProperty.Value.ToString();
-                        }
-                        else 
-                            propertyInfo.SetValue(_intellectualEntity, intellectualEntityProperty.Value);
+                            else if (intellectualEntityProperty.Name == "LayerName")
+                            {
+                                if (blockReference != null)
+                                    blockReference.Layer = intellectualEntityProperty.Value.ToString();
+                            }
+                            else if (intellectualEntityProperty.Name == "LineType")
+                            {
+                                if (blockReference != null)
+                                    blockReference.Linetype = intellectualEntityProperty.Value.ToString();
+                            }
+                            else
+                                propertyInfo.SetValue(_intellectualEntity, intellectualEntityProperty.Value);
 
-                        _intellectualEntity.UpdateEntities();
-                        _intellectualEntity.GetBlockTableRecordWithoutTransaction(blockReference);
-                        using (var resBuf = _intellectualEntity.GetParametersForXData())
-                        {
-                            if (blockReference != null)
-                                blockReference.XData = resBuf;
-                        }
+                            _intellectualEntity.UpdateEntities();
+                            _intellectualEntity.GetBlockTableRecordWithoutTransaction(blockReference);
+                            using (var resBuf = _intellectualEntity.GetParametersForXData())
+                            {
+                                if (blockReference != null)
+                                    blockReference.XData = resBuf;
+                            }
 
-                        if (blockReference != null)
-                            blockReference.ResetBlock();
+                            if (blockReference != null)
+                                blockReference.ResetBlock();
+                        }
                     }
                 }
+
+                Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
             }
 
-            Autodesk.AutoCAD.Internal.Utils.FlushGraphics();
+            Overrule.Overruling = true;
         }
     }
 }
