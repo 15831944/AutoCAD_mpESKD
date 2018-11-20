@@ -3,6 +3,7 @@
 namespace mpESKD.Functions.mpAxis.Overrules
 {
     using System;
+    using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base.Helpers;
@@ -35,6 +36,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
         {
             try
             {
+                Debug.Print("AxisGripPointsOverrule");
                 // Проверка дополнительных условий
                 if (IsApplicable(entity))
                 {

@@ -1,6 +1,7 @@
 ﻿// ReSharper disable InconsistentNaming
 namespace mpESKD.Functions.mpGroundLine.Overrules
 {
+    using System.Diagnostics;
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
@@ -29,6 +30,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         public override void GetGripPoints(Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir,
             GetGripPointsFlags bitFlags)
         {
+            Debug.Print("GroundLineGripPointOverrule");
             try
             {
                 if (IsApplicable(entity))

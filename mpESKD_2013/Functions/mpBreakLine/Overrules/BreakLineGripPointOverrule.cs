@@ -2,6 +2,7 @@
 
 namespace mpESKD.Functions.mpBreakLine.Overrules
 {
+    using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
@@ -29,6 +30,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         public override void GetGripPoints(Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir,
             GetGripPointsFlags bitFlags)
         {
+            Debug.Print("BreakLineGripPointsOverrule");
             try
             {
                 // Проверка дополнительных условий

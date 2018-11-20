@@ -7,6 +7,7 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Functions.mpAxis.Overrules
 {
+    using System.Diagnostics;
     using Base;
 
     public class AxisObjectOverrule : ObjectOverrule
@@ -22,7 +23,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
         }
         public override void Close(DBObject dbObject)
         {
-            // Проверка дополнительных условий
+            Debug.Print("AxisObjectOverrule");
             if (IsApplicable(dbObject))
             {
                 try

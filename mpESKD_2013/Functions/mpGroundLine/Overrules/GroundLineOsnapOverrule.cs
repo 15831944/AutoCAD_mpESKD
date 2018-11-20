@@ -2,6 +2,7 @@
 namespace mpESKD.Functions.mpGroundLine.Overrules
 {
     using System;
+    using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
@@ -25,7 +26,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         public override void GetObjectSnapPoints(Entity entity, ObjectSnapModes snapMode, IntPtr gsSelectionMark, Point3d pickPoint,
             Point3d lastPoint, Matrix3d viewTransform, Point3dCollection snapPoints, IntegerCollection geometryIds)
         {
-            // Проверка дополнительных условий
+            Debug.Print("GroundLineOsnapOverrule");
             if (IsApplicable(entity))
             {
                 try

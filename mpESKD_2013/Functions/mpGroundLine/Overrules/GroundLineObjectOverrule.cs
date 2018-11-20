@@ -1,6 +1,7 @@
 ﻿// ReSharper disable InconsistentNaming
 namespace mpESKD.Functions.mpGroundLine.Overrules
 {
+    using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
     using Base;
@@ -22,7 +23,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
         public override void Close(DBObject dbObject)
         {
-            // Проверка дополнительных условий
+            Debug.Print("GroundLineObjectOverrule");
             if (IsApplicable(dbObject))
             {
                 try

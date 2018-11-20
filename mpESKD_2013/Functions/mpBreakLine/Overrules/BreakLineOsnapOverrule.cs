@@ -8,6 +8,7 @@ using ModPlusAPI.Windows;
 
 namespace mpESKD.Functions.mpBreakLine.Overrules
 {
+    using System.Diagnostics;
     using Base;
 
     public class BreakLineOsnapOverrule : OsnapOverrule
@@ -25,7 +26,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         public override void GetObjectSnapPoints(Entity entity, ObjectSnapModes snapMode, IntPtr gsSelectionMark, Point3d pickPoint,
             Point3d lastPoint, Matrix3d viewTransform, Point3dCollection snapPoints, IntegerCollection geometryIds)
         {
-            // Проверка дополнительных условий
+            Debug.Print("BreakLineOsnapOverrule");
             if (IsApplicable(entity))
             {
                 try

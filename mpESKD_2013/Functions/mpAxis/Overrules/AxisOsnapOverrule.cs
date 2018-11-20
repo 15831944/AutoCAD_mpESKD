@@ -3,6 +3,7 @@
 namespace mpESKD.Functions.mpAxis.Overrules
 {
     using System;
+    using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
@@ -26,7 +27,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
         public override void GetObjectSnapPoints(Entity entity, ObjectSnapModes snapMode, IntPtr gsSelectionMark, Point3d pickPoint,
             Point3d lastPoint, Matrix3d viewTransform, Point3dCollection snapPoints, IntegerCollection geometryIds)
         {
-            // Проверка дополнительных условий
+            Debug.Print("AxisOsnapOverrule");
             if (IsApplicable(entity))
             {
                 try
