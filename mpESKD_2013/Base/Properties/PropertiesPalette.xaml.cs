@@ -315,8 +315,8 @@
                                     IntTextBox tb = new IntTextBox();
                                     Grid.SetColumn(tb, 2);
                                     Grid.SetRow(tb, j);
-                                    tb.Minimum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Minimum).Cast<int>().Max();
-                                    tb.Maximum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Maximum).Cast<int>().Min();
+                                    tb.Minimum = summaryProperty.EntityPropertyDataCollection.Select(p => Convert.ToInt32(p.Minimum)).Max();
+                                    tb.Maximum = summaryProperty.EntityPropertyDataCollection.Select(p => Convert.ToInt32(p.Maximum)).Min();
                                     tb.Style = Resources["PropertyValueIntTextBox"] as Style;
                                     SetDescription(tb, propertyDescription);
                                     SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, tb);
@@ -336,8 +336,8 @@
                                     DoubleTextBox tb = new DoubleTextBox();
                                     Grid.SetColumn(tb, 2);
                                     Grid.SetRow(tb, j);
-                                    tb.Minimum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Minimum).Cast<double>().Max();
-                                    tb.Maximum = summaryProperty.EntityPropertyDataCollection.Select(p => p.Maximum).Cast<double>().Min();
+                                    tb.Minimum = summaryProperty.EntityPropertyDataCollection.Select(p => Convert.ToDouble(p.Minimum)).Max();
+                                    tb.Maximum = summaryProperty.EntityPropertyDataCollection.Select(p => Convert.ToDouble(p.Maximum)).Min();
                                     tb.Style = Resources["PropertyValueDoubleTextBox"] as Style;
                                     SetDescription(tb, propertyDescription);
                                     SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, tb);

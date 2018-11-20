@@ -425,7 +425,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(Axis.BlockId, OpenMode.ForWrite);
-                        using (var resBuf = Axis.GetParametersForXData())
+                        using (var resBuf = Axis.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
                         }

@@ -63,7 +63,6 @@
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(GroundLineInterface.Name);
                 
-                // style
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();
 
@@ -125,7 +124,7 @@
                     using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
                     {
                         var ent = tr.GetObject(groundLine.BlockId, OpenMode.ForWrite);
-                        ent.XData = groundLine.GetParametersForXData();
+                        ent.XData = groundLine.GetDataForXData();
                         tr.Commit();
                     }
                 }
@@ -193,8 +192,7 @@
 
                             var ent = (BlockReference)tr.GetObject(groundLine.BlockId, OpenMode.ForWrite);
                             ent.Position = pline.GetPoint3dAt(0);
-
-                            ent.XData = groundLine.GetParametersForXData();
+                            ent.XData = groundLine.GetDataForXData();
                         }
                         tr.Commit();
                     }

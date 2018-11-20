@@ -18,22 +18,13 @@ namespace mpESKD.Functions.mpGroundLine
     {
         #region Constructor
         
-        /// <summary>Инициализация экземпляра класса для GroundLine без заполнения данными
-        /// В данном случае уже все данные получены и нужно только "построить" 
-        /// базовые примитивы</summary>
-        public GroundLine(ObjectId objectId)
+        /// <inheritdoc />
+        public GroundLine(ObjectId objectId) : base(objectId)
         {
-            BlockId = objectId;
         }
 
         public GroundLine()
         {
-            var blockTableRecord = new BlockTableRecord
-            {
-                Name = "*U",
-                BlockScaling = BlockScaling.Uniform
-            };
-            BlockRecord = blockTableRecord;
         }
 
         #endregion
@@ -43,6 +34,7 @@ namespace mpESKD.Functions.mpGroundLine
         /// <summary>
         /// Промежуточные точки
         /// </summary>
+        [SaveToXData]
         public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
         
         private List<Point3d> MiddlePointsOCS
@@ -70,6 +62,7 @@ namespace mpESKD.Functions.mpGroundLine
         [EntityProperty(PropertiesCategory.Geometry, 1, "p36", "d36", 
             GroundLineFirstStrokeOffset.ByHalfSpace, null, null)]
         [PropertyNameKeyInStyleEditor("p36-1")]
+        [SaveToXData]
         public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineFirstStrokeOffset.ByHalfSpace;
 
         /// <summary>
@@ -77,6 +70,7 @@ namespace mpESKD.Functions.mpGroundLine
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 2, "p37", "d37", 8, 1, 10)]
         [PropertyNameKeyInStyleEditor("p37-1")]
+        [SaveToXData]
         public int StrokeLength { get; set; } = 8;
 
         /// <summary>
@@ -84,6 +78,7 @@ namespace mpESKD.Functions.mpGroundLine
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 3, "p38", "d38", 4, 1, 10)]
         [PropertyNameKeyInStyleEditor("p38-1")]
+        [SaveToXData]
         public int StrokeOffset { get; set; } = 4;
 
         /// <summary>
@@ -91,6 +86,7 @@ namespace mpESKD.Functions.mpGroundLine
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 4, "p39", "d39", 60, 30, 90)]
         [PropertyNameKeyInStyleEditor("p39-1")]
+        [SaveToXData]
         public int StrokeAngle { get; set; } = 60;
 
         /// <summary>
@@ -98,6 +94,7 @@ namespace mpESKD.Functions.mpGroundLine
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 5, "p40", "d40", 10, 1, 20)]
         [PropertyNameKeyInStyleEditor("p40-1")]
+        [SaveToXData]
         public int Space { get; set; } = 10;
 
         /// <inheritdoc />
@@ -331,147 +328,148 @@ namespace mpESKD.Functions.mpGroundLine
 
         #endregion
         
-        public override ResultBuffer GetParametersForXData()
-        {
-            try
-            {
-                // ReSharper disable once UseObjectOrCollectionInitializer
-                var resBuf = new ResultBuffer();
+        //todo remove after test
+        //public override ResultBuffer GetParametersForXData()
+        //{
+        //    try
+        //    {
+        //        // ReSharper disable once UseObjectOrCollectionInitializer
+        //        var resBuf = new ResultBuffer();
 
-                // 1001 - DxfCode.ExtendedDataRegAppName. AppName
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, GroundLineInterface.Name));
+        //        // 1001 - DxfCode.ExtendedDataRegAppName. AppName
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, GroundLineInterface.Name));
 
-                // 1010
-                // Векторы от средних точек до начальной точки
-                foreach (Point3d middlePointOCS in MiddlePointsOCS)
-                {
-                    var vector = middlePointOCS - InsertionPointOCS;
-                    resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z)));
-                }
+        //        // 1010
+        //        // Векторы от средних точек до начальной точки
+        //        foreach (Point3d middlePointOCS in MiddlePointsOCS)
+        //        {
+        //            var vector = middlePointOCS - InsertionPointOCS;
+        //            resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z)));
+        //        }
 
-                // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
-                {
-                    var vector = EndPointOCS - InsertionPointOCS;
-                    resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z)));
-                }
+        //        // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
+        //        {
+        //            var vector = EndPointOCS - InsertionPointOCS;
+        //            resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z)));
+        //        }
 
-                // Текстовые значения (код 1000)
-                // Стиль
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
-                // scale
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 1
-                // Отступ первого штриха
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstStrokeOffset.ToString())); // 2
+        //        // Текстовые значения (код 1000)
+        //        // Стиль
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
+        //        // scale
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 1
+        //        // Отступ первого штриха
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstStrokeOffset.ToString())); // 2
 
-                // Целочисленные значения (код 1070)
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeLength)); // 0
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeOffset)); // 1
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeAngle)); // 2
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Space)); // 3
+        //        // Целочисленные значения (код 1070)
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeLength)); // 0
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeOffset)); // 1
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, StrokeAngle)); // 2
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Space)); // 3
 
-                // Значения типа double (dxfCode 1040)
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
+        //        // Значения типа double (dxfCode 1040)
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
 
-                return resBuf;
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-                return null;
-            }
-        }
+        //        return resBuf;
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        ExceptionBox.Show(exception);
+        //        return null;
+        //    }
+        //}
 
-        public override void GetParametersFromResBuf(ResultBuffer resBuf)
-        {
-            try
-            {
-                TypedValue[] resBufArr = resBuf.AsArray();
-                /* indexes
-                 * Для каждого значения с повторяющимся кодом назначен свой индекc (см. метод GetParametersForXData)
-                 */
-                List<Point3d> middleAndEndPoints = new List<Point3d>();
-                var index1000 = 0;
-                var index1040 = 0;
-                var index1070 = 0;
-                foreach (TypedValue typedValue in resBufArr)
-                {
-                    switch ((DxfCode)typedValue.TypeCode)
-                    {
-                        case DxfCode.ExtendedDataXCoordinate:
-                            {
-                                // Получаем вектор от точки до первой в системе координат блока
-                                var vectorFromPointToInsertion = ((Point3d)typedValue.Value).GetAsVector();
-                                // получаем точку в мировой системе координат
-                                var point = (InsertionPointOCS + vectorFromPointToInsertion).TransformBy(BlockTransform);
-                                middleAndEndPoints.Add(point);
-                                break;
-                            }
-                        case DxfCode.ExtendedDataAsciiString:
-                            {
-                                switch (index1000)
-                                {
-                                    case 0:
-                                        StyleGuid = typedValue.Value.ToString();
-                                        break;
-                                    case 1:
-                                        Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
-                                        break;
-                                    case 2:
-                                        FirstStrokeOffset = Enum.TryParse(typedValue.Value.ToString(), out GroundLineFirstStrokeOffset so)
-                                            ? so 
-                                            : GroundLineFirstStrokeOffset.ByHalfSpace;
-                                        break;
-                                }
-                                // index
-                                index1000++;
-                                break;
-                            }
-                        case DxfCode.ExtendedDataInteger16:
-                            {
-                                switch (index1070)
-                                {
-                                    case 0:
-                                        StrokeLength = (Int16)typedValue.Value;
-                                        break;
-                                    case 1:
-                                        StrokeOffset = (Int16)typedValue.Value;
-                                        break;
-                                    case 2:
-                                        StrokeAngle = (Int16)typedValue.Value;
-                                        break;
-                                    case 3:
-                                        Space = (Int16)typedValue.Value;
-                                        break;
-                                }
-                                //index
-                                index1070++;
-                                break;
-                            }
-                        case DxfCode.ExtendedDataReal:
-                            {
-                                if (index1040 == 0) // 0 - LineTypeScale
-                                    LineTypeScale = (double)typedValue.Value;
-                                index1040++;
-                                break;
-                            }
-                    }
-                }
+        //public override void GetParametersFromResBuf(ResultBuffer resBuf)
+        //{
+        //    try
+        //    {
+        //        TypedValue[] resBufArr = resBuf.AsArray();
+        //        /* indexes
+        //         * Для каждого значения с повторяющимся кодом назначен свой индекc (см. метод GetParametersForXData)
+        //         */
+        //        List<Point3d> middleAndEndPoints = new List<Point3d>();
+        //        var index1000 = 0;
+        //        var index1040 = 0;
+        //        var index1070 = 0;
+        //        foreach (TypedValue typedValue in resBufArr)
+        //        {
+        //            switch ((DxfCode)typedValue.TypeCode)
+        //            {
+        //                case DxfCode.ExtendedDataXCoordinate:
+        //                    {
+        //                        // Получаем вектор от точки до первой в системе координат блока
+        //                        var vectorFromPointToInsertion = ((Point3d)typedValue.Value).GetAsVector();
+        //                        // получаем точку в мировой системе координат
+        //                        var point = (InsertionPointOCS + vectorFromPointToInsertion).TransformBy(BlockTransform);
+        //                        middleAndEndPoints.Add(point);
+        //                        break;
+        //                    }
+        //                case DxfCode.ExtendedDataAsciiString:
+        //                    {
+        //                        switch (index1000)
+        //                        {
+        //                            case 0:
+        //                                StyleGuid = typedValue.Value.ToString();
+        //                                break;
+        //                            case 1:
+        //                                Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
+        //                                break;
+        //                            case 2:
+        //                                FirstStrokeOffset = Enum.TryParse(typedValue.Value.ToString(), out GroundLineFirstStrokeOffset so)
+        //                                    ? so 
+        //                                    : GroundLineFirstStrokeOffset.ByHalfSpace;
+        //                                break;
+        //                        }
+        //                        // index
+        //                        index1000++;
+        //                        break;
+        //                    }
+        //                case DxfCode.ExtendedDataInteger16:
+        //                    {
+        //                        switch (index1070)
+        //                        {
+        //                            case 0:
+        //                                StrokeLength = (Int16)typedValue.Value;
+        //                                break;
+        //                            case 1:
+        //                                StrokeOffset = (Int16)typedValue.Value;
+        //                                break;
+        //                            case 2:
+        //                                StrokeAngle = (Int16)typedValue.Value;
+        //                                break;
+        //                            case 3:
+        //                                Space = (Int16)typedValue.Value;
+        //                                break;
+        //                        }
+        //                        //index
+        //                        index1070++;
+        //                        break;
+        //                    }
+        //                case DxfCode.ExtendedDataReal:
+        //                    {
+        //                        if (index1040 == 0) // 0 - LineTypeScale
+        //                            LineTypeScale = (double)typedValue.Value;
+        //                        index1040++;
+        //                        break;
+        //                    }
+        //            }
+        //        }
 
-                // rebase points
-                if (middleAndEndPoints.Any())
-                {
-                    EndPoint = middleAndEndPoints.Last();
-                    MiddlePoints.Clear();
-                    for (var i = 0; i < middleAndEndPoints.Count - 1; i++)
-                    {
-                        MiddlePoints.Add(middleAndEndPoints[i]);
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-        }
+        //        // rebase points
+        //        if (middleAndEndPoints.Any())
+        //        {
+        //            EndPoint = middleAndEndPoints.Last();
+        //            MiddlePoints.Clear();
+        //            for (var i = 0; i < middleAndEndPoints.Count - 1; i++)
+        //            {
+        //                MiddlePoints.Add(middleAndEndPoints[i]);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        ExceptionBox.Show(exception);
+        //    }
+        //}
     }
 }

@@ -81,7 +81,7 @@
             }
             if (saveBack)
             {
-                using (var resBuf = axis.GetParametersForXData())
+                using (var resBuf = axis.GetDataForXData())
                 {
                     blockReference.XData = resBuf;
                 }
@@ -176,7 +176,7 @@
                     using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
                     {
                         var ent = tr.GetObject(axis.BlockId, OpenMode.ForWrite);
-                        ent.XData = axis.GetParametersForXData();
+                        ent.XData = axis.GetDataForXData();
                         tr.Commit();
                     }
                     // save first marker value to doc

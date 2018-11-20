@@ -70,7 +70,7 @@ namespace mpESKD.Base.Properties
                 _blkRefObjectId = ObjectId.Null;
                 return;
             }
-            var intellectualEntity = new EntityReaderFactory().GetFromEntity(blockReference);
+            var intellectualEntity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
             if (intellectualEntity != null)
             {
                 _intellectualEntity = intellectualEntity;
@@ -143,8 +143,7 @@ namespace mpESKD.Base.Properties
                     _blkRefObjectId = ObjectId.Null;
                     return;
                 }
-
-                var intellectualEntity = new EntityReaderFactory().GetFromEntity(blockReference);
+                var intellectualEntity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
                 if (intellectualEntity != null)
                 {
                     _intellectualEntity = intellectualEntity;
@@ -228,7 +227,7 @@ namespace mpESKD.Base.Properties
 
                             _intellectualEntity.UpdateEntities();
                             _intellectualEntity.GetBlockTableRecordWithoutTransaction(blockReference);
-                            using (var resBuf = _intellectualEntity.GetParametersForXData())
+                            using (var resBuf = _intellectualEntity.GetDataForXData())
                             {
                                 if (blockReference != null)
                                     blockReference.XData = resBuf;

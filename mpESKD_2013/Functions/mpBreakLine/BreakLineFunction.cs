@@ -105,7 +105,7 @@
                     using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
                     {
                         var ent = tr.GetObject(breakLine.BlockId, OpenMode.ForWrite);
-                        ent.XData = breakLine.GetParametersForXData();
+                        ent.XData = breakLine.GetDataForXData();
                         tr.Commit();
                     }
                 }

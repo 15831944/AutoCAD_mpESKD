@@ -1,24 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.GraphicsInterface;
-using mpESKD.Base.Helpers;
-using ModPlusAPI.Windows;
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 #pragma warning disable CS0618
 
 namespace mpESKD.Base
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.Serialization;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.GraphicsInterface;
+    using Helpers;
+    using ModPlusAPI.Windows;
+    using System.Reflection;
+    using System.Runtime.Serialization.Json;
+    using System.Text;
     using Autodesk.AutoCAD.Colors;
     using Enums;
+    using Styles;
 
     public abstract class IntellectualEntity : IDisposable
     {
         protected IntellectualEntity()
         {
             BlockTransform = Matrix3d.Identity;
+            var blockTableRecord = new BlockTableRecord
+            {
+                Name = "*U",
+                BlockScaling = BlockScaling.Uniform
+            };
+            BlockRecord = blockTableRecord;
+        }
+
+        /// <summary>Инициализация экземпляра класса IntellectualEntity без заполнения данными
+        /// В данном случае уже все данные получены и нужно только "построить" 
+        /// базовые примитивы</summary>
+        protected IntellectualEntity(ObjectId blockId) : base()
+        {
+            BlockId = blockId;
         }
 
         /// <summary>
@@ -38,6 +58,7 @@ namespace mpESKD.Base
         /// работы <see cref="DefaultEntityJig"/>. Имеется в каждом примитиве, но
         /// если не требуется, то просто не использовать её
         /// </summary>
+        [SaveToXData]
         public Point3d EndPoint { get; set; } = Point3d.Origin;
 
         /// <summary>
@@ -65,18 +86,20 @@ namespace mpESKD.Base
         /// Имя слоя
         /// </summary>
         [EntityProperty(PropertiesCategory.General, 2, "p7", "d7", "", null, null)]
+        [SaveToXData]
         public string LayerName { get; set; } = string.Empty;
 
         private AnnotationScale _scale;
         /// <summary>Масштаб примитива</summary>
         [EntityProperty(PropertiesCategory.General, 3, "p5", "d5", "1:1", null, null)]
+        [SaveToXData]
         public AnnotationScale Scale
         {
             get
             {
                 if (_scale != null)
                     return _scale;
-                _scale = new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1};
+                _scale = new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1 };
                 return _scale;
             }
             set => _scale = value;
@@ -86,13 +109,15 @@ namespace mpESKD.Base
         /// Тип линии. Свойство является абстрактным, так как в зависимости от интеллектуального примитива
         /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 4
         /// </summary>
+        [SaveToXData]
         public abstract string LineType { get; set; }
-        
+
         /// <summary>
         /// Масштаб типа линии для примитивов, имеющих изменяемый тип линии.
         /// Свойство является абстрактным, так как в зависимости от интеллектуального примитива
         /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 5
         /// </summary>
+        [SaveToXData]
         public abstract double LineTypeScale { get; set; }
 
         /// <summary>
@@ -101,6 +126,7 @@ namespace mpESKD.Base
         /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 1
         /// Категория всегда Content
         /// </summary>
+        [SaveToXData]
         public abstract string TextStyle { get; set; }
 
         /// <summary>Текущий масштаб</summary>
@@ -116,7 +142,7 @@ namespace mpESKD.Base
 
         // Описание блока
         private BlockTableRecord _blockRecord;
-        
+
         public BlockTableRecord BlockRecord
         {
             get
@@ -276,16 +302,173 @@ namespace mpESKD.Base
         }
 
         /// <summary>Идентификатор стиля</summary>
+        [SaveToXData]
         public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
-        
+
         /// <summary>
         /// Перерисовка элементов блока по параметрам ЕСКД элемента
         /// </summary>
         public abstract void UpdateEntities();
 
-        public abstract ResultBuffer GetParametersForXData();
+        /// <summary>
+        /// Сериализация значений параметров, помеченных атрибутом <see cref="SaveToXData"/>, в экземпляр <see cref="ResultBuffer"/>
+        /// </summary>
+        public ResultBuffer GetDataForXData()
+        {
+            return GetDataForXData("mp" + GetType().Name);
+        }
+        
+        private ResultBuffer GetDataForXData(string appName)
+        {
+            try
+            {
+                // ReSharper disable once UseObjectOrCollectionInitializer
+                var resultBuffer = new ResultBuffer();
+                // 1001 - DxfCode.ExtendedDataRegAppName. AppName
+                resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, appName));
 
-        public abstract void GetParametersFromResBuf(ResultBuffer resBuf);
+                Dictionary<string, object> propertiesDataDictionary = new Dictionary<string, object>();
+                foreach (PropertyInfo propertyInfo in this.GetType().GetProperties())
+                {
+                    var attribute = propertyInfo.GetCustomAttribute<SaveToXData>();
+                    if (attribute != null)
+                    {
+                        var value = propertyInfo.GetValue(this);
+                        if (value is AnnotationScale scale)
+                        {
+                            propertiesDataDictionary.Add(propertyInfo.Name, scale.Name);
+                        }
+                        else if(value is Point3d point)
+                        {
+                            var vector = point.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS;
+                            propertiesDataDictionary.Add(propertyInfo.Name, vector.AsString());
+                        }
+                        else if(value is List<Point3d> list)
+                        {
+                            var str = string.Join("#", list.Select(p => (p.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS).AsString()));
+                            propertiesDataDictionary.Add(propertyInfo.Name, str);
+                        }
+                        else if (value is Enum)
+                        {
+                            propertiesDataDictionary.Add(propertyInfo.Name, value.ToString());
+                        }
+                        else
+                        {
+                            propertiesDataDictionary.Add(propertyInfo.Name, value);
+                        }
+                    }
+                }
+
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Dictionary<string, object>),
+                        new DataContractJsonSerializerSettings() { UseSimpleDictionaryFormat = true });
+                    serializer.WriteObject(stream, propertiesDataDictionary);
+                    byte[] bytes = stream.ToArray();
+                    string json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                    AcadHelpers.WriteMessageInDebug($"Length of json: {json.Length}");
+                    resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, json));
+                }
+
+                return resultBuffer;
+            }
+            catch (Exception exception)
+            {
+                ExceptionBox.Show(exception);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Установка значений свойств, отмеченных атрибутом <see cref="SaveToXData"/> из расширенных данных примитива AutoCAD
+        /// </summary>
+        /// <param name="resultBuffer"></param>
+        public void SetPropertiesValuesFromXData(ResultBuffer resultBuffer)
+        {
+            try
+            {
+                TypedValue typedValue1001 = resultBuffer.AsArray().FirstOrDefault(tv =>
+                    tv.TypeCode == (int) DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
+                if (typedValue1001.Value != null)
+                {
+                    var typedValue1000 = resultBuffer.AsArray().FirstOrDefault(tv => tv.TypeCode == (int) DxfCode.ExtendedDataAsciiString);
+                    if (typedValue1000.Value != null)
+                    {
+                        using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(typedValue1000.Value.ToString())))
+                        {
+                            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Dictionary<string, object>),
+                                new DataContractJsonSerializerSettings { UseSimpleDictionaryFormat = true });
+                            if (serializer.ReadObject(ms) is Dictionary<string, object> data)
+                            {
+                                foreach (PropertyInfo propertyInfo in this.GetType().GetProperties())
+                                {
+                                    var attribute = propertyInfo.GetCustomAttribute<SaveToXData>();
+                                    if (attribute != null && data.ContainsKey(propertyInfo.Name))
+                                    {
+                                        string valueForProperty = data[propertyInfo.Name] != null 
+                                            ? data[propertyInfo.Name].ToString() 
+                                            : string.Empty;
+                                        if(string.IsNullOrEmpty(valueForProperty))
+                                            continue;
+
+                                        if (propertyInfo.Name == "StyleGuid")
+                                        {
+                                            GetType().GetProperty("Style")?.SetValue(this, StyleManager.GetStyleNameByGuid(this.GetType(), valueForProperty));
+                                        }
+                                        if (propertyInfo.PropertyType == typeof(AnnotationScale))
+                                        {
+                                            propertyInfo.SetValue(this,
+                                                AcadHelpers.GetAnnotationScaleByName(valueForProperty));
+                                        }
+                                        else if(propertyInfo.PropertyType == typeof(Point3d))
+                                        {
+                                            var vector = valueForProperty.ParseToPoint3d().GetAsVector();
+                                            var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
+                                            propertyInfo.SetValue(this, point);
+                                        }
+                                        else if(propertyInfo.PropertyType == typeof(List<Point3d>))
+                                        {
+                                            List<Point3d> points = new List<Point3d>();
+                                            foreach (string s in valueForProperty.Split('#'))
+                                            {
+                                                var vector = s.ParseToPoint3d().GetAsVector();
+                                                var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
+                                                points.Add(point);
+                                            }
+                                            propertyInfo.SetValue(this, points);
+                                        }
+                                        else if (propertyInfo.PropertyType == typeof(int))
+                                        {
+                                            propertyInfo.SetValue(this, Convert.ToInt32(valueForProperty));
+                                        }
+                                        else if (propertyInfo.PropertyType == typeof(double))
+                                        {
+                                            propertyInfo.SetValue(this, Convert.ToDouble(valueForProperty));
+                                        }
+                                        else if (propertyInfo.PropertyType == typeof(bool))
+                                        {
+                                            propertyInfo.SetValue(this, Convert.ToBoolean(valueForProperty));
+                                        }
+                                        else if (propertyInfo.PropertyType.BaseType == typeof(Enum))
+                                        {
+                                            propertyInfo.SetValue(this, Enum.Parse(propertyInfo.PropertyType, valueForProperty));
+                                        }
+                                        else
+                                        {
+                                            propertyInfo.SetValue(this, valueForProperty);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
+        }
 
         /// <summary>Установка свойств для примитивов, которые не меняются</summary>
         /// <param name="entity">Примитив автокада</param>

@@ -17,23 +17,14 @@ namespace mpESKD.Functions.mpBreakLine
     {
         #region Constructors
 
-        /// <summary>Инициализация экземпляра класса для BreakLine без заполнения данными
-        /// В данном случае уже все данные получены и нужно только "построить" 
-        /// базовые примитивы</summary>
-        public BreakLine(ObjectId blockId)
+        /// <inheritdoc />
+        public BreakLine(ObjectId blockId) : base(blockId)
         {
-            BlockId = blockId;
         }
 
         /// <summary>Инициализация экземпляра класса BreakLine для создания</summary>
         public BreakLine()
         {
-            var blockTableRecord = new BlockTableRecord
-            {
-                Name = "*U",
-                BlockScaling = BlockScaling.Uniform
-            };
-            BlockRecord = blockTableRecord;
         }
 
         #endregion
@@ -69,21 +60,25 @@ namespace mpESKD.Functions.mpBreakLine
 
         /// <summary>Тип линии обрыва: линейный, криволинейный, цилиндрический</summary>
         [EntityProperty(PropertiesCategory.Geometry, 1, "p1", "d1", BreakLineType.Linear, null, null)]
+        [SaveToXData]
         public BreakLineType BreakLineType { get; set; } = BreakLineType.Linear;
 
         /// <summary>Выступ линии обрыва за границы "обрываемого" объекта</summary>
         [EntityProperty(PropertiesCategory.Geometry, 2, "p2", "d2", 2, 0, 10)]
         [PropertyNameKeyInStyleEditor("p2-1")]
+        [SaveToXData]
         public int Overhang { get; set; } = 2;
 
         /// <summary>Ширина Обрыва для линейного обрыва</summary>
         [EntityProperty(PropertiesCategory.Geometry, 3, "p3", "d3", 5, 1, 10)]
         [PropertyNameKeyInStyleEditor("p3-1")]
+        [SaveToXData]
         public int BreakWidth { get; set; } = 5;
 
         /// <summary>Длина обрыва для линейного обрыва</summary>
         [EntityProperty(PropertiesCategory.Geometry, 4, "p4", "d4", 10, 1, 13)]
         [PropertyNameKeyInStyleEditor("p4-1")]
+        [SaveToXData]
         public int BreakHeight { get; set; } = 10;
         
         #endregion
@@ -319,113 +314,114 @@ namespace mpESKD.Functions.mpBreakLine
 
         #endregion
 
-        public override ResultBuffer GetParametersForXData()
-        {
-            try
-            {
-                // ReSharper disable once UseObjectOrCollectionInitializer
-                var resBuf = new ResultBuffer();
-                // 1001 - DxfCode.ExtendedDataRegAppName. AppName
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, BreakLineInterface.Name));
-                // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
-                var vector = EndPointOCS - InsertionPointOCS;
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z))); //1010
-                // Текстовые значения (код 1000)
-                // Стиль
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
-                // Тип разрыва
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BreakLineType.ToString())); // 1
-                // scale
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 2
-                // Целочисленные значения (код 1070)
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Overhang)); // 0
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakHeight)); // 1
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakWidth)); // 2
-                // Значения типа double (dxfCode 1040)
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
+        //todo remove after test
+        ////public override ResultBuffer GetParametersForXData()
+        ////{
+        ////    try
+        ////    {
+        ////        // ReSharper disable once UseObjectOrCollectionInitializer
+        ////        var resBuf = new ResultBuffer();
+        ////        // 1001 - DxfCode.ExtendedDataRegAppName. AppName
+        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, BreakLineInterface.Name));
+        ////        // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
+        ////        var vector = EndPointOCS - InsertionPointOCS;
+        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z))); //1010
+        ////        // Текстовые значения (код 1000)
+        ////        // Стиль
+        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
+        ////        // Тип разрыва
+        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BreakLineType.ToString())); // 1
+        ////        // scale
+        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 2
+        ////        // Целочисленные значения (код 1070)
+        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Overhang)); // 0
+        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakHeight)); // 1
+        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakWidth)); // 2
+        ////        // Значения типа double (dxfCode 1040)
+        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
 
-                return resBuf;
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-                return null;
-            }
-        }
+        ////        return resBuf;
+        ////    }
+        ////    catch (Exception exception)
+        ////    {
+        ////        ExceptionBox.Show(exception);
+        ////        return null;
+        ////    }
+        ////}
 
-        public override void GetParametersFromResBuf(ResultBuffer resBuf)
-        {
-            try
-            {
-                TypedValue[] resBufArr = resBuf.AsArray();
-                /* indexes
-                 * Для каждого значения с повторяющимся кодом назначен свой индекс (см. метод GetParametersForXData)
-                 */
-                var index1000 = 0;
-                var index1070 = 0;
-                var index1040 = 0;
-                foreach (TypedValue typedValue in resBufArr)
-                {
-                    switch ((DxfCode)typedValue.TypeCode)
-                    {
-                        case DxfCode.ExtendedDataXCoordinate:
-                            {
-                                // Получаем вектор от последней точки до первой в системе координат блока
-                                var vectorFromEndToInsertion = ((Point3d)typedValue.Value).GetAsVector();
-                                // получаем конечную точку в мировой системе координат
-                                EndPoint = (InsertionPointOCS + vectorFromEndToInsertion).TransformBy(BlockTransform);
-                                break;
-                            }
-                        case DxfCode.ExtendedDataAsciiString:
-                            {
-                                switch (index1000)
-                                {
-                                    case 0:
-                                        StyleGuid = typedValue.Value.ToString();
-                                        break;
-                                    case 1:
-                                        BreakLineType = Enum.TryParse(typedValue.Value.ToString(), out BreakLineType blt) ? blt : BreakLineType.Linear;
-                                        break;
-                                    case 2:
-                                        Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
-                                        break;
-                                }
-                                // index
-                                index1000++;
-                                break;
-                            }
-                        case DxfCode.ExtendedDataInteger16:
-                            {
-                                switch (index1070)
-                                {
-                                    case 0:
-                                        Overhang = (Int16)typedValue.Value;
-                                        break;
-                                    case 1:
-                                        BreakHeight = (Int16)typedValue.Value;
-                                        break;
-                                    case 2:
-                                        BreakWidth = (Int16)typedValue.Value;
-                                        break;
-                                }
-                                //index
-                                index1070++;
-                                break;
-                            }
-                        case DxfCode.ExtendedDataReal:
-                            {
-                                if (index1040 == 0) // 0 - LineTypeScale
-                                    LineTypeScale = (double)typedValue.Value;
-                                index1040++;
-                                break;
-                            }
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-        }
+        ////public override void GetParametersFromResBuf(ResultBuffer resBuf)
+        ////{
+        ////    try
+        ////    {
+        ////        TypedValue[] resBufArr = resBuf.AsArray();
+        ////        /* indexes
+        ////         * Для каждого значения с повторяющимся кодом назначен свой индекс (см. метод GetParametersForXData)
+        ////         */
+        ////        var index1000 = 0;
+        ////        var index1070 = 0;
+        ////        var index1040 = 0;
+        ////        foreach (TypedValue typedValue in resBufArr)
+        ////        {
+        ////            switch ((DxfCode)typedValue.TypeCode)
+        ////            {
+        ////                case DxfCode.ExtendedDataXCoordinate:
+        ////                    {
+        ////                        // Получаем вектор от последней точки до первой в системе координат блока
+        ////                        var vectorFromEndToInsertion = ((Point3d)typedValue.Value).GetAsVector();
+        ////                        // получаем конечную точку в мировой системе координат
+        ////                        EndPoint = (InsertionPointOCS + vectorFromEndToInsertion).TransformBy(BlockTransform);
+        ////                        break;
+        ////                    }
+        ////                case DxfCode.ExtendedDataAsciiString:
+        ////                    {
+        ////                        switch (index1000)
+        ////                        {
+        ////                            case 0:
+        ////                                StyleGuid = typedValue.Value.ToString();
+        ////                                break;
+        ////                            case 1:
+        ////                                BreakLineType = Enum.TryParse(typedValue.Value.ToString(), out BreakLineType blt) ? blt : BreakLineType.Linear;
+        ////                                break;
+        ////                            case 2:
+        ////                                Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
+        ////                                break;
+        ////                        }
+        ////                        // index
+        ////                        index1000++;
+        ////                        break;
+        ////                    }
+        ////                case DxfCode.ExtendedDataInteger16:
+        ////                    {
+        ////                        switch (index1070)
+        ////                        {
+        ////                            case 0:
+        ////                                Overhang = (Int16)typedValue.Value;
+        ////                                break;
+        ////                            case 1:
+        ////                                BreakHeight = (Int16)typedValue.Value;
+        ////                                break;
+        ////                            case 2:
+        ////                                BreakWidth = (Int16)typedValue.Value;
+        ////                                break;
+        ////                        }
+        ////                        //index
+        ////                        index1070++;
+        ////                        break;
+        ////                    }
+        ////                case DxfCode.ExtendedDataReal:
+        ////                    {
+        ////                        if (index1040 == 0) // 0 - LineTypeScale
+        ////                            LineTypeScale = (double)typedValue.Value;
+        ////                        index1040++;
+        ////                        break;
+        ////                    }
+        ////            }
+        ////        }
+        ////    }
+        ////    catch (Exception exception)
+        ////    {
+        ////        ExceptionBox.Show(exception);
+        ////    }
+        ////}
     }
 }

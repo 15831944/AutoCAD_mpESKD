@@ -313,7 +313,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
-                        using (var resBuf = GroundLine.GetParametersForXData())
+                        using (var resBuf = GroundLine.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
                         }
@@ -423,7 +423,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                         var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
                         if (newInsertionPoint.HasValue)
                             ((BlockReference)blkRef).Position = newInsertionPoint.Value;
-                        using (var resBuf = GroundLine.GetParametersForXData())
+                        using (var resBuf = GroundLine.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
                         }
@@ -529,7 +529,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
                     if (newInsertionPoint.HasValue)
                         ((BlockReference)blkRef).Position = newInsertionPoint.Value;
-                    using (var resBuf = GroundLine.GetParametersForXData())
+                    using (var resBuf = GroundLine.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
                     }
@@ -575,7 +575,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                 {
                     var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
                     ((BlockReference)blkRef).Position = newInsertionPoint;
-                    using (var resBuf = GroundLine.GetParametersForXData())
+                    using (var resBuf = GroundLine.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
                     }

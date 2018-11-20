@@ -16,23 +16,19 @@ namespace mpESKD.Functions.mpAxis
     {
         #region Constructors
 
-        /// <summary>Инициализация экземпляра класса для Axis без заполнения данными
-        /// В данном случае уже все данные получены и нужно только "построить" 
-        /// базовые примитивы</summary>
-        public Axis(ObjectId objectId)
+        /// <inheritdoc />
+        public Axis(ObjectId objectId) : base(objectId)
         {
-            BlockId = objectId;
         }
-        /// <summary>Инициализация экземпляра класса для BreakLine для создания</summary>
-        public Axis(string lastHorizontalValue, string lastVerticalValue)
-        {
-            var blockTableRecord = new BlockTableRecord
-            {
-                Name = "*U",
-                BlockScaling = BlockScaling.Uniform
-            };
-            BlockRecord = blockTableRecord;
 
+        public Axis()
+        {
+            
+        }
+
+        /// <summary>Инициализация экземпляра класса для BreakLine для создания</summary>
+        public Axis(string lastHorizontalValue, string lastVerticalValue) 
+        {
             // last values
             LastHorizontalValue = lastHorizontalValue;
             LastVerticalValue = lastVerticalValue;
@@ -102,16 +98,19 @@ namespace mpESKD.Functions.mpAxis
 
         /// <summary>Положение маркеров</summary>
         [EntityProperty(PropertiesCategory.Geometry, 1, "p8", "d8", AxisMarkersPosition.Bottom, null, null)]
+        [SaveToXData]
         public AxisMarkersPosition MarkersPosition { get; set; } = AxisMarkersPosition.Bottom;
 
         /// <summary>Излом</summary>
         [EntityProperty(PropertiesCategory.Geometry, 2, "p9", "d9", 10, 1, 20)]
         [PropertyNameKeyInStyleEditor("p9-1")]
+        [SaveToXData]
         public int Fracture { get; set; } = 10;
 
         /// <summary>Нижний отступ излома</summary>
         [EntityProperty(PropertiesCategory.Geometry, 3, "p15", "d15", 0, 0, 30)]
         [PropertyNameKeyInStyleEditor("p15-1")]
+        [SaveToXData]
         public int BottomFractureOffset
         {
             get => _bottomFractureOffset;
@@ -128,17 +127,20 @@ namespace mpESKD.Functions.mpAxis
         /// <summary>Верхний отступ излома</summary>
         [EntityProperty(PropertiesCategory.Geometry, 4, "p16", "d16", 0, 0, 30)]
         [PropertyNameKeyInStyleEditor("p16-1")]
+        [SaveToXData]
         public int TopFractureOffset { get; set; } = 0;
 
         /// <summary>Диаметр маркеров</summary>
         [EntityProperty(PropertiesCategory.Geometry, 5, "p10", "d10", 10, 6, 12)]
         [PropertyNameKeyInStyleEditor("p10-1")]
+        [SaveToXData]
         public int MarkersDiameter { get; set; } = 10;
 
         private int _markersCount = 1;
 
         /// <summary>Количество маркеров</summary>
         [EntityProperty(PropertiesCategory.Geometry, 6, "p11", "d11", 1, 1, 3)]
+        [SaveToXData]
         public int MarkersCount
         {
             get => _markersCount;
@@ -165,12 +167,15 @@ namespace mpESKD.Functions.mpAxis
 
         // Типы маркеров: Type 1 - один кружок, Type 2 - два кружка
         [EntityProperty(PropertiesCategory.Geometry, 7, "p12", "d12", AxisMarkerType.Type1, null, null)]
+        [SaveToXData]
         public AxisMarkerType FirstMarkerType { get; set; } = AxisMarkerType.Type1;
 
         [EntityProperty(PropertiesCategory.Geometry, 8, "p13", "d13", AxisMarkerType.Type1, null, null)]
+        [SaveToXData]
         public AxisMarkerType SecondMarkerType { get; set; } = AxisMarkerType.Type1;
 
         [EntityProperty(PropertiesCategory.Geometry, 8, "p14", "d14", AxisMarkerType.Type1, null, null)]
+        [SaveToXData]
         public AxisMarkerType ThirdMarkerType { get; set; } = AxisMarkerType.Type1;
 
         // Orient markers
@@ -180,6 +185,7 @@ namespace mpESKD.Functions.mpAxis
         /// <summary>Видимость нижнего бокового кружка</summary>
         [EntityProperty(PropertiesCategory.Geometry, 9, "p32", "d32", false, null, null)]
         [PropertyVisibilityDependency(new[] { nameof(BottomOrientText) })]
+        [SaveToXData]
         public bool BottomOrientMarkerVisible
         {
             get => _bottomOrientMarkerVisible;
@@ -202,6 +208,7 @@ namespace mpESKD.Functions.mpAxis
         /// <summary>Видимость верхнего бокового кружка</summary>
         [EntityProperty(PropertiesCategory.Geometry, 10, "p33", "d33", false, null, null)]
         [PropertyVisibilityDependency(new[] { nameof(TopOrientText) })]
+        [SaveToXData]
         public bool TopOrientMarkerVisible
         {
             get => _topOrientMarkerVisible;
@@ -221,65 +228,84 @@ namespace mpESKD.Functions.mpAxis
 
         [EntityProperty(PropertiesCategory.Geometry, 10, "", "", "", null, null, PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(OrientMarkerType), nameof(ArrowsSize) })]
+        [SaveToXData]
         public bool OrientMarkerVisibilityDependency { get; private set; }
 
         [EntityProperty(PropertiesCategory.Geometry, 11, "p34", "d34", AxisMarkerType.Type1, null, null)]
+        [SaveToXData]
         public AxisMarkerType OrientMarkerType { get; set; } = AxisMarkerType.Type1;
 
         /// <summary>Размер стрелок</summary>
         [EntityProperty(PropertiesCategory.Geometry, 12, "p29", "d29", 3, 0, 10)]
         [PropertyNameKeyInStyleEditor("p29-1")]
+        [SaveToXData]
         public int ArrowsSize { get; set; } = 3;
 
         // Отступы маркеров-ориентиров
+        [SaveToXData]
         private double BottomOrientMarkerOffset { get; set; } = double.NaN;
 
+        [SaveToXData]
         private double TopOrientMarkerOffset { get; set; } = double.NaN;
 
         // текст и текстовые значения
         [EntityProperty(PropertiesCategory.Content, 1, "p18", "d18", 3.5, 0.000000001, 1.0000E+99)]
         [PropertyNameKeyInStyleEditor("p18-1")]
+        [SaveToXData]
         public double TextHeight { get; set; } = 3.5;
 
         [EntityProperty(PropertiesCategory.Content, 2, "p20", "d20", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string FirstTextPrefix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 3,  "p22", "d22", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string FirstText { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 4,  "p21", "d21", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string FirstTextSuffix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 4,  "", "", "", null, null, PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(SecondText), nameof(SecondTextPrefix), nameof(SecondTextSuffix), nameof(SecondMarkerType) })]
+        [SaveToXData]
         public bool SecondTextVisibility { get; set; }
 
         [EntityProperty(PropertiesCategory.Content, 5, "p23", "d23", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string SecondTextPrefix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 6, "p25", "d25", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string SecondText { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 7,  "p24", "d24", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string SecondTextSuffix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 7, "", "", "", null, null, PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(ThirdText), nameof(ThirdTextPrefix), nameof(ThirdTextSuffix), nameof(ThirdMarkerType) })]
+        [SaveToXData]
         public bool ThirdTextVisibility { get; set; }
 
         [EntityProperty(PropertiesCategory.Content, 8, "p26", "d26", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string ThirdTextPrefix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 9, "p28", "d28", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string ThirdText { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 10, "p27", "d27", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string ThirdTextSuffix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 11, "p30", "d30", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string BottomOrientText { get; set; } = string.Empty;
         
         [EntityProperty(PropertiesCategory.Content, 12, "p31", "d31", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
         public string TopOrientText { get; set; } = string.Empty;
         
         // last values
@@ -301,9 +327,11 @@ namespace mpESKD.Functions.mpAxis
             (InsertionPoint.Z + EndPoint.Z) / 2
         );
 
+        [SaveToXData]
         public double BottomLineAngle { get; set; } = 0.0;
 
         private Point3d _bottomMarkerPoint;
+        
         /// <summary>Нижняя точка расположения маркеров</summary>  
         public Point3d BottomMarkerPoint
         {
@@ -325,9 +353,11 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
+        [SaveToXData]
         public double TopLineAngle { get; set; } = 0.0;
 
         private Point3d _topMarkerPoint;
+        
         /// <summary>Верхняя точка расположения маркеров</summary>
         public Point3d TopMarkerPoint
         {
@@ -348,6 +378,7 @@ namespace mpESKD.Functions.mpAxis
                 TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint - (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetScale() * BlockTransform.GetScale(), Vector3d.ZAxis);
             }
         }
+        
         /// <summary>Нижняя точка маркера ориентира</summary>
         public Point3d BottomOrientPoint
         {
@@ -1409,231 +1440,232 @@ namespace mpESKD.Functions.mpAxis
         }
         #endregion
 
-        public override ResultBuffer GetParametersForXData()
-        {
-            try
-            {
-                // ReSharper disable once UseObjectOrCollectionInitializer
-                var resBuf = new ResultBuffer();
-                // 1001 - DxfCode.ExtendedDataRegAppName. AppName
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, AxisInterface.Name));
-                // 1010
-                // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
-                var vector = EndPointOCS - InsertionPointOCS;
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z))); //0
-                // Текстовые значения (код 1000)
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, MarkersPosition.ToString())); // 1
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 2
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TextStyle)); // 3
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstText)); // 4
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstTextPrefix)); // 5
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstTextSuffix)); // 6
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, SecondText)); // 7
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, SecondTextPrefix)); // 8
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, SecondTextSuffix)); // 9
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdText)); // 10
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdTextPrefix)); // 11
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdTextSuffix)); // 12
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BottomOrientText)); // 13
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TopOrientText)); // 14
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BottomOrientMarkerVisible.ToString())); // 15
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TopOrientMarkerVisible.ToString())); // 16
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, OrientMarkerVisibilityDependency.ToString())); // 17
-                // Целочисленные значения (код 1070)
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersDiameter)); // 0
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Fracture)); // 1
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersCount)); // 2
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BottomFractureOffset)); // 3
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, TopFractureOffset)); // 4
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)FirstMarkerType)); // 5
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)SecondMarkerType)); // 6
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)ThirdMarkerType)); // 7
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)OrientMarkerType)); // 8
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, ArrowsSize)); // 9
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Convert.ToInt16(SecondTextVisibility))); // 10
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Convert.ToInt16(ThirdTextVisibility))); // 11
-                // Значения типа double (dxfCode 1040)
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomLineAngle)); // 1
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopLineAngle)); // 2
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TextHeight)); // 3
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomOrientMarkerOffset)); // 4
-                resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopOrientMarkerOffset)); // 5
+        //todo remove after test
+        //public override ResultBuffer GetParametersForXData()
+        //{
+        //    try
+        //    {
+        //        // ReSharper disable once UseObjectOrCollectionInitializer
+        //        var resBuf = new ResultBuffer();
+        //        // 1001 - DxfCode.ExtendedDataRegAppName. AppName
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, AxisInterface.Name));
+        //        // 1010
+        //        // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
+        //        var vector = EndPointOCS - InsertionPointOCS;
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z))); //0
+        //        // Текстовые значения (код 1000)
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, MarkersPosition.ToString())); // 1
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 2
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TextStyle)); // 3
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstText)); // 4
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstTextPrefix)); // 5
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, FirstTextSuffix)); // 6
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, SecondText)); // 7
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, SecondTextPrefix)); // 8
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, SecondTextSuffix)); // 9
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdText)); // 10
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdTextPrefix)); // 11
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, ThirdTextSuffix)); // 12
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BottomOrientText)); // 13
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TopOrientText)); // 14
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BottomOrientMarkerVisible.ToString())); // 15
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, TopOrientMarkerVisible.ToString())); // 16
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, OrientMarkerVisibilityDependency.ToString())); // 17
+        //        // Целочисленные значения (код 1070)
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersDiameter)); // 0
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Fracture)); // 1
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MarkersCount)); // 2
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BottomFractureOffset)); // 3
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, TopFractureOffset)); // 4
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)FirstMarkerType)); // 5
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)SecondMarkerType)); // 6
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)ThirdMarkerType)); // 7
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, (int)OrientMarkerType)); // 8
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, ArrowsSize)); // 9
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Convert.ToInt16(SecondTextVisibility))); // 10
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Convert.ToInt16(ThirdTextVisibility))); // 11
+        //        // Значения типа double (dxfCode 1040)
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomLineAngle)); // 1
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopLineAngle)); // 2
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TextHeight)); // 3
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, BottomOrientMarkerOffset)); // 4
+        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, TopOrientMarkerOffset)); // 5
 
-                return resBuf;
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-                return null;
-            }
-        }
+        //        return resBuf;
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        ExceptionBox.Show(exception);
+        //        return null;
+        //    }
+        //}
 
-        public override void GetParametersFromResBuf(ResultBuffer resBuf)
-        {
-            try
-            {
-                TypedValue[] resBufArr = resBuf.AsArray();
-                /* indexes
-                 * Для каждого значения с повторяющимся кодом назначен свой индекc (см. метод GetParametersForXData)
-                 */
-                var index1000 = 0;
-                var index1070 = 0;
-                var index1040 = 0;
-                foreach (TypedValue typedValue in resBufArr)
-                {
-                    switch ((DxfCode)typedValue.TypeCode)
-                    {
-                        case DxfCode.ExtendedDataXCoordinate:
-                            {
-                                // Получаем вектор от последней точки до первой в системе координат блока
-                                var vectorFromEndToInsertion = ((Point3d)typedValue.Value).GetAsVector();
-                                // получаем конечную точку в мировой системе координат
-                                EndPoint = (InsertionPointOCS + vectorFromEndToInsertion).TransformBy(BlockTransform);
-                                break;
-                            }
-                        case DxfCode.ExtendedDataAsciiString:
-                            {
-                                switch (index1000)
-                                {
-                                    case 0:
-                                        StyleGuid = typedValue.Value.ToString();
-                                        break;
-                                    case 1:
-                                        MarkersPosition = Enum.TryParse(typedValue.Value.ToString(), out AxisMarkersPosition p) ? p : AxisMarkersPosition.Bottom;
-                                        break;
-                                    case 2:
-                                        Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
-                                        break;
-                                    case 3:
-                                        TextStyle = typedValue.Value.ToString();
-                                        break;
-                                    case 4:
-                                        FirstText = typedValue.Value.ToString();
-                                        break;
-                                    case 5:
-                                        FirstTextPrefix = typedValue.Value.ToString();
-                                        break;
-                                    case 6:
-                                        FirstTextSuffix = typedValue.Value.ToString();
-                                        break;
-                                    case 7:
-                                        SecondText = typedValue.Value.ToString();
-                                        break;
-                                    case 8:
-                                        SecondTextPrefix = typedValue.Value.ToString();
-                                        break;
-                                    case 9:
-                                        SecondTextSuffix = typedValue.Value.ToString();
-                                        break;
-                                    case 10:
-                                        ThirdText = typedValue.Value.ToString();
-                                        break;
-                                    case 11:
-                                        ThirdTextPrefix = typedValue.Value.ToString();
-                                        break;
-                                    case 12:
-                                        ThirdTextSuffix = typedValue.Value.ToString();
-                                        break;
-                                    case 13:
-                                        BottomOrientText = typedValue.Value.ToString();
-                                        break;
-                                    case 14:
-                                        TopOrientText = typedValue.Value.ToString();
-                                        break;
-                                    case 15:
-                                        BottomOrientMarkerVisible = bool.TryParse(typedValue.Value.ToString(), out var b) && b;// false
-                                        break;
-                                    case 16:
-                                        TopOrientMarkerVisible = bool.TryParse(typedValue.Value.ToString(), out b) && b;//false
-                                        break;
-                                    case 17:
-                                        OrientMarkerVisibilityDependency = bool.TryParse(typedValue.Value.ToString(), out b) && b;//false
-                                        break;
-                                }
-                                // index
-                                index1000++;
-                                break;
-                            }
-                        case DxfCode.ExtendedDataInteger16:
-                            {
-                                switch (index1070)
-                                {
-                                    case 0:
-                                        MarkersDiameter = (Int16)typedValue.Value;
-                                        break;
-                                    case 1:
-                                        Fracture = (Int16)typedValue.Value;
-                                        break;
-                                    case 2:
-                                        MarkersCount = (Int16)typedValue.Value;
-                                        break;
-                                    case 3:
-                                        BottomFractureOffset = (Int16)typedValue.Value;
-                                        break;
-                                    case 4:
-                                        TopFractureOffset = (Int16)typedValue.Value;
-                                        break;
-                                    case 5:
-                                        FirstMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
-                                        break;
-                                    case 6:
-                                        SecondMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
-                                        break;
-                                    case 7:
-                                        ThirdMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
-                                        break;
-                                    case 8:
-                                        OrientMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
-                                        break;
-                                    case 9:
-                                        ArrowsSize = (Int16)typedValue.Value;
-                                        break;
-                                    case 10:
-                                        SecondTextVisibility = Convert.ToBoolean(typedValue.Value);
-                                        break;
-                                    case 11:
-                                        ThirdTextVisibility = Convert.ToBoolean(typedValue.Value);
-                                        break;
-                                }
-                                //index
-                                index1070++;
-                                break;
-                            }
-                        case DxfCode.ExtendedDataReal:
-                            {
-                                switch (index1040)
-                                {
-                                    case 0:
-                                        LineTypeScale = (double)typedValue.Value;
-                                        break;
-                                    case 1:
-                                        BottomLineAngle = (double)typedValue.Value;
-                                        break;
-                                    case 2:
-                                        TopLineAngle = (double)typedValue.Value;
-                                        break;
-                                    case 3:
-                                        TextHeight = (double)typedValue.Value;
-                                        break;
-                                    case 4:
-                                        BottomOrientMarkerOffset = (double)typedValue.Value;
-                                        break;
-                                    case 5:
-                                        TopOrientMarkerOffset = (double)typedValue.Value;
-                                        break;
-                                }
-                                index1040++;
-                                break;
-                            }
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-        }
+        //public override void GetParametersFromResBuf(ResultBuffer resBuf)
+        //{
+        //    try
+        //    {
+        //        TypedValue[] resBufArr = resBuf.AsArray();
+        //        /* indexes
+        //         * Для каждого значения с повторяющимся кодом назначен свой индекc (см. метод GetParametersForXData)
+        //         */
+        //        var index1000 = 0;
+        //        var index1070 = 0;
+        //        var index1040 = 0;
+        //        foreach (TypedValue typedValue in resBufArr)
+        //        {
+        //            switch ((DxfCode)typedValue.TypeCode)
+        //            {
+        //                case DxfCode.ExtendedDataXCoordinate:
+        //                    {
+        //                        // Получаем вектор от последней точки до первой в системе координат блока
+        //                        var vectorFromEndToInsertion = ((Point3d)typedValue.Value).GetAsVector();
+        //                        // получаем конечную точку в мировой системе координат
+        //                        EndPoint = (InsertionPointOCS + vectorFromEndToInsertion).TransformBy(BlockTransform);
+        //                        break;
+        //                    }
+        //                case DxfCode.ExtendedDataAsciiString:
+        //                    {
+        //                        switch (index1000)
+        //                        {
+        //                            case 0:
+        //                                StyleGuid = typedValue.Value.ToString();
+        //                                break;
+        //                            case 1:
+        //                                MarkersPosition = Enum.TryParse(typedValue.Value.ToString(), out AxisMarkersPosition p) ? p : AxisMarkersPosition.Bottom;
+        //                                break;
+        //                            case 2:
+        //                                Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
+        //                                break;
+        //                            case 3:
+        //                                TextStyle = typedValue.Value.ToString();
+        //                                break;
+        //                            case 4:
+        //                                FirstText = typedValue.Value.ToString();
+        //                                break;
+        //                            case 5:
+        //                                FirstTextPrefix = typedValue.Value.ToString();
+        //                                break;
+        //                            case 6:
+        //                                FirstTextSuffix = typedValue.Value.ToString();
+        //                                break;
+        //                            case 7:
+        //                                SecondText = typedValue.Value.ToString();
+        //                                break;
+        //                            case 8:
+        //                                SecondTextPrefix = typedValue.Value.ToString();
+        //                                break;
+        //                            case 9:
+        //                                SecondTextSuffix = typedValue.Value.ToString();
+        //                                break;
+        //                            case 10:
+        //                                ThirdText = typedValue.Value.ToString();
+        //                                break;
+        //                            case 11:
+        //                                ThirdTextPrefix = typedValue.Value.ToString();
+        //                                break;
+        //                            case 12:
+        //                                ThirdTextSuffix = typedValue.Value.ToString();
+        //                                break;
+        //                            case 13:
+        //                                BottomOrientText = typedValue.Value.ToString();
+        //                                break;
+        //                            case 14:
+        //                                TopOrientText = typedValue.Value.ToString();
+        //                                break;
+        //                            case 15:
+        //                                BottomOrientMarkerVisible = bool.TryParse(typedValue.Value.ToString(), out var b) && b;// false
+        //                                break;
+        //                            case 16:
+        //                                TopOrientMarkerVisible = bool.TryParse(typedValue.Value.ToString(), out b) && b;//false
+        //                                break;
+        //                            case 17:
+        //                                OrientMarkerVisibilityDependency = bool.TryParse(typedValue.Value.ToString(), out b) && b;//false
+        //                                break;
+        //                        }
+        //                        // index
+        //                        index1000++;
+        //                        break;
+        //                    }
+        //                case DxfCode.ExtendedDataInteger16:
+        //                    {
+        //                        switch (index1070)
+        //                        {
+        //                            case 0:
+        //                                MarkersDiameter = (Int16)typedValue.Value;
+        //                                break;
+        //                            case 1:
+        //                                Fracture = (Int16)typedValue.Value;
+        //                                break;
+        //                            case 2:
+        //                                MarkersCount = (Int16)typedValue.Value;
+        //                                break;
+        //                            case 3:
+        //                                BottomFractureOffset = (Int16)typedValue.Value;
+        //                                break;
+        //                            case 4:
+        //                                TopFractureOffset = (Int16)typedValue.Value;
+        //                                break;
+        //                            case 5:
+        //                                FirstMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
+        //                                break;
+        //                            case 6:
+        //                                SecondMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
+        //                                break;
+        //                            case 7:
+        //                                ThirdMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
+        //                                break;
+        //                            case 8:
+        //                                OrientMarkerType = (AxisMarkerType)(Int16)typedValue.Value;
+        //                                break;
+        //                            case 9:
+        //                                ArrowsSize = (Int16)typedValue.Value;
+        //                                break;
+        //                            case 10:
+        //                                SecondTextVisibility = Convert.ToBoolean(typedValue.Value);
+        //                                break;
+        //                            case 11:
+        //                                ThirdTextVisibility = Convert.ToBoolean(typedValue.Value);
+        //                                break;
+        //                        }
+        //                        //index
+        //                        index1070++;
+        //                        break;
+        //                    }
+        //                case DxfCode.ExtendedDataReal:
+        //                    {
+        //                        switch (index1040)
+        //                        {
+        //                            case 0:
+        //                                LineTypeScale = (double)typedValue.Value;
+        //                                break;
+        //                            case 1:
+        //                                BottomLineAngle = (double)typedValue.Value;
+        //                                break;
+        //                            case 2:
+        //                                TopLineAngle = (double)typedValue.Value;
+        //                                break;
+        //                            case 3:
+        //                                TextHeight = (double)typedValue.Value;
+        //                                break;
+        //                            case 4:
+        //                                BottomOrientMarkerOffset = (double)typedValue.Value;
+        //                                break;
+        //                            case 5:
+        //                                TopOrientMarkerOffset = (double)typedValue.Value;
+        //                                break;
+        //                        }
+        //                        index1040++;
+        //                        break;
+        //                    }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        ExceptionBox.Show(exception);
+        //    }
+        //}
     }
 }

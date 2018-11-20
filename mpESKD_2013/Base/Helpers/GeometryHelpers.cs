@@ -25,6 +25,11 @@ namespace mpESKD.Base.Helpers
             return $"{point.X}${point.Y}${point.Z}";
         }
 
+        public static string AsString(this Vector3d point)
+        {
+            return $"{point.X}${point.Y}${point.Z}";
+        }
+
         public static Point3d ParseToPoint3d(this string str)
         {
             if (!string.IsNullOrEmpty(str))
@@ -38,6 +43,14 @@ namespace mpESKD.Base.Helpers
             }
 
             return Point3d.Origin;
+        }
+
+        /// <summary>
+        /// Конвертация Point3d в Point2d путем отбрасывания Z
+        /// </summary>
+        public static Point2d ConvertPoint3dToPoint2d(this Point3d point3d)
+        {
+            return new Point2d(point3d.X, point3d.Y);
         }
     }
 }
