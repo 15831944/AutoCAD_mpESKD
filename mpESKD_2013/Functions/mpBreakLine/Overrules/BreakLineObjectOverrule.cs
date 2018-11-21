@@ -18,7 +18,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             if (_breakLineObjectOverrule != null) return _breakLineObjectOverrule;
             _breakLineObjectOverrule = new BreakLineObjectOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineObjectOverrule.SetXDataFilter(BreakLineInterface.Name);
+            _breakLineObjectOverrule.SetXDataFilter(BreakLineDescriptor.Instance.Name);
             return _breakLineObjectOverrule;
         }
 
@@ -51,7 +51,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineInterface.Name);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name);
         }
     }
 }

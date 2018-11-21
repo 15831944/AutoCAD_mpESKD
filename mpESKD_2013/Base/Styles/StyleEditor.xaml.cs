@@ -287,8 +287,8 @@ namespace mpESKD.Base.Styles
                             NumericBox tb = new NumericBox { IsEnabled = style.StyleType == StyleType.User };
                             Grid.SetColumn(tb, 2);
                             Grid.SetRow(tb, rowIndex);
-                            tb.Minimum = (int)property.Minimum;
-                            tb.Maximum = (int)property.Maximum;
+                            tb.Minimum = Convert.ToInt32(property.Minimum);
+                            tb.Maximum = Convert.ToInt32(property.Maximum);
                             tb.Style = Resources["PropertyValueIntTextBoxForStyleEditor"] as Style;
                             SetDescription(tb, propertyDescription);
                             BindingOperations.SetBinding(tb, NumericBox.ValueProperty, CreateTwoWayBindingForPropertyForNumericValue(property, true));
@@ -306,8 +306,8 @@ namespace mpESKD.Base.Styles
                             NumericBox tb = new NumericBox { IsEnabled = style.StyleType == StyleType.User };
                             Grid.SetColumn(tb, 2);
                             Grid.SetRow(tb, rowIndex);
-                            tb.Minimum = (double)property.Minimum;
-                            tb.Maximum = (double)property.Maximum;
+                            tb.Minimum = Convert.ToDouble(property.Minimum);
+                            tb.Maximum = Convert.ToDouble(property.Maximum);
                             tb.Style = Resources["PropertyValueDoubleTextBoxForStyleEditor"] as Style;
                             SetDescription(tb, propertyDescription);
                             BindingOperations.SetBinding(tb, NumericBox.ValueProperty, CreateTwoWayBindingForPropertyForNumericValue(property, false));

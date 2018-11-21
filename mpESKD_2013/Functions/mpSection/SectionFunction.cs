@@ -46,7 +46,7 @@
         private void CreateSection(bool isSimple)
         {
             // send statistic
-            Statistic.SendCommandStarting(SectionInterface.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, MpVersionData.CurCadVers);
 
             try
             {
@@ -56,7 +56,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(SectionInterface.Name);
+                ExtendedDataHelpers.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
 
                 var style = StyleManager.GetCurrentStyle(typeof(Section));
                 var section = new Section();

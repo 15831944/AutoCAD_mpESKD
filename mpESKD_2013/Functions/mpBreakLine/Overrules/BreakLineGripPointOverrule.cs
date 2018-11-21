@@ -22,7 +22,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             if (_breakLineGripPointOverrule != null) return _breakLineGripPointOverrule;
             _breakLineGripPointOverrule = new BreakLineGripPointsOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineGripPointOverrule.SetXDataFilter(BreakLineInterface.Name);
+            _breakLineGripPointOverrule.SetXDataFilter(BreakLineDescriptor.Instance.Name);
             return _breakLineGripPointOverrule;
         }
 
@@ -181,7 +181,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         // Проверка происходит по наличию XData с определенным AppName
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineInterface.Name);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name);
         }
     }
     /* Так как у линии обрыва все точки одинаковы, то достаточно создать одно переопределение
@@ -228,8 +228,6 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
         {
             try
             {
-                // AcadHelpers.Editor.WriteMessage("\n OnGripStatusChanged in GripData entity id: " + entity.ObjectId);
-
                 // При начале перемещения запоминаем первоначальное положение ручки
                 // Запоминаем начальные значения
                 if (newStatus == Status.GripStart)

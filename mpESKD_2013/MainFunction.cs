@@ -13,8 +13,6 @@
     using Autodesk.AutoCAD.Windows;
     using Base;
     using Base.Helpers;
-    using Base.Overrules;
-    using Base.Styles;
     using Functions.mpAxis;
     using mpESKD.Base.Properties;
     using ModPlus;
@@ -107,7 +105,9 @@
 
             // Functions Init
             TypeFactory.Instance.GetEntityFunctionTypes().ForEach(f => f.Initialize());
-            
+
+            Overrule.Overruling = true;
+
             // ribbon build for
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
             
@@ -194,7 +194,8 @@
                     {
                         var obj = tr.GetObject(ids[0], OpenMode.ForWrite);
                         // if axis
-                        if (obj is BlockReference blockReference && ExtendedDataHelpers.IsIntellectualEntity(blockReference, AxisInterface.Name))
+                        if (obj is BlockReference blockReference && 
+                            ExtendedDataHelpers.IsIntellectualEntity(blockReference, AxisDescriptor.Instance.Name))
                         {
                             BeditCommandWatcher.UseBedit = false;
                             AxisFunction.DoubleClickEdit(blockReference, location, tr);
@@ -246,11 +247,18 @@
         }
         private static void DocumentManager_DocumentLockModeChanged(object sender, Autodesk.AutoCAD.ApplicationServices.DocumentLockModeChangedEventArgs e)
         {
-            if (!UseBedit)
-                if (e.GlobalCommandName == "BEDIT")
-                {
-                    e.Veto();
-                }
+            try
+            {
+                if (!UseBedit)
+                    if (e.GlobalCommandName == "BEDIT")
+                    {
+                        e.Veto();
+                    }
+            }
+            catch (System.Exception exception)
+            {
+                AcadHelpers.WriteMessageInDebug($"\nException {exception.Message}");
+            }
         }
     }
 }

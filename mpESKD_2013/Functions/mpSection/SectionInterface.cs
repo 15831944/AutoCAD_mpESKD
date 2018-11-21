@@ -4,7 +4,7 @@
     using ModPlusAPI;
 
     //todo translate
-    public class SectionInterface
+    public class SectionDescriptor
     {
         public static string Name => "mpSection";
 

@@ -9,7 +9,7 @@
     using Base.Enums;
     using Overrules;
     using Base.Helpers;
-    using mpESKD.Base.Styles;
+    using Base.Styles;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
 
@@ -19,12 +19,11 @@
     {
         public void Initialize()
         {
-            // Включение работы переопределения ручек (нужна регенерация в конце метода (?))
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance(), true);
-            Overrule.Overruling = true;
         }
+
         public void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance());
@@ -54,7 +53,7 @@
         private static void CreateBreakLine(BreakLineType breakLineType)
         {
             // send statistic
-            Statistic.SendCommandStarting(BreakLineInterface.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, MpVersionData.CurCadVers);
             try
             {
                 Overrule.Overruling = false;
@@ -62,7 +61,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(BreakLineInterface.Name);
+                ExtendedDataHelpers.AddRegAppTableRecord(BreakLineDescriptor.Instance.Name);
                 var style = StyleManager.GetCurrentStyle(typeof(BreakLine));
                 var breakLine = new BreakLine { BreakLineType = breakLineType };
 
@@ -120,5 +119,4 @@
             }
         }
     }
-
 }

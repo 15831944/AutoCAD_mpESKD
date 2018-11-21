@@ -21,7 +21,6 @@
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance(), true);
-            Overrule.Overruling = true;
         }
 
         public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location, Transaction tr)
@@ -116,7 +115,7 @@
         private static void CreateAxis()
         {
             // send statistic
-            Statistic.SendCommandStarting(AxisInterface.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, MpVersionData.CurCadVers);
             try
             {
                 Overrule.Overruling = false;
@@ -125,7 +124,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(AxisInterface.Name);
+                ExtendedDataHelpers.AddRegAppTableRecord(AxisDescriptor.Instance.Name);
 
                 var style = StyleManager.GetCurrentStyle(typeof(Axis));
 

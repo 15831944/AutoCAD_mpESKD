@@ -23,7 +23,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
             if (_axisGripPointOverrule != null) return _axisGripPointOverrule;
             _axisGripPointOverrule = new AxisGripPointsOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _axisGripPointOverrule.SetXDataFilter(AxisInterface.Name);
+            _axisGripPointOverrule.SetXDataFilter(AxisDescriptor.Instance.Name);
             return _axisGripPointOverrule;
         }
         private Point3d InitEndPoint;
@@ -321,7 +321,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
         // Проверка происходит по наличию XData с определенным AppName
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisInterface.Name);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisDescriptor.Instance.Name);
         }
 
         #region Helpers
@@ -373,7 +373,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
             ModeKeywordsDisabled = true;
         }
-        // Экземпляр класса breakline, связанный с этой ручкой
+        // Экземпляр класса Axis, связанный с этой ручкой
         public Axis Axis { get; set; }
         // Имя ручки
         public AxisGripName GripName { get; set; }

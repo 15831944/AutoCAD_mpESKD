@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using ModPlusAPI;
 
-    public static class BreakLineInterface 
+    public static class BreakLineDescriptor 
     {
         public static string Name => "mpBreakLine";
         

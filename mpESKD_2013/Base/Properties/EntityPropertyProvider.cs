@@ -4,6 +4,7 @@ namespace mpESKD.Base.Properties
     using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -83,6 +84,8 @@ namespace mpESKD.Base.Properties
                     var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
                     if (attribute != null)
                     {
+                        if(attribute.Name == "Scale")
+                            Debug.Print("!");
                         if (attribute.Name == "Style")
                         {
                             IntellectualEntityProperty property = new IntellectualEntityProperty(
@@ -204,6 +207,8 @@ namespace mpESKD.Base.Properties
                         PropertyInfo propertyInfo = entityType.GetProperty(intellectualEntityProperty.Name);
                         if (propertyInfo != null)
                         {
+                            if (propertyInfo.Name == "Scale")
+                                Debug.Print("!");
                             if (intellectualEntityProperty.Name == "Style")
                             {
                                 var style = StyleManager.GetStyleByName(entityType, intellectualEntityProperty.Value.ToString());

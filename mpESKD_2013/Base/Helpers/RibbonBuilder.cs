@@ -1,10 +1,14 @@
 ﻿namespace mpESKD.Base.Helpers
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Windows.Controls;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.Windows;
+    using Functions.mpAxis;
+    using Functions.mpBreakLine;
+    using Functions.mpGroundLine;
     using ModPlus.Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
@@ -135,20 +139,10 @@
 
             var ribRowPanel = new RibbonRowPanel();
 
-            #region mpAxis
-            // Добавляем в него первую функцию, которую делаем основной
-            var ribBtn = RibbonHelpers.AddBigButton(
-                Functions.mpAxis.AxisInterface.Name,
-                Functions.mpAxis.AxisInterface.LName,
-                GetBigIconForFunction(Functions.mpAxis.AxisInterface.Name, Functions.mpAxis.AxisInterface.Name),
-                Functions.mpAxis.AxisInterface.Description,
-                Orientation.Vertical,
-                Functions.mpAxis.AxisInterface.FullDescription,
-                GetHelpImageForFunction(Functions.mpAxis.AxisInterface.Name, Functions.mpAxis.AxisInterface.ToolTipHelpImage)
-                );
-            if (ribBtn != null) ribRowPanel.Items.Add(ribBtn);
-
-            #endregion
+            // mpAxis
+            var ribBtn = GetBigButton(AxisDescriptor.Instance);
+            if (ribBtn != null) 
+                ribRowPanel.Items.Add(ribBtn);
             
             if (ribRowPanel.Items.Any())
             {
@@ -167,111 +161,18 @@
 
             var ribRowPanel = new RibbonRowPanel();
 
-            #region mpBreakLine
+            // mpBreakLine
+            ribRowPanel.Items.Add(GetSplitButton(BreakLineDescriptor.Instance));
 
-            {
-                // Создаем SplitButton
-                var risSplitBtn = new RibbonSplitButton
-                {
-                    Text = "RibbonSplitButton",
-                    Orientation = Orientation.Vertical,
-                    Size = RibbonItemSize.Large,
-                    ShowImage = true,
-                    ShowText = true,
-                    ListButtonStyle = Autodesk.Private.Windows.RibbonListButtonStyle.SplitButton,
-                    ResizeStyle = RibbonItemResizeStyles.NoResize,
-                    ListStyle = RibbonSplitButtonListStyle.List
-                };
-
-                // Добавляем в него первую функцию, которую делаем основной
-                var ribBtn = RibbonHelpers.AddBigButton(
-                    Functions.mpBreakLine.BreakLineInterface.Name,
-                    Functions.mpBreakLine.BreakLineInterface.LName,
-                    GetBigIconForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.Name),
-                    Functions.mpBreakLine.BreakLineInterface.Description,
-                    Orientation.Vertical,
-                    Functions.mpBreakLine.BreakLineInterface.FullDescription,
-                    GetHelpImageForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.ToolTipHelpImage)
-                );
-                if (ribBtn != null)
-                {
-                    risSplitBtn.Items.Add(ribBtn);
-                    risSplitBtn.Current = ribBtn;
-                }
-
-                // Затем добавляем подфункции
-                for (int i = 0; i < Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames.Count; i++)
-                {
-                    risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
-                        Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames[i],
-                        Functions.mpBreakLine.BreakLineInterface.SubFunctionsLNames[i],
-                        GetBigIconForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.SubFunctionsNames[i]),
-                        Functions.mpBreakLine.BreakLineInterface.SubDescriptions[i], Orientation.Vertical,
-                        Functions.mpBreakLine.BreakLineInterface.SubFullDescriptions[i],
-                        GetHelpImageForFunction(Functions.mpBreakLine.BreakLineInterface.Name, Functions.mpBreakLine.BreakLineInterface.SubHelpImages[i])
-                    ));
-                }
-
-                ribRowPanel.Items.Add(risSplitBtn);
-            }
-
-            #endregion
-
-            #region mpGroundLine
-
-            {
-                // Создаем SplitButton
-                var risSplitBtn = new RibbonSplitButton
-                {
-                    Text = "RibbonSplitButton",
-                    Orientation = Orientation.Vertical,
-                    Size = RibbonItemSize.Large,
-                    ShowImage = true,
-                    ShowText = true,
-                    ListButtonStyle = Autodesk.Private.Windows.RibbonListButtonStyle.SplitButton,
-                    ResizeStyle = RibbonItemResizeStyles.NoResize,
-                    ListStyle = RibbonSplitButtonListStyle.List
-                };
-
-                // Добавляем в него первую функцию, которую делаем основной
-                var ribBtn = RibbonHelpers.AddBigButton(
-                    Functions.mpGroundLine.GroundLineInterface.Name,
-                    Functions.mpGroundLine.GroundLineInterface.LName,
-                    GetBigIconForFunction(Functions.mpGroundLine.GroundLineInterface.Name, Functions.mpGroundLine.GroundLineInterface.Name),
-                    Functions.mpGroundLine.GroundLineInterface.Description,
-                    Orientation.Vertical,
-                    Functions.mpGroundLine.GroundLineInterface.FullDescription,
-                    GetHelpImageForFunction(Functions.mpGroundLine.GroundLineInterface.Name, Functions.mpGroundLine.GroundLineInterface.ToolTipHelpImage)
-                );
-                if (ribBtn != null)
-                {
-                    risSplitBtn.Items.Add(ribBtn);
-                    risSplitBtn.Current = ribBtn;
-                }
-
-                // Затем добавляем подфункции
-                for (int i = 0; i < Functions.mpGroundLine.GroundLineInterface.SubFunctionsNames.Count; i++)
-                {
-                    risSplitBtn.Items.Add(RibbonHelpers.AddBigButton(
-                        Functions.mpGroundLine.GroundLineInterface.SubFunctionsNames[i],
-                        Functions.mpGroundLine.GroundLineInterface.SubFunctionsLNames[i],
-                        GetBigIconForFunction(Functions.mpGroundLine.GroundLineInterface.Name, Functions.mpGroundLine.GroundLineInterface.SubFunctionsNames[i]),
-                        Functions.mpGroundLine.GroundLineInterface.SubDescriptions[i], Orientation.Vertical,
-                        Functions.mpGroundLine.GroundLineInterface.SubFullDescriptions[i],
-                        GetHelpImageForFunction(Functions.mpGroundLine.GroundLineInterface.Name, Functions.mpGroundLine.GroundLineInterface.SubHelpImages[i])
-                    ));
-                }
-
-                ribRowPanel.Items.Add(risSplitBtn);
-            }
-
-            #endregion
+            // mpGroundLine
+            ribRowPanel.Items.Add(GetSplitButton(GroundLineDescriptor.Instance));
 
             if (ribRowPanel.Items.Any())
             {
                 ribSourcePanel.Items.Add(ribRowPanel);
             }
         }
+
         private static void AddSettingsPanel(RibbonTab ribTab)
         {
             //create the panel source
@@ -308,6 +209,87 @@
             ribSourcePanel.Items.Add(ribRowPanel);
         }
 
+        /// <summary>
+        /// Получить SplitButton (основная функция + все подфункции) для дескриптора функции
+        /// </summary>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="orientation">Ориентация кнопки</param>
+        /// <param name="size">Размер кнопки</param>
+        private static RibbonSplitButton GetSplitButton(
+            IIntellectualEntityDescriptor descriptor,
+            Orientation orientation = Orientation.Vertical,
+            RibbonItemSize size = RibbonItemSize.Large)
+        {
+            // Создаем SplitButton
+            var risSplitBtn = new RibbonSplitButton
+            {
+                Text = "RibbonSplitButton",
+                Orientation = orientation,
+                Size = size,
+                ShowImage = true,
+                ShowText = true,
+                ListButtonStyle = Autodesk.Private.Windows.RibbonListButtonStyle.SplitButton,
+                ResizeStyle = RibbonItemResizeStyles.NoResize,
+                ListStyle = RibbonSplitButtonListStyle.List
+            };
+
+            // Добавляем в него первую функцию, которую делаем основной
+            var ribBtn = GetBigButton(descriptor, orientation);
+            if (ribBtn != null)
+            {
+                risSplitBtn.Items.Add(ribBtn);
+                risSplitBtn.Current = ribBtn;
+            }
+
+            // Затем добавляем подфункции
+            GetBigButtonsForSubFunctions(descriptor, orientation).ForEach(b => risSplitBtn.Items.Add(b));
+
+            return risSplitBtn;
+        }
+
+        /// <summary>
+        /// Получить большую кнопку по дескриптору функции. Возвращает кнопку для основной функции в дескрипторе
+        /// </summary>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="orientation">Ориентация кнопки</param>
+        private static RibbonButton GetBigButton(IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
+        {
+            return RibbonHelpers.AddBigButton(
+                descriptor.Name,
+                descriptor.LName,
+                GetBigIconForFunction(descriptor.Name, descriptor.Name),
+                descriptor.Description,
+                orientation,
+                descriptor.FullDescription,
+                GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage)
+            );
+        }
+
+        /// <summary>
+        /// Получить список больших кнопок для подфункций функции по дескриптору
+        /// </summary>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="orientation">Ориентация кнопки</param>
+        private static List<RibbonButton> GetBigButtonsForSubFunctions(IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
+        {
+            List<RibbonButton> buttons = new List<RibbonButton>();
+
+            for (int i = 0; i < descriptor.SubFunctionsNames.Count; i++)
+            {
+                buttons.Add(RibbonHelpers.AddBigButton(
+                    descriptor.SubFunctionsNames[i],
+                    descriptor.SubFunctionsLNames[i],
+                    GetBigIconForFunction(descriptor.Name, descriptor.SubFunctionsNames[i]),
+                    descriptor.SubDescriptions[i], 
+                    orientation,
+                    descriptor.SubFullDescriptions[i],
+                    GetHelpImageForFunction(descriptor.Name, descriptor.SubHelpImages[i])
+                ));
+            }
+
+            return buttons;
+        }
+
         private static string GetBigIconForFunction(string functionName, string subFunctionName)
         {
             return _colorTheme == 1
@@ -316,6 +298,7 @@
                 : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
                   functionName + "/Icons/" + subFunctionName + "_32x32_dark.png";
         }
+       
         private static string GetSmallIconForFunction(string functionName, string subFunctionName)
         {
             return _colorTheme == 1
@@ -330,6 +313,7 @@
             return "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
                    functionName + "/Help/" + imgName;
         }
+
         /// <summary>Вспомогательный метод для добавления символа перехода на новую строку в именах функций на палитре</summary>
         private static string ConvertLName(string lName)
         {

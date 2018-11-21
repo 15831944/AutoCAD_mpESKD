@@ -104,6 +104,7 @@
     <Compile Include="Base\Helpers\MathExtensions.cs" />
     <Compile Include="Base\Helpers\RelayCommand.cs" />
     <Compile Include="Base\Helpers\TextStyleHelper.cs" />
+    <Compile Include="Base\IIntellectualEntityDescriptor.cs" />
     <Compile Include="Base\IIntellectualEntityFunction.cs" />
     <Compile Include="Base\IntellectualEntity.cs" />
     <Compile Include="Base\Overrules\IntellectualEntityGripData.cs" />
@@ -143,7 +144,7 @@
     <Compile Include="Base\TypeFactory.cs" />
     <Compile Include="Functions\mpAxis\Axis.cs" />
     <Compile Include="Functions\mpAxis\AxisFunction.cs" />
-    <Compile Include="Functions\mpAxis\AxisInterface.cs" />
+    <Compile Include="Functions\mpAxis\AxisDescriptor.cs" />
     <Compile Include="Functions\mpAxis\AxisValueEditor.xaml.cs">
       <DependentUpon>AxisValueEditor.xaml</DependentUpon>
     </Compile>
@@ -156,13 +157,13 @@
     </Compile>
     <Compile Include="Functions\mpBreakLine\BreakLine.cs" />
     <Compile Include="Functions\mpBreakLine\BreakLineFunction.cs" />
-    <Compile Include="Functions\mpBreakLine\BreakLineInterface.cs" />
+    <Compile Include="Functions\mpBreakLine\BreakLineDescriptor.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLine.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLineFunction.cs" />
-    <Compile Include="Functions\mpGroundLine\GroundLineInterface.cs" />
+    <Compile Include="Functions\mpGroundLine\GroundLineDescriptor.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs" />
@@ -171,7 +172,7 @@
     <Compile Include="Functions\mpSection\Overrules\SectionOsnapOverrule.cs" />
     <Compile Include="Functions\mpSection\Section.cs" />
     <Compile Include="Functions\mpSection\SectionFunction.cs" />
-    <Compile Include="Functions\mpSection\SectionInterface.cs" />
+    <Compile Include="Functions\mpSection\SectionDescriptor.cs" />
     <Compile Include="Interface.cs" />
     <Compile Include="Base\Helpers\RibbonBuilder.cs" />
     <Compile Include="MainFunction.cs" />

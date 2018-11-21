@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using ModPlusAPI;
 
-    public class GroundLineInterface
+    public class GroundLineDescriptor
     {
         public static string Name => "mpGroundLine";
 

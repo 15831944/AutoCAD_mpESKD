@@ -150,6 +150,9 @@
     <Compile Include="..\mpESKD_2013\Base\Helpers\TextStyleHelper.cs">
       <Link>Base\Helpers\TextStyleHelper.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\IIntellectualEntityDescriptor.cs">
+      <Link>Base\IIntellectualEntityDescriptor.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\IIntellectualEntityFunction.cs">
       <Link>Base\IIntellectualEntityFunction.cs</Link>
     </Compile>
@@ -238,11 +241,11 @@
     <Compile Include="..\mpESKD_2013\Functions\mpAxis\Axis.cs">
       <Link>Functions\mpAxis\Axis.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisDescriptor.cs">
+      <Link>Functions\mpAxis\AxisDescriptor.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisFunction.cs">
       <Link>Functions\mpAxis\AxisFunction.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisInterface.cs">
-      <Link>Functions\mpAxis\AxisInterface.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisValueEditor.xaml.cs">
       <Link>Functions\mpAxis\AxisValueEditor.xaml.cs</Link>
@@ -260,11 +263,11 @@
     <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLine.cs">
       <Link>Functions\mpBreakLine\BreakLine.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineDescriptor.cs">
+      <Link>Functions\mpBreakLine\BreakLineDescriptor.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineFunction.cs">
       <Link>Functions\mpBreakLine\BreakLineFunction.cs</Link>
-    </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineInterface.cs">
-      <Link>Functions\mpBreakLine\BreakLineInterface.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs">
       <Link>Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs</Link>
@@ -278,11 +281,11 @@
     <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLine.cs">
       <Link>Functions\mpGroundLine\GroundLine.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\GroundLineDescriptor.cs">
+      <Link>Functions\mpGroundLine\GroundLineDescriptor.cs</Link>
+    </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLineFunction.cs">
       <Link>Functions\mpGroundLine\GroundLineFunction.cs</Link>
-    </Compile>
-    <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLineInterface.cs">
-      <Link>Functions\mpGroundLine\GroundLineInterface.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs">
       <Link>Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs</Link>
@@ -305,11 +308,11 @@
     <Compile Include="..\mpeskd_2013\functions\mpsection\Section.cs">
       <Link>Functions\mpSection\Section.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpSection\SectionDescriptor.cs">
+      <Link>Functions\mpSection\SectionDescriptor.cs</Link>
+    </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpsection\SectionFunction.cs">
       <Link>Functions\mpSection\SectionFunction.cs</Link>
-    </Compile>
-    <Compile Include="..\mpeskd_2013\functions\mpsection\SectionInterface.cs">
-      <Link>Functions\mpSection\SectionInterface.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\MainFunction.cs">
       <Link>MainFunction.cs</Link>

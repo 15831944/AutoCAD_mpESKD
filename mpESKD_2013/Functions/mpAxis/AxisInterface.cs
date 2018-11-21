@@ -3,7 +3,7 @@ using ModPlusAPI;
 
 namespace mpESKD.Functions.mpAxis
 {
-    public static class AxisInterface
+    public static class AxisDescriptor
     {
         public static string Name => "mpAxis";
         

@@ -88,17 +88,37 @@ namespace mpESKD.Functions.mpSection
         /// <summary>
         /// Длина верхнего и нижнего штриха
         /// </summary>
-        private int _strokeLength = 10;
+        [EntityProperty(PropertiesCategory.Geometry, 3, "", "", 10, 5, 10)]
+        [SaveToXData]
+        public int StrokeLength { get; set; } = 10;
 
         /// <summary>
-        /// Отступ полки по длине штриха
+        /// Отступ полки по длине штриха в процентах
         /// </summary>
-        private int _shelfOffset = 8;
+        [EntityProperty(PropertiesCategory.Geometry, 4, "", "", 80, 0, 100)]
+        [SaveToXData]
+        public int ShelfOffset { get; set; } = 80;
 
         /// <summary>
         /// Длина полки
         /// </summary>
-        private int _shelfLength = 10;
+        [EntityProperty(PropertiesCategory.Geometry, 5, "", "", 10, 5, 15)]
+        [SaveToXData]
+        public int ShelfLength { get; set; } = 10;
+
+        /// <summary>
+        /// Длина стрелки
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 6, "", "", 5, 1, 8)]
+        [SaveToXData]
+        public int ShelfArrowLength { get; set; } = 5;
+
+        /// <summary>
+        /// Толщина стрелки
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 7, "", "", 1.5, 0.1, 5)]
+        [SaveToXData]
+        public double ShelfArrowWidth { get; set; } = 1.5;
 
         #endregion
 
@@ -162,7 +182,6 @@ namespace mpESKD.Functions.mpSection
             get
             {
                 SetPropertiesToCadEntity(_topStroke.Value);
-                //todo check width
                 var width = StrokeWidth * GetScale();
                 _topStroke.Value.SetStartWidthAt(0, width);
                 _topStroke.Value.SetEndWidthAt(0, width);
@@ -322,6 +341,7 @@ namespace mpESKD.Functions.mpSection
             Point3d insertionPoint, List<Point3d> middlePoints,
             Point3d endPoint, double scale)
         {
+            // top and bottom strokes
             var topStrokeEndPoint = GetTopStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
             var bottomStrokeEndPoint = GetBottomStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
 
@@ -333,20 +353,34 @@ namespace mpESKD.Functions.mpSection
 
             var topStrokeNormalVector = (topStrokeEndPoint - insertionPoint).GetNormal();
             var bottomStrokeNormalVector = (bottomStrokeEndPoint - endPoint).GetNormal();
-            //todo to properties?
-            var topShelfFirstPoint = insertionPoint + topStrokeNormalVector * _shelfOffset * scale;
-            var topShelfSecondPoint = topShelfFirstPoint + topStrokeNormalVector.GetPerpendicularVector() * _shelfLength * scale;
+
+            // shelf lines
+            var topShelfFirstPoint = insertionPoint + topStrokeNormalVector * GetShelfOffset() * scale;
+            var topShelfSecondPoint = topShelfFirstPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale;
             _topShelfLine.Value.StartPoint = topShelfFirstPoint;
             _topShelfLine.Value.EndPoint = topShelfSecondPoint;
 
-            var bottomShelfFirstPoint = endPoint + bottomStrokeNormalVector * _shelfOffset * scale;
-            var bottomShelfSecondPoint = bottomShelfFirstPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * _shelfLength * scale;
+            var bottomShelfFirstPoint = endPoint + bottomStrokeNormalVector * GetShelfOffset() * scale;
+            var bottomShelfSecondPoint = bottomShelfFirstPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfLength * scale;
             _bottomShelfLine.Value.StartPoint = bottomShelfFirstPoint;
             _bottomShelfLine.Value.EndPoint = bottomShelfSecondPoint;
 
+            // shelf arrows
+            var topShelfArrowStartPoint = topShelfFirstPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfArrowLength * scale;
+            _topShelfArrow.Value.SetPointAt(0, topShelfArrowStartPoint.ConvertPoint3dToPoint2d());
+            _topShelfArrow.Value.SetPointAt(1, topShelfFirstPoint.ConvertPoint3dToPoint2d());
+            _topShelfArrow.Value.SetStartWidthAt(0, ShelfArrowWidth * scale);
+
+            var bottomShelfArrowStartPoint =
+                bottomShelfFirstPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfArrowLength * scale;
+            _bottomShelfArrow.Value.SetPointAt(0, bottomShelfArrowStartPoint.ConvertPoint3dToPoint2d());
+            _bottomShelfArrow.Value.SetPointAt(1, bottomShelfFirstPoint.ConvertPoint3dToPoint2d());
+            _bottomShelfArrow.Value.SetStartWidthAt(0, ShelfArrowWidth * scale);
+
+            MiddleStrokes.Clear();
+            // middle strokes
             if (MiddlePoints.Any())
             {
-                MiddleStrokes.Clear();
                 var strokesWidth = StrokeWidth * scale;
                 var middleStrokeLength = MiddleStrokeLength * scale;
 
@@ -374,149 +408,25 @@ namespace mpESKD.Functions.mpSection
             }
         }
 
+        private double GetShelfOffset()
+        {
+            return StrokeLength * ShelfOffset / 100.0;
+        }
+
         private Point3d GetBottomStrokeEndPoint(Point3d insertionPoint, Point3d endPoint, List<Point3d> middlePoints, double scale)
         {
             if (MiddlePoints.Any())
-                return endPoint + (endPoint - middlePoints.Last()).GetNormal() * _strokeLength * scale;
-            return endPoint + (endPoint - insertionPoint).GetNormal() * _strokeLength * scale;
+                return endPoint + (endPoint - middlePoints.Last()).GetNormal() * StrokeLength * scale;
+            return endPoint + (endPoint - insertionPoint).GetNormal() * StrokeLength * scale;
         }
 
         private Point3d GetTopStrokeEndPoint(Point3d insertionPoint, Point3d endPoint, List<Point3d> middlePoints, double scale)
         {
             if (MiddlePoints.Any())
-                return insertionPoint + (insertionPoint - middlePoints.First()).GetNormal() * _strokeLength * scale;
-            return insertionPoint + (insertionPoint - endPoint).GetNormal() * _strokeLength * scale;
+                return insertionPoint + (insertionPoint - middlePoints.First()).GetNormal() * StrokeLength * scale;
+            return insertionPoint + (insertionPoint - endPoint).GetNormal() * StrokeLength * scale;
         }
 
         #endregion
-
-        //todo remove after test
-        ///// <inheritdoc />
-        //public override ResultBuffer GetParametersForXData()
-        //{
-        //    // При сохранении свойств типа Enum, лучше сохранять их как int
-        //    try
-        //    {
-        //        // ReSharper disable once UseObjectOrCollectionInitializer
-        //        var resBuf = new ResultBuffer();
-        //        // 1001 - DxfCode.ExtendedDataRegAppName. AppName
-        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, SectionInterface.Name));
-        //        // 1010
-        //        // Векторы от средних точек до начальной точки
-        //        foreach (Point3d middlePointOCS in MiddlePointsOCS)
-        //        {
-        //            var vector = middlePointOCS - InsertionPointOCS;
-        //            resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z)));
-        //        }
-
-        //        // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
-        //        {
-        //            var vector = EndPointOCS - InsertionPointOCS;
-        //            resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z)));
-        //        }
-        //        // Текстовые значения (код 1000)
-        //        // Стиль
-        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
-        //        // scale
-        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 1
-
-        //        // Целочисленные значения (код 1070)
-        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, MiddleStrokeLength)); // 0
-
-        //        // Значения типа double (dxfCode 1040)
-        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
-        //        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, StrokeWidth)); // 1
-
-        //        return resBuf;
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        ExceptionBox.Show(exception);
-        //        return null;
-        //    }
-        //}
-
-        ///// <inheritdoc />
-        //public override void GetParametersFromResBuf(ResultBuffer resBuf)
-        //{
-        //    try
-        //    {
-        //        TypedValue[] resBufArr = resBuf.AsArray();
-        //        /* indexes
-        //         * Для каждого значения с повторяющимся кодом назначен свой индекc (см. метод GetParametersForXData)
-        //         */
-        //        List<Point3d> middleAndEndPoints = new List<Point3d>();
-        //        var index1000 = 0;
-        //        var index1040 = 0;
-        //        var index1070 = 0;
-        //        foreach (TypedValue typedValue in resBufArr)
-        //        {
-        //            switch ((DxfCode)typedValue.TypeCode)
-        //            {
-        //                case DxfCode.ExtendedDataXCoordinate:
-        //                    {
-        //                        // Получаем вектор от точки до первой в системе координат блока
-        //                        var vectorFromPointToInsertion = ((Point3d)typedValue.Value).GetAsVector();
-        //                        // получаем точку в мировой системе координат
-        //                        var point = (InsertionPointOCS + vectorFromPointToInsertion).TransformBy(BlockTransform);
-        //                        middleAndEndPoints.Add(point);
-        //                        break;
-        //                    }
-        //                case DxfCode.ExtendedDataAsciiString:
-        //                    {
-        //                        switch (index1000)
-        //                        {
-        //                            case 0:
-        //                                StyleGuid = typedValue.Value.ToString();
-        //                                break;
-        //                            case 1:
-        //                                Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
-        //                                break;
-        //                        }
-        //                        // index
-        //                        index1000++;
-        //                        break;
-        //                    }
-        //                case DxfCode.ExtendedDataInteger16:
-        //                    {
-        //                        switch (index1070)
-        //                        {
-        //                            case 0:
-        //                                MiddleStrokeLength = (Int16)typedValue.Value;
-        //                                break;
-        //                        }
-        //                        //index
-        //                        index1070++;
-        //                        break;
-        //                    }
-        //                case DxfCode.ExtendedDataReal:
-        //                    {
-        //                        if (index1040 == 0) // 0 - LineTypeScale
-        //                            LineTypeScale = (double)typedValue.Value;
-        //                        if (index1040 == 1) 
-        //                            StrokeWidth = (double)typedValue.Value;
-        //                        // index
-        //                        index1040++;
-        //                        break;
-        //                    }
-        //            }
-        //        }
-
-        //        // rebase points
-        //        if (middleAndEndPoints.Any())
-        //        {
-        //            EndPoint = middleAndEndPoints.Last();
-        //            MiddlePoints.Clear();
-        //            for (var i = 0; i < middleAndEndPoints.Count - 1; i++)
-        //            {
-        //                MiddlePoints.Add(middleAndEndPoints[i]);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        ExceptionBox.Show(exception);
-        //    }
-        //}
     }
 }

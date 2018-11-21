@@ -16,13 +16,18 @@
         public IntellectualEntity GetFromEntity(AcDd.Entity entity)
         {
             var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
-            string appName = entity.XData.AsArray()
-                .FirstOrDefault(tv => tv.TypeCode == (int)AcDd.DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()))
-                .Value.ToString();
+            if (entity.XData == null) 
+                return null;
+            var typedValue = entity.XData.AsArray()
+                .FirstOrDefault(tv => tv.TypeCode == (int)AcDd.DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()));
+            if (typedValue.Value != null)
+            {
+                var appName = typedValue.Value.ToString();
+                Type entityType = TypeFactory.Instance.GetEntityTypes().FirstOrDefault(t => t.Name == appName.Substring(2));
+                if (entityType != null)
+                    return GetEntity(entity, entityType, appName);
+            }
 
-            Type entityType = TypeFactory.Instance.GetEntityTypes().FirstOrDefault(t => t.Name == appName.Substring(2));
-            if (entityType != null)
-                return GetEntity(entity, entityType, appName);
             return null;
         }
 

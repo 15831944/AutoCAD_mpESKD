@@ -3,16 +3,13 @@ namespace mpESKD.Functions.mpBreakLine
 {
     using System;
     using System.Collections.Generic;
-    using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
-    using Properties;
     using ModPlusAPI.Windows;
 
-    [IntellectualEntityDisplayNameKeyAttribute("h48")]
+    [IntellectualEntityDisplayNameKey("h48")]
     public class BreakLine : IntellectualEntity
     {
         #region Constructors
@@ -97,16 +94,20 @@ namespace mpESKD.Functions.mpBreakLine
         
         #endregion
 
-        private readonly Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
+        private readonly Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() =>
+        {
+            // Это нужно, чтобы не выводилось сообщение в командную строку
+            var p = new Polyline();
+            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
+            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
+            return p;
+        });
 
         public Polyline MainPolyline
         {
             get
             {
-                _mainPolyline.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _mainPolyline.Value.LineWeight = LineWeight.ByBlock;
-                _mainPolyline.Value.Linetype = "ByBlock";
-                _mainPolyline.Value.LinetypeScale = LineTypeScale;
+                SetPropertiesToCadEntity(_mainPolyline.Value);
                 return _mainPolyline.Value;
             }
         }
@@ -116,7 +117,6 @@ namespace mpESKD.Functions.mpBreakLine
             get
             {
                 yield return MainPolyline;
-                //yield return other entities
             }
         }
 
@@ -171,7 +171,7 @@ namespace mpESKD.Functions.mpBreakLine
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, BreakLineMinLength * scale /** BlockTransform.GetScale()*/);
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, BreakLineMinLength * scale);
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
@@ -290,16 +290,16 @@ namespace mpESKD.Functions.mpBreakLine
         }
 
         /// <summary>Изменение точек полилинии</summary>
-        /// <param name="pts">Коллекция 2Д точек</param>
+        /// <param name="points">Коллекция 2Д точек</param>
         /// <param name="bulges">Список выпуклостей</param>
-        private void FillMainPolylineWithPoints(Point2dCollection pts, IList<double> bulges)
+        private void FillMainPolylineWithPoints(Point2dCollection points, IList<double> bulges)
         {
             // Если количество точек совпадает, тогда просто их меняем
-            if (pts.Count == MainPolyline.NumberOfVertices)
+            if (points.Count == MainPolyline.NumberOfVertices)
             {
-                for (var i = 0; i < pts.Count; i++)
+                for (var i = 0; i < points.Count; i++)
                 {
-                    MainPolyline.SetPointAt(i, pts[i]);
+                    MainPolyline.SetPointAt(i, points[i]);
                     MainPolyline.SetBulgeAt(i, bulges[i]);
                 }
             }
@@ -307,121 +307,18 @@ namespace mpESKD.Functions.mpBreakLine
             {
                 for (var i = 0; i < MainPolyline.NumberOfVertices; i++)
                     MainPolyline.RemoveVertexAt(i);
-                for (var i = 0; i < pts.Count; i++)
-                    MainPolyline.AddVertexAt(i, pts[i], bulges[i], 0.0, 0.0);
+                for (var i = 0; i < points.Count; i++)
+                {
+                    if (i < MainPolyline.NumberOfVertices)
+                    {
+                        MainPolyline.SetPointAt(i, points[i]);
+                        MainPolyline.SetBulgeAt(i, bulges[i]);
+                    }
+                    else MainPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
+                }
             }
         }
 
         #endregion
-
-        //todo remove after test
-        ////public override ResultBuffer GetParametersForXData()
-        ////{
-        ////    try
-        ////    {
-        ////        // ReSharper disable once UseObjectOrCollectionInitializer
-        ////        var resBuf = new ResultBuffer();
-        ////        // 1001 - DxfCode.ExtendedDataRegAppName. AppName
-        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, BreakLineInterface.Name));
-        ////        // Вектор от конечной точки до начальной с учетом масштаба блока и трансформацией блока
-        ////        var vector = EndPointOCS - InsertionPointOCS;
-        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataXCoordinate, new Point3d(vector.X, vector.Y, vector.Z))); //1010
-        ////        // Текстовые значения (код 1000)
-        ////        // Стиль
-        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, StyleGuid)); // 0
-        ////        // Тип разрыва
-        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, BreakLineType.ToString())); // 1
-        ////        // scale
-        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, Scale.Name)); // 2
-        ////        // Целочисленные значения (код 1070)
-        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, Overhang)); // 0
-        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakHeight)); // 1
-        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataInteger16, BreakWidth)); // 2
-        ////        // Значения типа double (dxfCode 1040)
-        ////        resBuf.Add(new TypedValue((int)DxfCode.ExtendedDataReal, LineTypeScale)); // 0
-
-        ////        return resBuf;
-        ////    }
-        ////    catch (Exception exception)
-        ////    {
-        ////        ExceptionBox.Show(exception);
-        ////        return null;
-        ////    }
-        ////}
-
-        ////public override void GetParametersFromResBuf(ResultBuffer resBuf)
-        ////{
-        ////    try
-        ////    {
-        ////        TypedValue[] resBufArr = resBuf.AsArray();
-        ////        /* indexes
-        ////         * Для каждого значения с повторяющимся кодом назначен свой индекс (см. метод GetParametersForXData)
-        ////         */
-        ////        var index1000 = 0;
-        ////        var index1070 = 0;
-        ////        var index1040 = 0;
-        ////        foreach (TypedValue typedValue in resBufArr)
-        ////        {
-        ////            switch ((DxfCode)typedValue.TypeCode)
-        ////            {
-        ////                case DxfCode.ExtendedDataXCoordinate:
-        ////                    {
-        ////                        // Получаем вектор от последней точки до первой в системе координат блока
-        ////                        var vectorFromEndToInsertion = ((Point3d)typedValue.Value).GetAsVector();
-        ////                        // получаем конечную точку в мировой системе координат
-        ////                        EndPoint = (InsertionPointOCS + vectorFromEndToInsertion).TransformBy(BlockTransform);
-        ////                        break;
-        ////                    }
-        ////                case DxfCode.ExtendedDataAsciiString:
-        ////                    {
-        ////                        switch (index1000)
-        ////                        {
-        ////                            case 0:
-        ////                                StyleGuid = typedValue.Value.ToString();
-        ////                                break;
-        ////                            case 1:
-        ////                                BreakLineType = Enum.TryParse(typedValue.Value.ToString(), out BreakLineType blt) ? blt : BreakLineType.Linear;
-        ////                                break;
-        ////                            case 2:
-        ////                                Scale = AcadHelpers.GetAnnotationScaleByName(typedValue.Value.ToString());
-        ////                                break;
-        ////                        }
-        ////                        // index
-        ////                        index1000++;
-        ////                        break;
-        ////                    }
-        ////                case DxfCode.ExtendedDataInteger16:
-        ////                    {
-        ////                        switch (index1070)
-        ////                        {
-        ////                            case 0:
-        ////                                Overhang = (Int16)typedValue.Value;
-        ////                                break;
-        ////                            case 1:
-        ////                                BreakHeight = (Int16)typedValue.Value;
-        ////                                break;
-        ////                            case 2:
-        ////                                BreakWidth = (Int16)typedValue.Value;
-        ////                                break;
-        ////                        }
-        ////                        //index
-        ////                        index1070++;
-        ////                        break;
-        ////                    }
-        ////                case DxfCode.ExtendedDataReal:
-        ////                    {
-        ////                        if (index1040 == 0) // 0 - LineTypeScale
-        ////                            LineTypeScale = (double)typedValue.Value;
-        ////                        index1040++;
-        ////                        break;
-        ////                    }
-        ////            }
-        ////        }
-        ////    }
-        ////    catch (Exception exception)
-        ////    {
-        ////        ExceptionBox.Show(exception);
-        ////    }
-        ////}
     }
 }

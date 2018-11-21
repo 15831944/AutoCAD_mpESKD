@@ -19,7 +19,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             if (_groundLineOsnapOverrule != null) return _groundLineOsnapOverrule;
             _groundLineOsnapOverrule = new GroundLineOsnapOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _groundLineOsnapOverrule.SetXDataFilter(GroundLineInterface.Name);
+            _groundLineOsnapOverrule.SetXDataFilter(GroundLineDescriptor.Instance.Name);
             return _groundLineOsnapOverrule;
         }
 
@@ -49,7 +49,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineInterface.Name);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name);
         }
     }
 }

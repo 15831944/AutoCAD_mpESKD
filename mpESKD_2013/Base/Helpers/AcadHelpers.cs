@@ -3,6 +3,7 @@
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Xml.Linq;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -458,9 +459,28 @@
             DBObject dbObject = rxObject as DBObject;
             if (dbObject == null)
                 return false;
-            // Всегда нужно проверять по наличию расширенных данных
-            // иначе может привести к фаталам при работе с динамическими блоками
-            return IsIntellectualEntity(dbObject, appName);
+            // comment #16 - http://adn-cis.org/forum/index.php?topic=8910.15
+            //if (dbObject.ObjectId == ObjectId.Null) return false;
+            if (dbObject is BlockReference)
+            {
+                // Всегда нужно проверять по наличию расширенных данных
+                // иначе может привести к фаталам при работе с динамическими блоками
+                return IsIntellectualEntity(dbObject, appName);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Проверка поддерживаемости вставки блока путем проверки наличия XData с поддерживаемым кодом 1001
+        /// </summary>
+        public static bool IsApplicable(BlockReference blockReference)
+        {
+            if (blockReference.XData == null)
+                return false;
+            var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
+            var typedValue = blockReference.XData.AsArray()
+                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()));
+            return typedValue.Value != null;
         }
 
         /// <summary>

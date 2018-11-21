@@ -1,13 +1,13 @@
-﻿using System;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Runtime;
-using mpESKD.Base.Helpers;
-using ModPlusAPI.Windows;
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 
 namespace mpESKD.Functions.mpBreakLine.Overrules
 {
+    using System;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.Runtime;
+    using Base.Helpers;
+    using ModPlusAPI.Windows;
     using System.Diagnostics;
     using Base;
 
@@ -19,7 +19,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             if (_breakLineOsnapOverrule != null) return _breakLineOsnapOverrule;
             _breakLineOsnapOverrule = new BreakLineOsnapOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineOsnapOverrule.SetXDataFilter(BreakLineInterface.Name);
+            _breakLineOsnapOverrule.SetXDataFilter(BreakLineDescriptor.Instance.Name);
             return _breakLineOsnapOverrule;
         }
 
@@ -48,7 +48,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineInterface.Name);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name);
         }
     }
 }

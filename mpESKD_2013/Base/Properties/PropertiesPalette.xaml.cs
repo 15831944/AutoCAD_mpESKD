@@ -91,8 +91,11 @@
                         {
                             foreach (SelectedObject selectedObject in psr.Value)
                             {
+                                if(selectedObject.ObjectId == ObjectId.Null)
+                                    continue;
                                 var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
-                                if (obj is BlockReference)
+                                if (obj is BlockReference blockReference && 
+                                    ExtendedDataHelpers.IsApplicable(blockReference))
                                 {
                                     objectIds.Add(selectedObject.ObjectId);
                                 }

@@ -23,7 +23,6 @@
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance(), true);
-            Overrule.Overruling = true;
         }
 
         public void Terminate()
@@ -51,7 +50,7 @@
         private void CreateGroundLine()
         {
             // send statistic
-            Statistic.SendCommandStarting(GroundLineInterface.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, MpVersionData.CurCadVers);
 
             try
             {
@@ -61,7 +60,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineInterface.Name);
+                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
                 
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();
@@ -160,7 +159,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineInterface.Name);
+                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
                 //style
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();
