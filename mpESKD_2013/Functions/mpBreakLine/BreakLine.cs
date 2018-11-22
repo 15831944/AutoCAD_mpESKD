@@ -7,6 +7,7 @@ namespace mpESKD.Functions.mpBreakLine
     using Autodesk.AutoCAD.Geometry;
     using Base;
     using Base.Enums;
+    using Base.Helpers;
     using ModPlusAPI.Windows;
 
     [IntellectualEntityDisplayNameKey("h48")]
@@ -77,7 +78,7 @@ namespace mpESKD.Functions.mpBreakLine
         [PropertyNameKeyInStyleEditor("p4-1")]
         [SaveToXData]
         public int BreakHeight { get; set; } = 10;
-        
+
         #endregion
 
         #region Geometry
@@ -91,32 +92,24 @@ namespace mpESKD.Functions.mpBreakLine
             (InsertionPoint.Y + EndPoint.Y) / 2,
             (InsertionPoint.Z + EndPoint.Z) / 2
         );
-        
+
         #endregion
 
-        private readonly Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() =>
-        {
-            // Это нужно, чтобы не выводилось сообщение в командную строку
-            var p = new Polyline();
-            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
-            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
-            return p;
-        });
+        /// <summary>
+        /// Главная полилиния примитива
+        /// </summary>
+        private Polyline _mainPolyline;
 
-        public Polyline MainPolyline
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_mainPolyline.Value);
-                return _mainPolyline.Value;
-            }
-        }
-
+        /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
             get
             {
-                yield return MainPolyline;
+                var entities = new List<Entity> { _mainPolyline };
+                foreach (var e in entities)
+                    if (e != null)
+                        SetPropertiesToCadEntity(e);
+                return entities;
             }
         }
 
@@ -200,7 +193,7 @@ namespace mpESKD.Functions.mpBreakLine
                     bulges.Add(0.0);
                 }
                 // Первая точка, соответствующая ручке
-                pts.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
+                pts.Add(insertionPoint.ConvertPoint3dToPoint2d());
                 bulges.Add(0.0);
                 pts.Add(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - BreakWidth / 2.0 * scale));
                 bulges.Add(0.0);
@@ -235,7 +228,7 @@ namespace mpESKD.Functions.mpBreakLine
                     bulges.Add(length / 10 / length / 4 * 2);
                 }
                 // Первая точка, соответствующая ручке
-                pts.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
+                pts.Add(insertionPoint.ConvertPoint3dToPoint2d());
                 bulges.Add(length / 10 / length / 2 * 4);
 
                 // Средняя точка
@@ -257,7 +250,7 @@ namespace mpESKD.Functions.mpBreakLine
             if (BreakLineType == BreakLineType.Cylindrical)
             {
                 // first
-                pts.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
+                pts.Add(insertionPoint.ConvertPoint3dToPoint2d());
                 bulges.Add(-0.392699081698724);
                 pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,
@@ -294,28 +287,11 @@ namespace mpESKD.Functions.mpBreakLine
         /// <param name="bulges">Список выпуклостей</param>
         private void FillMainPolylineWithPoints(Point2dCollection points, IList<double> bulges)
         {
-            // Если количество точек совпадает, тогда просто их меняем
-            if (points.Count == MainPolyline.NumberOfVertices)
+            _mainPolyline = new Polyline(points.Count);
+            SetPropertiesToCadEntity(_mainPolyline);
+            for (var i = 0; i < points.Count; i++)
             {
-                for (var i = 0; i < points.Count; i++)
-                {
-                    MainPolyline.SetPointAt(i, points[i]);
-                    MainPolyline.SetBulgeAt(i, bulges[i]);
-                }
-            }
-            else // иначе создаем заново
-            {
-                for (var i = 0; i < MainPolyline.NumberOfVertices; i++)
-                    MainPolyline.RemoveVertexAt(i);
-                for (var i = 0; i < points.Count; i++)
-                {
-                    if (i < MainPolyline.NumberOfVertices)
-                    {
-                        MainPolyline.SetPointAt(i, points[i]);
-                        MainPolyline.SetBulgeAt(i, bulges[i]);
-                    }
-                    else MainPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
-                }
+                _mainPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
             }
         }
 

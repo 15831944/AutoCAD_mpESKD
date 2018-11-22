@@ -4,8 +4,6 @@ namespace mpESKD.Functions.mpGroundLine
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
-    using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
@@ -17,7 +15,7 @@ namespace mpESKD.Functions.mpGroundLine
     public class GroundLine : IntellectualEntity
     {
         #region Constructor
-        
+
         /// <inheritdoc />
         public GroundLine(ObjectId objectId) : base(objectId)
         {
@@ -29,14 +27,14 @@ namespace mpESKD.Functions.mpGroundLine
 
         #endregion
 
-        #region Points and Grips
+        #region Points
 
         /// <summary>
         /// Промежуточные точки
         /// </summary>
         [SaveToXData]
         public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
-        
+
         private List<Point3d> MiddlePointsOCS
         {
             get
@@ -50,7 +48,7 @@ namespace mpESKD.Functions.mpGroundLine
         #endregion
 
         #region Properties
-        
+
         /// <summary>
         /// Минимальная длина линии грунта
         /// </summary>
@@ -59,7 +57,7 @@ namespace mpESKD.Functions.mpGroundLine
         /// <summary>
         /// Отступ первого штриха в каждом сегменте полилинии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "p36", "d36", 
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p36", "d36",
             GroundLineFirstStrokeOffset.ByHalfSpace, null, null)]
         [PropertyNameKeyInStyleEditor("p36-1")]
         [SaveToXData]
@@ -112,31 +110,27 @@ namespace mpESKD.Functions.mpGroundLine
 
         #region Geometry
 
-        private readonly Lazy<Polyline> _mainPolyline = new Lazy<Polyline>(() => new Polyline());
+        /// <summary>
+        /// Главная полилиния примитива
+        /// </summary>
+        private Polyline _mainPolyline;
+        
+        /// <summary>
+        /// Список штрихов
+        /// </summary>
+        private readonly List<Line> _strokes = new List<Line>();
 
-        public Polyline MainPolyline
-        {
-            get
-            {
-                _mainPolyline.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _mainPolyline.Value.LineWeight = LineWeight.ByBlock;
-                _mainPolyline.Value.Linetype = "ByBlock";
-                _mainPolyline.Value.LinetypeScale = LineTypeScale;
-                return _mainPolyline.Value;
-            }
-        }
-
-        public List<Line> Strokes { get; } = new List<Line>();
-
+        /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
             get
             {
-                yield return MainPolyline;
-                foreach (var s in Strokes)
-                {
-                    yield return s;
-                }
+                var entities = new List<Entity> { _mainPolyline };
+                entities.AddRange(_strokes);
+                foreach (var e in entities)
+                    if (e != null)
+                        SetPropertiesToCadEntity(e);
+                return entities;
             }
         }
         
@@ -211,37 +205,22 @@ namespace mpESKD.Functions.mpGroundLine
             Point3d endPoint, double scale)
         {
             var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
-
-            // Если количество точек совпадает, то просто их меняем
-            if (points.Count == MainPolyline.NumberOfVertices)
+            _mainPolyline = new Polyline(points.Count);
+            SetPropertiesToCadEntity(_mainPolyline);
+            for (var i = 0; i < points.Count; i++)
             {
-                for (var i = 0; i < points.Count; i++)
-                {
-                    MainPolyline.SetPointAt(i, points[i]);
-                }
-            }
-            // Иначе создаем заново
-            else
-            {
-                for (var i = 0; i < MainPolyline.NumberOfVertices; i++)
-                    MainPolyline.RemoveVertexAt(i);
-                for (var i = 0; i < points.Count; i++)
-                {
-                    if (i < MainPolyline.NumberOfVertices)
-                        MainPolyline.SetPointAt(i, points[i]);
-                    else MainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
-                }
+                _mainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
             }
 
             // create strokes
-            Strokes.Clear();
-            if (MainPolyline.Length >= GroundLineMinLength)
+            _strokes.Clear();
+            if (_mainPolyline.Length >= GroundLineMinLength)
             {
-                for (var i = 1; i < MainPolyline.NumberOfVertices; i++)
+                for (var i = 1; i < _mainPolyline.NumberOfVertices; i++)
                 {
-                    var previousPoint = MainPolyline.GetPoint3dAt(i - 1);
-                    var currentPoint = MainPolyline.GetPoint3dAt(i);
-                    Strokes.AddRange(CreateStrokesOnMainPolylineSegment(currentPoint, previousPoint, scale));
+                    var previousPoint = _mainPolyline.GetPoint3dAt(i - 1);
+                    var currentPoint = _mainPolyline.GetPoint3dAt(i);
+                    _strokes.AddRange(CreateStrokesOnMainPolylineSegment(currentPoint, previousPoint, scale));
                 }
             }
         }
@@ -260,7 +239,7 @@ namespace mpESKD.Functions.mpGroundLine
             Vector3d segmentVector = currentPoint - previousPoint;
             double segmentLength = segmentVector.Length;
             Vector3d perpendicular = segmentVector.GetPerpendicularVector().Negate();
-            double distanceAtSegmentStart = MainPolyline.GetDistAtPoint(previousPoint);
+            double distanceAtSegmentStart = _mainPolyline.GetDistAtPoint(previousPoint);
 
             var overflowIndex = 0;
 
@@ -295,7 +274,7 @@ namespace mpESKD.Functions.mpGroundLine
                 if (summDistanceAtSegment >= segmentLength)
                     break;
 
-                var firstStrokePoint = MainPolyline.GetPointAtDist(distanceAtSegmentStart + summDistanceAtSegment);
+                var firstStrokePoint = _mainPolyline.GetPointAtDist(distanceAtSegmentStart + summDistanceAtSegment);
                 var helpPoint =
                     firstStrokePoint + segmentVector.Negate().GetNormal() * StrokeLength * scale * Math.Cos(StrokeAngle.DegreeToRadian());
                 var secondStrokePoint =
@@ -314,14 +293,14 @@ namespace mpESKD.Functions.mpGroundLine
             return segmentStrokeDependencies;
         }
 
-        private Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
+        private static Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
         {
             // ReSharper disable once UseObjectOrCollectionInitializer
             var points = new Point2dCollection();
 
-            points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(insertionPoint));
-            middlePoints.ForEach(p => points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(p)));
-            points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint));
+            points.Add(insertionPoint.ConvertPoint3dToPoint2d());
+            middlePoints.ForEach(p => points.Add(p.ConvertPoint3dToPoint2d()));
+            points.Add(endPoint.ConvertPoint3dToPoint2d());
 
             return points;
         }

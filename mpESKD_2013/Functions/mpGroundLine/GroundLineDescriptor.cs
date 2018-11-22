@@ -14,13 +14,13 @@
         public string Name => "mpGroundLine";
 
         /// <inheritdoc />
-        public string LName => Language.GetItem(MainFunction.LangItem, "h73"); // "Линия грунта";
+        public string LName => Language.GetItem(Invariables.LangItem, "h73"); // "Линия грунта";
 
         /// <inheritdoc />
-        public string Description => Language.GetItem(MainFunction.LangItem, "h74"); // "Линия обозначения грунта";
+        public string Description => Language.GetItem(Invariables.LangItem, "h74"); // "Линия обозначения грунта";
 
         /// <inheritdoc />
-        public string FullDescription => Language.GetItem(MainFunction.LangItem, "h75"); // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию грунта";
+        public string FullDescription => Language.GetItem(Invariables.LangItem, "h75"); // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию грунта";
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
@@ -34,13 +34,13 @@
         /// <inheritdoc />
         public List<string> SubFunctionsLNames => new List<string>
         {
-            Language.GetItem(MainFunction.LangItem, "h76") // "Линия грунта из полилинии"
+            Language.GetItem(Invariables.LangItem, "h76") // "Линия грунта из полилинии"
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
-            Language.GetItem(MainFunction.LangItem, "h77") // "Конвертирование выбранной полилинии в линию обозначения грунта"
+            Language.GetItem(Invariables.LangItem, "h77") // "Конвертирование выбранной полилинии в линию обозначения грунта"
         };
 
         /// <inheritdoc />

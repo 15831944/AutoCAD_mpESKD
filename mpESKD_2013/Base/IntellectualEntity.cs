@@ -7,10 +7,8 @@ namespace mpESKD.Base
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Runtime.Serialization;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
-    using Autodesk.AutoCAD.GraphicsInterface;
     using Helpers;
     using ModPlusAPI.Windows;
     using System.Reflection;
@@ -36,7 +34,7 @@ namespace mpESKD.Base
         /// <summary>Инициализация экземпляра класса IntellectualEntity без заполнения данными
         /// В данном случае уже все данные получены и нужно только "построить" 
         /// базовые примитивы</summary>
-        protected IntellectualEntity(ObjectId blockId) : base()
+        protected IntellectualEntity(ObjectId blockId)
         {
             BlockId = blockId;
         }
@@ -68,8 +66,19 @@ namespace mpESKD.Base
         /// </summary>
         public Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
 
-        /// <summary>Коллекция базовых примитивов, входящих в примитив</summary>
+        /// <summary>
+        /// Коллекция примитивов, создающих графическое представление интеллектуального примитива
+        /// согласно его свойств
+        /// </summary>
         public abstract IEnumerable<Entity> Entities { get; }
+
+        /// <summary>
+        /// Коллекция примитивов, которая передается в BlockReference
+        /// </summary>
+        private IEnumerable<Entity> _entities
+        {
+            get { return Entities.Where(e => e != null); }
+        }
 
         public bool IsValueCreated { get; set; }
 
@@ -186,7 +195,7 @@ namespace mpESKD.Base
                                 _blockRecord.BlockScaling = BlockScaling.Uniform;
                                 var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
                                 //Debug.Print("Transformed copy");
-                                foreach (var entity in Entities)
+                                foreach (var entity in _entities)
                                 {
                                     if (entity.Visible)
                                     {
@@ -204,13 +213,10 @@ namespace mpESKD.Base
                     {
                         //Debug.Print("Value not created");
                         var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
-                        foreach (var entity in Entities)
+                        foreach (var entity in _entities)
                         {
-                            if (entity.Visible)
-                            {
                                 var transformedCopy = entity.GetTransformedCopy(matrix3D);
                                 _blockRecord.AppendEntity(transformedCopy);
-                            }
                         }
                         IsValueCreated = true;
                     }
@@ -245,7 +251,7 @@ namespace mpESKD.Base
                     blockTableRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite);
                     blockTableRecord.BlockScaling = BlockScaling.Uniform;
                     var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
-                    foreach (var entity in Entities)
+                    foreach (var entity in _entities)
                     {
                         var transformedCopy = entity.GetTransformedCopy(matrix3D);
                         blockTableRecord.AppendEntity(transformedCopy);
@@ -274,7 +280,7 @@ namespace mpESKD.Base
                                 ent.Erase(true);
                             }
                         }
-                        foreach (Entity entity in Entities)
+                        foreach (Entity entity in _entities)
                         {
                             using (entity)
                             {
@@ -311,13 +317,13 @@ namespace mpESKD.Base
         public abstract void UpdateEntities();
 
         /// <summary>
-        /// Сериализация значений параметров, помеченных атрибутом <see cref="SaveToXData"/>, в экземпляр <see cref="ResultBuffer"/>
+        /// Сериализация значений параметров, помеченных атрибутом <see cref="SaveToXDataAttribute"/>, в экземпляр <see cref="ResultBuffer"/>
         /// </summary>
         public ResultBuffer GetDataForXData()
         {
             return GetDataForXData("mp" + GetType().Name);
         }
-        
+
         private ResultBuffer GetDataForXData(string appName)
         {
             try
@@ -328,9 +334,9 @@ namespace mpESKD.Base
                 resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, appName));
 
                 Dictionary<string, object> propertiesDataDictionary = new Dictionary<string, object>();
-                foreach (PropertyInfo propertyInfo in this.GetType().GetProperties())
+                foreach (PropertyInfo propertyInfo in GetType().GetProperties())
                 {
-                    var attribute = propertyInfo.GetCustomAttribute<SaveToXData>();
+                    var attribute = propertyInfo.GetCustomAttribute<SaveToXDataAttribute>();
                     if (attribute != null)
                     {
                         var value = propertyInfo.GetValue(this);
@@ -338,12 +344,12 @@ namespace mpESKD.Base
                         {
                             propertiesDataDictionary.Add(propertyInfo.Name, scale.Name);
                         }
-                        else if(value is Point3d point)
+                        else if (value is Point3d point)
                         {
                             var vector = point.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS;
                             propertiesDataDictionary.Add(propertyInfo.Name, vector.AsString());
                         }
-                        else if(value is List<Point3d> list)
+                        else if (value is List<Point3d> list)
                         {
                             var str = string.Join("#", list.Select(p => (p.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS).AsString()));
                             propertiesDataDictionary.Add(propertyInfo.Name, str);
@@ -380,7 +386,7 @@ namespace mpESKD.Base
         }
 
         /// <summary>
-        /// Установка значений свойств, отмеченных атрибутом <see cref="SaveToXData"/> из расширенных данных примитива AutoCAD
+        /// Установка значений свойств, отмеченных атрибутом <see cref="SaveToXDataAttribute"/> из расширенных данных примитива AutoCAD
         /// </summary>
         /// <param name="resultBuffer"></param>
         public void SetPropertiesValuesFromXData(ResultBuffer resultBuffer)
@@ -388,10 +394,10 @@ namespace mpESKD.Base
             try
             {
                 TypedValue typedValue1001 = resultBuffer.AsArray().FirstOrDefault(tv =>
-                    tv.TypeCode == (int) DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
+                    tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
                 if (typedValue1001.Value != null)
                 {
-                    var typedValue1000 = resultBuffer.AsArray().FirstOrDefault(tv => tv.TypeCode == (int) DxfCode.ExtendedDataAsciiString);
+                    var typedValue1000 = resultBuffer.AsArray().FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataAsciiString);
                     if (typedValue1000.Value != null)
                     {
                         using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(typedValue1000.Value.ToString())))
@@ -400,33 +406,33 @@ namespace mpESKD.Base
                                 new DataContractJsonSerializerSettings { UseSimpleDictionaryFormat = true });
                             if (serializer.ReadObject(ms) is Dictionary<string, object> data)
                             {
-                                foreach (PropertyInfo propertyInfo in this.GetType().GetProperties())
+                                foreach (PropertyInfo propertyInfo in GetType().GetProperties())
                                 {
-                                    var attribute = propertyInfo.GetCustomAttribute<SaveToXData>();
+                                    var attribute = propertyInfo.GetCustomAttribute<SaveToXDataAttribute>();
                                     if (attribute != null && data.ContainsKey(propertyInfo.Name))
                                     {
-                                        string valueForProperty = data[propertyInfo.Name] != null 
-                                            ? data[propertyInfo.Name].ToString() 
+                                        string valueForProperty = data[propertyInfo.Name] != null
+                                            ? data[propertyInfo.Name].ToString()
                                             : string.Empty;
-                                        if(string.IsNullOrEmpty(valueForProperty))
+                                        if (string.IsNullOrEmpty(valueForProperty))
                                             continue;
 
                                         if (propertyInfo.Name == "StyleGuid")
                                         {
-                                            GetType().GetProperty("Style")?.SetValue(this, StyleManager.GetStyleNameByGuid(this.GetType(), valueForProperty));
+                                            GetType().GetProperty("Style")?.SetValue(this, StyleManager.GetStyleNameByGuid(GetType(), valueForProperty));
                                         }
                                         if (propertyInfo.PropertyType == typeof(AnnotationScale))
                                         {
                                             propertyInfo.SetValue(this,
                                                 AcadHelpers.GetAnnotationScaleByName(valueForProperty));
                                         }
-                                        else if(propertyInfo.PropertyType == typeof(Point3d))
+                                        else if (propertyInfo.PropertyType == typeof(Point3d))
                                         {
                                             var vector = valueForProperty.ParseToPoint3d().GetAsVector();
                                             var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
                                             propertyInfo.SetValue(this, point);
                                         }
-                                        else if(propertyInfo.PropertyType == typeof(List<Point3d>))
+                                        else if (propertyInfo.PropertyType == typeof(List<Point3d>))
                                         {
                                             List<Point3d> points = new List<Point3d>();
                                             foreach (string s in valueForProperty.Split('#'))
@@ -480,48 +486,39 @@ namespace mpESKD.Base
             entity.LinetypeScale = 1.0;
         }
 
-        public void Draw(WorldDraw draw)
-        {
-            var geometry = draw.Geometry;
-            foreach (var entity in Entities)
-            {
-                geometry.Draw(entity);
-            }
-        }
+        //todo remove after test
+        ////public void Draw(WorldDraw draw)
+        ////{
+        ////    var geometry = draw.Geometry;
+        ////    foreach (var entity in _entities)
+        ////    {
+        ////        geometry.Draw(entity);
+        ////    }
+        ////}
 
-        public void Erase()
-        {
-            foreach (var entity in Entities)
-            {
-                entity.Erase();
-            }
-        }
-        /// <summary>
-        /// Расчлинение интеллектуального примитива
-        /// </summary>
-        /// <param name="entitySet"></param>
-        public void Explode(DBObjectCollection entitySet)
-        {
-            entitySet.Clear();
-            foreach (var entity in Entities)
-            {
-                entitySet.Add(entity);
-            }
-        }
+        ////public void Erase()
+        ////{
+        ////    foreach (var entity in _entities)
+        ////    {
+        ////        entity.Erase();
+        ////    }
+        ////}
+        /////// <summary>
+        /////// Расчлинение интеллектуального примитива
+        /////// </summary>
+        /////// <param name="entitySet"></param>
+        ////public void Explode(DBObjectCollection entitySet)
+        ////{
+        ////    entitySet.Clear();
+        ////    foreach (var entity in _entities)
+        ////    {
+        ////        entitySet.Add(entity);
+        ////    }
+        ////}
 
         public void Dispose()
         {
             _blockRecord?.Dispose();
-        }
-    }
-
-    public sealed class MyBinder : SerializationBinder
-    {
-        public override Type BindToType(
-            string assemblyName,
-            string typeName)
-        {
-            return Type.GetType($"{typeName}, {assemblyName}");
         }
     }
 }

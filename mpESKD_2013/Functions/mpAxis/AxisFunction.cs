@@ -1,6 +1,7 @@
 ﻿namespace mpESKD.Functions.mpAxis
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
@@ -37,7 +38,7 @@
             }
             else
             {
-                MessageBox.Show(Language.GetItem(MainFunction.LangItem, "msg4"));
+                MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg4"));
                 //var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
                 //AcadHelpers.WriteMessageInDebug("\nLocation:");
 
@@ -96,12 +97,6 @@
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance());
         }
-
-        public static List<string> AxisRusAlphabet = new List<string>
-        {
-            "А","Б","В","Г","Д","Е","Ж","И","К","Л","М","Н","П","Р","С","Т","У","Ф","Ш","Э","Ю","Я",
-            "АА","ББ","ВВ","ГГ","ДД","ЕЕ","ЖЖ","ИИ","КК","ЛЛ","ММ","НН","ПП","РР","СС","ТТ","УУ","ФФ","ШШ","ЭЭ","ЮЮ","ЯЯ"
-        };
     }
 
     public class AxisCommands
@@ -128,14 +123,9 @@
 
                 var style = StyleManager.GetCurrentStyle(typeof(Axis));
 
-                // add layer from style
                 var axisLastHorizontalValue = string.Empty;
                 var axisLastVerticalValue = string.Empty;
-                if (MainStaticSettings.Settings.AxisSaveLastTextAndContinueNew)
-                {
-                    axisLastHorizontalValue = ModPlus.Helpers.XDataHelpers.GetStringXData("AxisLastValueForHorizontal");
-                    axisLastVerticalValue = ModPlus.Helpers.XDataHelpers.GetStringXData("AxisLastValueForVertical");
-                }
+                FindLastAxisValues(ref axisLastHorizontalValue, ref axisLastVerticalValue);
                 var axis = new Axis(axisLastHorizontalValue, axisLastVerticalValue);
 
                 var blockReference = MainFunction.CreateBlock(axis);
@@ -145,7 +135,7 @@
                         axis,
                         blockReference,
                         new Point3d(0, -1, 0),
-                        Language.GetItem(MainFunction.LangItem, "msg2"));
+                        Language.GetItem(Invariables.LangItem, "msg2"));
                     do
                     {
                         var status = AcadHelpers.Editor.Drag(entityJig).Status;
@@ -178,13 +168,6 @@
                         ent.XData = axis.GetDataForXData();
                         tr.Commit();
                     }
-                    // save first marker value to doc
-                    var v = (axis.EndPoint - axis.InsertionPoint).GetNormal();
-                    if ((v.X > 0.5 || v.X < -0.5) && (v.Y < 0.5 || v.Y > -0.5))
-                        ModPlus.Helpers.XDataHelpers.SetStringXData("AxisLastValueForHorizontal", axis.FirstText);
-                    else
-                        ModPlus.Helpers.XDataHelpers.SetStringXData("AxisLastValueForVertical", axis.FirstText);
-
                 }
             }
             catch (Exception exception)
@@ -194,6 +177,38 @@
             finally
             {
                 Overrule.Overruling = true;
+            }
+        }
+
+        /// <summary>
+        /// Поиск последних цифровых и буквенных значений осей на текущем виде
+        /// </summary>
+        /// <param name="axisLastHorizontalValue"></param>
+        /// <param name="axisLastVerticalValue"></param>
+        private static void FindLastAxisValues(ref string axisLastHorizontalValue, ref string axisLastVerticalValue)
+        {
+            if (MainStaticSettings.Settings.AxisSaveLastTextAndContinueNew)
+            {
+                List<int> allIntegerValues = new List<int>();
+                List<string> allLetterValues = new List<string>();
+                AcadHelpers.GetAllIntellectualEntitiesInCurrentSpace<Axis>(typeof(Axis)).ForEach(a =>
+                {
+                    var s = a.FirstText;
+                    if(int.TryParse(s, out var i))
+                        allIntegerValues.Add(i);
+                    else allLetterValues.Add(s);
+                });
+                if (allIntegerValues.Any())
+                {
+                    allIntegerValues.Sort();
+                    axisLastVerticalValue = allIntegerValues.Last().ToString();
+                }
+
+                if (allLetterValues.Any())
+                {
+                    allLetterValues.Sort();
+                    axisLastHorizontalValue = allLetterValues.Last();
+                }
             }
         }
     }

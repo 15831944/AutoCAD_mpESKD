@@ -1,5 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-namespace mpESKD.Functions.mpGroundLine.Overrules
+﻿namespace mpESKD.Functions.mpGroundLine.Overrules
 {
     using System;
     using System.Diagnostics;
@@ -12,15 +11,15 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
     public class GroundLineOsnapOverrule : OsnapOverrule
     {
-        protected static GroundLineOsnapOverrule _groundLineOsnapOverrule;
+        private static GroundLineOsnapOverrule _instance;
 
         public static GroundLineOsnapOverrule Instance()
         {
-            if (_groundLineOsnapOverrule != null) return _groundLineOsnapOverrule;
-            _groundLineOsnapOverrule = new GroundLineOsnapOverrule();
+            if (_instance != null) return _instance;
+            _instance = new GroundLineOsnapOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _groundLineOsnapOverrule.SetXDataFilter(GroundLineDescriptor.Instance.Name);
-            return _groundLineOsnapOverrule;
+            _instance.SetXDataFilter(GroundLineDescriptor.Instance.Name);
+            return _instance;
         }
 
         public override void GetObjectSnapPoints(Entity entity, ObjectSnapModes snapMode, IntPtr gsSelectionMark, Point3d pickPoint,

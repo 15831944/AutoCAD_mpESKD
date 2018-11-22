@@ -26,7 +26,7 @@ namespace mpESKD.Base.Styles
         public StyleEditor()
         {
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "tab4");
+            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "tab4");
             Loaded += StyleEditor_OnLoaded;
             ContentRendered += StyleEditor_ContentRendered;
         }
@@ -105,7 +105,7 @@ namespace mpESKD.Base.Styles
             TextBlock headerName = new TextBlock
             {
                 Margin = (Thickness)FindResource("ModPlusDefaultMargin"),
-                Text = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h54")
+                Text = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h54")
             };
             Grid.SetRow(headerName, 0);
             topGrid.Children.Add(headerName);
@@ -125,7 +125,7 @@ namespace mpESKD.Base.Styles
             TextBlock headerDescription = new TextBlock
             {
                 Margin = (Thickness)FindResource("ModPlusDefaultMargin"),
-                Text = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h55")
+                Text = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h55")
             };
             Grid.SetRow(headerDescription, 2);
             topGrid.Children.Add(headerDescription);
@@ -189,7 +189,7 @@ namespace mpESKD.Base.Styles
                             Grid.SetColumn(cb, 2);
                             Grid.SetRow(cb, rowIndex);
                             var layers = AcadHelpers.Layers;
-                            layers.Insert(0, ModPlusAPI.Language.GetItem(MainFunction.LangItem, "defl")); // "По умолчанию"
+                            layers.Insert(0, ModPlusAPI.Language.GetItem(Invariables.LangItem, "defl")); // "По умолчанию"
                             if (!layers.Contains(style.GetLayerNameProperty()))
                                 layers.Insert(1, style.GetLayerNameProperty());
                             cb.ItemsSource = layers;
@@ -399,13 +399,13 @@ namespace mpESKD.Base.Styles
             {
                 if (!string.IsNullOrEmpty(property.DisplayNameLocalizationKeyForStyleEditor))
                 {
-                    var displayName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, property.DisplayNameLocalizationKeyForStyleEditor);
+                    var displayName = ModPlusAPI.Language.GetItem(Invariables.LangItem, property.DisplayNameLocalizationKeyForStyleEditor);
                     if (!string.IsNullOrEmpty(displayName))
                         return displayName;
                 }
 
                 {
-                    var displayName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, property.DisplayNameLocalizationKey);
+                    var displayName = ModPlusAPI.Language.GetItem(Invariables.LangItem, property.DisplayNameLocalizationKey);
                     if (!string.IsNullOrEmpty(displayName))
                         return displayName;
                 }
@@ -426,7 +426,7 @@ namespace mpESKD.Base.Styles
         {
             try
             {
-                var description = ModPlusAPI.Language.GetItem(MainFunction.LangItem, property.DescriptionLocalizationKey);
+                var description = ModPlusAPI.Language.GetItem(Invariables.LangItem, property.DescriptionLocalizationKey);
                 if (!string.IsNullOrEmpty(description))
                     return description;
             }
@@ -556,7 +556,7 @@ namespace mpESKD.Base.Styles
             {
                 var newStyle = new IntellectualEntityStyle(entityStyles.EntityType, true)
                 {
-                    Name = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h13"),
+                    Name = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h13"),
                     StyleType = StyleType.User
                 };
                 entityStyles.Styles.Add(newStyle);
@@ -566,7 +566,7 @@ namespace mpESKD.Base.Styles
             {
                 var newStyle = new IntellectualEntityStyle(style.EntityType, true)
                 {
-                    Name = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h13"),
+                    Name = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h13"),
                     StyleType = StyleType.User
                 };
                 _styles.Single(es => es.Styles.Contains(style)).Styles.Add(newStyle);
@@ -597,7 +597,7 @@ namespace mpESKD.Base.Styles
             if (selected == null)
                 return;
             if (selected is IntellectualEntityStyle style && style.CanEdit)
-                if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h69"), MessageBoxIcon.Question))
+                if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(Invariables.LangItem, "h69"), MessageBoxIcon.Question))
                 {
                     foreach (EntityStyles entityStyles in _styles)
                     {
@@ -648,9 +648,9 @@ namespace mpESKD.Base.Styles
                 if (entityStyles.HasStylesWithSameName)
                 {
                     ModPlusAPI.Windows.MessageBox.Show(
-                        ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h70") + " \"" + entityStyles.DisplayName +
-                        "\" " + ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h71") + "\"!" + Environment.NewLine +
-                        ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h72"), MessageBoxIcon.Alert);
+                        ModPlusAPI.Language.GetItem(Invariables.LangItem, "h70") + " \"" + entityStyles.DisplayName +
+                        "\" " + ModPlusAPI.Language.GetItem(Invariables.LangItem, "h71") + "\"!" + Environment.NewLine +
+                        ModPlusAPI.Language.GetItem(Invariables.LangItem, "h72"), MessageBoxIcon.Alert);
                     e.Cancel = true;
                     return;
                 }
@@ -727,7 +727,7 @@ namespace mpESKD.Base.Styles
             {
                 Hide();
                 PromptEntityOptions promptEntityOptions =
-                    new PromptEntityOptions("\n" + ModPlusAPI.Language.GetItem(MainFunction.LangItem, "msg3"));
+                    new PromptEntityOptions("\n" + ModPlusAPI.Language.GetItem(Invariables.LangItem, "msg3"));
                 promptEntityOptions.SetRejectMessage("\nWrong entity");
                 promptEntityOptions.AllowNone = false;
                 promptEntityOptions.AddAllowedClass(typeof(BlockReference), true);
@@ -744,7 +744,7 @@ namespace mpESKD.Base.Styles
                             var entity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
                             var newStyle = new IntellectualEntityStyle(entity.GetType())
                             {
-                                Name = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h13"),
+                                Name = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h13"),
                                 StyleType = StyleType.User,
                                 Guid = Guid.NewGuid().ToString()
                             };

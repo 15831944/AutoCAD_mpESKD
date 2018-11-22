@@ -38,7 +38,7 @@
                 };
             else if (Name == "LayerName" && string.IsNullOrEmpty(attribute.DefaultValue.ToString()))
             {
-                DefaultValue = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "defl");
+                DefaultValue = ModPlusAPI.Language.GetItem(Invariables.LangItem, "defl");
             }
             else
             {

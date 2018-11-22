@@ -169,6 +169,9 @@
     <Compile Include="..\mpESKD_2013\Base\IntellectualEntity.cs">
       <Link>Base\IntellectualEntity.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Invariables.cs">
+      <Link>Base\Invariables.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\Overrules\IntellectualEntityGripData.cs">
       <Link>Base\Overrules\IntellectualEntityGripData.cs</Link>
     </Compile>

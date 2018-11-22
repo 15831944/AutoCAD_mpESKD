@@ -2,6 +2,7 @@
 {
     using System.Windows;
     using System.Windows.Input;
+    using Base;
     using Base.Enums;
 
     public partial class AxisValueEditor
@@ -11,7 +12,7 @@
         public AxisValueEditor()
         {
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h67");
+            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h67");
         }
 
         private void AxisValueEditor_OnLoaded(object sender, RoutedEventArgs e)

@@ -24,6 +24,12 @@ namespace mpESKD.Functions.mpSection
         {
         }
 
+        public Section(string lastIntegerValue, string lastLetterValue)
+        {
+            LastIntegerValue = lastIntegerValue;
+            LastLetterValue = lastLetterValue;
+        }
+
         #endregion
 
         #region Points and Grips
@@ -43,6 +49,16 @@ namespace mpESKD.Functions.mpSection
                 return points;
             }
         }
+
+        /// <summary>
+        /// Точка вставки верхнего текста обозначения
+        /// </summary>
+        public Point3d TopDesignationPoint { get; set; } = Point3d.Origin;
+        
+        /// <summary>
+        /// Точка вставки нижнего текста обозначения
+        /// </summary>
+        public Point3d BottomDesignationPoint { get; set; } = Point3d.Origin;
 
         #endregion
 
@@ -83,8 +99,6 @@ namespace mpESKD.Functions.mpSection
         [SaveToXData]
         public double StrokeWidth { get; set; } = 0.5;
 
-        //todo добавить ли эти свойства в палитру и стиль?
-
         /// <summary>
         /// Длина верхнего и нижнего штриха
         /// </summary>
@@ -120,6 +134,45 @@ namespace mpESKD.Functions.mpSection
         [SaveToXData]
         public double ShelfArrowWidth { get; set; } = 1.5;
 
+        /// <summary>
+        /// Высота текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 2, "", "", 3.5, 0.000000001, 1.0000E+99)]
+        [SaveToXData]
+        public double MainTextHeight { get; set; } = 3.5;
+
+        /// <summary>
+        /// Высота малого текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 3, "", "", 2.5, 0.000000001, 1.0000E+99)]
+        [SaveToXData]
+        public double SecondTextHeight { get; set; } = 2.5;
+
+        /// <summary>
+        /// Обозначение разреза
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 4, "", "", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
+        public string Designation { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Префикс обозначения
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 5, "", "", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
+        public string DesignationPrefix { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Номер листа (пишется в скобках после обозначения)
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 6, "", "", "", null, null, PropertyScope.Palette)]
+        [SaveToXData]
+        public string SheetNumber { get; set; } = string.Empty;
+
+        private readonly string LastIntegerValue = string.Empty;
+
+        private readonly string LastLetterValue = string.Empty;
+
         #endregion
 
         #region Geometry
@@ -127,147 +180,66 @@ namespace mpESKD.Functions.mpSection
         /// <summary>
         /// Средние штрихи - штрихи, создаваемые в средних точках
         /// </summary>
-        public List<Polyline> MiddleStrokes { get; } = new List<Polyline>();
-
-        private readonly Lazy<Line> _topShelfLine = new Lazy<Line>(() => new Line());
+        public readonly List<Polyline> _middleStrokes = new List<Polyline>();
 
         /// <summary>
         /// Верхняя полка
         /// </summary>
-        public Line TopShelfLine
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topShelfLine.Value);
-                return _topShelfLine.Value;
-            }
-        }
-
-        private readonly Lazy<Polyline> _topShelfArrow = new Lazy<Polyline>(() =>
-        {
-            // Это нужно, чтобы не выводилось сообщение в командную строку
-            var p = new Polyline();
-            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
-            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
-            return p;
-        });
+        private Line _topShelfLine;
 
         /// <summary>
         /// Стрелка верхней полки
         /// </summary>
-        public Polyline TopShelfArrow
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topShelfArrow.Value);
-                //todo add width
-                return _topShelfArrow.Value;
-            }
-        }
-
-        private readonly Lazy<Polyline> _topStroke = new Lazy<Polyline>(() =>
-        {
-            // Это нужно, чтобы не выводилось сообщение в командную строку
-            var p = new Polyline();
-            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
-            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
-            return p;
-        });
+        private Polyline _topShelfArrow;
 
         /// <summary>
         /// Верхний штрих
         /// </summary>
-        public Polyline TopStroke
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topStroke.Value);
-                var width = StrokeWidth * GetScale();
-                _topStroke.Value.SetStartWidthAt(0, width);
-                _topStroke.Value.SetEndWidthAt(0, width);
-                _topStroke.Value.SetStartWidthAt(1, width);
-                _topStroke.Value.SetEndWidthAt(1, width);
-                return _topStroke.Value;
-            }
-        }
-
-        private readonly Lazy<Line> _bottomShelfLine = new Lazy<Line>(() => new Line());
+        private Polyline _topStroke;
 
         /// <summary>
         /// Нижняя полка
         /// </summary>
-        public Line BottomShelfLine
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomShelfLine.Value);
-                return _bottomShelfLine.Value;
-            }
-        }
-
-        private readonly Lazy<Polyline> _bottomShelfArrow = new Lazy<Polyline>(() =>
-        {
-            // Это нужно, чтобы не выводилось сообщение в командную строку
-            var p = new Polyline();
-            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
-            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
-            return p;
-        });
+        private Line _bottomShelfLine;
 
         /// <summary>
         /// Стрелка нижней полки
         /// </summary>
-        public Polyline BottomShelfArrow
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomShelfArrow.Value);
-                //todo add width
-                return _bottomShelfArrow.Value;
-            }
-        }
-
-        private readonly Lazy<Polyline> _bottomStroke = new Lazy<Polyline>(() =>
-        {
-            // Это нужно, чтобы не выводилось сообщение в командную строку
-            var p = new Polyline();
-            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
-            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
-            return p;
-        });
+        private Polyline _bottomShelfArrow;
 
         /// <summary>
         /// Нижний штрих
         /// </summary>
-        public Polyline BottomStroke
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomStroke.Value);
-                var width = StrokeWidth * GetScale();
-                _bottomStroke.Value.SetStartWidthAt(0, width);
-                _bottomStroke.Value.SetEndWidthAt(0, width);
-                _bottomStroke.Value.SetStartWidthAt(1, width);
-                _bottomStroke.Value.SetEndWidthAt(1, width);
-                return _bottomStroke.Value;
-            }
-        }
+        private Polyline _bottomStroke;
 
-        /// <inheritdoc />
+        #region Text entities
+
+        private MText _topMText;
+
+        private MText _bottomMText;
+
+        #endregion
+
         public override IEnumerable<Entity> Entities
         {
             get
             {
-                yield return TopShelfLine;
-                yield return TopShelfArrow;
-                yield return TopStroke;
-                yield return BottomShelfLine;
-                yield return BottomShelfArrow;
-                yield return BottomStroke;
-                foreach (var s in MiddleStrokes)
+                var entities = new List<Entity>
                 {
-                    yield return s;
-                }
+                    _topShelfLine,
+                    _topShelfArrow,
+                    _topStroke,
+                    _bottomShelfLine,
+                    _bottomShelfArrow,
+                    _bottomStroke,
+                    _topMText,
+                    _bottomMText
+                };
+                entities.AddRange(_middleStrokes);
+                foreach (var e in entities)
+                    if (e != null)
+                        SetPropertiesToCadEntity(e);
+                return entities;
             }
         }
 
@@ -341,15 +313,19 @@ namespace mpESKD.Functions.mpSection
             Point3d insertionPoint, List<Point3d> middlePoints,
             Point3d endPoint, double scale)
         {
+            var strokesWidth = StrokeWidth * scale;
+
             // top and bottom strokes
             var topStrokeEndPoint = GetTopStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
             var bottomStrokeEndPoint = GetBottomStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
 
-            _topStroke.Value.SetPointAt(0, topStrokeEndPoint.ConvertPoint3dToPoint2d());
-            _topStroke.Value.SetPointAt(1, insertionPoint.ConvertPoint3dToPoint2d());
+            _topStroke = new Polyline(2);
+            _topStroke.AddVertexAt(0, topStrokeEndPoint.ConvertPoint3dToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            _topStroke.AddVertexAt(1, insertionPoint.ConvertPoint3dToPoint2d(), 0.0, strokesWidth, strokesWidth);
 
-            _bottomStroke.Value.SetPointAt(0, endPoint.ConvertPoint3dToPoint2d());
-            _bottomStroke.Value.SetPointAt(1, bottomStrokeEndPoint.ConvertPoint3dToPoint2d());
+            _bottomStroke = new Polyline(2);
+            _bottomStroke.AddVertexAt(0, endPoint.ConvertPoint3dToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            _bottomStroke.AddVertexAt(1, bottomStrokeEndPoint.ConvertPoint3dToPoint2d(), 0.0, strokesWidth, strokesWidth);
 
             var topStrokeNormalVector = (topStrokeEndPoint - insertionPoint).GetNormal();
             var bottomStrokeNormalVector = (bottomStrokeEndPoint - endPoint).GetNormal();
@@ -357,31 +333,79 @@ namespace mpESKD.Functions.mpSection
             // shelf lines
             var topShelfFirstPoint = insertionPoint + topStrokeNormalVector * GetShelfOffset() * scale;
             var topShelfSecondPoint = topShelfFirstPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale;
-            _topShelfLine.Value.StartPoint = topShelfFirstPoint;
-            _topShelfLine.Value.EndPoint = topShelfSecondPoint;
+            _topShelfLine = new Line
+            {
+                StartPoint = topShelfFirstPoint,
+                EndPoint = topShelfSecondPoint
+            };
 
             var bottomShelfFirstPoint = endPoint + bottomStrokeNormalVector * GetShelfOffset() * scale;
             var bottomShelfSecondPoint = bottomShelfFirstPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfLength * scale;
-            _bottomShelfLine.Value.StartPoint = bottomShelfFirstPoint;
-            _bottomShelfLine.Value.EndPoint = bottomShelfSecondPoint;
+            _bottomShelfLine = new Line
+            {
+                StartPoint = bottomShelfFirstPoint,
+                EndPoint = bottomShelfSecondPoint
+            };
 
             // shelf arrows
             var topShelfArrowStartPoint = topShelfFirstPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfArrowLength * scale;
-            _topShelfArrow.Value.SetPointAt(0, topShelfArrowStartPoint.ConvertPoint3dToPoint2d());
-            _topShelfArrow.Value.SetPointAt(1, topShelfFirstPoint.ConvertPoint3dToPoint2d());
-            _topShelfArrow.Value.SetStartWidthAt(0, ShelfArrowWidth * scale);
+            _topShelfArrow = new Polyline(2);
+            _topShelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
+            _topShelfArrow.AddVertexAt(1, topShelfFirstPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
+            //_topShelfArrow.SetStartWidthAt(0, ShelfArrowWidth * scale);
 
             var bottomShelfArrowStartPoint =
                 bottomShelfFirstPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfArrowLength * scale;
-            _bottomShelfArrow.Value.SetPointAt(0, bottomShelfArrowStartPoint.ConvertPoint3dToPoint2d());
-            _bottomShelfArrow.Value.SetPointAt(1, bottomShelfFirstPoint.ConvertPoint3dToPoint2d());
-            _bottomShelfArrow.Value.SetStartWidthAt(0, ShelfArrowWidth * scale);
+            _bottomShelfArrow = new Polyline(2);
+            _bottomShelfArrow.AddVertexAt(0, bottomShelfArrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
+            _bottomShelfArrow.AddVertexAt(1, bottomShelfFirstPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
 
-            MiddleStrokes.Clear();
+            // text
+            _topMText = new MText
+            {
+                TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle),
+                Contents = GetTextContents(),
+                TextHeight = MainTextHeight * scale
+            };
+
+            var alongShelfTextOffset = _topMText.ActualWidth / 2;
+            var acrossShelfTextOffset = _topMText.ActualHeight / 2;
+            var check = 1 / Math.Sqrt(2);
+            if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
+                (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
+            {
+                alongShelfTextOffset = _topMText.ActualHeight / 2;
+                acrossShelfTextOffset = _topMText.ActualWidth / 2;
+            }
+
+            var tempPoint = topShelfSecondPoint + (topShelfFirstPoint - topShelfSecondPoint).GetNormal() * alongShelfTextOffset;
+            var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
+            _topMText.Attachment = AttachmentPoint.MiddleCenter;
+            _topMText.Location = topTextCenterPoint;
+            
+            _bottomMText = new MText
+            {
+                TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle),
+                Contents = GetTextContents(),
+                TextHeight = MainTextHeight * scale
+            };
+
+            if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
+                (bottomStrokeNormalVector.Y < check || bottomStrokeNormalVector.Y > -check))
+            {
+                alongShelfTextOffset = _topMText.ActualHeight / 2;
+                acrossShelfTextOffset = _topMText.ActualWidth / 2;
+            }
+
+            tempPoint = bottomShelfSecondPoint + (bottomShelfFirstPoint - bottomShelfSecondPoint).GetNormal() * alongShelfTextOffset;
+            var bottomTextCenterPoint = tempPoint + bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
+            _bottomMText.Attachment = AttachmentPoint.MiddleCenter;
+            _bottomMText.Location = bottomTextCenterPoint;
+
+            _middleStrokes.Clear();
             // middle strokes
             if (MiddlePoints.Any())
             {
-                var strokesWidth = StrokeWidth * scale;
                 var middleStrokeLength = MiddleStrokeLength * scale;
 
                 var points = new List<Point3d> { insertionPoint };
@@ -403,7 +427,7 @@ namespace mpESKD.Functions.mpSection
                         (currentPoint + (nextPoint - currentPoint).GetNormal() * middleStrokeLength).ConvertPoint3dToPoint2d(),
                         0, strokesWidth, strokesWidth);
 
-                    MiddleStrokes.Add(middleStrokePolyline);
+                    _middleStrokes.Add(middleStrokePolyline);
                 }
             }
         }
@@ -425,6 +449,43 @@ namespace mpESKD.Functions.mpSection
             if (MiddlePoints.Any())
                 return insertionPoint + (insertionPoint - middlePoints.First()).GetNormal() * StrokeLength * scale;
             return insertionPoint + (insertionPoint - endPoint).GetNormal() * StrokeLength * scale;
+        }
+
+        /// <summary>
+        /// Получить актуальные размеры многострочного текста 
+        /// </summary>
+        /// <returns>[0] - ActualWidth, [1] - ActualHeight</returns>
+        private List<double> GetTextActualSize()
+        {
+            MText mText = new MText
+            {
+                TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle),
+                Contents = GetTextContents(),
+                TextHeight = MainTextHeight * GetScale()
+            };
+
+            return new List<double> { mText.ActualWidth, mText.ActualHeight };
+        }
+
+        /// <summary>
+        /// Содержимое для MText в зависимости от значений
+        /// </summary>
+        /// <returns></returns>
+        private string GetTextContents()
+        {
+            //todo брать значение по последнему разрезу
+            if (string.IsNullOrEmpty(Designation))
+                Designation = "A";
+            // Если номер не указан, то обычный текст
+            if (string.IsNullOrEmpty(SheetNumber))
+                return DesignationPrefix + Designation;
+
+            // Если номер указан, но высоты текста одинаковые, то обычный текст с номером
+            if (Math.Abs(MainTextHeight - SecondTextHeight) < 0.0001)
+                return $"{DesignationPrefix}{Designation} ({SheetNumber})";
+
+            // Иначе форматированный текст для многострочного текста
+            return $"{DesignationPrefix}{Designation}{{\\H{SecondTextHeight / MainTextHeight}x; ({SheetNumber})";
         }
 
         #endregion

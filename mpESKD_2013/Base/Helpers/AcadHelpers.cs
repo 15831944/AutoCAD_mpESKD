@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Base.Helpers
 {
+    using System;
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -27,7 +28,7 @@
         /// <summary>Редактор активного документа</summary>
         public static Editor Editor => AcApp.DocumentManager.MdiActiveDocument.Editor;
 
-        /// <summary>Список слоёв текущей базы данных</summary>
+        /// <summary>Список слоев текущей базы данных</summary>
         public static List<string> Layers
         {
             get
@@ -125,61 +126,15 @@
         /// 
         /// </summary>
         /// <param name="point"></param>
-        /// <param name="enities"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public static ObjectId AddBlock(Point3d point, params Entity[] enities)
-        {
-            ObjectId objectId;
-            BlockTableRecord blockTableRecord = new BlockTableRecord
-            {
-                Name = "*U"
-            };
-
-            Entity[] entityArray = enities;
-            for (int i = 0; i < (int)entityArray.Length; i++)
-            {
-                blockTableRecord.AppendEntity(entityArray[i]);
-            }
-            using (Document.LockDocument())
-            {
-                using (Transaction tr = Database.TransactionManager.StartTransaction())
-                {
-                    using (BlockTable blockTable = Database.BlockTableId.Write<BlockTable>(false, true))
-                    {
-                        using (BlockReference blockReference =
-                            new BlockReference(point, blockTable.Add(blockTableRecord)))
-                        {
-                            ObjectId
-                                item = blockTable[
-                                    BlockTableRecord
-                                        .ModelSpace]; //&&&&&&&&?????????????????????????????????????????????????paperspace
-                            using (BlockTableRecord btr = item.Write<BlockTableRecord>(false, true))
-                            {
-                                objectId = btr.AppendEntity(blockReference);
-                            }
-                            tr.AddNewlyCreatedDBObject(blockReference, true);
-                        }
-                        tr.AddNewlyCreatedDBObject(blockTableRecord, true);
-                    }
-                    tr.Commit();
-                }
-            }
-            return objectId;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <param name="enities"></param>
-        /// <returns></returns>
-        public static BlockReference GetBlockReference(Point3d point, IEnumerable<Entity> enities)
+        public static BlockReference GetBlockReference(Point3d point, IEnumerable<Entity> entities)
         {
             BlockTableRecord blockTableRecord = new BlockTableRecord
             {
                 Name = "*U"
             };
-            foreach (Entity enity in enities)
+            foreach (Entity enity in entities)
             {
                 blockTableRecord.AppendEntity(enity);
             }
@@ -213,7 +168,7 @@
         {
             if (blkRefObjectId == ObjectId.Null)
                 return;
-            if (!layerName.Equals(Language.GetItem(MainFunction.LangItem, "defl"))) // "По умолчанию"
+            if (!layerName.Equals(Language.GetItem(Invariables.LangItem, "defl"))) // "По умолчанию"
             {
                 if (LayerHelper.HasLayer(layerName))
                 {
@@ -317,12 +272,12 @@
                             catch (Autodesk.AutoCAD.Runtime.Exception exception)
                             {
                                 if (exception.ErrorStatus == ErrorStatus.FilerError)
-                                    MessageBox.Show(Language.GetItem(MainFunction.LangItem, "err1") + ": " + filename, MessageBoxIcon.Close); // Не удалось найти файл
+                                    MessageBox.Show(Language.GetItem(Invariables.LangItem, "err1") + ": " + filename, MessageBoxIcon.Close); // Не удалось найти файл
                                 else if (exception.ErrorStatus == ErrorStatus.DuplicateRecordName)
                                 {
                                     // ignore
                                 }
-                                else MessageBox.Show(Language.GetItem(MainFunction.LangItem, "err2") + ": " + ltname, MessageBoxIcon.Close); //Не удалось загрузить тип линий
+                                else MessageBox.Show(Language.GetItem(Invariables.LangItem, "err2") + ": " + ltname, MessageBoxIcon.Close); //Не удалось загрузить тип линий
                             }
                         }
                     tr.Commit();
@@ -418,6 +373,36 @@
             }
             return ObjectId.Null;
         }
+
+        /// <summary>
+        /// Найти все блоки в текущем пространстве (модель/лист), представляющие интеллектуальный примитив указанного типа
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entityType"></param>
+        /// <returns></returns>
+        public static List<T> GetAllIntellectualEntitiesInCurrentSpace<T>(Type entityType) where T : IntellectualEntity
+        {
+            List<T> list = new List<T>();
+            var appName = $"mp{entityType.Name}";
+            using (var tr = Database.TransactionManager.StartOpenCloseTransaction())
+            {
+                BlockTableRecord blockTableRecord = (BlockTableRecord)tr.GetObject(Database.CurrentSpaceId, OpenMode.ForRead);
+                foreach (ObjectId objectId in blockTableRecord)
+                {
+                    if(objectId == ObjectId.Null)
+                        continue;
+                    if (tr.GetObject(objectId, OpenMode.ForRead) is BlockReference blockReference)
+                    {
+                        var xData = blockReference.GetXDataForApplication(appName);
+                        if (xData != null)
+                            list.Add(EntityReaderFactory.Instance.GetFromEntity<T>(blockReference));
+                    }
+                }
+                tr.Commit();
+            }
+
+            return list;
+        }
     }
 
     /// <summary>Вспомогательные методы работы с расширенными данными
@@ -454,13 +439,15 @@
         /// </summary>
         /// <param name="rxObject"></param>
         /// <param name="appName"></param>
-        public static bool IsApplicable(RXObject rxObject, string appName)
+        /// <param name="checkIsNullId">comment #16 - http://adn-cis.org/forum/index.php?topic=8910.15 </param>
+        public static bool IsApplicable(RXObject rxObject, string appName, bool checkIsNullId = false)
         {
             DBObject dbObject = rxObject as DBObject;
             if (dbObject == null)
                 return false;
-            // comment #16 - http://adn-cis.org/forum/index.php?topic=8910.15
-            //if (dbObject.ObjectId == ObjectId.Null) return false;
+            if (checkIsNullId)
+                if (dbObject.ObjectId == ObjectId.Null)
+                    return false;
             if (dbObject is BlockReference)
             {
                 // Всегда нужно проверять по наличию расширенных данных

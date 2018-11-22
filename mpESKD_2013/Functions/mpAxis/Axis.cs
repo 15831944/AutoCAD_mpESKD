@@ -23,11 +23,11 @@ namespace mpESKD.Functions.mpAxis
 
         public Axis()
         {
-            
+
         }
 
         /// <summary>Инициализация экземпляра класса для BreakLine для создания</summary>
-        public Axis(string lastHorizontalValue, string lastVerticalValue) 
+        public Axis(string lastHorizontalValue, string lastVerticalValue)
         {
             // last values
             LastHorizontalValue = lastHorizontalValue;
@@ -49,7 +49,6 @@ namespace mpESKD.Functions.mpAxis
         /// </summary>
         [EntityProperty(PropertiesCategory.General, 3, "p5", "d5", "1:1", null, null)]
         [SaveToXData]
-        //todo check in palette
         public new AnnotationScale Scale
         {
             get
@@ -96,7 +95,7 @@ namespace mpESKD.Functions.mpAxis
 
         #region Axis Properties
 
-        private int _bottomFractureOffset = 0;
+        private int _bottomFractureOffset;
 
         /// <summary>Положение маркеров</summary>
         [EntityProperty(PropertiesCategory.Geometry, 1, "p8", "d8", AxisMarkersPosition.Bottom, null, null)]
@@ -260,15 +259,15 @@ namespace mpESKD.Functions.mpAxis
         [SaveToXData]
         public string FirstTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 3,  "p22", "d22", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 3, "p22", "d22", "", null, null, PropertyScope.Palette)]
         [SaveToXData]
         public string FirstText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 4,  "p21", "d21", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 4, "p21", "d21", "", null, null, PropertyScope.Palette)]
         [SaveToXData]
         public string FirstTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 4,  "", "", "", null, null, PropertyScope.Hidden)]
+        [EntityProperty(PropertiesCategory.Content, 4, "", "", "", null, null, PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(SecondText), nameof(SecondTextPrefix), nameof(SecondTextSuffix), nameof(SecondMarkerType) })]
         [SaveToXData]
         public bool SecondTextVisibility { get; set; }
@@ -281,7 +280,7 @@ namespace mpESKD.Functions.mpAxis
         [SaveToXData]
         public string SecondText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 7,  "p24", "d24", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 7, "p24", "d24", "", null, null, PropertyScope.Palette)]
         [SaveToXData]
         public string SecondTextSuffix { get; set; } = string.Empty;
 
@@ -305,11 +304,11 @@ namespace mpESKD.Functions.mpAxis
         [EntityProperty(PropertiesCategory.Content, 11, "p30", "d30", "", null, null, PropertyScope.Palette)]
         [SaveToXData]
         public string BottomOrientText { get; set; } = string.Empty;
-        
+
         [EntityProperty(PropertiesCategory.Content, 12, "p31", "d31", "", null, null, PropertyScope.Palette)]
         [SaveToXData]
         public string TopOrientText { get; set; } = string.Empty;
-        
+
         // last values
         private readonly string LastHorizontalValue = string.Empty;
 
@@ -330,10 +329,10 @@ namespace mpESKD.Functions.mpAxis
         );
 
         [SaveToXData]
-        public double BottomLineAngle { get; set; } = 0.0;
+        public double BottomLineAngle { get; set; }
 
         private Point3d _bottomMarkerPoint;
-        
+
         /// <summary>Нижняя точка расположения маркеров</summary>  
         public Point3d BottomMarkerPoint
         {
@@ -356,10 +355,10 @@ namespace mpESKD.Functions.mpAxis
         }
 
         [SaveToXData]
-        public double TopLineAngle { get; set; } = 0.0;
+        public double TopLineAngle { get; set; }
 
         private Point3d _topMarkerPoint;
-        
+
         /// <summary>Верхняя точка расположения маркеров</summary>
         public Point3d TopMarkerPoint
         {
@@ -380,7 +379,7 @@ namespace mpESKD.Functions.mpAxis
                 TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint - (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetScale() * BlockTransform.GetScale(), Vector3d.ZAxis);
             }
         }
-        
+
         /// <summary>Нижняя точка маркера ориентира</summary>
         public Point3d BottomOrientPoint
         {
@@ -424,9 +423,8 @@ namespace mpESKD.Functions.mpAxis
         private Point3d TopOrientPointOCS => TopOrientPoint.TransformBy(BlockTransform.Inverse());
 
         #endregion
-        
+
         /// <summary>Установка свойств для однострочного текста</summary>
-        /// <param name="dbText"></param>
         private void SetPropertiesToDBText(DBText dbText)
         {
             dbText.Height = TextHeight * GetScale();
@@ -437,117 +435,31 @@ namespace mpESKD.Functions.mpAxis
             dbText.LineWeight = LineWeight.ByBlock;
             dbText.TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
         }
-        private readonly Lazy<Line> _mainLine = new Lazy<Line>(() => new Line());
-
+        
         /// <summary>Средняя (основная) линия оси</summary>
-        public Line MainLine
-        {
-            get
-            {
-                _mainLine.Value.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                _mainLine.Value.LineWeight = LineWeight.ByBlock;
-                _mainLine.Value.Linetype = "ByBlock";
-                _mainLine.Value.LinetypeScale = LineTypeScale;
-                return _mainLine.Value;
-            }
-        }
+        private Line _mainLine;
 
-        private readonly Lazy<Line> _bottomOrientLine = new Lazy<Line>(() => new Line());
-        public Line BottomOrientLine
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomOrientLine.Value);
-                return _bottomOrientLine.Value;
-            }
-        }
+        private Line _bottomOrientLine;
 
-        private readonly Lazy<Line> _topOrientLine = new Lazy<Line>(() => new Line());
-        public Line TopOrientLine
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topOrientLine.Value);
-                return _topOrientLine.Value;
-            }
-        }
+        private Line _topOrientLine;
 
-        private readonly Lazy<Polyline> _bottomOrientArrow = new Lazy<Polyline>(() =>
-        {
-            // Это нужно, чтобы не выводилось сообщение в командную строку
-            var p = new Polyline();
-            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
-            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
-            return p;
-        });
-        public Polyline BottomOrientArrow
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomOrientArrow.Value);
-                return _bottomOrientArrow.Value;
-            }
-        }
+        private Polyline _bottomOrientArrow;
 
-        private readonly Lazy<Polyline> _topOrientArrow = new Lazy<Polyline>(() =>
-        {
-            // Это нужно, чтобы не выводилось сообщение в командную строку
-            var p = new Polyline();
-            p.AddVertexAt(0, Point2d.Origin, 0.0, 0.0, 0.0);
-            p.AddVertexAt(1, Point2d.Origin, 0.0, 0.0, 0.0);
-            return p;
-        });
-        public Polyline TopOrientArrow
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topOrientArrow.Value);
-                return _topOrientArrow.Value;
-            }
-        }
+        private Polyline _topOrientArrow;
 
         #region Fractures
 
-        private readonly Lazy<Line> _bottomMarkerLine = new Lazy<Line>(() => new Line());
         /// <summary>"Палочка" от конечной точки до кружка (маркера)</summary>
-        public Line BottomMarkerLine
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomMarkerLine.Value);
-                return _bottomMarkerLine.Value;
-            }
-        }
-        private readonly Lazy<Line> _bottomFractureOffsetLine = new Lazy<Line>(() => new Line());
+        private Line _bottomMarkerLine;
+        
         /// <summary>Палочка отступа нижнего излома</summary>
-        public Line BottomFractureOffsetLine
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomFractureOffsetLine.Value);
-                return _bottomFractureOffsetLine.Value;
-            }
-        }
-        private readonly Lazy<Line> _topFractureOffsetLine = new Lazy<Line>(() => new Line());
+        private Line _bottomFractureOffsetLine;
+        
         /// <summary>Палочка отступа верхнего излома</summary>
-        public Line TopFractureOffsetLine
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topFractureOffsetLine.Value);
-                return _topFractureOffsetLine.Value;
-            }
-        }
-        private readonly Lazy<Line> _topMarkerLine = new Lazy<Line>(() => new Line());
+        private Line _topFractureOffsetLine;
+        
         /// <summary>Палочка от точки вставки до кружка (маркера)</summary>
-        public Line TopMarkerLine
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topMarkerLine.Value);
-                return _topMarkerLine.Value;
-            }
-        }
+        private Line _topMarkerLine;
 
         #endregion
 
@@ -555,296 +467,126 @@ namespace mpESKD.Functions.mpAxis
 
         #region Bottom
 
-        private readonly Lazy<Circle> _bottomFirstMarker = new Lazy<Circle>(() => new Circle());
-        public Circle BottomFirstCircle
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomFirstMarker.Value);
-                return _bottomFirstMarker.Value;
-            }
-        }
-        // Второй кружок при типе маркера 2
-        private readonly Lazy<Circle> _bottomFirstMarkerType2 = new Lazy<Circle>(() => new Circle());
-        public Circle BottomFirstCircleType2
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomFirstMarkerType2.Value);
-                return _bottomFirstMarkerType2.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _bottomSecondMarker = new Lazy<Circle>(() => new Circle());
-        public Circle BottomSecondCircle
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomSecondMarker.Value);
-                return _bottomSecondMarker.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _bottomSecondMarkerType2 = new Lazy<Circle>(() => new Circle());
-        public Circle BottomSecondCircleType2
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomSecondMarkerType2.Value);
-                return _bottomSecondMarkerType2.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _bottomThirdMarker = new Lazy<Circle>(() => new Circle());
-        public Circle BottomThirdCircle
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomThirdMarker.Value);
-                return _bottomThirdMarker.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _bottomThirdMarkerType2 = new Lazy<Circle>(() => new Circle());
-        public Circle BottomThirdCircleType2
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomThirdMarkerType2.Value);
-                return _bottomThirdMarkerType2.Value;
-            }
-        }
-
+        private Circle _bottomFirstMarker;
+        
+        private Circle _bottomFirstMarkerType2;
+        
+        private Circle _bottomSecondMarker;
+        
+        private Circle _bottomSecondMarkerType2;
+        
+        private Circle _bottomThirdMarker;
+        
+        private Circle _bottomThirdMarkerType2;
+        
         #endregion
 
         #region Top
 
-        private readonly Lazy<Circle> _topFirstMarker = new Lazy<Circle>(() => new Circle());
-        public Circle TopFirstCircle
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topFirstMarker.Value);
-                return _topFirstMarker.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _topFirstMarkerType2 = new Lazy<Circle>(() => new Circle());
-        public Circle TopFirstCircleType2
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topFirstMarkerType2.Value);
-                return _topFirstMarkerType2.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _topSecondMarker = new Lazy<Circle>(() => new Circle());
-        public Circle TopSecondCircle
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topSecondMarker.Value);
-                return _topSecondMarker.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _topSecondMarkerType2 = new Lazy<Circle>(() => new Circle());
-        public Circle TopSecondCircleType2
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topSecondMarkerType2.Value);
-                return _topSecondMarkerType2.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _topThirdMarker = new Lazy<Circle>(() => new Circle());
-        public Circle TopThirdCircle
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topThirdMarker.Value);
-                return _topThirdMarker.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _topThirdMarkerType2 = new Lazy<Circle>(() => new Circle());
-        public Circle TopThirdCircleType2
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topThirdMarkerType2.Value);
-                return _topThirdMarkerType2.Value;
-            }
-        }
-
+        private Circle _topFirstMarker;
+        
+        private Circle _topFirstMarkerType2;
+        
+        private Circle _topSecondMarker;
+        
+        private Circle _topSecondMarkerType2;
+        
+        private Circle _topThirdMarker;
+        
+        private Circle _topThirdMarkerType2;
+        
         #endregion
 
         #region Orient
 
-        private readonly Lazy<Circle> _bottomOrientMarker = new Lazy<Circle>(() => new Circle());
-        public Circle BottomOrientCircle
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomOrientMarker.Value);
-                return _bottomOrientMarker.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _bottomOrientMarkerType2 = new Lazy<Circle>(() => new Circle());
-        public Circle BottomOrientCircleType2
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_bottomOrientMarkerType2.Value);
-                return _bottomOrientMarkerType2.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _topOrientMarker = new Lazy<Circle>(() => new Circle());
-        public Circle TopOrientCircle
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topOrientMarker.Value);
-                return _topOrientMarker.Value;
-            }
-        }
-
-        private readonly Lazy<Circle> _topOrientMarkerType2 = new Lazy<Circle>(() => new Circle());
-        public Circle TopOrientCircleType2
-        {
-            get
-            {
-                SetPropertiesToCadEntity(_topOrientMarkerType2.Value);
-                return _topOrientMarkerType2.Value;
-            }
-        }
-
+        private Circle _bottomOrientMarker;
+        
+        private Circle _bottomOrientMarkerType2;
+        
+        private Circle _topOrientMarker;
+        
+        private Circle _topOrientMarkerType2;
+        
         #endregion
 
         #endregion
 
         #region Texts
 
-        private readonly Lazy<DBText> _bottomFirstDBText = new Lazy<DBText>(() => new DBText());
-        public DBText BottomFirstDBText
-        {
-            get
-            {
-                SetPropertiesToDBText(_bottomFirstDBText.Value);
-                return _bottomFirstDBText.Value;
-            }
-        }
-        private readonly Lazy<DBText> _topFirstDBText = new Lazy<DBText>(() => new DBText());
-        public DBText TopFirstDBText
-        {
-            get
-            {
-                SetPropertiesToDBText(_topFirstDBText.Value);
-                return _topFirstDBText.Value;
-            }
-        }
-
-        private readonly Lazy<DBText> _bottomSecondDBText = new Lazy<DBText>(() => new DBText());
-        public DBText BottomSecondDBText
-        {
-            get
-            {
-                SetPropertiesToDBText(_bottomSecondDBText.Value);
-                return _bottomSecondDBText.Value;
-            }
-        }
-        private readonly Lazy<DBText> _topSecondDBText = new Lazy<DBText>(() => new DBText());
-        public DBText TopSecondDBText
-        {
-            get
-            {
-                SetPropertiesToDBText(_topSecondDBText.Value);
-                return _topSecondDBText.Value;
-            }
-        }
-
-        private readonly Lazy<DBText> _bottomThirdDBText = new Lazy<DBText>(() => new DBText());
-        public DBText BottomThirdDBText
-        {
-            get
-            {
-                SetPropertiesToDBText(_bottomThirdDBText.Value);
-                return _bottomThirdDBText.Value;
-            }
-        }
-        private readonly Lazy<DBText> _topThirdDBText = new Lazy<DBText>(() => new DBText());
-        public DBText TopThirdDBText
-        {
-            get
-            {
-                SetPropertiesToDBText(_topThirdDBText.Value);
-                return _topThirdDBText.Value;
-            }
-        }
-
-        private readonly Lazy<DBText> _bottomOrientDBText = new Lazy<DBText>(() => new DBText());
-        public DBText BottomOrientDBText
-        {
-            get
-            {
-                SetPropertiesToDBText(_bottomOrientDBText.Value);
-                return _bottomOrientDBText.Value;
-            }
-        }
-
-        private readonly Lazy<DBText> _topOrientDBText = new Lazy<DBText>(() => new DBText());
-        public DBText TopOrientDBText
-        {
-            get
-            {
-                SetPropertiesToDBText(_topOrientDBText.Value);
-                return _topOrientDBText.Value;
-            }
-        }
-
+        private DBText _bottomFirstDBText;
+        
+        private DBText _topFirstDBText;
+        
+        private DBText _bottomSecondDBText;
+        
+        private DBText _topSecondDBText;
+        
+        private DBText _bottomThirdDBText;
+        
+        private DBText _topThirdDBText;
+        
+        private DBText _bottomOrientDBText;
+        
+        private DBText _topOrientDBText;
+        
         #endregion
 
         public override IEnumerable<Entity> Entities
         {
             get
             {
-                yield return MainLine;
-                yield return BottomMarkerLine;
-                yield return TopMarkerLine;
-                yield return BottomFirstCircle;
-                yield return BottomFirstCircleType2;
-                yield return BottomSecondCircle;
-                yield return BottomSecondCircleType2;
-                yield return BottomThirdCircle;
-                yield return BottomThirdCircleType2;
-                yield return TopFirstCircle;
-                yield return TopFirstCircleType2;
-                yield return TopSecondCircle;
-                yield return TopSecondCircleType2;
-                yield return TopThirdCircle;
-                yield return TopThirdCircleType2;
-                yield return BottomFractureOffsetLine;
-                yield return TopFractureOffsetLine;
-                yield return BottomFirstDBText;
-                yield return BottomSecondDBText;
-                yield return BottomThirdDBText;
-                yield return TopFirstDBText;
-                yield return TopSecondDBText;
-                yield return TopThirdDBText;
-                yield return BottomOrientArrow;
-                yield return BottomOrientCircle;
-                yield return BottomOrientCircleType2;
-                yield return BottomOrientDBText;
-                yield return BottomOrientLine;
-                yield return TopOrientArrow;
-                yield return TopOrientCircle;
-                yield return TopOrientCircleType2;
-                yield return TopOrientDBText;
-                yield return TopOrientLine;
+                var entities = new List<Entity>
+                {
+                    _bottomOrientLine,
+                    _topOrientLine,
+                    _bottomOrientArrow,
+                    _topOrientArrow,
+                    _bottomMarkerLine,
+                    _bottomFractureOffsetLine,
+                    _topFractureOffsetLine,
+                    _topMarkerLine,
+                    _bottomFirstMarker,
+                    _bottomFirstMarkerType2,
+                    _bottomSecondMarker,
+                    _bottomSecondMarkerType2,
+                    _bottomThirdMarker,
+                    _bottomThirdMarkerType2,
+                    _topFirstMarker,
+                    _topFirstMarkerType2,
+                    _topSecondMarker,
+                    _topSecondMarkerType2,
+                    _topThirdMarker,
+                    _topThirdMarkerType2,
+                    _bottomOrientMarker,
+                    _bottomOrientMarkerType2,
+                    _topOrientMarker,
+                    _topOrientMarkerType2,
+                    _bottomFirstDBText,
+                    _topFirstDBText,
+                    _bottomSecondDBText,
+                    _topSecondDBText,
+                    _bottomThirdDBText,
+                    _topThirdDBText,
+                    _bottomOrientDBText,
+                    _topOrientDBText
+                };
+                foreach (var e in entities)
+                    if (e != null && !(e is DBText))
+                    {
+                        SetPropertiesToCadEntity(e);
+                    }
+
+                if (_mainLine != null)
+                {
+                    _mainLine.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                    _mainLine.LineWeight = LineWeight.ByBlock;
+                    _mainLine.Linetype = "ByBlock";
+                    _mainLine.LinetypeScale = LineTypeScale;
+                }
+
+                entities.Add(_mainLine);
+
+                return entities;
             }
         }
 
@@ -911,8 +653,11 @@ namespace mpESKD.Functions.mpAxis
         private void SetEntitiesPoints(Point3d insertionPoint, Point3d endPoint, Point3d bottomMarkerPoint, Point3d topMarkerPoint, double scale)
         {
             // main line
-            _mainLine.Value.StartPoint = insertionPoint;
-            _mainLine.Value.EndPoint = endPoint;
+            _mainLine = new Line
+            {
+                StartPoint = insertionPoint,
+                EndPoint = endPoint
+            };
             var mainVector = endPoint - insertionPoint;
 
             #region Bottom
@@ -924,109 +669,110 @@ namespace mpESKD.Functions.mpAxis
                 var bottomLineStartPoint = endPoint + mainVector.GetNormal() * BottomFractureOffset * scale;
                 if (BottomFractureOffset > 0)
                 {
-                    _bottomFractureOffsetLine.Value.StartPoint = endPoint;
-                    _bottomFractureOffsetLine.Value.EndPoint = bottomLineStartPoint;
+                    _bottomFractureOffsetLine = new Line
+                    {
+                        StartPoint = endPoint,
+                        EndPoint = bottomLineStartPoint
+                    };
                 }
-                else _bottomFractureOffsetLine.Value.Visible = false;
 
                 var markerLineVector = firstMarkerCenter - bottomLineStartPoint;
-                _bottomMarkerLine.Value.Visible = true;
-                _bottomMarkerLine.Value.StartPoint = bottomLineStartPoint;
-                _bottomMarkerLine.Value.EndPoint = bottomLineStartPoint + markerLineVector.GetNormal() * (markerLineVector.Length - MarkersDiameter * scale / 2.0);
-                // markers
-                _bottomFirstMarker.Value.Visible = true;
-                _bottomFirstMarker.Value.Center = firstMarkerCenter;
-                _bottomFirstMarker.Value.Diameter = MarkersDiameter * scale;
-                // text
-                if (string.IsNullOrEmpty(FirstTextPrefix) && string.IsNullOrEmpty(FirstText) &&
-                    string.IsNullOrEmpty(FirstTextSuffix))
-                    BottomFirstDBText.Visible = false;
-                else
+                _bottomMarkerLine = new Line
                 {
-                    BottomFirstDBText.Visible = true;
-                    BottomFirstDBText.Position = firstMarkerCenter;
-                    BottomFirstDBText.AlignmentPoint = firstMarkerCenter;
+                    StartPoint = bottomLineStartPoint,
+                    EndPoint = bottomLineStartPoint + markerLineVector.GetNormal() * (markerLineVector.Length - MarkersDiameter * scale / 2.0)
+                };
+                // markers
+                _bottomFirstMarker = new Circle
+                {
+                    Center = firstMarkerCenter, Diameter = MarkersDiameter * scale
+                };
+                // text
+                if (!string.IsNullOrEmpty(FirstTextPrefix) || 
+                    !string.IsNullOrEmpty(FirstText) || 
+                    !string.IsNullOrEmpty(FirstTextSuffix))
+                {
+                    _bottomFirstDBText = new DBText();
+                    SetPropertiesToDBText(_bottomFirstDBText);
+                    _bottomFirstDBText.Position = firstMarkerCenter;
+                    _bottomFirstDBText.AlignmentPoint = firstMarkerCenter;
                 }
+
                 // Второй кружок первого маркера
                 if (FirstMarkerType == AxisMarkerType.Type2)
                 {
-                    _bottomFirstMarkerType2.Value.Center = firstMarkerCenter;
-                    _bottomFirstMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                    _bottomFirstMarkerType2 = new Circle
+                    {
+                        Center = firstMarkerCenter, Diameter = (MarkersDiameter - 2) * scale
+                    };
                 }
-                else _bottomFirstMarkerType2.Value.Visible = false;
                 // Если количество маркеров больше 1
                 if (MarkersCount > 1)
                 {
                     // Значит второй маркер точно есть (независимо от 3-го)
                     var secontMarkerCenter = firstMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
-                    _bottomSecondMarker.Value.Visible = true;
-                    _bottomSecondMarker.Value.Center = secontMarkerCenter;
-                    _bottomSecondMarker.Value.Diameter = MarkersDiameter * scale;
-                    // text
-                    if (string.IsNullOrEmpty(SecondTextPrefix) && string.IsNullOrEmpty(SecondText) &&
-                        string.IsNullOrEmpty(SecondTextSuffix))
-                        BottomSecondDBText.Visible = false;
-                    else
+                    _bottomSecondMarker = new Circle
                     {
-                        BottomSecondDBText.Visible = true;
-                        BottomSecondDBText.Position = secontMarkerCenter;
-                        BottomSecondDBText.AlignmentPoint = secontMarkerCenter;
+                        Center = secontMarkerCenter, Diameter = MarkersDiameter * scale
+                    };
+                    // text
+                    if (!string.IsNullOrEmpty(SecondTextPrefix) ||
+                        !string.IsNullOrEmpty(SecondText) || 
+                        !string.IsNullOrEmpty(SecondTextSuffix))
+                    {
+                        _bottomSecondDBText = new DBText();
+                        SetPropertiesToDBText(_bottomSecondDBText);
+                        _bottomSecondDBText.Position = secontMarkerCenter;
+                        _bottomSecondDBText.AlignmentPoint = secontMarkerCenter;
                     }
+
                     // второй кружок второго маркера
                     if (SecondMarkerType == AxisMarkerType.Type2)
                     {
-                        _bottomSecondMarkerType2.Value.Center = secontMarkerCenter;
-                        _bottomSecondMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                        _bottomSecondMarkerType2 = new Circle
+                        {
+                            Center = secontMarkerCenter, Diameter = (MarkersDiameter - 2) * scale
+                        };
                     }
-                    else _bottomSecondMarkerType2.Value.Visible = false;
                     // Если количество маркеров больше двух, тогда рисую 3-ий маркер
                     if (MarkersCount > 2)
                     {
                         var thirdMarkerCenter = secontMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
-                        _bottomThirdMarker.Value.Visible = true;
-                        _bottomThirdMarker.Value.Center = thirdMarkerCenter;
-                        _bottomThirdMarker.Value.Diameter = MarkersDiameter * scale;
-                        // text
-                        if (string.IsNullOrEmpty(ThirdTextPrefix) && string.IsNullOrEmpty(ThirdText) &&
-                            string.IsNullOrEmpty(ThirdTextSuffix))
-                            BottomThirdDBText.Visible = false;
-                        else
+                        _bottomThirdMarker = new Circle
                         {
-                            BottomThirdDBText.Visible = true;
-                            BottomThirdDBText.Position = thirdMarkerCenter;
-                            BottomThirdDBText.AlignmentPoint = thirdMarkerCenter;
+                            Center = thirdMarkerCenter, Diameter = MarkersDiameter * scale
+                        };
+                        // text
+                        if (!string.IsNullOrEmpty(ThirdTextPrefix) ||
+                            !string.IsNullOrEmpty(ThirdText) || 
+                            !string.IsNullOrEmpty(ThirdTextSuffix))
+                        {
+                            _bottomThirdDBText = new DBText();
+                            SetPropertiesToDBText(_bottomThirdDBText);
+                            _bottomThirdDBText.Position = thirdMarkerCenter;
+                            _bottomThirdDBText.AlignmentPoint = thirdMarkerCenter;
                         }
+
                         // второй кружок третьего маркера
                         if (ThirdMarkerType == AxisMarkerType.Type2)
                         {
-                            _bottomThirdMarkerType2.Value.Center = thirdMarkerCenter;
-                            _bottomThirdMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                            _bottomThirdMarkerType2 = new Circle
+                            {
+                                Center = thirdMarkerCenter, Diameter = (MarkersDiameter - 2) * scale
+                            };
                         }
-                        else _bottomThirdMarkerType2.Value.Visible = false;
                     }
-                    else
-                    {
-                        _bottomThirdMarker.Value.Visible = false;
-                        _bottomThirdMarkerType2.Value.Visible = false;
-                    }
-                }
-                else
-                {
-                    _bottomSecondMarker.Value.Visible = false;
-                    _bottomSecondMarkerType2.Value.Visible = false;
-                    _bottomThirdMarker.Value.Visible = false;
-                    _bottomThirdMarkerType2.Value.Visible = false;
                 }
 
                 #region Orient marker
 
                 if (BottomOrientMarkerVisible)
                 {
-                    _bottomOrientLine.Value.Visible = true;
                     var bottomOrientMarkerCenter = BottomOrientPointOCS + mainVector.GetNormal() * MarkersDiameter / 2.0 * scale;
-                    _bottomOrientMarker.Value.Visible = true;
-                    _bottomOrientMarker.Value.Center = bottomOrientMarkerCenter;
-                    _bottomOrientMarker.Value.Diameter = MarkersDiameter * scale;
+                    _bottomOrientMarker = new Circle
+                    {
+                        Center = bottomOrientMarkerCenter, Diameter = MarkersDiameter * scale
+                    };
                     // line
                     var _bottomOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, bottomOrientMarkerCenter, firstMarkerCenter,
@@ -1034,98 +780,46 @@ namespace mpESKD.Functions.mpAxis
                     var _bottomOrientLineEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         bottomOrientMarkerCenter, firstMarkerCenter, bottomOrientMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    if (_bottomOrientLineEndPoint.IsEqualTo(_bottomOrientLineStartPoint, Tolerance.Global))
+                    if (!_bottomOrientLineEndPoint.IsEqualTo(_bottomOrientLineStartPoint, Tolerance.Global))
                     {
-                        _bottomOrientLine.Value.Visible = false;
-                        // arrow false
-                        _bottomOrientArrow.Value.Visible = false;
-                    }
-                    else
-                    {
-                        _bottomOrientLine.Value.Visible = true;
-                        _bottomOrientLine.Value.StartPoint = _bottomOrientLineStartPoint;
-                        _bottomOrientLine.Value.EndPoint = _bottomOrientLineEndPoint;
+                        _bottomOrientLine = new Line
+                        {
+                            StartPoint = _bottomOrientLineStartPoint,
+                            EndPoint = _bottomOrientLineEndPoint
+                        };
                         // arrow
-                        if (Math.Abs((_bottomOrientLineEndPoint - _bottomOrientLineStartPoint).Length) < ArrowsSize * scale ||
-                            ArrowsSize == 0)
+                        if (!(Math.Abs((_bottomOrientLineEndPoint - _bottomOrientLineStartPoint).Length) < ArrowsSize * scale) &&
+                            ArrowsSize != 0)
                         {
-                            //arrow false
-                            _bottomOrientArrow.Value.Visible = false;
-                        }
-                        else
-                        {
-                            _bottomOrientArrow.Value.Visible = true;
-                            // arrow draw
+                            _bottomOrientArrow = new Polyline(2);
                             var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(_bottomOrientLineEndPoint,
                                 _bottomOrientLineStartPoint,
                                 _bottomOrientLineEndPoint, ArrowsSize * scale);
-                            if (_bottomOrientArrow.Value.NumberOfVertices == 2)
-                            {
-                                _bottomOrientArrow.Value.SetPointAt(0,
-                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint));
-                                _bottomOrientArrow.Value.SetBulgeAt(0, 0.0);
-                                _bottomOrientArrow.Value.SetPointAt(1,
-                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(_bottomOrientLineEndPoint));
-                                _bottomOrientArrow.Value.SetBulgeAt(1, 0.0);
-                                _bottomOrientArrow.Value.SetStartWidthAt(0, ArrowsSize * scale * 1 / 3);
-                            }
-                            else
-                            {
-                                _bottomOrientArrow.Value.AddVertexAt(0,
-                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint),
-                                    0.0, ArrowsSize * scale * 1 / 3, 0.0);
-                                _bottomOrientArrow.Value.AddVertexAt(1,
-                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(_bottomOrientLineEndPoint),
-                                    0.0, 0.0, 0.0);
-                            }
+                            _bottomOrientArrow.AddVertexAt(0, arrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
+                            _bottomOrientArrow.AddVertexAt(1, _bottomOrientLineEndPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
                         }
                     }
+
                     // text
-                    if (string.IsNullOrEmpty(BottomOrientText))
-                        BottomOrientDBText.Visible = false;
-                    else
+                    if (!string.IsNullOrEmpty(BottomOrientText))
                     {
-                        BottomOrientDBText.Visible = true;
-                        BottomOrientDBText.Position = bottomOrientMarkerCenter;
-                        BottomOrientDBText.AlignmentPoint = bottomOrientMarkerCenter;
+                        _bottomOrientDBText = new DBText();
+                        SetPropertiesToDBText(_bottomOrientDBText);
+                        _bottomOrientDBText.Position = bottomOrientMarkerCenter;
+                        _bottomOrientDBText.AlignmentPoint = bottomOrientMarkerCenter;
                     }
+
                     // type2
                     if (OrientMarkerType == AxisMarkerType.Type2)
                     {
-                        _bottomOrientMarkerType2.Value.Center = bottomOrientMarkerCenter;
-                        _bottomOrientMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                        _bottomOrientMarkerType2 = new Circle
+                        {
+                            Center = bottomOrientMarkerCenter, Diameter = (MarkersDiameter - 2) * scale
+                        };
                     }
-                    else _bottomOrientMarkerType2.Value.Visible = false;
-                }
-                else
-                {
-                    _bottomOrientArrow.Value.Visible = false;
-                    _bottomOrientDBText.Value.Visible = false;
-                    _bottomOrientLine.Value.Visible = false;
-                    _bottomOrientMarker.Value.Visible = false;
-                    _bottomOrientMarkerType2.Value.Visible = false;
                 }
 
                 #endregion
-            }
-            else
-            {
-                _bottomMarkerLine.Value.Visible = false;
-                _bottomFirstMarker.Value.Visible = false;
-                _bottomFirstMarkerType2.Value.Visible = false;
-                _bottomSecondMarker.Value.Visible = false;
-                _bottomSecondMarkerType2.Value.Visible = false;
-                _bottomThirdMarker.Value.Visible = false;
-                _bottomThirdMarkerType2.Value.Visible = false;
-                _bottomFractureOffsetLine.Value.Visible = false;
-                _bottomFirstDBText.Value.Visible = false;
-                _bottomSecondDBText.Value.Visible = false;
-                _bottomThirdDBText.Value.Visible = false;
-                _bottomOrientArrow.Value.Visible = false;
-                _bottomOrientDBText.Value.Visible = false;
-                _bottomOrientLine.Value.Visible = false;
-                _bottomOrientMarker.Value.Visible = false;
-                _bottomOrientMarkerType2.Value.Visible = false;
             }
             #endregion
 
@@ -1138,109 +832,110 @@ namespace mpESKD.Functions.mpAxis
                 var topLineStartPoint = insertionPoint - mainVector.GetNormal() * TopFractureOffset * scale;
                 if (TopFractureOffset > 0)
                 {
-                    _topFractureOffsetLine.Value.StartPoint = insertionPoint;
-                    _topFractureOffsetLine.Value.EndPoint = topLineStartPoint;
+                    _topFractureOffsetLine = new Line
+                    {
+                        StartPoint = insertionPoint,
+                        EndPoint = topLineStartPoint
+                    };
                 }
-                else _topFractureOffsetLine.Value.Visible = false;
 
                 var markerLineVector = firstMarkerCenter - topLineStartPoint;
-                _topMarkerLine.Value.Visible = true;
-                _topMarkerLine.Value.StartPoint = topLineStartPoint;
-                _topMarkerLine.Value.EndPoint = topLineStartPoint + markerLineVector.GetNormal() * (markerLineVector.Length - MarkersDiameter * scale / 2.0);
-                // markers
-                _topFirstMarker.Value.Visible = true;
-                _topFirstMarker.Value.Center = firstMarkerCenter;
-                _topFirstMarker.Value.Diameter = MarkersDiameter * scale;
-                // text
-                if (string.IsNullOrEmpty(FirstTextPrefix) && string.IsNullOrEmpty(FirstText) &&
-                    string.IsNullOrEmpty(FirstTextSuffix))
-                    TopFirstDBText.Visible = false;
-                else
+                _topMarkerLine = new Line
                 {
-                    TopFirstDBText.Visible = true;
-                    TopFirstDBText.Position = firstMarkerCenter;
-                    TopFirstDBText.AlignmentPoint = firstMarkerCenter;
+                    StartPoint = topLineStartPoint,
+                    EndPoint = topLineStartPoint + markerLineVector.GetNormal() * (markerLineVector.Length - MarkersDiameter * scale / 2.0)
+                };
+                // markers
+                _topFirstMarker = new Circle
+                {
+                    Center = firstMarkerCenter, Diameter = MarkersDiameter * scale
+                };
+                // text
+                if (!string.IsNullOrEmpty(FirstTextPrefix) || 
+                    !string.IsNullOrEmpty(FirstText) ||
+                    !string.IsNullOrEmpty(FirstTextSuffix))
+                {
+                    _topFirstDBText = new DBText();
+                    SetPropertiesToDBText(_topFirstDBText);
+                    _topFirstDBText.Position = firstMarkerCenter;
+                    _topFirstDBText.AlignmentPoint = firstMarkerCenter;
                 }
+
                 // Второй кружок первого маркера
                 if (FirstMarkerType == AxisMarkerType.Type2)
                 {
-                    _topFirstMarkerType2.Value.Center = firstMarkerCenter;
-                    _topFirstMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                    _topFirstMarkerType2 = new Circle
+                    {
+                        Center = firstMarkerCenter, Diameter = (MarkersDiameter - 2) * scale
+                    };
                 }
-                else _topFirstMarkerType2.Value.Visible = false;
                 // Если количество маркеров больше 1
                 if (MarkersCount > 1)
                 {
                     // Значит второй маркер точно есть (независимо от 3-го)
                     var secontMarkerCenter = firstMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
-                    _topSecondMarker.Value.Visible = true;
-                    _topSecondMarker.Value.Center = secontMarkerCenter;
-                    _topSecondMarker.Value.Diameter = MarkersDiameter * scale;
-                    // text
-                    if (string.IsNullOrEmpty(SecondTextPrefix) && string.IsNullOrEmpty(SecondText) &&
-                        string.IsNullOrEmpty(SecondTextSuffix))
-                        TopSecondDBText.Visible = false;
-                    else
+                    _topSecondMarker = new Circle
                     {
-                        TopSecondDBText.Visible = true;
-                        TopSecondDBText.Position = secontMarkerCenter;
-                        TopSecondDBText.AlignmentPoint = secontMarkerCenter;
+                        Center = secontMarkerCenter, Diameter = MarkersDiameter * scale
+                    };
+                    // text
+                    if (!string.IsNullOrEmpty(SecondTextPrefix) || 
+                        !string.IsNullOrEmpty(SecondText) ||
+                        !string.IsNullOrEmpty(SecondTextSuffix))
+                    {
+                        _topSecondDBText = new DBText();
+                        SetPropertiesToDBText(_topSecondDBText);
+                        _topSecondDBText.Position = secontMarkerCenter;
+                        _topSecondDBText.AlignmentPoint = secontMarkerCenter;
                     }
+
                     // второй кружок второго маркера
                     if (SecondMarkerType == AxisMarkerType.Type2)
                     {
-                        _topSecondMarkerType2.Value.Center = secontMarkerCenter;
-                        _topSecondMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                        _topSecondMarkerType2 = new Circle
+                        {
+                            Center = secontMarkerCenter, Diameter = (MarkersDiameter - 2) * scale
+                        };
                     }
-                    else _topSecondMarkerType2.Value.Visible = false;
                     // Если количество маркеров больше двух, тогда рисую 3-ий маркер
                     if (MarkersCount > 2)
                     {
                         var thirdMarkerCenter = secontMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
-                        _topThirdMarker.Value.Visible = true;
-                        _topThirdMarker.Value.Center = thirdMarkerCenter;
-                        _topThirdMarker.Value.Diameter = MarkersDiameter * scale;
-                        // text
-                        if (string.IsNullOrEmpty(ThirdTextPrefix) && string.IsNullOrEmpty(ThirdText) &&
-                            string.IsNullOrEmpty(ThirdTextSuffix))
-                            TopThirdDBText.Visible = false;
-                        else
+                        _topThirdMarker = new Circle
                         {
-                            TopThirdDBText.Visible = true;
-                            TopThirdDBText.Position = thirdMarkerCenter;
-                            TopThirdDBText.AlignmentPoint = thirdMarkerCenter;
+                            Center = thirdMarkerCenter, Diameter = MarkersDiameter * scale
+                        };
+                        // text
+                        if (!string.IsNullOrEmpty(ThirdTextPrefix) ||
+                            !string.IsNullOrEmpty(ThirdText) || 
+                            !string.IsNullOrEmpty(ThirdTextSuffix))
+                        {
+                            _topThirdDBText = new DBText();
+                            SetPropertiesToDBText(_topThirdDBText);
+                            _topThirdDBText.Position = thirdMarkerCenter;
+                            _topThirdDBText.AlignmentPoint = thirdMarkerCenter;
                         }
+
                         // второй кружок третьего маркера
                         if (ThirdMarkerType == AxisMarkerType.Type2)
                         {
-                            _topThirdMarkerType2.Value.Center = thirdMarkerCenter;
-                            _topThirdMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                            _topThirdMarkerType2 = new Circle
+                            {
+                                Center = thirdMarkerCenter, Diameter = (MarkersDiameter - 2) * scale
+                            };
                         }
-                        else _topThirdMarkerType2.Value.Visible = false;
                     }
-                    else
-                    {
-                        _topThirdMarker.Value.Visible = false;
-                        _topThirdMarkerType2.Value.Visible = false;
-                    }
-                }
-                else
-                {
-                    _topSecondMarker.Value.Visible = false;
-                    _topSecondMarkerType2.Value.Visible = false;
-                    _topThirdMarker.Value.Visible = false;
-                    _topThirdMarkerType2.Value.Visible = false;
                 }
 
                 #region Orient marker
 
                 if (TopOrientMarkerVisible)
                 {
-                    _topOrientLine.Value.Visible = true;
                     var topOrientMarkerCenter = TopOrientPointOCS - mainVector.GetNormal() * MarkersDiameter / 2.0 * scale;
-                    _topOrientMarker.Value.Visible = true;
-                    _topOrientMarker.Value.Center = topOrientMarkerCenter;
-                    _topOrientMarker.Value.Diameter = MarkersDiameter * scale;
+                    _topOrientMarker = new Circle
+                    {
+                        Center = topOrientMarkerCenter, Diameter = MarkersDiameter * scale
+                    };
                     // line
                     var _topOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, topOrientMarkerCenter, firstMarkerCenter,
@@ -1248,98 +943,47 @@ namespace mpESKD.Functions.mpAxis
                     var _topOrientLineEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         topOrientMarkerCenter, firstMarkerCenter, topOrientMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    if (_topOrientLineEndPoint.IsEqualTo(_topOrientLineStartPoint, Tolerance.Global))
+                    if (!_topOrientLineEndPoint.IsEqualTo(_topOrientLineStartPoint, Tolerance.Global))
                     {
-                        _topOrientLine.Value.Visible = false;
-                        // arrow false
-                        _topOrientArrow.Value.Visible = false;
-                    }
-                    else
-                    {
-                        _topOrientLine.Value.Visible = true;
-                        _topOrientLine.Value.StartPoint = _topOrientLineStartPoint;
-                        _topOrientLine.Value.EndPoint = _topOrientLineEndPoint;
+                        _topOrientLine = new Line
+                        {
+                            StartPoint = _topOrientLineStartPoint,
+                            EndPoint = _topOrientLineEndPoint
+                        };
                         // arrow
-                        if (Math.Abs((_topOrientLineEndPoint - _topOrientLineStartPoint).Length) < ArrowsSize * scale ||
-                            ArrowsSize == 0)
+                        if (!(Math.Abs((_topOrientLineEndPoint - _topOrientLineStartPoint).Length) < ArrowsSize * scale) &&
+                            ArrowsSize != 0)
                         {
-                            //arrow false
-                            _topOrientArrow.Value.Visible = false;
-                        }
-                        else
-                        {
-                            _topOrientArrow.Value.Visible = true;
+                            _topOrientArrow = new Polyline(2);
                             // arrow draw
                             var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(_topOrientLineEndPoint,
                                 _topOrientLineStartPoint,
                                 _topOrientLineEndPoint, ArrowsSize * scale);
-                            if (_topOrientArrow.Value.NumberOfVertices == 2)
-                            {
-                                _topOrientArrow.Value.SetPointAt(0,
-                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint));
-                                _topOrientArrow.Value.SetBulgeAt(0, 0.0);
-                                _topOrientArrow.Value.SetPointAt(1,
-                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(_topOrientLineEndPoint));
-                                _topOrientArrow.Value.SetBulgeAt(1, 0.0);
-                                _topOrientArrow.Value.SetStartWidthAt(0, ArrowsSize * scale * 1 / 3);
-                            }
-                            else
-                            {
-                                _topOrientArrow.Value.AddVertexAt(0,
-                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowStartPoint),
-                                    0.0, ArrowsSize * scale * 1 / 3, 0.0);
-                                _topOrientArrow.Value.AddVertexAt(1,
-                                    ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(_topOrientLineEndPoint),
-                                    0.0, 0.0, 0.0);
-                            }
+                            _topOrientArrow.AddVertexAt(0, arrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
+                            _topOrientArrow.AddVertexAt(1, _topOrientLineEndPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
                         }
                     }
+
                     // text
-                    if (string.IsNullOrEmpty(TopOrientText))
-                        TopOrientDBText.Visible = false;
-                    else
+                    if (!string.IsNullOrEmpty(TopOrientText))
                     {
-                        TopOrientDBText.Visible = true;
-                        TopOrientDBText.Position = topOrientMarkerCenter;
-                        TopOrientDBText.AlignmentPoint = topOrientMarkerCenter;
+                        _topOrientDBText = new DBText();
+                        SetPropertiesToDBText(_topOrientDBText);
+                        _topOrientDBText.Position = topOrientMarkerCenter;
+                        _topOrientDBText.AlignmentPoint = topOrientMarkerCenter;
                     }
+
                     // type2
                     if (OrientMarkerType == AxisMarkerType.Type2)
                     {
-                        _topOrientMarkerType2.Value.Center = topOrientMarkerCenter;
-                        _topOrientMarkerType2.Value.Diameter = (MarkersDiameter - 2) * scale;
+                        _topOrientMarkerType2 = new Circle
+                        {
+                            Center = topOrientMarkerCenter, Diameter = (MarkersDiameter - 2) * scale
+                        };
                     }
-                    else _topOrientMarkerType2.Value.Visible = false;
-                }
-                else
-                {
-                    _topOrientArrow.Value.Visible = false;
-                    _topOrientDBText.Value.Visible = false;
-                    _topOrientLine.Value.Visible = false;
-                    _topOrientMarker.Value.Visible = false;
-                    _topOrientMarkerType2.Value.Visible = false;
                 }
 
                 #endregion
-            }
-            else
-            {
-                _topMarkerLine.Value.Visible = false;
-                _topFirstMarker.Value.Visible = false;
-                _topFirstMarkerType2.Value.Visible = false;
-                _topSecondMarker.Value.Visible = false;
-                _topSecondMarkerType2.Value.Visible = false;
-                _topThirdMarker.Value.Visible = false;
-                _topThirdMarkerType2.Value.Visible = false;
-                _topFractureOffsetLine.Value.Visible = false;
-                _topFirstDBText.Value.Visible = false;
-                _topSecondDBText.Value.Visible = false;
-                _topThirdDBText.Value.Visible = false;
-                _topOrientArrow.Value.Visible = false;
-                _topOrientDBText.Value.Visible = false;
-                _topOrientLine.Value.Visible = false;
-                _topOrientMarker.Value.Visible = false;
-                _topOrientMarkerType2.Value.Visible = false;
             }
             #endregion
         }
@@ -1347,19 +991,20 @@ namespace mpESKD.Functions.mpAxis
         private void UpdateTextEntities()
         {
             SetFirstTextOnCreation();
-            BottomFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
-            BottomSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
-            BottomThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
-            TopFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
-            TopSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
-            TopThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
-            BottomOrientDBText.TextString = BottomOrientText;
-            TopOrientDBText.TextString = TopOrientText;
+            if (_bottomFirstDBText != null) _bottomFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
+            if (_bottomSecondDBText != null) _bottomSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
+            if (_bottomThirdDBText != null) _bottomThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
+            if (_topFirstDBText != null) _topFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
+            if (_topSecondDBText != null) _topSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
+            if (_topThirdDBText != null) _topThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
+            if (_bottomOrientDBText != null) _bottomOrientDBText.TextString = BottomOrientText;
+            if (_topOrientDBText != null) _topOrientDBText.TextString = TopOrientText;
         }
 
         private void SetFirstTextOnCreation()
         {
-            if (EndPointOCS == Point3d.Origin) return;
+            if (EndPointOCS == Point3d.Origin)
+                return;
             if (IsValueCreated)
             {
                 var check = 1 / Math.Sqrt(2);
@@ -1376,6 +1021,7 @@ namespace mpESKD.Functions.mpAxis
 
         private string _newHorizontalMarkValue = string.Empty;
 
+        //todo вынести в отдельный вспомогательный класс, разделив на два метода
         private string GetFirstTextValueByLastAxis(string direction)
         {
             if (direction.Equals("Horizontal"))
@@ -1389,15 +1035,15 @@ namespace mpESKD.Functions.mpAxis
                             _newHorizontalMarkValue = (i + 1).ToString();
                             return _newHorizontalMarkValue;
                         }
-                        if (AxisFunction.AxisRusAlphabet.Contains(LastHorizontalValue))
+                        if (Invariables.AxisRusAlphabet.Contains(LastHorizontalValue))
                         {
-                            var index = AxisFunction.AxisRusAlphabet.IndexOf(LastHorizontalValue);
-                            if (index == AxisFunction.AxisRusAlphabet.Count - 1)
+                            var index = Invariables.AxisRusAlphabet.IndexOf(LastHorizontalValue);
+                            if (index == Invariables.AxisRusAlphabet.Count - 1)
                             {
-                                _newHorizontalMarkValue = AxisFunction.AxisRusAlphabet[0];
+                                _newHorizontalMarkValue = Invariables.AxisRusAlphabet[0];
                                 return _newHorizontalMarkValue;
                             }
-                            _newHorizontalMarkValue = AxisFunction.AxisRusAlphabet[index + 1];
+                            _newHorizontalMarkValue = Invariables.AxisRusAlphabet[index + 1];
                             return _newHorizontalMarkValue;
                         }
                         _newHorizontalMarkValue = "А";
@@ -1419,15 +1065,15 @@ namespace mpESKD.Functions.mpAxis
                             _newVerticalMarkValue = (i + 1).ToString();
                             return _newVerticalMarkValue;
                         }
-                        if (AxisFunction.AxisRusAlphabet.Contains(LastVerticalValue))
+                        if (Invariables.AxisRusAlphabet.Contains(LastVerticalValue))
                         {
-                            var index = AxisFunction.AxisRusAlphabet.IndexOf(LastVerticalValue);
-                            if (index == AxisFunction.AxisRusAlphabet.Count - 1)
+                            var index = Invariables.AxisRusAlphabet.IndexOf(LastVerticalValue);
+                            if (index == Invariables.AxisRusAlphabet.Count - 1)
                             {
-                                _newVerticalMarkValue = AxisFunction.AxisRusAlphabet[0];
+                                _newVerticalMarkValue = Invariables.AxisRusAlphabet[0];
                                 return _newVerticalMarkValue;
                             }
-                            _newVerticalMarkValue = AxisFunction.AxisRusAlphabet[index + 1];
+                            _newVerticalMarkValue = Invariables.AxisRusAlphabet[index + 1];
                             return _newVerticalMarkValue;
                         }
                         _newVerticalMarkValue = "1";

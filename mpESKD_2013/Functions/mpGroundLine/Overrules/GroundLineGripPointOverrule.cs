@@ -45,9 +45,6 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(entity);
                     if (groundLine != null)
                     {
-                        Vector3d val = new Vector3d(entity.GetPlane(), Vector2d.XAxis);
-                        var scale = val.Length;
-
                         // Если средних точек нет, значит линия состоит всего из двух точек
                         // в этом случае не нужно добавлять точки удаления крайних вершин
 
@@ -62,7 +59,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                         {
                             var removeVertexGrip = new GroundLineRemoveVertexGrip(groundLine, 0)
                             {
-                                GripPoint = groundLine.InsertionPoint - Vector3d.YAxis * 4 * scale
+                                GripPoint = groundLine.InsertionPoint - Vector3d.YAxis * 20 * curViewUnitSize
                             };
                             grips.Add(removeVertexGrip);
                         }
@@ -78,7 +75,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
                             var removeVertexGrip = new GroundLineRemoveVertexGrip(groundLine, index + 1)
                             {
-                                GripPoint = groundLine.MiddlePoints[index] - Vector3d.YAxis * 4 * scale
+                                GripPoint = groundLine.MiddlePoints[index] - Vector3d.YAxis * 20 * curViewUnitSize
                             };
                             grips.Add(removeVertexGrip);
                         }
@@ -94,7 +91,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                         {
                             var removeVertexGrip = new GroundLineRemoveVertexGrip(groundLine, groundLine.MiddlePoints.Count + 1)
                             {
-                                GripPoint = groundLine.EndPoint - Vector3d.YAxis * 4 * scale
+                                GripPoint = groundLine.EndPoint - Vector3d.YAxis * 20 * curViewUnitSize
                             };
                             grips.Add(removeVertexGrip);
                         }
@@ -140,14 +137,14 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                                 var addVertexGrip = new GroundLineAddVertexGrip(groundLine, groundLine.EndPoint, null)
                                 {
                                     GripPoint = groundLine.EndPoint +
-                                                (groundLine.EndPoint - groundLine.MiddlePoints.Last()).GetNormal() * 4 * scale
+                                                (groundLine.EndPoint - groundLine.MiddlePoints.Last()).GetNormal() * 20 * curViewUnitSize
                                 };
                                 grips.Add(addVertexGrip);
 
                                 addVertexGrip = new GroundLineAddVertexGrip(groundLine, null, groundLine.InsertionPoint)
                                 {
                                     GripPoint = groundLine.InsertionPoint +
-                                                (groundLine.InsertionPoint - groundLine.MiddlePoints.First()).GetNormal() * 4 * scale
+                                                (groundLine.InsertionPoint - groundLine.MiddlePoints.First()).GetNormal() * 20 * curViewUnitSize
                                 };
                                 grips.Add(addVertexGrip);
                             }
@@ -156,14 +153,14 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                                 var addVertexGrip = new GroundLineAddVertexGrip(groundLine, groundLine.EndPoint, null)
                                 {
                                     GripPoint = groundLine.EndPoint + 
-                                                (groundLine.InsertionPoint - groundLine.EndPoint).GetNormal() * 4 * scale
+                                                (groundLine.InsertionPoint - groundLine.EndPoint).GetNormal() * 20 * curViewUnitSize
                                 };
                                 grips.Add(addVertexGrip);
 
                                 addVertexGrip = new GroundLineAddVertexGrip(groundLine, null, groundLine.EndPoint)
                                 {
                                     GripPoint = groundLine.InsertionPoint +
-                                                (groundLine.EndPoint - groundLine.InsertionPoint ).GetNormal() * 4 * scale
+                                                (groundLine.EndPoint - groundLine.InsertionPoint ).GetNormal() * 20 * curViewUnitSize
                                 };
                                 grips.Add(addVertexGrip);
 
@@ -177,29 +174,17 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
                         #endregion
 
-                        var reverseGrip = new GroundLineReverseGrip(groundLine);
-                        if (groundLine.MiddlePoints.Any())
+                        var reverseGrip = new GroundLineReverseGrip(groundLine)
                         {
-                            Point2dCollection points = new Point2dCollection();
-                            points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(groundLine.InsertionPoint));
-                            groundLine.MiddlePoints.ForEach(p => points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(p)));
-                            points.Add(ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(groundLine.EndPoint));
-                            Polyline polyline = new Polyline();
-                            for (var i = 0; i < points.Count; i++)
-                            {
-                                polyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
-                            }
-
-                            reverseGrip.GripPoint = polyline.GetPointAtDist(polyline.Length / 2) +
-                                                    Vector3d.YAxis * 4 * scale;
-                        }
-                        else
-                        {
-                            reverseGrip.GripPoint =
-                                GeometryHelpers.GetMiddlePoint3d(groundLine.InsertionPoint, groundLine.EndPoint) +
-                                Vector3d.YAxis * 4 * scale;
-                        }
+                            GripPoint = groundLine.InsertionPoint + Vector3d.YAxis * 20 * curViewUnitSize
+                        };
                         grips.Add(reverseGrip);
+                        reverseGrip = new GroundLineReverseGrip(groundLine)
+                        {
+                            GripPoint = groundLine.EndPoint + Vector3d.YAxis * 20 * curViewUnitSize
+                        };
+                        grips.Add(reverseGrip);
+                        
                     }
                 }
             }
@@ -291,7 +276,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         // Подсказка в зависимости от имени ручки
         public override string GetTooltip()
         {
-            return Language.GetItem(MainFunction.LangItem, "gp1"); // stretch
+            return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
         }
 
         // Временное значение ручки
@@ -380,7 +365,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
         public override string GetTooltip()
         {
-            return Language.GetItem(MainFunction.LangItem, "gp4"); //  "Добавить вершину";
+            return Language.GetItem(Invariables.LangItem, "gp4"); //  "Добавить вершину";
         }
 
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
@@ -499,7 +484,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         // Подсказка в зависимости от имени ручки
         public override string GetTooltip()
         {
-            return Language.GetItem(MainFunction.LangItem, "gp3"); // "Удалить вершину";
+            return Language.GetItem(Invariables.LangItem, "gp3"); // "Удалить вершину";
         }
 
         public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)

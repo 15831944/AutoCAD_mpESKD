@@ -9,7 +9,7 @@ namespace mpESKD.Base.Properties
         public PaletteSettings()
         {
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(MainFunction.LangItem, "h1");
+            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h1");
             Loaded += LmSettings_Loaded;
         }
         private void LmSettings_Loaded(object sender, RoutedEventArgs e)

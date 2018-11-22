@@ -15,9 +15,9 @@ namespace mpESKD.Base.Properties.Converters
                 && (value == null || value is int))
             {
                 if (value == null)
-                    return "*" + Language.GetItem(MainFunction.LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
+                    return "*" + Language.GetItem(Invariables.LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
                 if (double.IsNaN((int) value))
-                    return "*" + Language.GetItem(MainFunction.LangItem, "vc2") + "*"; // НЕ ОПРЕДЕЛЕНО
+                    return "*" + Language.GetItem(Invariables.LangItem, "vc2") + "*"; // НЕ ОПРЕДЕЛЕНО
                 return string.Empty;
             }
 
@@ -45,9 +45,9 @@ namespace mpESKD.Base.Properties.Converters
                 && (value == null || value is double))
             {
                 if (value == null)
-                    return "*" + Language.GetItem(MainFunction.LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
+                    return "*" + Language.GetItem(Invariables.LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
                 if (double.IsNaN((double) value))
-                    return "*" + Language.GetItem(MainFunction.LangItem, "vc2") + "*"; // НЕ ОПРЕДЕЛЕНО
+                    return "*" + Language.GetItem(Invariables.LangItem, "vc2") + "*"; // НЕ ОПРЕДЕЛЕНО
                 return string.Empty;
             }
 

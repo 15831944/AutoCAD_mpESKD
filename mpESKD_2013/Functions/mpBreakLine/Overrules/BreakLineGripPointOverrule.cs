@@ -210,9 +210,9 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                 case BreakLineGripName.StartGrip:
                 case BreakLineGripName.EndGrip:
                     {
-                        return Language.GetItem(MainFunction.LangItem, "gp1"); // stretch
+                        return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
                     }
-                case BreakLineGripName.MiddleGrip: return Language.GetItem(MainFunction.LangItem, "gp2"); // move
+                case BreakLineGripName.MiddleGrip: return Language.GetItem(Invariables.LangItem, "gp2"); // move
             }
             return base.GetTooltip();
         }

@@ -50,7 +50,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name, true);
         }
     }
 }

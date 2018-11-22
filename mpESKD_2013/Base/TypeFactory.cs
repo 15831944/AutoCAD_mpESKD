@@ -73,7 +73,7 @@
         {
             try
             {
-                return ModPlusAPI.Language.GetItem(MainFunction.LangItem, key);
+                return ModPlusAPI.Language.GetItem(Invariables.LangItem, key);
             }
             catch
             {

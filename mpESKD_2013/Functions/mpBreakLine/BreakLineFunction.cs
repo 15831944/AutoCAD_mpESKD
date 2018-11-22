@@ -63,16 +63,17 @@
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(BreakLineDescriptor.Instance.Name);
                 var style = StyleManager.GetCurrentStyle(typeof(BreakLine));
-                var breakLine = new BreakLine { BreakLineType = breakLineType };
+                var breakLine = new BreakLine();
 
                 var blockReference = MainFunction.CreateBlock(breakLine);
                 breakLine.ApplyStyle(style, true);
+                breakLine.BreakLineType = breakLineType;
 
                 var entityJig = new DefaultEntityJig(
                         breakLine,
                         blockReference,
                         new Point3d(15, 0, 0),
-                        Language.GetItem(MainFunction.LangItem, "msg2"));
+                        Language.GetItem(Invariables.LangItem, "msg2"));
                 do
                 {
                     var status = AcadHelpers.Editor.Drag(entityJig).Status;

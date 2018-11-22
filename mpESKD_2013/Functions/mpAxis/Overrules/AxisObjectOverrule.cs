@@ -1,26 +1,25 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Runtime;
-using mpESKD.Base.Helpers;
-using ModPlusAPI.Windows;
-
-// ReSharper disable InconsistentNaming
-
-namespace mpESKD.Functions.mpAxis.Overrules
+﻿namespace mpESKD.Functions.mpAxis.Overrules
 {
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Runtime;
+    using Base.Helpers;
+    using ModPlusAPI.Windows;
     using System.Diagnostics;
     using Base;
 
     public class AxisObjectOverrule : ObjectOverrule
     {
-        protected static AxisObjectOverrule _axisObjectOverrule;
+        private static AxisObjectOverrule _instance;
+
         public static AxisObjectOverrule Instance()
         {
-            if (_axisObjectOverrule != null) return _axisObjectOverrule;
-            _axisObjectOverrule = new AxisObjectOverrule();
+            if (_instance != null) return _instance;
+            _instance = new AxisObjectOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _axisObjectOverrule.SetXDataFilter(AxisDescriptor.Instance.Name);
-            return _axisObjectOverrule;
+            _instance.SetXDataFilter(AxisDescriptor.Instance.Name);
+            return _instance;
         }
+
         public override void Close(DBObject dbObject)
         {
             Debug.Print("AxisObjectOverrule");
@@ -50,7 +49,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisDescriptor.Instance.Name);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisDescriptor.Instance.Name, true);
         }
     }
 }

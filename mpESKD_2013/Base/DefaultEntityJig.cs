@@ -59,7 +59,7 @@
                 switch (JigState)
                 {
                     case JigState.PromptInsertPoint:
-                        return _insertionPoint.Acquire(prompts, "\n" + Language.GetItem(MainFunction.LangItem, "msg1"), value =>
+                        return _insertionPoint.Acquire(prompts, "\n" + Language.GetItem(Invariables.LangItem, "msg1"), value =>
                             {
                                 _intellectualEntity.InsertionPoint = value;
                             });

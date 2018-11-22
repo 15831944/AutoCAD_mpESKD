@@ -154,7 +154,7 @@
     /// <remarks>Работает со свойствами типа: int, double, bool, Enum, Point3d, List(Point3d).
     /// Остальные типы желательно добавить в метод <see cref="IntellectualEntity.SetPropertiesValuesFromXData"/></remarks>
     /// </summary>
-    public class SaveToXData : Attribute
+    public class SaveToXDataAttribute : Attribute
     {
     }
 }

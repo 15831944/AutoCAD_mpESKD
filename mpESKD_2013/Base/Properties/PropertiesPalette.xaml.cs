@@ -497,7 +497,7 @@
         {
             try
             {
-                var displayName = ModPlusAPI.Language.GetItem(MainFunction.LangItem, summaryProperty.DisplayNameLocalizationKey);
+                var displayName = ModPlusAPI.Language.GetItem(Invariables.LangItem, summaryProperty.DisplayNameLocalizationKey);
                 if (!string.IsNullOrEmpty(displayName))
                     return displayName;
             }
@@ -517,7 +517,7 @@
         {
             try
             {
-                var description = ModPlusAPI.Language.GetItem(MainFunction.LangItem, summaryProperty.DescriptionLocalizationKey);
+                var description = ModPlusAPI.Language.GetItem(Invariables.LangItem, summaryProperty.DescriptionLocalizationKey);
                 if (!string.IsNullOrEmpty(description))
                     return description;
             }

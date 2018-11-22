@@ -74,7 +74,7 @@
             {
                 var systemStyle = new IntellectualEntityStyle(et)
                 {
-                    Name = LocalizationHelper.GetEntityLocalizationName(et) + " [" + Language.GetItem(MainFunction.LangItem, "h12") + "]",
+                    Name = LocalizationHelper.GetEntityLocalizationName(et) + " [" + Language.GetItem(Invariables.LangItem, "h12") + "]",
                     Description = TypeFactory.Instance.GetSystemStyleLocalizedDescription(et),
                     Guid = "00000000-0000-0000-0000-000000000000",
                     StyleType = StyleType.System
@@ -114,7 +114,7 @@
                             attribute, keyForEditorAttribute, entityType,
                             AcadHelpers.Layers.Contains(attribute.DefaultValue.ToString())
                                 ? attribute.DefaultValue
-                                : Language.GetItem(MainFunction.LangItem, "defl"),
+                                : Language.GetItem(Invariables.LangItem, "defl"),
                             ObjectId.Null));
                     }
                     else
@@ -565,7 +565,7 @@
                         {
                             var layerName = propertyFromStyle.Value.ToString();
                             if (string.IsNullOrEmpty(layerName))
-                                layerName = Language.GetItem(MainFunction.LangItem, "defl");
+                                layerName = Language.GetItem(Invariables.LangItem, "defl");
                             if (isOnEntityCreation)
                             {
                                 if (MainStaticSettings.Settings.UseLayerFromStyle)

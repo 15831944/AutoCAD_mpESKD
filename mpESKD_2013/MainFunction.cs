@@ -20,8 +20,6 @@
 
     public class MainFunction : IExtensionApplication
     {
-        public static string LangItem = "mpESKD";
-        
         #region Properties palette
 
         public static void AddToMpPalette(bool show)
@@ -32,7 +30,7 @@
                 bool flag = false;
                 foreach (Palette palette in mpPaletteSet)
                 {
-                    if (palette.Name.Equals(Language.GetItem(LangItem, "h11"))) // Свойства примитивов ModPlus
+                    if (palette.Name.Equals(Language.GetItem(Invariables.LangItem, "h11"))) // Свойства примитивов ModPlus
                     {
                         flag = true;
                     }
@@ -40,7 +38,7 @@
                 if (!flag)
                 {
                     PropertiesPalette lmPalette = new PropertiesPalette();
-                    mpPaletteSet.Add(Language.GetItem(LangItem, "h11"), new ElementHost
+                    mpPaletteSet.Add(Language.GetItem(Invariables.LangItem, "h11"), new ElementHost
                     {
                         AutoSize = true,
                         Dock = DockStyle.Fill,
@@ -65,7 +63,7 @@
                 int num = 0;
                 while (num < mpPaletteSet.Count)
                 {
-                    if (!mpPaletteSet[num].Name.Equals(Language.GetItem(LangItem, "h11")))
+                    if (!mpPaletteSet[num].Name.Equals(Language.GetItem(Invariables.LangItem, "h11")))
                     {
                         num++;
                     }
@@ -171,7 +169,7 @@
             else
             {
                 ModPlusAPI.Windows.MessageBox.Show(
-                    Language.GetItem(LangItem, "err5"),
+                    Language.GetItem(Invariables.LangItem, "err5"),
                     ModPlusAPI.Windows.MessageBoxIcon.Close);
             }
         }

@@ -51,7 +51,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
 
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name);
+            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name, true);
         }
     }
 }

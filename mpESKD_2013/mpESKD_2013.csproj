@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\Attributes.cs" />
+    <Compile Include="Base\Invariables.cs" />
     <Compile Include="Base\DefaultEntityJig.cs" />
     <Compile Include="Base\EntityReaderFactory.cs" />
     <Compile Include="Base\Enums\AxisMarkersPosition.cs" />

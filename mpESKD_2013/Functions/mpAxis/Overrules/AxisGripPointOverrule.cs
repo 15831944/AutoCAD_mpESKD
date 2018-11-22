@@ -203,7 +203,7 @@ namespace mpESKD.Functions.mpAxis.Overrules
 
                             if (gripPoint.GripName == AxisGripName.MiddleGrip)
                             {
-                                // Т.к. средняя точка нужна для переноса примитива, но не соответсвует точки вставки блока
+                                // Т.к. средняя точка нужна для переноса примитива, но не соответствует точки вставки блока
                                 // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
                                 // точку вставки
                                 var lenghtVector = (gripPoint.Axis.InsertionPoint - gripPoint.Axis.EndPoint) / 2;
@@ -389,9 +389,9 @@ namespace mpESKD.Functions.mpAxis.Overrules
                 case AxisGripName.BottomOrientGrip:
                 case AxisGripName.TopOrientGrip:
                     {
-                        return Language.GetItem(MainFunction.LangItem, "gp1"); // stretch
+                        return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
                     }
-                case AxisGripName.MiddleGrip: return Language.GetItem(MainFunction.LangItem, "gp2"); // move
+                case AxisGripName.MiddleGrip: return Language.GetItem(Invariables.LangItem, "gp2"); // move
             }
             return base.GetTooltip();
         }

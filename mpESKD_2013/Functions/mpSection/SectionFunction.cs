@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Functions.mpSection
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
@@ -59,32 +60,45 @@
                 ExtendedDataHelpers.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
 
                 var style = StyleManager.GetCurrentStyle(typeof(Section));
-                var section = new Section();
+                var sectionLastLetterValue = string.Empty;
+                var sectionLastIntegerValue = string.Empty;
+                FindLastSectionValues(ref sectionLastLetterValue, ref sectionLastIntegerValue);
+                var section = new Section(sectionLastIntegerValue, sectionLastLetterValue);
 
                 var blockReference = MainFunction.CreateBlock(section);
                 section.ApplyStyle(style, true);
 
+                //todo implement isSimple variable
                 var entityJig = new DefaultEntityJig(
                     section,
                     blockReference,
                     new Point3d(20, 0, 0),
-                    Language.GetItem(MainFunction.LangItem, "msg5"));
+                    Language.GetItem(Invariables.LangItem, "msg5"));
                 do
                 {
                     var status = AcadHelpers.Editor.Drag(entityJig).Status;
                     if (status == PromptStatus.OK)
                     {
-                        entityJig.JigState = JigState.PromptNextPoint;
-                        if (entityJig.PreviousPoint == null)
+                        if (isSimple)
                         {
-                            entityJig.PreviousPoint = section.MiddlePoints.Any()
-                                ? section.MiddlePoints.Last()
-                                : section.InsertionPoint;
+                            if (entityJig.JigState == JigState.PromptInsertPoint)
+                                entityJig.JigState = JigState.PromptNextPoint;
+                            else break;
                         }
                         else
                         {
-                            section.RebasePoints();
-                            entityJig.PreviousPoint = section.MiddlePoints.Last();
+                            entityJig.JigState = JigState.PromptNextPoint;
+                            if (entityJig.PreviousPoint == null)
+                            {
+                                entityJig.PreviousPoint = section.MiddlePoints.Any()
+                                    ? section.MiddlePoints.Last()
+                                    : section.InsertionPoint;
+                            }
+                            else
+                            {
+                                section.RebasePoints();
+                                entityJig.PreviousPoint = section.MiddlePoints.Last();
+                            }
                         }
                     }
                     else
@@ -131,6 +145,38 @@
             finally
             {
                 Overrule.Overruling = true;
+            }
+        }
+
+        /// <summary>
+        /// Поиск последних цифровых и буквенных значений разрезов на текущем виде
+        /// </summary>
+        /// <param name="sectionLastLetterValue"></param>
+        /// <param name="sectionLastIntegerValue"></param>
+        private static void FindLastSectionValues(ref string sectionLastLetterValue, ref string sectionLastIntegerValue)
+        {
+            if (MainStaticSettings.Settings.AxisSaveLastTextAndContinueNew)
+            {
+                List<int> allIntegerValues = new List<int>();
+                List<string> allLetterValues = new List<string>();
+                AcadHelpers.GetAllIntellectualEntitiesInCurrentSpace<Section>(typeof(Section)).ForEach(a =>
+                {
+                    var s = a.Designation;
+                    if(int.TryParse(s, out var i))
+                        allIntegerValues.Add(i);
+                    else allLetterValues.Add(s);
+                });
+                if (allIntegerValues.Any())
+                {
+                    allIntegerValues.Sort();
+                    sectionLastIntegerValue = allIntegerValues.Last().ToString();
+                }
+
+                if (allLetterValues.Any())
+                {
+                    allLetterValues.Sort();
+                    sectionLastLetterValue = allLetterValues.Last();
+                }
             }
         }
     }

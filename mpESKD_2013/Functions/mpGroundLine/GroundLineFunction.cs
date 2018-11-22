@@ -72,7 +72,7 @@
                     groundLine,
                     blockReference,
                     new Point3d(20, 0, 0),
-                    Language.GetItem(MainFunction.LangItem, "msg5"));
+                    Language.GetItem(Invariables.LangItem, "msg5"));
                 do
                 {
                     var status = AcadHelpers.Editor.Drag(entityJig).Status;
@@ -144,12 +144,12 @@
             Statistic.SendCommandStarting("mpGroundLineFromPolyline", MpVersionData.CurCadVers);
             try
             {
-                var peo = new PromptEntityOptions("\n" + Language.GetItem(MainFunction.LangItem, "msg6"))
+                var peo = new PromptEntityOptions("\n" + Language.GetItem(Invariables.LangItem, "msg6"))
                 {
                     AllowNone = false,
                     AllowObjectOnLockedLayer = true
                 };
-                peo.SetRejectMessage("\n" + Language.GetItem(MainFunction.LangItem, "wrong"));
+                peo.SetRejectMessage("\n" + Language.GetItem(Invariables.LangItem, "wrong"));
                 peo.AddAllowedClass(typeof(Polyline), true);
 
                 var per = AcadHelpers.Editor.GetEntity(peo);
@@ -200,7 +200,7 @@
                     AcadHelpers.Document.TransactionManager.FlushGraphics();
 
                     // "Удалить исходную полилинию?"
-                    if (MessageBox.ShowYesNo(Language.GetItem(MainFunction.LangItem, "msg7"), MessageBoxIcon.Question))
+                    if (MessageBox.ShowYesNo(Language.GetItem(Invariables.LangItem, "msg7"), MessageBoxIcon.Question))
                     {
                         using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                         {
