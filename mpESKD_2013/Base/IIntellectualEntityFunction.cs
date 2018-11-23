@@ -14,5 +14,10 @@
         /// Метод, вызываемый при закрытии AutoCAD
         /// </summary>
         void Terminate();
+
+        /// <summary>
+        /// Создать аналог интеллектуального примитива
+        /// </summary>
+        void CreateAnalog(IntellectualEntity sourceEntity);
     }
 }

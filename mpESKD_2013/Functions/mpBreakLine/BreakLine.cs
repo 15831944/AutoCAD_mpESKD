@@ -108,7 +108,7 @@ namespace mpESKD.Functions.mpBreakLine
                 var entities = new List<Entity> { _mainPolyline };
                 foreach (var e in entities)
                     if (e != null)
-                        SetPropertiesToCadEntity(e);
+                        SetImmutablePropertiesToNestedEntity(e);
                 return entities;
             }
         }
@@ -288,7 +288,7 @@ namespace mpESKD.Functions.mpBreakLine
         private void FillMainPolylineWithPoints(Point2dCollection points, IList<double> bulges)
         {
             _mainPolyline = new Polyline(points.Count);
-            SetPropertiesToCadEntity(_mainPolyline);
+            SetImmutablePropertiesToNestedEntity(_mainPolyline);
             for (var i = 0; i < points.Count; i++)
             {
                 _mainPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);

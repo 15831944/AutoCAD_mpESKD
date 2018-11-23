@@ -84,8 +84,6 @@ namespace mpESKD.Base.Properties
                     var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
                     if (attribute != null)
                     {
-                        if(attribute.Name == "Scale")
-                            Debug.Print("!");
                         if (attribute.Name == "Style")
                         {
                             IntellectualEntityProperty property = new IntellectualEntityProperty(

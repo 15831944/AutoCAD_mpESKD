@@ -12,18 +12,30 @@
     using Base.Styles;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Overrules;
 
     public class SectionFunction : IIntellectualEntityFunction
     {
+        /// <inheritdoc />
         public void Initialize()
         {
-            //todo add overrules
-            Overrule.Overruling = true;
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SectionGripPointOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SectionOsnapOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SectionObjectOverrule.Instance(), true);
         }
 
+        /// <inheritdoc />
         public void Terminate()
         {
-            //todo add overrules
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SectionGripPointOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SectionOsnapOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SectionObjectOverrule.Instance());
+        }
+
+        /// <inheritdoc />
+        public void CreateAnalog(IntellectualEntity sourceEntity)
+        {
+            //todo release
         }
 
         [CommandMethod("ModPlus", "mpSection", CommandFlags.Modal)]
@@ -155,29 +167,30 @@
         /// <param name="sectionLastIntegerValue"></param>
         private static void FindLastSectionValues(ref string sectionLastLetterValue, ref string sectionLastIntegerValue)
         {
-            if (MainStaticSettings.Settings.AxisSaveLastTextAndContinueNew)
-            {
-                List<int> allIntegerValues = new List<int>();
-                List<string> allLetterValues = new List<string>();
-                AcadHelpers.GetAllIntellectualEntitiesInCurrentSpace<Section>(typeof(Section)).ForEach(a =>
-                {
-                    var s = a.Designation;
-                    if(int.TryParse(s, out var i))
-                        allIntegerValues.Add(i);
-                    else allLetterValues.Add(s);
-                });
-                if (allIntegerValues.Any())
-                {
-                    allIntegerValues.Sort();
-                    sectionLastIntegerValue = allIntegerValues.Last().ToString();
-                }
+            //todo implement settings
+            //if (MainStaticSettings.Settings.SectionSaveLastTextAndContinueNew)
+            //{
+            //    List<int> allIntegerValues = new List<int>();
+            //    List<string> allLetterValues = new List<string>();
+            //    AcadHelpers.GetAllIntellectualEntitiesInCurrentSpace<Section>(typeof(Section)).ForEach(a =>
+            //    {
+            //        var s = a.Designation;
+            //        if(int.TryParse(s, out var i))
+            //            allIntegerValues.Add(i);
+            //        else allLetterValues.Add(s);
+            //    });
+            //    if (allIntegerValues.Any())
+            //    {
+            //        allIntegerValues.Sort();
+            //        sectionLastIntegerValue = allIntegerValues.Last().ToString();
+            //    }
 
-                if (allLetterValues.Any())
-                {
-                    allLetterValues.Sort();
-                    sectionLastLetterValue = allLetterValues.Last();
-                }
-            }
+            //    if (allLetterValues.Any())
+            //    {
+            //        allLetterValues.Sort();
+            //        sectionLastLetterValue = allLetterValues.Last();
+            //    }
+            //}
         }
     }
 }

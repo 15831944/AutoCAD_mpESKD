@@ -1,5 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-namespace mpESKD.Functions.mpGroundLine.Overrules
+﻿namespace mpESKD.Functions.mpGroundLine.Overrules
 {
     using System.Diagnostics;
     using System.Linq;
@@ -16,21 +15,20 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
     public class GroundLineGripPointOverrule : GripOverrule
     {
-        protected static GroundLineGripPointOverrule _groundLineGripPointOverrule;
+        private static GroundLineGripPointOverrule _instance;
 
         public static GroundLineGripPointOverrule Instance()
         {
-            if (_groundLineGripPointOverrule != null) return _groundLineGripPointOverrule;
-            _groundLineGripPointOverrule = new GroundLineGripPointOverrule();
+            if (_instance != null) return _instance;
+            _instance = new GroundLineGripPointOverrule();
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _groundLineGripPointOverrule.SetXDataFilter(GroundLineDescriptor.Instance.Name);
-            return _groundLineGripPointOverrule;
+            _instance.SetXDataFilter(GroundLineDescriptor.Instance.Name);
+            return _instance;
         }
 
         public override void GetGripPoints(Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir,
             GetGripPointsFlags bitFlags)
         {
-            Debug.Print("GroundLineGripPointOverrule");
             try
             {
                 if (IsApplicable(entity))
@@ -38,10 +36,6 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                     // Удаляю все ручки - это удалит ручку вставки блока
                     grips.Clear();
 
-                    // Получаем экземпляр класса, который описывает как должен выглядеть примитив
-                    // т.е. правила построения графики внутри блока
-                    // Информация собирается по XData и свойствам самого блока
-                    
                     var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(entity);
                     if (groundLine != null)
                     {
@@ -264,7 +258,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
 
         /// <summary>
-        /// Экземпляр класса GroundLine
+        /// Экземпляр класса Section
         /// </summary>
         public GroundLine GroundLine { get; }
 
@@ -331,6 +325,9 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
     }
 
+    /// <summary>
+    /// Ручка добавления вершины
+    /// </summary>
     public class GroundLineAddVertexGrip : IntellectualEntityGripData
     {
         public GroundLineAddVertexGrip(GroundLine groundLine, Point3d? leftPoint, Point3d? rightPoint)
@@ -347,7 +344,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
 
         /// <summary>
-        /// Экземпляр класса GroundLine
+        /// Экземпляр класса Section
         /// </summary>
         public GroundLine GroundLine { get; }
 
@@ -458,6 +455,9 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
     }
 
+    /// <summary>
+    /// Ручка удаления вершины
+    /// </summary>
     public class GroundLineRemoveVertexGrip : IntellectualEntityGripData
     {
         public GroundLineRemoveVertexGrip(GroundLine groundLine, int index)
@@ -472,7 +472,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
 
         /// <summary>
-        /// Экземпляр класса GroundLine
+        /// Экземпляр класса Section
         /// </summary>
         public GroundLine GroundLine { get; }
 
@@ -529,6 +529,9 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
     }
 
+    /// <summary>
+    /// Ручка реверса линии грунта
+    /// </summary>
     public class GroundLineReverseGrip : IntellectualEntityGripData
     {
         public GroundLineReverseGrip(GroundLine groundLine)
@@ -542,7 +545,7 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
         }
 
         /// <summary>
-        /// Экземпляр класса GroundLine
+        /// Экземпляр класса Section
         /// </summary>
         public GroundLine GroundLine { get; }
 

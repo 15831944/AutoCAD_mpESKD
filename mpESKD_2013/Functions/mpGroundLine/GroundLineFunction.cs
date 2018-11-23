@@ -1,6 +1,5 @@
 ﻿namespace mpESKD.Functions.mpGroundLine
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -15,9 +14,9 @@
     using ModPlusAPI.Windows;
     using Overrules;
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class GroundLineFunction : IIntellectualEntityFunction
     {
+        /// <inheritdoc />
         public void Initialize()
         {
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance(), true);
@@ -25,16 +24,47 @@
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance(), true);
         }
 
+        /// <inheritdoc />
         public void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance());
         }
-    }
 
-    public class GroundLineCommands
-    {
+        /// <inheritdoc />
+        public void CreateAnalog(IntellectualEntity sourceEntity)
+        {
+            // send statistic
+            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, MpVersionData.CurCadVers);
+
+            try
+            {
+                Overrule.Overruling = false;
+
+                /* Регистрация ЕСКД приложения должна запускаться при запуске
+                 * функции, т.к. регистрация происходит в текущем документе
+                 * При инициализации плагина регистрации нет!
+                 */
+                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
+                
+                var groundLine = new GroundLine();
+                var blockReference = MainFunction.CreateBlock(groundLine);
+
+                groundLine.SetPropertiesFromIntellectualEntity(sourceEntity);
+
+                InsertGroundLineWithJig(groundLine, blockReference);
+            }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
+            finally
+            {
+                Overrule.Overruling = true;
+            }
+        }
+
         [CommandMethod("ModPlus", "mpGroundLine", CommandFlags.Modal)]
         public void CreateGroundLineCommand()
         {
@@ -68,65 +98,7 @@
                 var blockReference = MainFunction.CreateBlock(groundLine);
                 groundLine.ApplyStyle(style, true);
 
-                var entityJig = new DefaultEntityJig(
-                    groundLine,
-                    blockReference,
-                    new Point3d(20, 0, 0),
-                    Language.GetItem(Invariables.LangItem, "msg5"));
-                do
-                {
-                    var status = AcadHelpers.Editor.Drag(entityJig).Status;
-                    if (status == PromptStatus.OK)
-                    {
-                        entityJig.JigState = JigState.PromptNextPoint;
-                        if (entityJig.PreviousPoint == null)
-                        {
-                            entityJig.PreviousPoint = groundLine.MiddlePoints.Any()
-                                ? groundLine.MiddlePoints.Last()
-                                : groundLine.InsertionPoint;
-                        }
-                        else
-                        {
-                            groundLine.RebasePoints();
-                            entityJig.PreviousPoint = groundLine.MiddlePoints.Last();
-                        }
-                    }
-                    else
-                    {
-                        if (groundLine.MiddlePoints.Any())
-                        {
-                            groundLine.EndPoint = groundLine.MiddlePoints.Last();
-                            groundLine.MiddlePoints.RemoveAt(groundLine.MiddlePoints.Count - 1);
-                            groundLine.UpdateEntities();
-                            groundLine.BlockRecord.UpdateAnonymousBlocks();
-                        }
-                        else
-                        {
-                            // if no middle points - remove entity
-                            using (AcadHelpers.Document.LockDocument())
-                            {
-                                using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
-                                {
-                                    var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite);
-                                    obj.Erase(true);
-                                    tr.Commit();
-                                }
-                            }
-                        }
-
-                        break;
-                    }
-                } while (true);
-
-                if (!groundLine.BlockId.IsErased)
-                {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
-                    {
-                        var ent = tr.GetObject(groundLine.BlockId, OpenMode.ForWrite);
-                        ent.XData = groundLine.GetDataForXData();
-                        tr.Commit();
-                    }
-                }
+                InsertGroundLineWithJig(groundLine, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -135,6 +107,69 @@
             finally
             {
                 Overrule.Overruling = true;
+            }
+        }
+
+        private static void InsertGroundLineWithJig(GroundLine groundLine, BlockReference blockReference)
+        {
+            var entityJig = new DefaultEntityJig(
+                groundLine,
+                blockReference,
+                new Point3d(20, 0, 0),
+                Language.GetItem(Invariables.LangItem, "msg5"));
+            do
+            {
+                var status = AcadHelpers.Editor.Drag(entityJig).Status;
+                if (status == PromptStatus.OK)
+                {
+                    entityJig.JigState = JigState.PromptNextPoint;
+                    if (entityJig.PreviousPoint == null)
+                    {
+                        entityJig.PreviousPoint = groundLine.MiddlePoints.Any()
+                            ? groundLine.MiddlePoints.Last()
+                            : groundLine.InsertionPoint;
+                    }
+                    else
+                    {
+                        groundLine.RebasePoints();
+                        entityJig.PreviousPoint = groundLine.MiddlePoints.Last();
+                    }
+                }
+                else
+                {
+                    if (groundLine.MiddlePoints.Any())
+                    {
+                        groundLine.EndPoint = groundLine.MiddlePoints.Last();
+                        groundLine.MiddlePoints.RemoveAt(groundLine.MiddlePoints.Count - 1);
+                        groundLine.UpdateEntities();
+                        groundLine.BlockRecord.UpdateAnonymousBlocks();
+                    }
+                    else
+                    {
+                        // if no middle points - remove entity
+                        using (AcadHelpers.Document.LockDocument())
+                        {
+                            using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                            {
+                                var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite);
+                                obj.Erase(true);
+                                tr.Commit();
+                            }
+                        }
+                    }
+
+                    break;
+                }
+            } while (true);
+
+            if (!groundLine.BlockId.IsErased)
+            {
+                using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                {
+                    var ent = tr.GetObject(groundLine.BlockId, OpenMode.ForWrite);
+                    ent.XData = groundLine.GetDataForXData();
+                    tr.Commit();
+                }
             }
         }
 

@@ -2,7 +2,7 @@
 {
     using System;
     using System.Linq;
-    using AcDd = Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.DatabaseServices;
     using ModPlusAPI.Annotations;
 
     public class EntityReaderFactory
@@ -13,13 +13,13 @@
 
 
         [CanBeNull]
-        public IntellectualEntity GetFromEntity(AcDd.Entity entity)
+        public IntellectualEntity GetFromEntity(Entity entity)
         {
             var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
             if (entity.XData == null) 
                 return null;
             var typedValue = entity.XData.AsArray()
-                .FirstOrDefault(tv => tv.TypeCode == (int)AcDd.DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()));
+                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()));
             if (typedValue.Value != null)
             {
                 var appName = typedValue.Value.ToString();
@@ -32,14 +32,14 @@
         }
 
         [CanBeNull]
-        public T GetFromEntity<T>(AcDd.Entity entity) where T : IntellectualEntity
+        public T GetFromEntity<T>(Entity entity) where T : IntellectualEntity
         {
             return (T)GetFromEntity(entity);
         }
 
-        private IntellectualEntity GetEntity(AcDd.Entity ent, Type type, string appName)
+        private IntellectualEntity GetEntity(Entity ent, Type type, string appName)
         {
-            using (AcDd.ResultBuffer resBuf = ent.GetXDataForApplication(appName))
+            using (ResultBuffer resBuf = ent.GetXDataForApplication(appName))
             {
                 // В случае команды ОТМЕНА может вернуть null
                 if (resBuf == null) 
@@ -48,7 +48,7 @@
                 entity.BlockId = ent.ObjectId;
                 // Получаем параметры из самого блока
                 // ОБЯЗАТЕЛЬНО СНАЧАЛА ИЗ БЛОКА!!!!!!
-                entity.GetParametersFromEntity(ent);
+                entity.GetPropertiesFromCadEntity(ent);
                 // Получаем параметры из XData
                 entity.SetPropertiesValuesFromXData(resBuf);
 

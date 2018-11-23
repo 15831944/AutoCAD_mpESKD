@@ -16,6 +16,7 @@ namespace mpESKD.Base
     using System.Text;
     using Autodesk.AutoCAD.Colors;
     using Enums;
+    using ModPlusAPI.Annotations;
     using Styles;
 
     public abstract class IntellectualEntity : IDisposable
@@ -215,8 +216,8 @@ namespace mpESKD.Base
                         var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
                         foreach (var entity in _entities)
                         {
-                                var transformedCopy = entity.GetTransformedCopy(matrix3D);
-                                _blockRecord.AppendEntity(transformedCopy);
+                            var transformedCopy = entity.GetTransformedCopy(matrix3D);
+                            _blockRecord.AppendEntity(transformedCopy);
                         }
                         IsValueCreated = true;
                     }
@@ -297,7 +298,7 @@ namespace mpESKD.Base
         #endregion
 
         /// <summary>Получение свойств блока, которые присуще примитиву</summary>
-        public void GetParametersFromEntity(Entity entity)
+        public void GetPropertiesFromCadEntity(Entity entity)
         {
             var blockReference = (BlockReference)entity;
             if (blockReference != null)
@@ -324,6 +325,7 @@ namespace mpESKD.Base
             return GetDataForXData("mp" + GetType().Name);
         }
 
+        [CanBeNull]
         private ResultBuffer GetDataForXData(string appName)
         {
             try
@@ -389,7 +391,8 @@ namespace mpESKD.Base
         /// Установка значений свойств, отмеченных атрибутом <see cref="SaveToXDataAttribute"/> из расширенных данных примитива AutoCAD
         /// </summary>
         /// <param name="resultBuffer"></param>
-        public void SetPropertiesValuesFromXData(ResultBuffer resultBuffer)
+        /// <param name="skipPoints"></param>
+        public void SetPropertiesValuesFromXData(ResultBuffer resultBuffer, bool skipPoints = false)
         {
             try
             {
@@ -428,12 +431,16 @@ namespace mpESKD.Base
                                         }
                                         else if (propertyInfo.PropertyType == typeof(Point3d))
                                         {
+                                            if (skipPoints)
+                                                continue;
                                             var vector = valueForProperty.ParseToPoint3d().GetAsVector();
                                             var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
                                             propertyInfo.SetValue(this, point);
                                         }
                                         else if (propertyInfo.PropertyType == typeof(List<Point3d>))
                                         {
+                                            if (skipPoints)
+                                                continue;
                                             List<Point3d> points = new List<Point3d>();
                                             foreach (string s in valueForProperty.Split('#'))
                                             {
@@ -476,9 +483,39 @@ namespace mpESKD.Base
             }
         }
 
-        /// <summary>Установка свойств для примитивов, которые не меняются</summary>
+        /// <summary>
+        /// Копирование свойств, отмеченных атрибутом <see cref="SaveToXDataAttribute"/> из расширенных данных примитива AutoCAD
+        /// в текущий интеллектуальный примитив
+        /// </summary>
+        public void SetPropertiesFromIntellectualEntity(IntellectualEntity sourceEntity)
+        {
+            ResultBuffer dataForXData = sourceEntity.GetDataForXData();
+            if (dataForXData != null)
+            {
+                SetPropertiesValuesFromXData(dataForXData, true);
+                if (sourceEntity.BlockId != ObjectId.Null)
+                {
+                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        var entity = tr.GetObject(sourceEntity.BlockId, OpenMode.ForRead) as Entity;
+                        var destinationBlockReference = tr.GetObject(BlockId, OpenMode.ForWrite) as BlockReference;
+                        if (entity != null && destinationBlockReference != null)
+                        {
+                            destinationBlockReference.LinetypeId = entity.LinetypeId;
+                            destinationBlockReference.Layer = entity.Layer;
+                        }
+
+                        tr.Commit();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Установка свойств для примитивов, которые не меняются
+        /// </summary>
         /// <param name="entity">Примитив автокада</param>
-        public void SetPropertiesToCadEntity(Entity entity)
+        public void SetImmutablePropertiesToNestedEntity(Entity entity)
         {
             entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
             entity.LineWeight = LineWeight.ByBlock;
@@ -486,35 +523,17 @@ namespace mpESKD.Base
             entity.LinetypeScale = 1.0;
         }
 
-        //todo remove after test
-        ////public void Draw(WorldDraw draw)
-        ////{
-        ////    var geometry = draw.Geometry;
-        ////    foreach (var entity in _entities)
-        ////    {
-        ////        geometry.Draw(entity);
-        ////    }
-        ////}
-
-        ////public void Erase()
-        ////{
-        ////    foreach (var entity in _entities)
-        ////    {
-        ////        entity.Erase();
-        ////    }
-        ////}
-        /////// <summary>
-        /////// Расчлинение интеллектуального примитива
-        /////// </summary>
-        /////// <param name="entitySet"></param>
-        ////public void Explode(DBObjectCollection entitySet)
-        ////{
-        ////    entitySet.Clear();
-        ////    foreach (var entity in _entities)
-        ////    {
-        ////        entitySet.Add(entity);
-        ////    }
-        ////}
+        /// <summary>
+        /// Установка свойств для примитива, которые могут меняться "из вне" (ByBlock)
+        /// </summary>
+        /// <param name="entity">Примитив автокада</param>
+        public void SetChangeablePropertiesToNestedEntity(Entity entity)
+        {
+            entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+            entity.LineWeight = LineWeight.ByBlock;
+            entity.Linetype = "ByBlock";
+            entity.LinetypeScale = LineTypeScale;
+        }
 
         public void Dispose()
         {

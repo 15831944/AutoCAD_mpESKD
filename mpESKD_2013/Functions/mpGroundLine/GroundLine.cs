@@ -125,11 +125,15 @@ namespace mpESKD.Functions.mpGroundLine
         {
             get
             {
-                var entities = new List<Entity> { _mainPolyline };
+                var entities = new List<Entity> ();
                 entities.AddRange(_strokes);
                 foreach (var e in entities)
                     if (e != null)
-                        SetPropertiesToCadEntity(e);
+                        SetImmutablePropertiesToNestedEntity(e);
+                if(_mainPolyline != null)
+                    SetChangeablePropertiesToNestedEntity(_mainPolyline);
+                entities.Add(_mainPolyline);
+
                 return entities;
             }
         }
@@ -206,7 +210,7 @@ namespace mpESKD.Functions.mpGroundLine
         {
             var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
             _mainPolyline = new Polyline(points.Count);
-            SetPropertiesToCadEntity(_mainPolyline);
+            SetImmutablePropertiesToNestedEntity(_mainPolyline);
             for (var i = 0; i < points.Count; i++)
             {
                 _mainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
@@ -280,7 +284,7 @@ namespace mpESKD.Functions.mpGroundLine
                 var secondStrokePoint =
                     helpPoint + perpendicular * StrokeLength * scale * Math.Sin(StrokeAngle.DegreeToRadian());
                 Line stroke = new Line(firstStrokePoint, secondStrokePoint);
-                SetPropertiesToCadEntity(stroke);
+                SetImmutablePropertiesToNestedEntity(stroke);
 
                 // индекс сегмента равен "левой" вершине
                 segmentStrokeDependencies.Add(stroke);

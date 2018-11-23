@@ -573,16 +573,11 @@ namespace mpESKD.Functions.mpAxis
                 foreach (var e in entities)
                     if (e != null && !(e is DBText))
                     {
-                        SetPropertiesToCadEntity(e);
+                        SetImmutablePropertiesToNestedEntity(e);
                     }
 
                 if (_mainLine != null)
-                {
-                    _mainLine.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-                    _mainLine.LineWeight = LineWeight.ByBlock;
-                    _mainLine.Linetype = "ByBlock";
-                    _mainLine.LinetypeScale = LineTypeScale;
-                }
+                    SetChangeablePropertiesToNestedEntity(_mainLine);
 
                 entities.Add(_mainLine);
 
@@ -599,6 +594,7 @@ namespace mpESKD.Functions.mpAxis
                 var scale = GetScale();
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
+
                     // Задание точки вставки (т.е. второй точки еще нет)
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }

@@ -53,8 +53,9 @@ namespace mpESKD.Functions.mpSection
         /// <summary>
         /// Точка вставки верхнего текста обозначения
         /// </summary>
+        [SaveToXData]
         public Point3d TopDesignationPoint { get; set; } = Point3d.Origin;
-        
+
         /// <summary>
         /// Точка вставки нижнего текста обозначения
         /// </summary>
@@ -173,6 +174,47 @@ namespace mpESKD.Functions.mpSection
 
         private readonly string LastLetterValue = string.Empty;
 
+        public double TextActualWidth { get; private set; }
+
+        public double TextActualHeight { get; private set; }
+
+        /// <summary>
+        /// Отступ средней точки верхнего текста вдоль верхней полки
+        /// </summary>
+        [SaveToXData]
+        public double AlongTopShelfTextOffset { get; set; } = double.NaN;
+
+        /// <summary>
+        /// Отступ средней точки верхнего текста от верхней полки (вдоль верхнего штриха)
+        /// </summary>
+        [SaveToXData]
+        public double AcrossTopShelfTextOffset { get; set; } = double.NaN;
+
+        /// <summary>
+        /// Отступ средней точки нижнего текста вдоль нижней полки
+        /// </summary>
+        [SaveToXData]
+        public double AlongBottomShelfTextOffset { get; set; } = double.NaN;
+
+        /// <summary>
+        /// Отступ средней точки нижнего текста от нижней полки (вдоль верхнего штриха)
+        /// </summary>
+        [SaveToXData]
+        public double AcrossBottomShelfTextOffset { get; set; } = double.NaN;
+
+        [SaveToXData]
+        public Point3d TopShelfEndPoint { get; private set; }
+
+        [SaveToXData]
+        public Point3d BottomShelfEndPoint { get; private set; }
+
+        /// <summary>
+        /// Направление разреза: слева на право или справа на лево. Меняется при работе ручки (<see cref="Overrules.SectionReverseGrip.OnHotGrip"/>)
+        /// Используется для определения положения ручки (<see cref="Overrules.SectionGripPointOverrule"/>)
+        /// </summary>
+        [SaveToXData]
+        public EntityDirection EntityDirection { get; set; } = EntityDirection.LeftToRight;
+
         #endregion
 
         #region Geometry
@@ -238,7 +280,7 @@ namespace mpESKD.Functions.mpSection
                 entities.AddRange(_middleStrokes);
                 foreach (var e in entities)
                     if (e != null)
-                        SetPropertiesToCadEntity(e);
+                        SetImmutablePropertiesToNestedEntity(e);
                 return entities;
             }
         }
@@ -331,76 +373,110 @@ namespace mpESKD.Functions.mpSection
             var bottomStrokeNormalVector = (bottomStrokeEndPoint - endPoint).GetNormal();
 
             // shelf lines
-            var topShelfFirstPoint = insertionPoint + topStrokeNormalVector * GetShelfOffset() * scale;
-            var topShelfSecondPoint = topShelfFirstPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale;
+            var topShelfStartPoint = insertionPoint + topStrokeNormalVector * GetShelfOffset() * scale;
+            var topShelfEndPoint = topShelfStartPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale;
+            TopShelfEndPoint = topShelfEndPoint.TransformBy(BlockTransform);
             _topShelfLine = new Line
             {
-                StartPoint = topShelfFirstPoint,
-                EndPoint = topShelfSecondPoint
+                StartPoint = topShelfStartPoint,
+                EndPoint = topShelfEndPoint
             };
 
-            var bottomShelfFirstPoint = endPoint + bottomStrokeNormalVector * GetShelfOffset() * scale;
-            var bottomShelfSecondPoint = bottomShelfFirstPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfLength * scale;
+            var bottomShelfStartPoint = endPoint + bottomStrokeNormalVector * GetShelfOffset() * scale;
+            var bottomShelfEndPoint = bottomShelfStartPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfLength * scale;
+            BottomShelfEndPoint = bottomShelfEndPoint.TransformBy(BlockTransform);
             _bottomShelfLine = new Line
             {
-                StartPoint = bottomShelfFirstPoint,
-                EndPoint = bottomShelfSecondPoint
+                StartPoint = bottomShelfStartPoint,
+                EndPoint = bottomShelfEndPoint
             };
 
             // shelf arrows
-            var topShelfArrowStartPoint = topShelfFirstPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfArrowLength * scale;
+            var topShelfArrowStartPoint = topShelfStartPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfArrowLength * scale;
             _topShelfArrow = new Polyline(2);
             _topShelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
-            _topShelfArrow.AddVertexAt(1, topShelfFirstPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
-            //_topShelfArrow.SetStartWidthAt(0, ShelfArrowWidth * scale);
+            _topShelfArrow.AddVertexAt(1, topShelfStartPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
 
             var bottomShelfArrowStartPoint =
-                bottomShelfFirstPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfArrowLength * scale;
+                bottomShelfStartPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfArrowLength * scale;
             _bottomShelfArrow = new Polyline(2);
             _bottomShelfArrow.AddVertexAt(0, bottomShelfArrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
-            _bottomShelfArrow.AddVertexAt(1, bottomShelfFirstPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
+            _bottomShelfArrow.AddVertexAt(1, bottomShelfStartPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
 
             // text
+            var textStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
+            //todo Текста может и не быть!
+            // этот случай нужно обработать, чтобы не создавались ручки
+            var textContents = GetTextContents();
+            var textHeight = MainTextHeight * scale;
             _topMText = new MText
             {
-                TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle),
-                Contents = GetTextContents(),
-                TextHeight = MainTextHeight * scale
+                TextStyleId = textStyleId,
+                Contents = textContents,
+                TextHeight = textHeight,
+                Attachment = AttachmentPoint.MiddleCenter
             };
 
-            var alongShelfTextOffset = _topMText.ActualWidth / 2;
-            var acrossShelfTextOffset = _topMText.ActualHeight / 2;
-            var check = 1 / Math.Sqrt(2);
-            if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
-                (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
-            {
-                alongShelfTextOffset = _topMText.ActualHeight / 2;
-                acrossShelfTextOffset = _topMText.ActualWidth / 2;
-            }
-
-            var tempPoint = topShelfSecondPoint + (topShelfFirstPoint - topShelfSecondPoint).GetNormal() * alongShelfTextOffset;
-            var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
-            _topMText.Attachment = AttachmentPoint.MiddleCenter;
-            _topMText.Location = topTextCenterPoint;
-            
             _bottomMText = new MText
             {
-                TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle),
-                Contents = GetTextContents(),
-                TextHeight = MainTextHeight * scale
+                TextStyleId = textStyleId,
+                Contents = textContents,
+                TextHeight = textHeight,
+                Attachment = AttachmentPoint.MiddleCenter
             };
 
-            if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
-                (bottomStrokeNormalVector.Y < check || bottomStrokeNormalVector.Y > -check))
+            TextActualHeight = _topMText.ActualHeight;
+            TextActualWidth = _topMText.ActualWidth;
+
+            var check = 1 / Math.Sqrt(2);
+            var alongShelfTextOffset = _topMText.ActualWidth / 2;
+            var acrossShelfTextOffset = _topMText.ActualHeight / 2;
+
+            if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
             {
-                alongShelfTextOffset = _topMText.ActualHeight / 2;
-                acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                // top
+                if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
+                    (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
+                {
+                    alongShelfTextOffset = _topMText.ActualHeight / 2;
+                    acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                }
+                var tempPoint = topShelfEndPoint + (topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset;
+                var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
+                _topMText.Location = topTextCenterPoint;
+
+                TopDesignationPoint = _topMText.Bounds.Value.MinPoint.TransformBy(BlockTransform);
+            }
+            else
+            {
+                // top
+                var tempPoint = topShelfEndPoint + (topShelfStartPoint - topShelfEndPoint).GetNormal() * AlongTopShelfTextOffset;
+                var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + AcrossTopShelfTextOffset);
+                _topMText.Location = topTextCenterPoint;
             }
 
-            tempPoint = bottomShelfSecondPoint + (bottomShelfFirstPoint - bottomShelfSecondPoint).GetNormal() * alongShelfTextOffset;
-            var bottomTextCenterPoint = tempPoint + bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
-            _bottomMText.Attachment = AttachmentPoint.MiddleCenter;
-            _bottomMText.Location = bottomTextCenterPoint;
+            if (double.IsNaN(AlongBottomShelfTextOffset) && double.IsNaN(AcrossBottomShelfTextOffset))
+            {
+                // bottom
+                if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
+                    (bottomStrokeNormalVector.Y < check || bottomStrokeNormalVector.Y > -check))
+                {
+                    alongShelfTextOffset = _topMText.ActualHeight / 2;
+                    acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                }
+
+                var tempPoint = bottomShelfEndPoint + (bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * alongShelfTextOffset;
+                var bottomTextCenterPoint = tempPoint + bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
+                _bottomMText.Location = bottomTextCenterPoint;
+
+                BottomDesignationPoint = _bottomMText.Bounds.Value.MinPoint.TransformBy(BlockTransform);
+            }
+            else
+            {
+                var tempPoint = bottomShelfEndPoint + (bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * AlongBottomShelfTextOffset;
+                var bottomTextCenterPoint = tempPoint + bottomStrokeNormalVector * ((2 * scale) + AcrossBottomShelfTextOffset);
+                _bottomMText.Location = bottomTextCenterPoint;
+            }
 
             _middleStrokes.Clear();
             // middle strokes
