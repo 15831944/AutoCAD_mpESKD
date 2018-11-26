@@ -999,8 +999,8 @@ namespace mpESKD.Functions.mpAxis
 
         private void SetFirstTextOnCreation()
         {
-            if (EndPointOCS == Point3d.Origin)
-                return;
+            //if (EndPointOCS == Point3d.Origin)
+            //    return;
             if (IsValueCreated)
             {
                 var check = 1 / Math.Sqrt(2);
@@ -1017,7 +1017,6 @@ namespace mpESKD.Functions.mpAxis
 
         private string _newHorizontalMarkValue = string.Empty;
 
-        //todo вынести в отдельный вспомогательный класс, разделив на два метода
         private string GetFirstTextValueByLastAxis(string direction)
         {
             if (direction.Equals("Horizontal"))

@@ -157,6 +157,58 @@
         }
         #endregion
 
+        #region Section
+
+        private bool _sectionSaveLastTextAndContinueNew;
+        /// <summary>Сохранять значения последних созданных разрезов и продолжать значения создаваемых разрезов</summary>
+        public bool SectionSaveLastTextAndContinueNew
+        {
+            get => !bool.TryParse(
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD",
+                           nameof(SectionSaveLastTextAndContinueNew)),
+                       out _sectionSaveLastTextAndContinueNew) || _sectionSaveLastTextAndContinueNew; // true
+            set
+            {
+                _sectionSaveLastTextAndContinueNew = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(SectionSaveLastTextAndContinueNew), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _sectionShowHelpLineOnSelection;
+        /// <summary>Показывать вспомогательную линию сечения</summary>
+        public bool SectionShowHelpLineOnSelection
+        {
+            get => !bool.TryParse(
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD",
+                           nameof(SectionShowHelpLineOnSelection)),
+                       out _sectionShowHelpLineOnSelection) || _sectionShowHelpLineOnSelection; // true
+            set
+            {
+                _sectionShowHelpLineOnSelection = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(SectionShowHelpLineOnSelection), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _sectionUsePluginTextEditor;
+        /// <summary>Использовать редактор значений разреза из плагина</summary>
+        public bool SectionUsePluginTextEditor
+        {
+            get => !bool.TryParse(
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD",
+                           nameof(SectionUsePluginTextEditor)),
+                       out _sectionUsePluginTextEditor) || _sectionUsePluginTextEditor; // true
+            set
+            {
+                _sectionUsePluginTextEditor = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(SectionUsePluginTextEditor), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
@@ -167,6 +219,7 @@
     public static class MainStaticSettings
     {
         public static MainSettings Settings;
+
         static MainStaticSettings()
         {
             if (Settings == null)

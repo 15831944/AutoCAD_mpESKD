@@ -13,6 +13,7 @@
     using Base.Overrules;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    // ReSharper disable once RedundantNameQualifier
     using Section = mpSection.Section;
 
     public class SectionGripPointOverrule : GripOverrule
@@ -115,7 +116,7 @@
                         }
 
                         #endregion
-                        
+
                         #region Reverse Grips
 
 
@@ -138,7 +139,7 @@
 
                         #region Text grips
 
-                        if (section.TopDesignationPoint != Point3d.Origin)
+                        if (section.TopDesignationPoint != Point3d.Origin && section.HasTextValue())
                         {
                             var textGrip = new SectionTextGrip(section)
                             {
@@ -148,7 +149,7 @@
                             grips.Add(textGrip);
                         }
 
-                        if (section.BottomDesignationPoint != Point3d.Origin)
+                        if (section.BottomDesignationPoint != Point3d.Origin && section.HasTextValue())
                         {
                             var textGrip = new SectionTextGrip(section)
                             {
@@ -199,15 +200,41 @@
                         }
                         else if (gripData is SectionTextGrip textGrip)
                         {
-                            //todo work if has text!
                             var section = textGrip.Section;
                             if (textGrip.Name == TextGripName.TopText)
                             {
-                                var topShelfVector = section.MiddlePoints.Any()
+                                var topStrokeVector = section.MiddlePoints.Any()
                                     ? (section.InsertionPoint - section.MiddlePoints.First()).GetNormal()
                                     : (section.InsertionPoint - section.EndPoint).GetNormal();
-                                var tempPoint = section.TopShelfEndPoint +
-                                                topShelfVector.GetPerpendicularVector() * textGrip.CachedAlongTopShelfTextOffset;
+                                var topShelfVector = topStrokeVector.GetPerpendicularVector().Negate();
+                                var deltaY = topStrokeVector.DotProduct(offset);
+                                var deltaX = topShelfVector.DotProduct(offset);
+                                if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
+                                    section.AlongTopShelfTextOffset = deltaX;
+                                else
+                                    section.AlongTopShelfTextOffset = textGrip.CachedAlongTopShelfTextOffset + deltaX;
+
+                                if (double.IsNaN(textGrip.CachedAcrossTopShelfTextOffset))
+                                    section.AcrossTopShelfTextOffset = deltaY;
+                                else
+                                    section.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
+                            }
+
+                            if (textGrip.Name == TextGripName.BottomText)
+                            {
+                                var bottomStrokeVector = section.MiddlePoints.Any()
+                                    ? (section.EndPoint - section.MiddlePoints.Last()).GetNormal()
+                                    : (section.EndPoint - section.InsertionPoint).GetNormal();
+                                var bottomShelfVector = bottomStrokeVector.GetPerpendicularVector();
+                                var deltaY = bottomStrokeVector.DotProduct(offset);
+                                var deltaX = bottomShelfVector.DotProduct(offset);
+                                if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
+                                    section.AlongBottomShelfTextOffset = deltaX;
+                                else section.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
+
+                                if (double.IsNaN(textGrip.CachedAcrossBottomShelfTextOffset))
+                                    section.AcrossBottomShelfTextOffset = deltaY;
+                                else section.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
                             }
 
                             section.UpdateEntities();
@@ -334,10 +361,8 @@
 
         public override bool WorldDraw(WorldDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint, double dGripSize)
         {
-            if (GripIndex > 0)
+            if (GripIndex > 0 && MainStaticSettings.Settings.SectionShowHelpLineOnSelection)
             {
-
-
                 short backupColor = worldDraw.SubEntityTraits.Color;
                 FillType backupFillType = worldDraw.SubEntityTraits.FillType;
 
@@ -393,21 +418,11 @@
         {
             return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
         }
-
-        // Временное значение ручки
-        private Point3d _gripTmp;
-
+        
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
             try
             {
-                // При начале перемещения запоминаем первоначальное положение ручки
-                // Запоминаем начальные значения
-                if (newStatus == Status.GripStart)
-                {
-                    _gripTmp = GripPoint;
-                }
-
                 // При удачном перемещении ручки записываем новые значения в расширенные данные
                 // По этим данным я потом получаю экземпляр класса section
                 if (newStatus == Status.GripEnd)
@@ -427,10 +442,16 @@
                 // При отмене перемещения возвращаем временные значения
                 if (newStatus == Status.GripAbort)
                 {
-                    if (_gripTmp != null)
+                    if (Name == TextGripName.TopText)
                     {
-                        //todo check
-                        GripPoint = _gripTmp;
+                        Section.AlongTopShelfTextOffset = CachedAlongTopShelfTextOffset;
+                        Section.AcrossTopShelfTextOffset = CachedAcrossTopShelfTextOffset;
+                    }
+
+                    if (Name == TextGripName.BottomText)
+                    {
+                        Section.AlongBottomShelfTextOffset = CachedAlongBottomShelfTextOffset;
+                        Section.AcrossBottomShelfTextOffset = CachedAcrossBottomShelfTextOffset;
                     }
                 }
 
@@ -687,6 +708,14 @@
                     ? EntityDirection.RightToLeft
                     : EntityDirection.LeftToRight;
                 Section.BlockTransform = Section.BlockTransform.Inverse();
+
+                // swap text offsets
+                var tmp = Section.AcrossBottomShelfTextOffset;
+                Section.AcrossBottomShelfTextOffset = Section.AcrossTopShelfTextOffset;
+                Section.AcrossTopShelfTextOffset = tmp;
+                tmp = Section.AlongBottomShelfTextOffset;
+                Section.AlongBottomShelfTextOffset = Section.AlongTopShelfTextOffset;
+                Section.AlongTopShelfTextOffset = tmp;
 
                 Section.UpdateEntities();
                 Section.BlockRecord.UpdateAnonymousBlocks();

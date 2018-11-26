@@ -319,6 +319,10 @@
     <Compile Include="..\mpeskd_2013\functions\mpsection\SectionFunction.cs">
       <Link>Functions\mpSection\SectionFunction.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Functions\mpSection\SectionValueEditor.xaml.cs">
+      <Link>Functions\mpSection\SectionValueEditor.xaml.cs</Link>
+      <DependentUpon>SectionValueEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="..\mpESKD_2013\MainFunction.cs">
       <Link>MainFunction.cs</Link>
     </Compile>
@@ -377,6 +381,11 @@
     </Page>
     <Page Include="..\mpESKD_2013\Functions\mpAxis\AxisValueEditor.xaml">
       <Link>Functions\mpAxis\AxisValueEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpESKD_2013\Functions\mpSection\SectionValueEditor.xaml">
+      <Link>Functions\mpSection\SectionValueEditor.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

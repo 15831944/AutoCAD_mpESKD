@@ -54,12 +54,13 @@ namespace mpESKD.Functions.mpSection
         /// Точка вставки верхнего текста обозначения
         /// </summary>
         [SaveToXData]
-        public Point3d TopDesignationPoint { get; set; } = Point3d.Origin;
+        public Point3d TopDesignationPoint { get; private set; } = Point3d.Origin;
 
         /// <summary>
         /// Точка вставки нижнего текста обозначения
         /// </summary>
-        public Point3d BottomDesignationPoint { get; set; } = Point3d.Origin;
+        [SaveToXData]
+        public Point3d BottomDesignationPoint { get; private set; } = Point3d.Origin;
 
         #endregion
 
@@ -404,78 +405,84 @@ namespace mpESKD.Functions.mpSection
             _bottomShelfArrow.AddVertexAt(1, bottomShelfStartPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
 
             // text
-            var textStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
-            //todo Текста может и не быть!
-            // этот случай нужно обработать, чтобы не создавались ручки
             var textContents = GetTextContents();
-            var textHeight = MainTextHeight * scale;
-            _topMText = new MText
+            if (!string.IsNullOrEmpty(textContents))
             {
-                TextStyleId = textStyleId,
-                Contents = textContents,
-                TextHeight = textHeight,
-                Attachment = AttachmentPoint.MiddleCenter
-            };
-
-            _bottomMText = new MText
-            {
-                TextStyleId = textStyleId,
-                Contents = textContents,
-                TextHeight = textHeight,
-                Attachment = AttachmentPoint.MiddleCenter
-            };
-
-            TextActualHeight = _topMText.ActualHeight;
-            TextActualWidth = _topMText.ActualWidth;
-
-            var check = 1 / Math.Sqrt(2);
-            var alongShelfTextOffset = _topMText.ActualWidth / 2;
-            var acrossShelfTextOffset = _topMText.ActualHeight / 2;
-
-            if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
-            {
-                // top
-                if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
-                    (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
+                var textStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
+                var textHeight = MainTextHeight * scale;
+                _topMText = new MText
                 {
-                    alongShelfTextOffset = _topMText.ActualHeight / 2;
-                    acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                    TextStyleId = textStyleId,
+                    Contents = textContents,
+                    TextHeight = textHeight,
+                    Attachment = AttachmentPoint.MiddleCenter
+                };
+
+                _bottomMText = new MText
+                {
+                    TextStyleId = textStyleId,
+                    Contents = textContents,
+                    TextHeight = textHeight,
+                    Attachment = AttachmentPoint.MiddleCenter
+                };
+
+                TextActualHeight = _topMText.ActualHeight;
+                TextActualWidth = _topMText.ActualWidth;
+
+                var check = 1 / Math.Sqrt(2);
+                var alongShelfTextOffset = _topMText.ActualWidth / 2;
+                var acrossShelfTextOffset = _topMText.ActualHeight / 2;
+
+                // top
+                if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
+                {
+                    if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
+                        (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
+                    {
+                        alongShelfTextOffset = _topMText.ActualHeight / 2;
+                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                    }
+
+                    var tempPoint = topShelfEndPoint + (topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset;
+                    var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
+                    _topMText.Location = topTextCenterPoint;
+
+
                 }
-                var tempPoint = topShelfEndPoint + (topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset;
-                var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
-                _topMText.Location = topTextCenterPoint;
+                else
+                {
+                    var tempPoint = topShelfEndPoint +
+                                    (topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (TextActualWidth / 2));
+                    var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (TextActualHeight / 2)));
+                    _topMText.Location = topTextCenterPoint;
+                }
 
                 TopDesignationPoint = _topMText.Bounds.Value.MinPoint.TransformBy(BlockTransform);
-            }
-            else
-            {
-                // top
-                var tempPoint = topShelfEndPoint + (topShelfStartPoint - topShelfEndPoint).GetNormal() * AlongTopShelfTextOffset;
-                var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + AcrossTopShelfTextOffset);
-                _topMText.Location = topTextCenterPoint;
-            }
 
-            if (double.IsNaN(AlongBottomShelfTextOffset) && double.IsNaN(AcrossBottomShelfTextOffset))
-            {
                 // bottom
-                if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
-                    (bottomStrokeNormalVector.Y < check || bottomStrokeNormalVector.Y > -check))
+                if (double.IsNaN(AlongBottomShelfTextOffset) && double.IsNaN(AcrossBottomShelfTextOffset))
                 {
-                    alongShelfTextOffset = _topMText.ActualHeight / 2;
-                    acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                    if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
+                        (bottomStrokeNormalVector.Y < check || bottomStrokeNormalVector.Y > -check))
+                    {
+                        alongShelfTextOffset = _topMText.ActualHeight / 2;
+                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                    }
+
+                    var tempPoint = bottomShelfEndPoint + (bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * alongShelfTextOffset;
+                    var bottomTextCenterPoint = tempPoint + bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
+                    _bottomMText.Location = bottomTextCenterPoint;
+                }
+                else
+                {
+                    var tempPoint = bottomShelfEndPoint + (bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() *
+                                    (AlongBottomShelfTextOffset + (TextActualWidth / 2));
+                    var bottomTextCenterPoint =
+                        tempPoint + bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (TextActualHeight / 2)));
+                    _bottomMText.Location = bottomTextCenterPoint;
                 }
 
-                var tempPoint = bottomShelfEndPoint + (bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * alongShelfTextOffset;
-                var bottomTextCenterPoint = tempPoint + bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
-                _bottomMText.Location = bottomTextCenterPoint;
-
                 BottomDesignationPoint = _bottomMText.Bounds.Value.MinPoint.TransformBy(BlockTransform);
-            }
-            else
-            {
-                var tempPoint = bottomShelfEndPoint + (bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * AlongBottomShelfTextOffset;
-                var bottomTextCenterPoint = tempPoint + bottomStrokeNormalVector * ((2 * scale) + AcrossBottomShelfTextOffset);
-                _bottomMText.Location = bottomTextCenterPoint;
             }
 
             _middleStrokes.Clear();
@@ -508,6 +515,18 @@ namespace mpESKD.Functions.mpSection
             }
         }
 
+        /// <summary>
+        /// True - есть хоть какое-то строковое значение
+        /// </summary>
+        public bool HasTextValue()
+        {
+            if (string.IsNullOrEmpty(DesignationPrefix) &&
+                string.IsNullOrEmpty(Designation) &&
+                string.IsNullOrEmpty(SheetNumber))
+                return false;
+            return true;
+        }
+
         private double GetShelfOffset()
         {
             return StrokeLength * ShelfOffset / 100.0;
@@ -527,31 +546,53 @@ namespace mpESKD.Functions.mpSection
             return insertionPoint + (insertionPoint - endPoint).GetNormal() * StrokeLength * scale;
         }
 
-        /// <summary>
-        /// Получить актуальные размеры многострочного текста 
-        /// </summary>
-        /// <returns>[0] - ActualWidth, [1] - ActualHeight</returns>
-        private List<double> GetTextActualSize()
+        private void SetFirstTextOnCreation()
         {
-            MText mText = new MText
+            if (IsValueCreated)
             {
-                TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle),
-                Contents = GetTextContents(),
-                TextHeight = MainTextHeight * GetScale()
-            };
+                bool setStandard = true;
+                if (!string.IsNullOrEmpty(LastIntegerValue))
+                {
+                    if (int.TryParse(LastIntegerValue, out var i))
+                    {
+                        Designation = (i + 1).ToString();
+                        setStandard = false;
+                    }
+                }
+                else if (!string.IsNullOrEmpty(LastLetterValue))
+                {
+                    if (Invariables.AxisRusAlphabet.Contains(LastLetterValue))
+                    {
+                        var index = Invariables.AxisRusAlphabet.IndexOf(LastLetterValue);
+                        if (index == Invariables.AxisRusAlphabet.Count - 1)
+                        {
+                            Designation = Invariables.AxisRusAlphabet[0];
+                        }
+                        else
+                        {
+                            Designation = Invariables.AxisRusAlphabet[index + 1];
+                        }
 
-            return new List<double> { mText.ActualWidth, mText.ActualHeight };
+                        setStandard = false;
+                    }
+                }
+
+                if (setStandard)
+                    Designation = "А";
+            }
         }
-
+        
         /// <summary>
         /// Содержимое для MText в зависимости от значений
         /// </summary>
         /// <returns></returns>
         private string GetTextContents()
         {
-            //todo брать значение по последнему разрезу
-            if (string.IsNullOrEmpty(Designation))
-                Designation = "A";
+            SetFirstTextOnCreation();
+
+            if (!HasTextValue())
+                return string.Empty;
+
             // Если номер не указан, то обычный текст
             if (string.IsNullOrEmpty(SheetNumber))
                 return DesignationPrefix + Designation;

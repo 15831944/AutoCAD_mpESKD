@@ -342,27 +342,25 @@ namespace mpESKD.Base
                     if (attribute != null)
                     {
                         var value = propertyInfo.GetValue(this);
-                        if (value is AnnotationScale scale)
+                        switch (value)
                         {
-                            propertiesDataDictionary.Add(propertyInfo.Name, scale.Name);
-                        }
-                        else if (value is Point3d point)
-                        {
-                            var vector = point.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS;
-                            propertiesDataDictionary.Add(propertyInfo.Name, vector.AsString());
-                        }
-                        else if (value is List<Point3d> list)
-                        {
-                            var str = string.Join("#", list.Select(p => (p.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS).AsString()));
-                            propertiesDataDictionary.Add(propertyInfo.Name, str);
-                        }
-                        else if (value is Enum)
-                        {
-                            propertiesDataDictionary.Add(propertyInfo.Name, value.ToString());
-                        }
-                        else
-                        {
-                            propertiesDataDictionary.Add(propertyInfo.Name, value);
+                            case AnnotationScale scale:
+                                propertiesDataDictionary.Add(propertyInfo.Name, scale.Name);
+                                break;
+                            case Point3d point:
+                                var vector = point.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS;
+                                propertiesDataDictionary.Add(propertyInfo.Name, vector.AsString());
+                                break;
+                            case List<Point3d> list:
+                                var str = string.Join("#", list.Select(p => (p.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS).AsString()));
+                                propertiesDataDictionary.Add(propertyInfo.Name, str);
+                                break;
+                            case Enum e:
+                                propertiesDataDictionary.Add(propertyInfo.Name, value.ToString());
+                                break;
+                            default:
+                                propertiesDataDictionary.Add(propertyInfo.Name, value);
+                                break;
                         }
                     }
                 }

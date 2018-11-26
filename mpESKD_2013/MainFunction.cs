@@ -16,6 +16,7 @@
     using Base;
     using Base.Helpers;
     using Functions.mpAxis;
+    using Functions.mpSection;
     using mpESKD.Base.Properties;
     using ModPlus;
     using ModPlusAPI;
@@ -112,7 +113,7 @@
         public static string StylesPath = string.Empty;
 
         /// <summary>Обработка двойного клика по блоку</summary>
-        private static void AcApp_BeginDoubleClick(object sender, Autodesk.AutoCAD.ApplicationServices.BeginDoubleClickEventArgs e)
+        private static void AcApp_BeginDoubleClick(object sender, BeginDoubleClickEventArgs e)
         {
             var pt = e.Location;
 
@@ -128,12 +129,19 @@
                     using (Transaction tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                     {
                         var obj = tr.GetObject(ids[0], OpenMode.ForWrite);
-                        // if axis
-                        if (obj is BlockReference blockReference &&
-                            ExtendedDataHelpers.IsIntellectualEntity(blockReference, AxisDescriptor.Instance.Name))
+                        if (obj is BlockReference blockReference)
                         {
-                            BeditCommandWatcher.UseBedit = false;
-                            AxisFunction.DoubleClickEdit(blockReference, location, tr);
+                            // axis
+                            if (ExtendedDataHelpers.IsIntellectualEntity(blockReference, AxisDescriptor.Instance.Name))
+                            {
+                                AxisFunction.DoubleClickEdit(blockReference, location, tr);
+                            }
+                            // section
+                            else if (ExtendedDataHelpers.IsIntellectualEntity(blockReference, SectionDescriptor.Instance.Name))
+                            {
+                                SectionFunction.DoubleClickEdit(blockReference, location, tr);
+                            }
+                            else BeditCommandWatcher.UseBedit = true;
                         }
                         else BeditCommandWatcher.UseBedit = true;
                         tr.Commit();

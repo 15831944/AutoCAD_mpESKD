@@ -56,6 +56,10 @@
                 var blockReference = MainFunction.CreateBlock(axis);
                 
                 axis.SetPropertiesFromIntellectualEntity(sourceEntity);
+
+                // Отключаю видимость кружков направления
+                axis.TopOrientMarkerVisible = false;
+                axis.BottomOrientMarkerVisible = false;
                 
                 InsertAxisWithJig(axis, blockReference);
             }
@@ -186,7 +190,7 @@
             }
         }
 
-        public static void DoubleClickEdit(BlockReference blockReference, Autodesk.AutoCAD.Geometry.Point3d location, Transaction tr)
+        public static void DoubleClickEdit(BlockReference blockReference, Point3d location, Transaction tr)
         {
             BeditCommandWatcher.UseBedit = false;
             var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blockReference);
@@ -243,12 +247,12 @@
             }
             if (saveBack)
             {
+                axis.UpdateEntities();
+                axis.BlockRecord.UpdateAnonymousBlocks();
                 using (var resBuf = axis.GetDataForXData())
                 {
                     blockReference.XData = resBuf;
                 }
-                axis.UpdateEntities();
-                axis.BlockRecord.UpdateAnonymousBlocks();
             }
             axis.Dispose();
         }

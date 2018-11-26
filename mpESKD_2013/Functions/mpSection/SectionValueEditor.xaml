@@ -1,0 +1,47 @@
+﻿<mps:ModPlusWindow x:Class="mpESKD.Functions.mpSection.SectionValueEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mps="https://modplus.org/winfx/xaml/controls"
+             mc:Ignorable="d" 
+             SizeToContent="WidthAndHeight"
+                   Topmost="True"
+                   Loaded="SectionValueEditor_OnLoaded">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="D:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <!--todo translate all-->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Designation:"
+                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
+        <TextBox Grid.Row="0" Grid.Column="1" Name="TbDesignation" MaxLength="20"></TextBox>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Prefix:"
+                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" Name="TbDesignationPrefix" MaxLength="3"></TextBox>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Sheet number:"
+                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
+        <TextBox Grid.Row="2" Grid.Column="1" Name="TbSheetNumber" MaxLength="5"></TextBox>
+
+        <CheckBox Grid.Row="3" Grid.Column="0" Content="Восстановить положение текста"
+                  Name="ChkRestoreTextPosition"></CheckBox>
+        <Button Grid.Row="3" Grid.Column="1" Content="Accept"
+                HorizontalAlignment="Right" Name="BtAccept"
+                IsDefault="True" Click="BtAccept_OnClick"></Button>
+    </Grid>
+</mps:ModPlusWindow>

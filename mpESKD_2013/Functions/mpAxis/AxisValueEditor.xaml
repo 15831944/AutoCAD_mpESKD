@@ -6,7 +6,6 @@
                    xmlns:system="clr-namespace:System;assembly=mscorlib"
                    xmlns:enums="clr-namespace:mpESKD.Base.Enums"
                    Loaded="AxisValueEditor_OnLoaded" SizeToContent="WidthAndHeight"
-                      PreviewKeyDown="AxisValueEditor_OnPreviewKeyDown"
                       Topmost="True">
     <Window.Resources>
         <ResourceDictionary>
@@ -94,6 +93,7 @@
         </StackPanel>
         <!-- accept -->
         <Button Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3"
+                IsDefault="True"
                 HorizontalAlignment="Right" Content="{Binding Source={StaticResource Lang}, XPath=accept}"
                 Name="BtAccept" Click="BtAccept_OnClick"></Button>
     </Grid>

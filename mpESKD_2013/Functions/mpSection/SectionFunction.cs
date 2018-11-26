@@ -1,7 +1,8 @@
 ﻿namespace mpESKD.Functions.mpSection
 {
-    using System.Collections.Generic;
+    using System;
     using System.Linq;
+    using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
@@ -35,7 +36,37 @@
         /// <inheritdoc />
         public void CreateAnalog(IntellectualEntity sourceEntity)
         {
-            //todo release
+            // send statistic
+            Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, MpVersionData.CurCadVers);
+            try
+            {
+                Overrule.Overruling = false;
+
+                /* Регистрация ЕСКД приложения должна запускаться при запуске
+                 * функции, т.к. регистрация происходит в текущем документе
+                 * При инициализации плагина регистрации нет!
+                 */
+                ExtendedDataHelpers.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
+
+                var sectionLastLetterValue = string.Empty;
+                var sectionLastIntegerValue = string.Empty;
+                FindLastSectionValues(ref sectionLastLetterValue, ref sectionLastIntegerValue);
+                var section = new Section(sectionLastIntegerValue, sectionLastLetterValue);
+
+                var blockReference = MainFunction.CreateBlock(section);
+                
+                section.SetPropertiesFromIntellectualEntity(sourceEntity);
+                
+                InsertSectionWithJig(false, section, blockReference);
+            }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
+            finally
+            {
+                Overrule.Overruling = true;
+            }
         }
 
         [CommandMethod("ModPlus", "mpSection", CommandFlags.Modal)]
@@ -53,10 +84,87 @@
         [CommandMethod("ModPlus", "mpSectionFromPolyline", CommandFlags.Modal)]
         public void CreateSectionFromPolylineCommand()
         {
-            //todo release
+            // send statistic
+            Statistic.SendCommandStarting("mpSectionFromPolyline", MpVersionData.CurCadVers);
+            try
+            {
+                var peo = new PromptEntityOptions("\n" + Language.GetItem(Invariables.LangItem, "msg6"))
+                {
+                    AllowNone = false,
+                    AllowObjectOnLockedLayer = true
+                };
+                peo.SetRejectMessage("\n" + Language.GetItem(Invariables.LangItem, "wrong"));
+                peo.AddAllowedClass(typeof(Polyline), true);
+
+                var per = AcadHelpers.Editor.GetEntity(peo);
+                if (per.Status != PromptStatus.OK) return;
+
+                /* Регистрация ЕСКД приложения должна запускаться при запуске
+                 * функции, т.к. регистрация происходит в текущем документе
+                 * При инициализации плагина регистрации нет!
+                 */
+                ExtendedDataHelpers.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
+
+                var style = StyleManager.GetCurrentStyle(typeof(Section));
+                var sectionLastLetterValue = string.Empty;
+                var sectionLastIntegerValue = string.Empty;
+                FindLastSectionValues(ref sectionLastLetterValue, ref sectionLastIntegerValue);
+                var section = new Section(sectionLastIntegerValue, sectionLastLetterValue);
+
+                MainFunction.CreateBlock(section);
+                section.ApplyStyle(style, true);
+
+                var plineId = per.ObjectId;
+
+                using (AcadHelpers.Document.LockDocument(DocumentLockMode.ProtectedAutoWrite, null, null, true))
+                {
+                    using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        var dbObj = tr.GetObject(plineId, OpenMode.ForRead);
+                        if (dbObj is Polyline pline)
+                        {
+                            for (int i = 0; i < pline.NumberOfVertices; i++)
+                            {
+                                if (i == 0)
+                                    section.InsertionPoint = pline.GetPoint3dAt(i);
+                                else if (i == pline.NumberOfVertices - 1)
+                                    section.EndPoint = pline.GetPoint3dAt(i);
+                                else
+                                    section.MiddlePoints.Add(pline.GetPoint3dAt(i));
+                            }
+
+                            section.UpdateEntities();
+                            section.BlockRecord.UpdateAnonymousBlocks();
+
+                            var ent = (BlockReference)tr.GetObject(section.BlockId, OpenMode.ForWrite);
+                            ent.Position = pline.GetPoint3dAt(0);
+                            ent.XData = section.GetDataForXData();
+                        }
+                        tr.Commit();
+                    }
+
+                    AcadHelpers.Document.TransactionManager.QueueForGraphicsFlush();
+                    AcadHelpers.Document.TransactionManager.FlushGraphics();
+
+                    // "Удалить исходную полилинию?"
+                    if (MessageBox.ShowYesNo(Language.GetItem(Invariables.LangItem, "msg7"), MessageBoxIcon.Question))
+                    {
+                        using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                        {
+                            var dbObj = tr.GetObject(plineId, OpenMode.ForWrite);
+                            dbObj.Erase(true);
+                            tr.Commit();
+                        }
+                    }
+                }
+            }
+            catch (System.Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
         }
 
-        private void CreateSection(bool isSimple)
+        private static void CreateSection(bool isSimple)
         {
             // send statistic
             Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, MpVersionData.CurCadVers);
@@ -80,75 +188,7 @@
                 var blockReference = MainFunction.CreateBlock(section);
                 section.ApplyStyle(style, true);
 
-                //todo implement isSimple variable
-                var entityJig = new DefaultEntityJig(
-                    section,
-                    blockReference,
-                    new Point3d(20, 0, 0),
-                    Language.GetItem(Invariables.LangItem, "msg5"));
-                do
-                {
-                    var status = AcadHelpers.Editor.Drag(entityJig).Status;
-                    if (status == PromptStatus.OK)
-                    {
-                        if (isSimple)
-                        {
-                            if (entityJig.JigState == JigState.PromptInsertPoint)
-                                entityJig.JigState = JigState.PromptNextPoint;
-                            else break;
-                        }
-                        else
-                        {
-                            entityJig.JigState = JigState.PromptNextPoint;
-                            if (entityJig.PreviousPoint == null)
-                            {
-                                entityJig.PreviousPoint = section.MiddlePoints.Any()
-                                    ? section.MiddlePoints.Last()
-                                    : section.InsertionPoint;
-                            }
-                            else
-                            {
-                                section.RebasePoints();
-                                entityJig.PreviousPoint = section.MiddlePoints.Last();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (section.MiddlePoints.Any())
-                        {
-                            section.EndPoint = section.MiddlePoints.Last();
-                            section.MiddlePoints.RemoveAt(section.MiddlePoints.Count - 1);
-                            section.UpdateEntities();
-                            section.BlockRecord.UpdateAnonymousBlocks();
-                        }
-                        else
-                        {
-                            // if no middle points - remove entity
-                            using (AcadHelpers.Document.LockDocument())
-                            {
-                                using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
-                                {
-                                    var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite);
-                                    obj.Erase(true);
-                                    tr.Commit();
-                                }
-                            }
-                        }
-
-                        break;
-                    }
-                } while (true);
-
-                if (!section.BlockId.IsErased)
-                {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
-                    {
-                        var ent = tr.GetObject(section.BlockId, OpenMode.ForWrite);
-                        ent.XData = section.GetDataForXData();
-                        tr.Commit();
-                    }
-                }
+                InsertSectionWithJig(isSimple, section, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -160,37 +200,125 @@
             }
         }
 
+        private static void InsertSectionWithJig(bool isSimple, Section section, BlockReference blockReference)
+        {
+            var entityJig = new DefaultEntityJig(
+                section,
+                blockReference,
+                new Point3d(20, 0, 0),
+                Language.GetItem(Invariables.LangItem, "msg5"));
+            do
+            {
+                var status = AcadHelpers.Editor.Drag(entityJig).Status;
+                if (status == PromptStatus.OK)
+                {
+                    if (isSimple)
+                    {
+                        if (entityJig.JigState == JigState.PromptInsertPoint)
+                            entityJig.JigState = JigState.PromptNextPoint;
+                        else break;
+                    }
+                    else
+                    {
+                        entityJig.JigState = JigState.PromptNextPoint;
+                        if (entityJig.PreviousPoint == null)
+                        {
+                            entityJig.PreviousPoint = section.MiddlePoints.Any()
+                                ? section.MiddlePoints.Last()
+                                : section.InsertionPoint;
+                        }
+                        else
+                        {
+                            section.RebasePoints();
+                            entityJig.PreviousPoint = section.MiddlePoints.Last();
+                        }
+                    }
+                }
+                else
+                {
+                    if (section.MiddlePoints.Any())
+                    {
+                        section.EndPoint = section.MiddlePoints.Last();
+                        section.MiddlePoints.RemoveAt(section.MiddlePoints.Count - 1);
+                        section.UpdateEntities();
+                        section.BlockRecord.UpdateAnonymousBlocks();
+                    }
+                    else
+                    {
+                        // if no middle points - remove entity
+                        using (AcadHelpers.Document.LockDocument())
+                        {
+                            using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                            {
+                                var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite);
+                                obj.Erase(true);
+                                tr.Commit();
+                            }
+                        }
+                    }
+
+                    break;
+                }
+            } while (true);
+
+            if (!section.BlockId.IsErased)
+            {
+                using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                {
+                    var ent = tr.GetObject(section.BlockId, OpenMode.ForWrite);
+                    ent.XData = section.GetDataForXData();
+                    tr.Commit();
+                }
+            }
+        }
+
         /// <summary>
         /// Поиск последних цифровых и буквенных значений разрезов на текущем виде
         /// </summary>
-        /// <param name="sectionLastLetterValue"></param>
-        /// <param name="sectionLastIntegerValue"></param>
         private static void FindLastSectionValues(ref string sectionLastLetterValue, ref string sectionLastIntegerValue)
         {
-            //todo implement settings
-            //if (MainStaticSettings.Settings.SectionSaveLastTextAndContinueNew)
-            //{
-            //    List<int> allIntegerValues = new List<int>();
-            //    List<string> allLetterValues = new List<string>();
-            //    AcadHelpers.GetAllIntellectualEntitiesInCurrentSpace<Section>(typeof(Section)).ForEach(a =>
-            //    {
-            //        var s = a.Designation;
-            //        if(int.TryParse(s, out var i))
-            //            allIntegerValues.Add(i);
-            //        else allLetterValues.Add(s);
-            //    });
-            //    if (allIntegerValues.Any())
-            //    {
-            //        allIntegerValues.Sort();
-            //        sectionLastIntegerValue = allIntegerValues.Last().ToString();
-            //    }
+            if (MainStaticSettings.Settings.SectionSaveLastTextAndContinueNew)
+            {
+                var sections = AcadHelpers.GetAllIntellectualEntitiesInCurrentSpace<Section>(typeof(Section));
+                if (sections.Any())
+                {
+                    sections.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
+                    var v = sections.Last().Designation;
+                    if (int.TryParse(v, out var i))
+                        sectionLastIntegerValue = i.ToString();
+                    else sectionLastLetterValue = v;
+                }
+            }
+        }
 
-            //    if (allLetterValues.Any())
-            //    {
-            //        allLetterValues.Sort();
-            //        sectionLastLetterValue = allLetterValues.Last();
-            //    }
-            //}
+        public static void DoubleClickEdit(BlockReference blockReference, Point3d location, Transaction tr)
+        {
+            BeditCommandWatcher.UseBedit = false;
+            var section = EntityReaderFactory.Instance.GetFromEntity<Section>(blockReference);
+            section.UpdateEntities();
+            bool saveBack = false;
+            if (MainStaticSettings.Settings.SectionUsePluginTextEditor)
+            {
+                SectionValueEditor sectionValueEditor = new SectionValueEditor { Section = section };
+                if (sectionValueEditor.ShowDialog() == true)
+                    saveBack = true;
+            }
+            else
+            {
+                MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg4"));
+            }
+
+            if (saveBack)
+            {
+                section.UpdateEntities();
+                section.BlockRecord.UpdateAnonymousBlocks();
+                using (var resBuf = section.GetDataForXData())
+                {
+                    blockReference.XData = resBuf;
+                }
+                
+            }
+            section.Dispose();
         }
     }
 }
