@@ -62,8 +62,7 @@
                 case nameof(GroundLine):
                     return TryGetLocalizationValue("h78");
                 case nameof(Section):
-                    //todo translate
-                    return "Section";
+                    return TryGetLocalizationValue("h96");
             }
 
             return string.Empty;

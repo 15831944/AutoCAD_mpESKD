@@ -16,7 +16,7 @@
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
                 <ResourceDictionary Source="../Properties/Controls/ControlStylesForEditor.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="D:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
             <!-- images -->
             <Canvas x:Key="ImageBreakLine" Width="190" Height="150">
@@ -763,8 +763,7 @@
                             </Grid>
                         </Border>
                     </TabItem>
-                    <!--todo translate -->
-                    <TabItem Header="Section">
+                    <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h79}">
                         <Border BorderThickness="1" BorderBrush="{DynamicResource BoxesBorderBrush}">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -772,18 +771,15 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <!--todo translate-->
-                                <CheckBox Grid.Row="0" Content="Save last value"
+                                <CheckBox Grid.Row="0" Content="{Binding Source={StaticResource Lang}, XPath=h86}"
                                           IsChecked="{Binding Path=SectionSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="translate it"></CheckBox>
-                                <!--todo translate-->
-                                <CheckBox Grid.Row="1" Content="Show help line"
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h87}"></CheckBox>
+                                <CheckBox Grid.Row="1" Content="{Binding Source={StaticResource Lang}, XPath=h88}"
                                           IsChecked="{Binding Path=SectionShowHelpLineOnSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="translate it"></CheckBox>
-                                <!--todo translate-->
-                                <CheckBox Grid.Row="2" Content="Using plugin text editor"
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h89}"></CheckBox>
+                                <CheckBox Grid.Row="2" Content="{Binding Source={StaticResource Lang}, XPath=h91}"
                                           IsChecked="{Binding Path=SectionUsePluginTextEditor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="translate it"></CheckBox>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h92}"></CheckBox>
                             </Grid>
                         </Border>
                     </TabItem>

@@ -1,6 +1,7 @@
 ﻿namespace mpESKD.Functions.mpSection
 {
     using System.Windows;
+    using Base;
 
     public partial class SectionValueEditor
     {
@@ -9,8 +10,7 @@
         public SectionValueEditor()
         {
             InitializeComponent();
-            //todo translate
-            Title = "Section value change";
+            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h94");
         }
 
         private void SectionValueEditor_OnLoaded(object sender, RoutedEventArgs e)

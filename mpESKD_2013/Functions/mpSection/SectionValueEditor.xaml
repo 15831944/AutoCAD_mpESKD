@@ -13,7 +13,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="D:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
         </ResourceDictionary>
     </Window.Resources>
     <!--todo translate all-->
@@ -28,19 +28,19 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Designation:"
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p51}"
                    Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
         <TextBox Grid.Row="0" Grid.Column="1" Name="TbDesignation" MaxLength="20"></TextBox>
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Prefix:"
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p52}"
                    Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
         <TextBox Grid.Row="1" Grid.Column="1" Name="TbDesignationPrefix" MaxLength="3"></TextBox>
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Sheet number:"
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=p53}"
                    Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
         <TextBox Grid.Row="2" Grid.Column="1" Name="TbSheetNumber" MaxLength="5"></TextBox>
 
-        <CheckBox Grid.Row="3" Grid.Column="0" Content="Восстановить положение текста"
+        <CheckBox Grid.Row="3" Grid.Column="0" Content="{Binding Source={StaticResource Lang}, XPath=h93}"
                   Name="ChkRestoreTextPosition"></CheckBox>
-        <Button Grid.Row="3" Grid.Column="1" Content="Accept"
+        <Button Grid.Row="3" Grid.Column="1" Content="{Binding Source={StaticResource Lang}, XPath=accept}"
                 HorizontalAlignment="Right" Name="BtAccept"
                 IsDefault="True" Click="BtAccept_OnClick"></Button>
     </Grid>

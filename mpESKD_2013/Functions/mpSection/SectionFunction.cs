@@ -57,7 +57,7 @@
                 
                 section.SetPropertiesFromIntellectualEntity(sourceEntity);
                 
-                InsertSectionWithJig(false, section, blockReference);
+                InsertSectionWithJig(true, section, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -72,13 +72,13 @@
         [CommandMethod("ModPlus", "mpSection", CommandFlags.Modal)]
         public void CreateSectionCommand()
         {
-            CreateSection(false);
+            CreateSection(true);
         }
 
-        [CommandMethod("ModPlus", "mpSectionSimply", CommandFlags.Modal)]
+        [CommandMethod("ModPlus", "mpSectionBroken", CommandFlags.Modal)]
         public void CreateSimplySectionCommand()
         {
-            CreateSection(true);
+            CreateSection(false);
         }
 
         [CommandMethod("ModPlus", "mpSectionFromPolyline", CommandFlags.Modal)]

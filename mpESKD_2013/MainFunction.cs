@@ -351,8 +351,7 @@
             if (_intellectualEntityContextMenu == null)
             {
                 _intellectualEntityContextMenu = new ContextMenuExtension();
-                //todo translate
-                var menuItem = new Autodesk.AutoCAD.Windows.MenuItem("MP:Create analog");
+                var menuItem = new Autodesk.AutoCAD.Windows.MenuItem(Language.GetItem(Invariables.LangItem, "h95"));
                 menuItem.Click += CreateAnalogMenuItem_Click;
                 _intellectualEntityContextMenu.MenuItems.Add(menuItem);
             }

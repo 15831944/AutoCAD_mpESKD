@@ -17,7 +17,7 @@
         public string LName => Language.GetItem(Invariables.LangItem, "h73"); // "Линия грунта";
 
         /// <inheritdoc />
-        public string Description => Language.GetItem(Invariables.LangItem, "h74"); // "Линия обозначения грунта";
+        public string Description => Language.GetItem(Invariables.LangItem, "h74"); // "Отрисовка линии обозначения грунта";
 
         /// <inheritdoc />
         public string FullDescription => Language.GetItem(Invariables.LangItem, "h75"); // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию грунта";
@@ -34,13 +34,15 @@
         /// <inheritdoc />
         public List<string> SubFunctionsLNames => new List<string>
         {
-            Language.GetItem(Invariables.LangItem, "h76") // "Линия грунта из полилинии"
+            // "Линия грунта из полилинии"
+            Language.GetItem(Invariables.LangItem, "h76") 
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
-            Language.GetItem(Invariables.LangItem, "h77") // "Конвертирование выбранной полилинии в линию обозначения грунта"
+            // "Конвертирование выбранной полилинии в линию обозначения грунта"
+            Language.GetItem(Invariables.LangItem, "h77") 
         };
 
         /// <inheritdoc />

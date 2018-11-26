@@ -455,9 +455,7 @@
       <Link>Resources\StyleEditor_32x32_dark.png</Link>
     </Resource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Functions\mpSection\Icons\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png">
       <Link>Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png</Link>
@@ -470,6 +468,26 @@
     </Resource>
     <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png">
       <Link>Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSectionBroken_32x32.png">
+      <Link>Functions\mpSection\Icons\mpSectionBroken_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png">
+      <Link>Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png">
+      <Link>Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png">
+      <Link>Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSection_32x32.png">
+      <Link>Functions\mpSection\Icons\mpSection_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSection_32x32_dark.png">
+      <Link>Functions\mpSection\Icons\mpSection_32x32_dark.png</Link>
     </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

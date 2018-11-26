@@ -11,6 +11,7 @@ namespace mpESKD.Functions.mpSection
     using Base.Helpers;
     using ModPlusAPI.Windows;
 
+    [IntellectualEntityDisplayNameKey("h79")]
     public class Section : IntellectualEntity
     {
         #region Constructors
@@ -75,8 +76,7 @@ namespace mpESKD.Functions.mpSection
         public override double LineTypeScale { get; set; }
 
         /// <inheritdoc />
-        /// todo translate
-        [EntityProperty(PropertiesCategory.Content, 1, "", "", "Standard", null, null)]
+        [EntityProperty(PropertiesCategory.Content, 1, "p41", "d41", "Standard", null, null)]
         [SaveToXData]
         public override string TextStyle { get; set; }
 
@@ -88,86 +88,93 @@ namespace mpESKD.Functions.mpSection
         /// <summary>
         /// Длина среднего штриха (половина длины полилинии на переломе)
         /// </summary>
-        /// todo translate
-        [EntityProperty(PropertiesCategory.Geometry, 1, "", "", 8, 1, 20)]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "h42", "d42", 8, 1, 20)]
+        [PropertyNameKeyInStyleEditor("p42-1")]
         [SaveToXData]
         public int MiddleStrokeLength { get; set; } = 8;
 
         /// <summary>
         /// Толщина штрихов
         /// </summary>
-        /// todo translate
-        [EntityProperty(PropertiesCategory.Geometry, 2, "", "", 0.5, 0, 2)]
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p43", "d43", 0.5, 0, 2)]
+        [PropertyNameKeyInStyleEditor("p43-1")]
         [SaveToXData]
         public double StrokeWidth { get; set; } = 0.5;
 
         /// <summary>
         /// Длина верхнего и нижнего штриха
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "", "", 10, 5, 10)]
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p44", "d44", 10, 5, 10)]
+        [PropertyNameKeyInStyleEditor("p44-1")]
         [SaveToXData]
         public int StrokeLength { get; set; } = 10;
 
         /// <summary>
         /// Отступ полки по длине штриха в процентах
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, "", "", 80, 0, 100)]
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p45", "d45", 80, 0, 100)]
+        [PropertyNameKeyInStyleEditor("p45-1")]
         [SaveToXData]
         public int ShelfOffset { get; set; } = 80;
 
         /// <summary>
         /// Длина полки
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, "", "", 10, 5, 15)]
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p46", "d46", 10, 5, 15)]
+        [PropertyNameKeyInStyleEditor("p46-1")]
         [SaveToXData]
         public int ShelfLength { get; set; } = 10;
 
         /// <summary>
         /// Длина стрелки
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 6, "", "", 5, 1, 8)]
+        [EntityProperty(PropertiesCategory.Geometry, 6, "p47", "d47", 5, 1, 8)]
+        [PropertyNameKeyInStyleEditor("p47-1")]
         [SaveToXData]
         public int ShelfArrowLength { get; set; } = 5;
 
         /// <summary>
         /// Толщина стрелки
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 7, "", "", 1.5, 0.1, 5)]
+        [EntityProperty(PropertiesCategory.Geometry, 7, "p48", "d48", 1.5, 0.1, 5)]
+        [PropertyNameKeyInStyleEditor("p48-1")]
         [SaveToXData]
         public double ShelfArrowWidth { get; set; } = 1.5;
 
         /// <summary>
         /// Высота текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 2, "", "", 3.5, 0.000000001, 1.0000E+99)]
+        [EntityProperty(PropertiesCategory.Content, 2, "p49", "d49", 3.5, 0.000000001, 1.0000E+99)]
+        [PropertyNameKeyInStyleEditor("p49-1")]
         [SaveToXData]
         public double MainTextHeight { get; set; } = 3.5;
 
         /// <summary>
         /// Высота малого текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 3, "", "", 2.5, 0.000000001, 1.0000E+99)]
+        [EntityProperty(PropertiesCategory.Content, 3, "p50", "d50", 2.5, 0.000000001, 1.0000E+99)]
+        [PropertyNameKeyInStyleEditor("p50-1")]
         [SaveToXData]
         public double SecondTextHeight { get; set; } = 2.5;
 
         /// <summary>
         /// Обозначение разреза
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 4, "", "", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 4, "p51", "d51", "", null, null, PropertyScope.Palette)]
         [SaveToXData]
         public string Designation { get; set; } = string.Empty;
 
         /// <summary>
         /// Префикс обозначения
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 5, "", "", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 5, "p52", "d52", "", null, null, PropertyScope.Palette)]
         [SaveToXData]
         public string DesignationPrefix { get; set; } = string.Empty;
 
         /// <summary>
         /// Номер листа (пишется в скобках после обозначения)
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 6, "", "", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 6, "p53", "d53", "", null, null, PropertyScope.Palette)]
         [SaveToXData]
         public string SheetNumber { get; set; } = string.Empty;
 

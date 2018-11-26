@@ -9,6 +9,7 @@
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpGroundLine;
+    using Functions.mpSection;
     using ModPlus.Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
@@ -116,6 +117,7 @@
                 // add content
                 AddAxisPanel(ribTab);
                 AddLinesPanel(ribTab);
+                AddViewsPanel(ribTab);
                 // add settings panel
                 AddSettingsPanel(ribTab);
                 ////////////////////////
@@ -128,9 +130,12 @@
                 ExceptionBox.Show(exception);
             }
         }
+
+        /// <summary>
+        /// Панель "Оси"
+        /// </summary>
         private static void AddAxisPanel(RibbonTab ribTab)
         {
-            // Линии
             // create the panel source
             var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab3") };
             // now the panel
@@ -141,18 +146,20 @@
 
             // mpAxis
             var ribBtn = GetBigButton(AxisDescriptor.Instance);
-            if (ribBtn != null) 
+            if (ribBtn != null)
                 ribRowPanel.Items.Add(ribBtn);
-            
+
             if (ribRowPanel.Items.Any())
             {
                 ribSourcePanel.Items.Add(ribRowPanel);
             }
         }
 
+        /// <summary>
+        /// Панель "Линии"
+        /// </summary>
         private static void AddLinesPanel(RibbonTab ribTab)
         {
-            // Линии
             // create the panel source
             var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab1") };
             // now the panel
@@ -168,9 +175,26 @@
             ribRowPanel.Items.Add(GetSplitButton(GroundLineDescriptor.Instance));
 
             if (ribRowPanel.Items.Any())
-            {
                 ribSourcePanel.Items.Add(ribRowPanel);
-            }
+        }
+
+        /// <summary>
+        /// Панель "Виды, разрезы"
+        /// </summary>
+        private static void AddViewsPanel(RibbonTab ribTab)
+        {
+            // create the panel source
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab8") };
+            var ribPanel = new RibbonPanel { Source = ribSourcePanel };
+            ribTab.Panels.Add(ribPanel);
+
+            var ribRowPanel = new RibbonRowPanel();
+
+            // mpSection
+            ribRowPanel.Items.Add(GetSplitButton(SectionDescriptor.Instance));
+
+            if (ribRowPanel.Items.Any())
+                ribSourcePanel.Items.Add(ribRowPanel);
         }
 
         private static void AddSettingsPanel(RibbonTab ribTab)
@@ -280,7 +304,7 @@
                     descriptor.SubFunctionsNames[i],
                     descriptor.SubFunctionsLNames[i],
                     GetBigIconForFunction(descriptor.Name, descriptor.SubFunctionsNames[i]),
-                    descriptor.SubDescriptions[i], 
+                    descriptor.SubDescriptions[i],
                     orientation,
                     descriptor.SubFullDescriptions[i],
                     GetHelpImageForFunction(descriptor.Name, descriptor.SubHelpImages[i])
@@ -298,7 +322,7 @@
                 : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
                   functionName + "/Icons/" + subFunctionName + "_32x32_dark.png";
         }
-       
+
         private static string GetSmallIconForFunction(string functionName, string subFunctionName)
         {
             return _colorTheme == 1

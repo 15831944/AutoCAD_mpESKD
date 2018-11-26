@@ -265,14 +265,20 @@
   <ItemGroup>
     <Resource Include="Resources\StyleEditor_32x32_dark.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Functions\mpSection\Icons\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
+    <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png" />
+    <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png" />
+    <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png" />
+    <Resource Include="Functions\mpSection\Icons\mpSection_32x32.png" />
+    <Resource Include="Functions\mpSection\Icons\mpSection_32x32_dark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
