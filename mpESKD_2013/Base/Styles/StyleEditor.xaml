@@ -770,6 +770,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <CheckBox Grid.Row="0" Content="{Binding Source={StaticResource Lang}, XPath=h86}"
                                           IsChecked="{Binding Path=SectionSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -780,6 +781,10 @@
                                 <CheckBox Grid.Row="2" Content="{Binding Source={StaticResource Lang}, XPath=h91}"
                                           IsChecked="{Binding Path=SectionUsePluginTextEditor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           ToolTip="{Binding Source={StaticResource Lang}, XPath=h92}"></CheckBox>
+                                <!-- todo translate and use h90 -->
+                                <CheckBox Grid.Row="2" Content="Dependent text movement"
+                                          IsChecked="{Binding Path=SectionUsePluginTextEditor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ToolTip="Dependent text movement"></CheckBox>
                             </Grid>
                         </Border>
                     </TabItem>

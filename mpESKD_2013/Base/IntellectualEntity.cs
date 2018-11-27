@@ -1,4 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
+
 #pragma warning disable CS0618
 
 namespace mpESKD.Base
@@ -15,6 +16,7 @@ namespace mpESKD.Base
     using System.Runtime.Serialization.Json;
     using System.Text;
     using Autodesk.AutoCAD.Colors;
+    using Autodesk.AutoCAD.Internal;
     using Enums;
     using ModPlusAPI.Annotations;
     using Styles;
@@ -27,8 +29,15 @@ namespace mpESKD.Base
             var blockTableRecord = new BlockTableRecord
             {
                 Name = "*U",
-                BlockScaling = BlockScaling.Uniform
+                BlockScaling = BlockScaling.Uniform,
+                //Annotative = AnnotativeStates.True
             };
+
+            // todo annotative
+            // https://www.keanw.com/2007/04/making_autocad_.html
+            //ObjectContextManager ocm = AcadHelpers.Database.ObjectContextManager;
+            //ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
+            //ObjectContexts.AddContext(blockTableRecord, occ.GetContext("1:1"));
             BlockRecord = blockTableRecord;
         }
 
@@ -100,6 +109,7 @@ namespace mpESKD.Base
         public string LayerName { get; set; } = string.Empty;
 
         private AnnotationScale _scale;
+
         /// <summary>Масштаб примитива</summary>
         [EntityProperty(PropertiesCategory.General, 3, "p5", "d5", "1:1", null, null)]
         [SaveToXData]
@@ -109,12 +119,21 @@ namespace mpESKD.Base
             {
                 if (_scale != null)
                     return _scale;
-                _scale = new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1 };
-                return _scale;
+                return new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1 };
             }
-            set => _scale = value;
+            set
+            {
+                var oldScale = _scale;
+                _scale = value;
+                if (oldScale != null && oldScale != value)
+                    ProcessScaleChange(oldScale, value);
+            }
         }
 
+        protected virtual void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
+        {
+        }
+        
         /// <summary>
         /// Тип линии. Свойство является абстрактным, так как в зависимости от интеллектуального примитива
         /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 4
@@ -139,10 +158,18 @@ namespace mpESKD.Base
         [SaveToXData]
         public abstract string TextStyle { get; set; }
 
-        /// <summary>Текущий масштаб</summary>
+        /// <summary>Текущий численный масштаб масштаб</summary>
         public double GetScale()
         {
-            return Scale.DrawingUnits / Scale.PaperUnits;
+            return Scale.GetNumericScale();
+        }
+
+        /// <summary>
+        /// Текущий полный численный масштаб (с учетом масштаба блока)
+        /// </summary>
+        public double GetFullScale()
+        {
+            return GetScale() * BlockTransform.GetScale();
         }
 
         #region Block
@@ -178,22 +205,31 @@ namespace mpESKD.Base
                                 else
                                 {
                                     _blockRecord = new BlockTableRecord { Name = "*U", BlockScaling = BlockScaling.Uniform };
-                                    using (var blockTable =
-                                        AcadHelpers.Database.BlockTableId.Write<BlockTable>())
+                                    using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
                                     {
                                         //Debug.Print("Creating new (no erasing)");
                                         blockTable.Add(_blockRecord);
                                         tr.AddNewlyCreatedDBObject(_blockRecord, true);
                                     }
+
                                     blkRef.BlockTableRecord = _blockRecord.Id;
                                 }
+
                                 tr.Commit();
                             }
+
                             using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
                             {
                                 var blkRef = (BlockReference)tr.GetObject(BlockId, OpenMode.ForWrite);
                                 _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite);
                                 _blockRecord.BlockScaling = BlockScaling.Uniform;
+
+                                // todo annotative
+                                //_blockRecord.Annotative = AnnotativeStates.True;
+                                //ObjectContextManager ocm = AcadHelpers.Database.ObjectContextManager;
+                                //ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
+                                //ObjectContexts.AddContext(_blockRecord, occ.GetContext("1:1"));
+
                                 var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
                                 //Debug.Print("Transformed copy");
                                 foreach (var entity in _entities)
@@ -205,8 +241,10 @@ namespace mpESKD.Base
                                         tr.AddNewlyCreatedDBObject(transformedCopy, true);
                                     }
                                 }
+
                                 tr.Commit();
                             }
+
                             AcadHelpers.Document.TransactionManager.FlushGraphics();
                         }
                     }
@@ -219,6 +257,7 @@ namespace mpESKD.Base
                             var transformedCopy = entity.GetTransformedCopy(matrix3D);
                             _blockRecord.AppendEntity(transformedCopy);
                         }
+
                         IsValueCreated = true;
                     }
                 }
@@ -226,6 +265,7 @@ namespace mpESKD.Base
                 {
                     ExceptionBox.Show(exception);
                 }
+
                 return _blockRecord;
             }
             set => _blockRecord = value;
@@ -244,9 +284,11 @@ namespace mpESKD.Base
                         blockTable.Add(blockTableRecord);
                         tr.AddNewlyCreatedDBObject(blockTableRecord, true);
                     }
+
                     blkRef.BlockTableRecord = blockTableRecord.Id;
                     tr.Commit();
                 }
+
                 using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     blockTableRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite);
@@ -258,9 +300,11 @@ namespace mpESKD.Base
                         blockTableRecord.AppendEntity(transformedCopy);
                         tr.AddNewlyCreatedDBObject(transformedCopy, true);
                     }
+
                     tr.Commit();
                 }
             }
+
             _blockRecord = blockTableRecord;
             return blockTableRecord;
         }
@@ -281,6 +325,7 @@ namespace mpESKD.Base
                                 ent.Erase(true);
                             }
                         }
+
                         foreach (Entity entity in _entities)
                         {
                             using (entity)
@@ -291,6 +336,7 @@ namespace mpESKD.Base
                     }
                 }
             }
+
             _blockRecord = blockTableRecord;
             return blockTableRecord;
         }
@@ -352,7 +398,8 @@ namespace mpESKD.Base
                                 propertiesDataDictionary.Add(propertyInfo.Name, vector.AsString());
                                 break;
                             case List<Point3d> list:
-                                var str = string.Join("#", list.Select(p => (p.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS).AsString()));
+                                var str = string.Join("#",
+                                    list.Select(p => (p.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS).AsString()));
                                 propertiesDataDictionary.Add(propertyInfo.Name, str);
                                 break;
                             case Enum e:
@@ -418,14 +465,14 @@ namespace mpESKD.Base
                                         if (string.IsNullOrEmpty(valueForProperty))
                                             continue;
 
-                                        if (propertyInfo.Name == "StyleGuid")
+                                        if (propertyInfo.Name == nameof(StyleGuid))
                                         {
-                                            GetType().GetProperty("Style")?.SetValue(this, StyleManager.GetStyleNameByGuid(GetType(), valueForProperty));
+                                            GetType().GetProperty("Style")
+                                                ?.SetValue(this, StyleManager.GetStyleNameByGuid(GetType(), valueForProperty));
                                         }
-                                        if (propertyInfo.PropertyType == typeof(AnnotationScale))
+                                        else if (propertyInfo.Name == nameof(Scale))
                                         {
-                                            propertyInfo.SetValue(this,
-                                                AcadHelpers.GetAnnotationScaleByName(valueForProperty));
+                                            Scale = AcadHelpers.GetAnnotationScaleByName(valueForProperty);
                                         }
                                         else if (propertyInfo.PropertyType == typeof(Point3d))
                                         {
@@ -446,6 +493,7 @@ namespace mpESKD.Base
                                                 var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
                                                 points.Add(point);
                                             }
+
                                             propertyInfo.SetValue(this, points);
                                         }
                                         else if (propertyInfo.PropertyType == typeof(int))

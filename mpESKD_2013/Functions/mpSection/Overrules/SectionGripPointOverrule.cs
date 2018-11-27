@@ -207,8 +207,8 @@
                                     ? (section.InsertionPoint - section.MiddlePoints.First()).GetNormal()
                                     : (section.InsertionPoint - section.EndPoint).GetNormal();
                                 var topShelfVector = topStrokeVector.GetPerpendicularVector().Negate();
-                                var deltaY = topStrokeVector.DotProduct(offset);
-                                var deltaX = topShelfVector.DotProduct(offset);
+                                var deltaY = topStrokeVector.DotProduct(offset) / section.BlockTransform.GetScale();
+                                var deltaX = topShelfVector.DotProduct(offset) / section.BlockTransform.GetScale();
                                 if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
                                     section.AlongTopShelfTextOffset = deltaX;
                                 else
@@ -218,6 +218,17 @@
                                     section.AcrossTopShelfTextOffset = deltaY;
                                 else
                                     section.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
+
+                                if (MainStaticSettings.Settings.SectionDependentTextMovement)
+                                {
+                                    if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
+                                        section.AlongBottomShelfTextOffset = deltaX;
+                                    else section.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
+
+                                    if (double.IsNaN(textGrip.CachedAcrossBottomShelfTextOffset))
+                                        section.AcrossBottomShelfTextOffset = deltaY;
+                                    else section.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
+                                }
                             }
 
                             if (textGrip.Name == TextGripName.BottomText)
@@ -226,8 +237,9 @@
                                     ? (section.EndPoint - section.MiddlePoints.Last()).GetNormal()
                                     : (section.EndPoint - section.InsertionPoint).GetNormal();
                                 var bottomShelfVector = bottomStrokeVector.GetPerpendicularVector();
-                                var deltaY = bottomStrokeVector.DotProduct(offset);
-                                var deltaX = bottomShelfVector.DotProduct(offset);
+                                var deltaY = bottomStrokeVector.DotProduct(offset) / section.BlockTransform.GetScale();
+                                var deltaX = bottomShelfVector.DotProduct(offset) / section.BlockTransform.GetScale();
+
                                 if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
                                     section.AlongBottomShelfTextOffset = deltaX;
                                 else section.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
@@ -235,6 +247,19 @@
                                 if (double.IsNaN(textGrip.CachedAcrossBottomShelfTextOffset))
                                     section.AcrossBottomShelfTextOffset = deltaY;
                                 else section.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
+
+                                if (MainStaticSettings.Settings.SectionDependentTextMovement)
+                                {
+                                    if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
+                                        section.AlongTopShelfTextOffset = deltaX;
+                                    else
+                                        section.AlongTopShelfTextOffset = textGrip.CachedAlongTopShelfTextOffset + deltaX;
+
+                                    if (double.IsNaN(textGrip.CachedAcrossTopShelfTextOffset))
+                                        section.AcrossTopShelfTextOffset = deltaY;
+                                    else
+                                        section.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
+                                }
                             }
 
                             section.UpdateEntities();
@@ -418,7 +443,7 @@
         {
             return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
         }
-        
+
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
             try

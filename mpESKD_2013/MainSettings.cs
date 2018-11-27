@@ -207,6 +207,22 @@
             }
         }
 
+        private bool _sectionDependentTextMovement;
+        /// <summary>Зависимое перемещение текста</summary>
+        public bool SectionDependentTextMovement
+        {
+            get => !bool.TryParse(
+                       UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD",
+                           nameof(SectionDependentTextMovement)),
+                       out _sectionDependentTextMovement) || _sectionDependentTextMovement; // true
+            set
+            {
+                _sectionDependentTextMovement = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(SectionDependentTextMovement), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;

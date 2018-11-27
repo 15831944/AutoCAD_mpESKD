@@ -205,8 +205,6 @@ namespace mpESKD.Base.Properties
                         PropertyInfo propertyInfo = entityType.GetProperty(intellectualEntityProperty.Name);
                         if (propertyInfo != null)
                         {
-                            if (propertyInfo.Name == "Scale")
-                                Debug.Print("!");
                             if (intellectualEntityProperty.Name == "Style")
                             {
                                 var style = StyleManager.GetStyleByName(entityType, intellectualEntityProperty.Value.ToString());

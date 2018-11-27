@@ -160,6 +160,14 @@
             return Database.Cannoscale;
         }
 
+        /// <summary>
+        /// Возвращает численный масштаб (отношение единиц чертежа к единицам листа)
+        /// </summary>
+        public static double GetNumericScale(this AnnotationScale scale)
+        {
+            return scale.DrawingUnits / scale.PaperUnits;
+        }
+
         /// <summary>Применение стиля к блоку согласно стиля</summary>
         /// <param name="blkRefObjectId">ObjectId of block reference</param>
         /// <param name="layerName">Имя слоя</param>
