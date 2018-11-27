@@ -29,15 +29,8 @@ namespace mpESKD.Base
             var blockTableRecord = new BlockTableRecord
             {
                 Name = "*U",
-                BlockScaling = BlockScaling.Uniform,
-                //Annotative = AnnotativeStates.True
+                BlockScaling = BlockScaling.Uniform
             };
-
-            // todo annotative
-            // https://www.keanw.com/2007/04/making_autocad_.html
-            //ObjectContextManager ocm = AcadHelpers.Database.ObjectContextManager;
-            //ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
-            //ObjectContexts.AddContext(blockTableRecord, occ.GetContext("1:1"));
             BlockRecord = blockTableRecord;
         }
 
@@ -223,12 +216,6 @@ namespace mpESKD.Base
                                 var blkRef = (BlockReference)tr.GetObject(BlockId, OpenMode.ForWrite);
                                 _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite);
                                 _blockRecord.BlockScaling = BlockScaling.Uniform;
-
-                                // todo annotative
-                                //_blockRecord.Annotative = AnnotativeStates.True;
-                                //ObjectContextManager ocm = AcadHelpers.Database.ObjectContextManager;
-                                //ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
-                                //ObjectContexts.AddContext(_blockRecord, occ.GetContext("1:1"));
 
                                 var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
                                 //Debug.Print("Transformed copy");
