@@ -28,6 +28,15 @@
         /// <summary>Редактор активного документа</summary>
         public static Editor Editor => AcApp.DocumentManager.MdiActiveDocument.Editor;
 
+        public static ObjectContextCollection ObjectContextCollection
+        {
+            get
+            {
+                ObjectContextManager ocm = Database.ObjectContextManager;
+                return ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
+            }
+        }
+
         /// <summary>Список слоев текущей базы данных</summary>
         public static List<string> Layers
         {
