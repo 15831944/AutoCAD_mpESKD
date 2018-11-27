@@ -120,7 +120,7 @@
                     else
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
-                            attribute, 
+                            attribute,
                             keyForEditorAttribute,
                             entityType,
                             attribute.DefaultValue,
@@ -157,7 +157,7 @@
                     else if (attribute.Name == "LineType")
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
-                            attribute, 
+                            attribute,
                             keyForEditorAttribute,
                             entityType,
                             blockReference.Linetype,
@@ -166,7 +166,7 @@
                     else
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
-                            attribute, 
+                            attribute,
                             keyForEditorAttribute,
                             entityType,
                             propertyInfo.GetValue(entity),
@@ -197,7 +197,7 @@
                     var style = EntityStyles[i];
                     if (style.StyleType == StyleType.System)
                         continue;
-                    if(style.EntityType != entityType)
+                    if (style.EntityType != entityType)
                         continue;
                     EntityStyles.RemoveAt(i);
                 }
@@ -290,8 +290,40 @@
                         }
                     }
 
+                    style.CheckMissedProperties(entityType);
+
                     // add style
                     EntityStyles.Add(style);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Проверка стиля на наличие отсутствующих свойств. Свойства могут отсутствовать в случае,
+        /// если стиль уже был сохранен, но позже вышло обновление с добавлением нового свойства
+        /// </summary>
+        /// <param name="style">Проверяемый стиль</param>
+        /// <param name="entityType">Тип примитива</param>
+        private static void CheckMissedProperties(this IntellectualEntityStyle style, Type entityType)
+        {
+            foreach (PropertyInfo propertyInfo in entityType.GetProperties())
+            {
+                var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
+                var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
+                if (attribute != null && attribute.Name != "Style")
+                {
+                    if (attribute.PropertyScope != PropertyScope.PaletteAndStyleEditor)
+                        continue;
+                    // ReSharper disable once SimplifyLinqExpression
+                    if (!style.Properties.Any(p => p.Name == attribute.Name))
+                    {
+                        style.Properties.Add(new IntellectualEntityProperty(
+                        attribute,
+                        keyForEditorAttribute,
+                        entityType,
+                        attribute.DefaultValue,
+                        ObjectId.Null));
+                    }
                 }
             }
         }
@@ -401,7 +433,7 @@
             UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings,
                 "mp" + style.EntityType.Name,
                 "CurrentStyleGuid",
-                style.Guid, 
+                style.Guid,
                 true);
         }
 
@@ -487,7 +519,7 @@
         {
             EntityStyles.Remove(style);
         }
-        
+
         /// <summary>
         /// Возвращает значение свойства "Имя слоя" из стиля
         /// </summary>

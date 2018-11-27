@@ -178,14 +178,17 @@ namespace mpESKD.Functions.mpSection
         [SaveToXData]
         public string SheetNumber { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Позиция номера листа
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 7, "p54", "d54", AxisMarkersPosition.Both, null, null)]
+        [SaveToXData]
+        public AxisMarkersPosition SheetNumberPosition { get; set; } = AxisMarkersPosition.Both;
+
         private readonly string LastIntegerValue = string.Empty;
 
         private readonly string LastLetterValue = string.Empty;
-
-        public double TextActualWidth { get; private set; }
-
-        public double TextActualHeight { get; private set; }
-
+        
         /// <summary>
         /// Отступ средней точки верхнего текста вдоль верхней полки
         /// </summary>
@@ -412,15 +415,16 @@ namespace mpESKD.Functions.mpSection
             _bottomShelfArrow.AddVertexAt(1, bottomShelfStartPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
 
             // text
-            var textContents = GetTextContents();
-            if (!string.IsNullOrEmpty(textContents))
+            var textContentsForTopText = GetTextContents(true);
+            var textContentsForBottomText = GetTextContents(false);
+            if (!string.IsNullOrEmpty(textContentsForTopText) && !string.IsNullOrEmpty(textContentsForBottomText))
             {
                 var textStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
                 var textHeight = MainTextHeight * scale;
                 _topMText = new MText
                 {
                     TextStyleId = textStyleId,
-                    Contents = textContents,
+                    Contents = textContentsForTopText,
                     TextHeight = textHeight,
                     Attachment = AttachmentPoint.MiddleCenter
                 };
@@ -428,19 +432,19 @@ namespace mpESKD.Functions.mpSection
                 _bottomMText = new MText
                 {
                     TextStyleId = textStyleId,
-                    Contents = textContents,
+                    Contents = textContentsForBottomText,
                     TextHeight = textHeight,
                     Attachment = AttachmentPoint.MiddleCenter
                 };
 
-                TextActualHeight = _topMText.ActualHeight;
-                TextActualWidth = _topMText.ActualWidth;
+                //TextActualHeight = _topMText.ActualHeight;
+                //TextActualWidth = _topMText.ActualWidth;
 
                 var check = 1 / Math.Sqrt(2);
-                var alongShelfTextOffset = _topMText.ActualWidth / 2;
-                var acrossShelfTextOffset = _topMText.ActualHeight / 2;
 
                 // top
+                var alongShelfTextOffset = _topMText.ActualWidth / 2;
+                var acrossShelfTextOffset = _topMText.ActualHeight / 2;
                 if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
                 {
                     if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
@@ -459,14 +463,16 @@ namespace mpESKD.Functions.mpSection
                 else
                 {
                     var tempPoint = topShelfEndPoint +
-                                    (topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (TextActualWidth / 2));
-                    var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (TextActualHeight / 2)));
+                                    (topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2));
+                    var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2)));
                     _topMText.Location = topTextCenterPoint;
                 }
 
                 TopDesignationPoint = _topMText.Bounds.Value.MinPoint.TransformBy(BlockTransform);
 
                 // bottom
+                alongShelfTextOffset = _bottomMText.ActualWidth / 2;
+                acrossShelfTextOffset = _bottomMText.ActualHeight / 2;
                 if (double.IsNaN(AlongBottomShelfTextOffset) && double.IsNaN(AcrossBottomShelfTextOffset))
                 {
                     if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
@@ -483,9 +489,9 @@ namespace mpESKD.Functions.mpSection
                 else
                 {
                     var tempPoint = bottomShelfEndPoint + (bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() *
-                                    (AlongBottomShelfTextOffset + (TextActualWidth / 2));
+                                    (AlongBottomShelfTextOffset + (_bottomMText.ActualWidth / 2));
                     var bottomTextCenterPoint =
-                        tempPoint + bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (TextActualHeight / 2)));
+                        tempPoint + bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (_bottomMText.ActualHeight / 2)));
                     _bottomMText.Location = bottomTextCenterPoint;
                 }
 
@@ -592,24 +598,47 @@ namespace mpESKD.Functions.mpSection
         /// <summary>
         /// Содержимое для MText в зависимости от значений
         /// </summary>
+        /// <param name="isForTopText">True - содержимое для верхнего текста. False - содержимое для нижнего текста</param>
         /// <returns></returns>
-        private string GetTextContents()
+        private string GetTextContents(bool isForTopText)
         {
             SetFirstTextOnCreation();
 
             if (!HasTextValue())
                 return string.Empty;
 
+            var prefixAndDesignation = DesignationPrefix + Designation;
+            var allWithSameHeight = $"{DesignationPrefix}{Designation} ({SheetNumber})";
+            var allWithDifferentHeight = $"{DesignationPrefix}{Designation}{{\\H{SecondTextHeight / MainTextHeight}x;({SheetNumber})";
+            var isSameTextHeight = Math.Abs(MainTextHeight - SecondTextHeight) < 0.0001;
+
             // Если номер не указан, то обычный текст
             if (string.IsNullOrEmpty(SheetNumber))
-                return DesignationPrefix + Designation;
-
-            // Если номер указан, но высоты текста одинаковые, то обычный текст с номером
-            if (Math.Abs(MainTextHeight - SecondTextHeight) < 0.0001)
-                return $"{DesignationPrefix}{Designation} ({SheetNumber})";
+                return prefixAndDesignation;
 
             // Иначе форматированный текст для многострочного текста
-            return $"{DesignationPrefix}{Designation}{{\\H{SecondTextHeight / MainTextHeight}x; ({SheetNumber})";
+            
+            if (isForTopText)
+            {
+                if (SheetNumberPosition == AxisMarkersPosition.Both || SheetNumberPosition == AxisMarkersPosition.Top)
+                {
+                    // Если номер указан, но высоты текста одинаковые, то обычный текст с номером
+                    if (isSameTextHeight)
+                        return allWithSameHeight;
+
+                    return allWithDifferentHeight;
+                }
+                return prefixAndDesignation;
+            }
+
+            if (SheetNumberPosition == AxisMarkersPosition.Both || SheetNumberPosition == AxisMarkersPosition.Bottom)
+            {
+                if (isSameTextHeight)
+                    return allWithSameHeight;
+                return allWithDifferentHeight;
+            }
+
+            return prefixAndDesignation;
         }
 
         #endregion

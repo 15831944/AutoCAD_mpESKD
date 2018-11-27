@@ -781,10 +781,9 @@
                                 <CheckBox Grid.Row="2" Content="{Binding Source={StaticResource Lang}, XPath=h91}"
                                           IsChecked="{Binding Path=SectionUsePluginTextEditor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           ToolTip="{Binding Source={StaticResource Lang}, XPath=h92}"></CheckBox>
-                                <!-- todo translate and use h90 -->
-                                <CheckBox Grid.Row="2" Content="Dependent text movement"
+                                <CheckBox Grid.Row="3" Content="{Binding Source={StaticResource Lang}, XPath=h90}"
                                           IsChecked="{Binding Path=SectionUsePluginTextEditor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="Dependent text movement"></CheckBox>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h97}"></CheckBox>
                             </Grid>
                         </Border>
                     </TabItem>
