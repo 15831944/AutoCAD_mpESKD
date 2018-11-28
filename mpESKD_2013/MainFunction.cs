@@ -339,13 +339,11 @@
                         copyLayer = false;
                     else if (MainStaticSettings.Settings.LayerActionOnCreateAnalog == LayerActionOnCreateAnalog.Ask)
                     {
-                        //todo translate
-                        // todo translate in StyleEditor
-                        PromptKeywordOptions promptKeywordOptions = new PromptKeywordOptions("Copy layer? [Да/Нет]", "Yes No");
+                        PromptKeywordOptions promptKeywordOptions = 
+                            new PromptKeywordOptions("\n" + Language.GetItem(Invariables.LangItem, "msg8"), "Yes No");
                         var promptResult = AcadHelpers.Editor.GetKeywords(promptKeywordOptions);
                         if (promptResult.Status == PromptStatus.OK)
                         {
-                            AcadHelpers.WriteMessageInDebug("\nSelect keyword: " + promptResult.StringResult);
                             if (promptResult.StringResult == "No")
                                 copyLayer = false;
                         }

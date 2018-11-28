@@ -729,27 +729,26 @@
                         <Grid.Resources>
                             <enums:LayerActionOnCreateAnalogValueConverter x:Key="LayerActionOnCreateAnalogValueConverter"/>
                         </Grid.Resources>
-                        <!--todo translate -->
-                        <TextBlock Grid.Column="0" Text="Layer action:"
+                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h98}"
                                    Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
                         <ComboBox Grid.Column="1" SelectedIndex="{Binding Path=LayerActionOnCreateAnalog, Mode=TwoWay,
                             UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LayerActionOnCreateAnalogValueConverter}}">
-                            <ComboBoxItem Content="Copy"></ComboBoxItem>
-                            <ComboBoxItem Content="Not copy"></ComboBoxItem>
-                            <ComboBoxItem Content="Ask"></ComboBoxItem>
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la1}"></ComboBoxItem>
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la2}"></ComboBoxItem>
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la3}"></ComboBoxItem>
                         </ComboBox>
                     </Grid>
                     <!-- Maximum of selected objects -->
-                    <Grid Grid.Row="6">
+                    <Grid Grid.Row="6"
+                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h38}"
+                          ToolTipService.InitialShowDelay="0"
+                          ToolTipService.ShowDuration="30000">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <Grid.ToolTip>
-                            <TextBlock Margin="{DynamicResource ModPlusDefaultMargin}" MaxWidth="350" TextWrapping="Wrap"
-                                       Text="{Binding Source={StaticResource Lang}, XPath=h38}"></TextBlock>
-                        </Grid.ToolTip>
-                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h39}" ></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h39}" 
+                                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
                         <mps:NumericBox Grid.Column="1"  Minimum="0" Interval="50" NumericInputMode="Numbers"
                                            Value="{Binding Path=MaxSelectedObjects, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         </mps:NumericBox>
