@@ -34,7 +34,7 @@
         }
 
         /// <inheritdoc />
-        public void CreateAnalog(IntellectualEntity sourceEntity)
+        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
             // send statistic
             Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, MpVersionData.CurCadVers);
@@ -55,7 +55,7 @@
 
                 var blockReference = MainFunction.CreateBlock(section);
                 
-                section.SetPropertiesFromIntellectualEntity(sourceEntity);
+                section.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
                 
                 InsertSectionWithJig(true, section, blockReference);
             }

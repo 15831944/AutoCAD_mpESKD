@@ -6,6 +6,7 @@
                       xmlns:local="clr-namespace:mpESKD.Base.Styles"
                       xmlns:mps="https://modplus.org/winfx/xaml/controls"
                       xmlns:mpEskd="clr-namespace:mpESKD"
+                   xmlns:enums="clr-namespace:mpESKD.Base.Enums"
                       mc:Ignorable="d" SizeToContent="WidthAndHeight" 
                       ResizeMode="CanResizeWithGrip"
                       MinHeight="410" MinWidth="580" Closed="StyleEditor_OnClosed"
@@ -671,6 +672,7 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
                     <!--Use scale from style-->
                     <CheckBox Grid.Row="0" 
@@ -718,8 +720,27 @@
                                           ToolTip="{Binding Source={StaticResource Lang}, XPath=h37}"/>
                         </ComboBox>
                     </Grid>
-                    <!-- Maximum of selected objects -->
+                    <!-- LayerActionOnCreateAnalog -->
                     <Grid Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.Resources>
+                            <enums:LayerActionOnCreateAnalogValueConverter x:Key="LayerActionOnCreateAnalogValueConverter"/>
+                        </Grid.Resources>
+                        <!--todo translate -->
+                        <TextBlock Grid.Column="0" Text="Layer action:"
+                                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
+                        <ComboBox Grid.Column="1" SelectedIndex="{Binding Path=LayerActionOnCreateAnalog, Mode=TwoWay,
+                            UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LayerActionOnCreateAnalogValueConverter}}">
+                            <ComboBoxItem Content="Copy"></ComboBoxItem>
+                            <ComboBoxItem Content="Not copy"></ComboBoxItem>
+                            <ComboBoxItem Content="Ask"></ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+                    <!-- Maximum of selected objects -->
+                    <Grid Grid.Row="6">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>

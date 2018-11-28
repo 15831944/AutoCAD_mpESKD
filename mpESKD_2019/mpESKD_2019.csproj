@@ -121,6 +121,9 @@
     <Compile Include="..\mpESKD_2013\Base\Enums\JigState.cs">
       <Link>Base\Enums\JigState.cs</Link>
     </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\LayerActionOnCreateAnalog.cs">
+      <Link>Base\Enums\LayerActionOnCreateAnalog.cs</Link>
+    </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\PropertiesCategory.cs">
       <Link>Base\Enums\PropertiesCategory.cs</Link>
     </Compile>

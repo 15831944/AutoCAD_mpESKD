@@ -34,7 +34,7 @@
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance());
         }
 
-        public void CreateAnalog(IntellectualEntity sourceEntity)
+        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
             // send statistic
             Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, MpVersionData.CurCadVers);
@@ -55,7 +55,7 @@
 
                 var blockReference = MainFunction.CreateBlock(axis);
                 
-                axis.SetPropertiesFromIntellectualEntity(sourceEntity);
+                axis.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
 
                 // Отключаю видимость кружков направления
                 axis.TopOrientMarkerVisible = false;

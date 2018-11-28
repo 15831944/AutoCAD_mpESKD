@@ -33,7 +33,7 @@
         }
 
         /// <inheritdoc />
-        public void CreateAnalog(IntellectualEntity sourceEntity)
+        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
             // send statistic
             Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, MpVersionData.CurCadVers);
@@ -51,7 +51,7 @@
                 var groundLine = new GroundLine();
                 var blockReference = MainFunction.CreateBlock(groundLine);
 
-                groundLine.SetPropertiesFromIntellectualEntity(sourceEntity);
+                groundLine.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
 
                 InsertGroundLineWithJig(groundLine, blockReference);
             }

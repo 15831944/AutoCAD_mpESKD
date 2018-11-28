@@ -1,7 +1,9 @@
 ﻿namespace mpESKD
 {
+    using System;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
+    using Base.Enums;
     using ModPlusAPI;
 
     public class MainSettings : INotifyPropertyChanged
@@ -100,6 +102,25 @@
             {
                 _maxSelectedObject = value;
                 UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(MaxSelectedObjects), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        private LayerActionOnCreateAnalog _layerActionOnCreateAnalog;
+        /// <summary>
+        /// Работа со слоем при команде "Создать аналог". Возможные значения: Спросить, Копировать, Не копировать
+        /// </summary>
+        public LayerActionOnCreateAnalog LayerActionOnCreateAnalog
+        {
+            get => Enum.TryParse(
+                UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(LayerActionOnCreateAnalog)),
+                out LayerActionOnCreateAnalog e)
+                ? e
+                : LayerActionOnCreateAnalog.Ask;
+            set
+            {
+                _layerActionOnCreateAnalog = value;
+                UserConfigFile.SetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", nameof(LayerActionOnCreateAnalog), value.ToString(), true);
                 OnPropertyChanged();
             }
         }

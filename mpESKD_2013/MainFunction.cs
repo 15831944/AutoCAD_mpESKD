@@ -14,6 +14,7 @@
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.AutoCAD.Windows;
     using Base;
+    using Base.Enums;
     using Base.Helpers;
     using Functions.mpAxis;
     using Functions.mpSection;
@@ -333,13 +334,30 @@
 
                 if (intellectualEntity != null)
                 {
+                    var copyLayer = true;
+                    if (MainStaticSettings.Settings.LayerActionOnCreateAnalog == LayerActionOnCreateAnalog.NotCopy)
+                        copyLayer = false;
+                    else if (MainStaticSettings.Settings.LayerActionOnCreateAnalog == LayerActionOnCreateAnalog.Ask)
+                    {
+                        //todo translate
+                        // todo translate in StyleEditor
+                        PromptKeywordOptions promptKeywordOptions = new PromptKeywordOptions("Copy layer? [Да/Нет]", "Yes No");
+                        var promptResult = AcadHelpers.Editor.GetKeywords(promptKeywordOptions);
+                        if (promptResult.Status == PromptStatus.OK)
+                        {
+                            AcadHelpers.WriteMessageInDebug("\nSelect keyword: " + promptResult.StringResult);
+                            if (promptResult.StringResult == "No")
+                                copyLayer = false;
+                        }
+                        else copyLayer = false;
+                    }
                     var function = TypeFactory.Instance.GetEntityFunctionTypes().FirstOrDefault(f =>
                     {
                         var functionName = $"{intellectualEntity.GetType().Name}Function";
                         var fName = f.GetType().Name;
                         return fName == functionName;
                     });
-                    function?.CreateAnalog(intellectualEntity);
+                    function?.CreateAnalog(intellectualEntity, copyLayer);
                 }
             }
         }

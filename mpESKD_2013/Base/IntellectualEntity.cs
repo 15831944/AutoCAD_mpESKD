@@ -519,12 +519,13 @@ namespace mpESKD.Base
         /// Копирование свойств, отмеченных атрибутом <see cref="SaveToXDataAttribute"/> из расширенных данных примитива AutoCAD
         /// в текущий интеллектуальный примитив
         /// </summary>
-        public void SetPropertiesFromIntellectualEntity(IntellectualEntity sourceEntity)
+        public void SetPropertiesFromIntellectualEntity(IntellectualEntity sourceEntity, bool copyLayer)
         {
             ResultBuffer dataForXData = sourceEntity.GetDataForXData();
             if (dataForXData != null)
             {
                 SetPropertiesValuesFromXData(dataForXData, true);
+
                 if (sourceEntity.BlockId != ObjectId.Null)
                 {
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
@@ -534,7 +535,8 @@ namespace mpESKD.Base
                         if (entity != null && destinationBlockReference != null)
                         {
                             destinationBlockReference.LinetypeId = entity.LinetypeId;
-                            destinationBlockReference.Layer = entity.Layer;
+                            if(copyLayer)
+                                destinationBlockReference.Layer = entity.Layer;
                         }
 
                         tr.Commit();

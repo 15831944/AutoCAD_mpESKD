@@ -31,7 +31,7 @@
         }
 
         /// <inheritdoc />
-        public void CreateAnalog(IntellectualEntity sourceEntity)
+        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
             // send statistic
             Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, MpVersionData.CurCadVers);
@@ -47,7 +47,7 @@
                 var breakLine = new BreakLine();
                 var blockReference = MainFunction.CreateBlock(breakLine);
                 
-                breakLine.SetPropertiesFromIntellectualEntity(sourceEntity);
+                breakLine.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
 
                 InsertBreakLineWithJig(breakLine, blockReference);
             }
