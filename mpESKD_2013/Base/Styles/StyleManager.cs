@@ -590,6 +590,7 @@
                                 {
                                     propertyInfo.SetValue(entity, propertyFromStyle.Value);
                                 }
+                                else entity.Scale = AcadHelpers.GetCurrentScale();
                             }
                             else propertyInfo.SetValue(entity, propertyFromStyle.Value);
                         }

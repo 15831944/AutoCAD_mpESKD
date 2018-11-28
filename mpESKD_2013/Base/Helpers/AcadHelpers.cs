@@ -80,6 +80,14 @@
             }
         }
 
+        /// <summary>
+        /// Текущий аннотативный масштаб
+        /// </summary>
+        public static AnnotationScale GetCurrentScale()
+        {
+            return ObjectContextCollection.CurrentContext as AnnotationScale;
+        }
+
         /// <summary>Текстовые стили текущего чертежа</summary>
         public static List<string> TextStyles
         {
