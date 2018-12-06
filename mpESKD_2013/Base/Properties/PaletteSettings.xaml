@@ -1,7 +1,6 @@
 ﻿<mps:ModPlusWindow x:Class="mpESKD.Base.Properties.PaletteSettings"
                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                     xmlns:mpc="clr-namespace:ModPlusAPI.Windows.Mpc;assembly=ModPlusAPI"
                      xmlns:mps="https://modplus.org/winfx/xaml/controls"
                      SizeToContent="WidthAndHeight" KeyDown="LmSettings_OnKeyDown" ResizeMode="NoResize">
     <Window.Resources>
