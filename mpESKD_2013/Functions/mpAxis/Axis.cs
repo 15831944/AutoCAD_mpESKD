@@ -54,8 +54,8 @@ namespace mpESKD.Functions.mpAxis
         public override string LineType { get; set; } = "осевая";
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 5, "p6", "d6", 1.0, 0.0, 1.0000E+99)]
-        public override double LineTypeScale { get; set; }
+        [EntityProperty(PropertiesCategory.General, 5, "p6", "d6", 10.0, 0.0, 1.0000E+99)]
+        public override double LineTypeScale { get; set; } = 10;
 
         /// <inheritdoc />
         [EntityProperty(PropertiesCategory.Content, 1, "p17", "d17", "Standard", null, null)]

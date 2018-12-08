@@ -407,7 +407,22 @@ namespace mpESKD.Base
                     byte[] bytes = stream.ToArray();
                     string json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
                     AcadHelpers.WriteMessageInDebug($"Length of json: {json.Length}");
-                    resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, json));
+
+                    // Так как в одной строке нельзя хранить более 255 символов, то сохраняю данные, разбив их на части
+                    List<string> dataToSave = new List<string>();
+                    if (json.Length > 255)
+                    {
+                        do
+                        {
+                            dataToSave.Add(json.Substring(0, 255));
+                            json = json.Substring(255);
+                        } while (json.Length > 255);
+                        dataToSave.Add(json);
+                    }
+                    else dataToSave.Add(json);
+
+                    dataToSave.ForEach(s => resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, s)));
+                    //resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, json));
                 }
 
                 return resultBuffer;
@@ -432,10 +447,11 @@ namespace mpESKD.Base
                     tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
                 if (typedValue1001.Value != null)
                 {
-                    var typedValue1000 = resultBuffer.AsArray().FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataAsciiString);
-                    if (typedValue1000.Value != null)
+                    //var typedValue1000 = resultBuffer.AsArray().FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataAsciiString);
+                    var json = GetJsonFromXDataValues(resultBuffer);
+                    if (!string.IsNullOrEmpty(json))
                     {
-                        using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(typedValue1000.Value.ToString())))
+                        using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json)))
                         {
                             DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Dictionary<string, object>),
                                 new DataContractJsonSerializerSettings { UseSimpleDictionaryFormat = true });
@@ -513,6 +529,17 @@ namespace mpESKD.Base
             {
                 ExceptionBox.Show(exception);
             }
+        }
+
+        private string GetJsonFromXDataValues(ResultBuffer resultBuffer)
+        {
+            string json = string.Empty;
+            foreach (TypedValue typedValue in resultBuffer.AsArray().Where(tv => tv.TypeCode == (int)DxfCode.ExtendedDataAsciiString))
+            {
+                json += typedValue.Value.ToString();
+            }
+
+            return json;
         }
 
         /// <summary>
