@@ -13,6 +13,8 @@ namespace mpESKD.Base
     using Helpers;
     using ModPlusAPI.Windows;
     using System.Reflection;
+    using System.Runtime.Serialization;
+    using System.Runtime.Serialization.Formatters.Binary;
     using System.Runtime.Serialization.Json;
     using System.Text;
     using Autodesk.AutoCAD.Colors;
@@ -399,30 +401,21 @@ namespace mpESKD.Base
                     }
                 }
 
-                using (MemoryStream stream = new MemoryStream())
+                DataHolder dataHolder = new DataHolder(propertiesDataDictionary);
+                var binaryFormatter = new BinaryFormatter();
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Dictionary<string, object>),
-                        new DataContractJsonSerializerSettings() { UseSimpleDictionaryFormat = true });
-                    serializer.WriteObject(stream, propertiesDataDictionary);
-                    byte[] bytes = stream.ToArray();
-                    string json = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-                    AcadHelpers.WriteMessageInDebug($"Length of json: {json.Length}");
-
-                    // Так как в одной строке нельзя хранить более 255 символов, то сохраняю данные, разбив их на части
-                    List<string> dataToSave = new List<string>();
-                    if (json.Length > 255)
+                    binaryFormatter.Serialize(ms, dataHolder);
+                    ms.Position = 0;
+                    AcadHelpers.WriteMessageInDebug($"MemoryStream Length: {ms.Length} bytes or {ms.Length / 1024} KB");
+                    int kMaxChunkSize = 127;
+                    for (int i = 0; i < ms.Length; i += kMaxChunkSize)
                     {
-                        do
-                        {
-                            dataToSave.Add(json.Substring(0, 255));
-                            json = json.Substring(255);
-                        } while (json.Length > 255);
-                        dataToSave.Add(json);
+                        var length = (int)Math.Min(ms.Length - i, kMaxChunkSize);
+                        byte[] dataChunk = new byte[length];
+                        ms.Read(dataChunk, 0, length);
+                        resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataBinaryChunk, dataChunk));
                     }
-                    else dataToSave.Add(json);
-
-                    dataToSave.ForEach(s => resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, s)));
-                    //resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataAsciiString, json));
                 }
 
                 return resultBuffer;
@@ -447,81 +440,21 @@ namespace mpESKD.Base
                     tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
                 if (typedValue1001.Value != null)
                 {
-                    //var typedValue1000 = resultBuffer.AsArray().FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataAsciiString);
+                    //todo со временем убрать совсем
                     var json = GetJsonFromXDataValues(resultBuffer);
                     if (!string.IsNullOrEmpty(json))
                     {
                         using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json)))
                         {
-                            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Dictionary<string, object>),
-                                new DataContractJsonSerializerSettings { UseSimpleDictionaryFormat = true });
-                            if (serializer.ReadObject(ms) is Dictionary<string, object> data)
-                            {
-                                foreach (PropertyInfo propertyInfo in GetType().GetProperties())
-                                {
-                                    var attribute = propertyInfo.GetCustomAttribute<SaveToXDataAttribute>();
-                                    if (attribute != null && data.ContainsKey(propertyInfo.Name))
-                                    {
-                                        string valueForProperty = data[propertyInfo.Name] != null
-                                            ? data[propertyInfo.Name].ToString()
-                                            : string.Empty;
-                                        if (string.IsNullOrEmpty(valueForProperty))
-                                            continue;
-
-                                        if (propertyInfo.Name == nameof(StyleGuid))
-                                        {
-                                            Style = StyleManager.GetStyleNameByGuid(GetType(), valueForProperty);
-                                        }
-                                        else if (propertyInfo.Name == nameof(Scale))
-                                        {
-                                            Scale = AcadHelpers.GetAnnotationScaleByName(valueForProperty);
-                                        }
-                                        else if (propertyInfo.PropertyType == typeof(Point3d))
-                                        {
-                                            if (skipPoints)
-                                                continue;
-                                            var vector = valueForProperty.ParseToPoint3d().GetAsVector();
-                                            var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
-                                            propertyInfo.SetValue(this, point);
-                                        }
-                                        else if (propertyInfo.PropertyType == typeof(List<Point3d>))
-                                        {
-                                            if (skipPoints)
-                                                continue;
-                                            List<Point3d> points = new List<Point3d>();
-                                            foreach (string s in valueForProperty.Split('#'))
-                                            {
-                                                var vector = s.ParseToPoint3d().GetAsVector();
-                                                var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
-                                                points.Add(point);
-                                            }
-
-                                            propertyInfo.SetValue(this, points);
-                                        }
-                                        else if (propertyInfo.PropertyType == typeof(int))
-                                        {
-                                            propertyInfo.SetValue(this, Convert.ToInt32(valueForProperty));
-                                        }
-                                        else if (propertyInfo.PropertyType == typeof(double))
-                                        {
-                                            propertyInfo.SetValue(this, Convert.ToDouble(valueForProperty));
-                                        }
-                                        else if (propertyInfo.PropertyType == typeof(bool))
-                                        {
-                                            propertyInfo.SetValue(this, Convert.ToBoolean(valueForProperty));
-                                        }
-                                        else if (propertyInfo.PropertyType.BaseType == typeof(Enum))
-                                        {
-                                            propertyInfo.SetValue(this, Enum.Parse(propertyInfo.PropertyType, valueForProperty));
-                                        }
-                                        else
-                                        {
-                                            propertyInfo.SetValue(this, valueForProperty);
-                                        }
-                                    }
-                                }
-                            }
+                            WritePropertiesFromMemoryStream(skipPoints, ms);
                         }
+                    }
+                    else
+                    {
+                        var binaryFormatter = new BinaryFormatter { Binder = new Binder() };
+                        var memoryStream = GetMemoryStreamFromResultBuffer(resultBuffer);
+                        var dataHolder = (DataHolder)binaryFormatter.Deserialize(memoryStream);
+                        WritePropertiesFromReadedData(skipPoints, dataHolder.Data);
                     }
                 }
             }
@@ -531,15 +464,141 @@ namespace mpESKD.Base
             }
         }
 
+        private MemoryStream GetMemoryStreamFromResultBuffer(ResultBuffer resultBuffer)
+        {
+            var memoryStream = new MemoryStream();
+
+            foreach (TypedValue typedValue in resultBuffer.AsArray()
+                .Where(tv => tv.TypeCode == (int)DxfCode.ExtendedDataBinaryChunk))
+            {
+                var dataChunk = (byte[])typedValue.Value;
+                memoryStream.Write(dataChunk, 0, dataChunk.Length);
+            }
+
+            memoryStream.Position = 0;
+
+            return memoryStream;
+        }
+
+        //todo со временем убрать совсем
         private string GetJsonFromXDataValues(ResultBuffer resultBuffer)
         {
             string json = string.Empty;
-            foreach (TypedValue typedValue in resultBuffer.AsArray().Where(tv => tv.TypeCode == (int)DxfCode.ExtendedDataAsciiString))
+            foreach (TypedValue typedValue in resultBuffer.AsArray()
+                .Where(tv => tv.TypeCode == (int)DxfCode.ExtendedDataAsciiString))
             {
                 json += typedValue.Value.ToString();
             }
 
             return json;
+        }
+
+        [Serializable]
+        internal class DataHolder
+        {
+            public DataHolder(Dictionary<string, object> data)
+            {
+                Data = data;
+            }
+
+            public Dictionary<string, object> Data { get; }
+        }
+
+        internal class Binder : SerializationBinder
+        {
+            public override Type BindToType(string assemblyName, string typeName)
+            {
+                return Type.GetType($"{typeName}, {assemblyName}");
+            }
+        }
+
+        /// <summary>
+        /// Запись данных в интеллектуальный объект из объекта <see cref="MemoryStream"/>, представляющего собой Json
+        /// </summary>
+        /// <param name="skipPoints"></param>
+        /// <param name="ms"></param>
+        //todo со временем убрать совсем
+        private void WritePropertiesFromMemoryStream(bool skipPoints, MemoryStream ms)
+        {
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Dictionary<string, object>),
+                new DataContractJsonSerializerSettings { UseSimpleDictionaryFormat = true });
+            if (serializer.ReadObject(ms) is Dictionary<string, object> data)
+            {
+                WritePropertiesFromReadedData(skipPoints, data);
+            }
+        }
+
+        /// <summary>
+        /// Запись свойств текущего экземпляра интеллектуального объекта, полученных из расширенных
+        /// данных блока в виде словаря
+        /// </summary>
+        /// <param name="skipPoints"></param>
+        /// <param name="data"></param>
+        private void WritePropertiesFromReadedData(bool skipPoints, Dictionary<string, object> data)
+        {
+            foreach (PropertyInfo propertyInfo in GetType().GetProperties())
+            {
+                var attribute = propertyInfo.GetCustomAttribute<SaveToXDataAttribute>();
+                if (attribute != null && data.ContainsKey(propertyInfo.Name))
+                {
+                    string valueForProperty = data[propertyInfo.Name] != null
+                        ? data[propertyInfo.Name].ToString()
+                        : string.Empty;
+                    if (string.IsNullOrEmpty(valueForProperty))
+                        continue;
+
+                    if (propertyInfo.Name == nameof(StyleGuid))
+                    {
+                        Style = StyleManager.GetStyleNameByGuid(GetType(), valueForProperty);
+                    }
+                    else if (propertyInfo.Name == nameof(Scale))
+                    {
+                        Scale = AcadHelpers.GetAnnotationScaleByName(valueForProperty);
+                    }
+                    else if (propertyInfo.PropertyType == typeof(Point3d))
+                    {
+                        if (skipPoints)
+                            continue;
+                        var vector = valueForProperty.ParseToPoint3d().GetAsVector();
+                        var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
+                        propertyInfo.SetValue(this, point);
+                    }
+                    else if (propertyInfo.PropertyType == typeof(List<Point3d>))
+                    {
+                        if (skipPoints)
+                            continue;
+                        List<Point3d> points = new List<Point3d>();
+                        foreach (string s in valueForProperty.Split('#'))
+                        {
+                            var vector = s.ParseToPoint3d().GetAsVector();
+                            var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
+                            points.Add(point);
+                        }
+
+                        propertyInfo.SetValue(this, points);
+                    }
+                    else if (propertyInfo.PropertyType == typeof(int))
+                    {
+                        propertyInfo.SetValue(this, Convert.ToInt32(valueForProperty));
+                    }
+                    else if (propertyInfo.PropertyType == typeof(double))
+                    {
+                        propertyInfo.SetValue(this, Convert.ToDouble(valueForProperty));
+                    }
+                    else if (propertyInfo.PropertyType == typeof(bool))
+                    {
+                        propertyInfo.SetValue(this, Convert.ToBoolean(valueForProperty));
+                    }
+                    else if (propertyInfo.PropertyType.BaseType == typeof(Enum))
+                    {
+                        propertyInfo.SetValue(this, Enum.Parse(propertyInfo.PropertyType, valueForProperty));
+                    }
+                    else
+                    {
+                        propertyInfo.SetValue(this, valueForProperty);
+                    }
+                }
+            }
         }
 
         /// <summary>
