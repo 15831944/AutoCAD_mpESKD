@@ -18,9 +18,9 @@ namespace mpESKD.Base
     using System.Runtime.Serialization.Json;
     using System.Text;
     using Autodesk.AutoCAD.Colors;
-    using Autodesk.AutoCAD.Internal;
     using Enums;
     using ModPlusAPI.Annotations;
+    using ModPlusAPI.FunctionDataHelpers.mpESKD;
     using Styles;
 
     public abstract class IntellectualEntity : IDisposable
@@ -401,6 +401,12 @@ namespace mpESKD.Base
                     }
                 }
 
+                /*
+                 * Так как SerializationBinder использует имя сборки, то данные сохраненные в 2013 версии, не будут
+                 * работать в других, так как имя сборки отличается. В связи с этим вспомогательный класс хранения
+                 * данных вынесен в ModPlusAPI, которая имеет всегда одинаковое имя и версию
+                 */
+
                 DataHolder dataHolder = new DataHolder(propertiesDataDictionary);
                 var binaryFormatter = new BinaryFormatter();
                 using (MemoryStream ms = new MemoryStream())
@@ -491,25 +497,6 @@ namespace mpESKD.Base
             }
 
             return json;
-        }
-
-        [Serializable]
-        internal class DataHolder
-        {
-            public DataHolder(Dictionary<string, object> data)
-            {
-                Data = data;
-            }
-
-            public Dictionary<string, object> Data { get; }
-        }
-
-        internal class Binder : SerializationBinder
-        {
-            public override Type BindToType(string assemblyName, string typeName)
-            {
-                return Type.GetType($"{typeName}, {assemblyName}");
-            }
         }
 
         /// <summary>
@@ -658,6 +645,14 @@ namespace mpESKD.Base
         public void Dispose()
         {
             _blockRecord?.Dispose();
+        }
+    }
+
+    public class Binder : SerializationBinder
+    {
+        public override Type BindToType(string assemblyName, string typeName)
+        {
+            return Type.GetType($"{typeName}, {assemblyName}");
         }
     }
 }
