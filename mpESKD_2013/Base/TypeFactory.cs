@@ -29,6 +29,25 @@
         }
 
         /// <summary>
+        /// Возвращает дескриптор для примитива по типу примитива
+        /// </summary>
+        /// <param name="entityType">Тип примитива</param>
+        /// <returns></returns>
+        public IIntellectualEntityDescriptor GetDescriptor(Type entityType)
+        {
+            if (entityType == typeof(BreakLine))
+                return BreakLineDescriptor.Instance;
+            if (entityType == typeof(Axis))
+                return AxisDescriptor.Instance;
+            if (entityType == typeof(GroundLine))
+                return GroundLineDescriptor.Instance;
+            if (entityType == typeof(Section))
+                return SectionDescriptor.Instance;
+
+            return null;
+        }
+
+        /// <summary>
         /// Возвращает список экземпляров функций, реализующих интерфейс <see cref="IIntellectualEntityFunction"/>
         /// </summary>
         public List<IIntellectualEntityFunction> GetEntityFunctionTypes()

@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;A2017</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -25,7 +25,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;A2017</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -121,6 +121,9 @@
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\PropertyScope.cs">
       <Link>Base\Enums\PropertyScope.cs</Link>
+    </Compile>
+    <Compile Include="..\mpESKD_2013\Base\Enums\SearchProceedOption.cs">
+      <Link>Base\Enums\SearchProceedOption.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\StyleType.cs">
       <Link>Base\Enums\StyleType.cs</Link>
@@ -326,20 +329,25 @@
       <Link>Functions\mpSection\SectionValueEditor.xaml.cs</Link>
       <DependentUpon>SectionValueEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\mpeskd_2013\functions\searchentities\SearchEntitiesCommand.cs">
+      <Link>Functions\SearchEntities\SearchEntitiesCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\mpeskd_2013\functions\searchentities\SearchEntitiesSettings.xaml.cs">
+      <Link>Functions\SearchEntities\SearchEntitiesSettings.xaml.cs</Link>
+      <DependentUpon>SearchEntitiesSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="..\mpESKD_2013\MainFunction.cs">
       <Link>MainFunction.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\MainSettings.cs">
       <Link>MainSettings.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Properties\Annotations.cs">
-      <Link>Properties\Annotations.cs</Link>
+    <Compile Include="..\mpESKD_2013\ModPlusConnector.cs">
+      <Link>ModPlusConnector.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Properties\AssemblyInfoCommon.cs">
-      <Link>Properties\AssemblyInfoCommon.cs</Link>
+    <Compile Include="..\mpESKD_2013\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Interface.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -389,6 +397,11 @@
     </Page>
     <Page Include="..\mpESKD_2013\Functions\mpSection\SectionValueEditor.xaml">
       <Link>Functions\mpSection\SectionValueEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\functions\searchentities\SearchEntitiesSettings.xaml">
+      <Link>Functions\SearchEntities\SearchEntitiesSettings.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -458,7 +471,14 @@
       <Link>Resources\StyleEditor_32x32_dark.png</Link>
     </Resource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="..\mpESKD_2013\Resources\SearchEntities_32x32.png">
+      <Link>Resources\SearchEntities_32x32.png</Link>
+    </Resource>
+    <Resource Include="..\mpESKD_2013\Resources\SearchEntities_32x32_dark.png">
+      <Link>Resources\SearchEntities_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png">
       <Link>Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png</Link>
@@ -495,6 +515,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(ModPlusPostBuild)" "AutoCAD" "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Debug (
+"$(ModPlusPostBuild)" "AutoCAD" "$(TargetPath)"
+)
+if $(ConfigurationName) == Release (
+"$(ModPlusPostBuild)" "AutoCAD" "$(TargetPath)" "s"
+)</PostBuildEvent>
   </PropertyGroup>
 </Project>

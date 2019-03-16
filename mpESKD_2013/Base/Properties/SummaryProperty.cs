@@ -5,10 +5,10 @@
     using System.ComponentModel;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using Annotations;
     using Autodesk.AutoCAD.DatabaseServices;
     using Enums;
     using Helpers;
+    using ModPlusAPI.Annotations;
 
     public class SummaryProperty : INotifyPropertyChanged
     {

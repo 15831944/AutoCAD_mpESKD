@@ -6,8 +6,8 @@
     using System.Runtime.CompilerServices;
     using System.Windows;
     using System.Xml.Linq;
-    using Annotations;
     using Enums;
+    using ModPlusAPI.Annotations;
     using Properties;
 
     public class IntellectualEntityStyle : INotifyPropertyChanged

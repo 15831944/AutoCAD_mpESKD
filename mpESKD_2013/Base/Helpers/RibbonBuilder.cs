@@ -118,6 +118,10 @@
                 AddAxisPanel(ribTab);
                 AddLinesPanel(ribTab);
                 AddViewsPanel(ribTab);
+                
+                // tools 
+                AddToolsPanel(ribTab);
+                
                 // add settings panel
                 AddSettingsPanel(ribTab);
                 ////////////////////////
@@ -197,6 +201,39 @@
                 ribSourcePanel.Items.Add(ribRowPanel);
         }
 
+        /// <summary>
+        /// Добавить панель "Утилиты"
+        /// </summary>
+        private static void AddToolsPanel(RibbonTab ribTab)
+        {
+            //create the panel source
+            var ribSourcePanel = new RibbonPanelSource
+            {
+                Title = Language.GetItem(Invariables.LangItem, "tab9")
+            };
+            // now the panel
+            var ribPanel = new RibbonPanel
+            {
+                Source = ribSourcePanel
+            };
+            ribTab.Panels.Add(ribPanel);
+
+            var ribRowPanel = new RibbonRowPanel();
+            ribRowPanel.Items.Add(
+                RibbonHelpers.AddBigButton(
+                    "mpESKDSearch",
+                    Language.GetItem(Invariables.LangItem, "tab10"),
+                    _colorTheme == 1 // 1 - light
+                        ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/SearchEntities_32x32.png"
+                        : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/SearchEntities_32x32_dark.png",
+                    Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, "", "", "help/mpeskd"
+                ));
+            ribSourcePanel.Items.Add(ribRowPanel);
+        }
+
+        /// <summary>
+        /// Добавить панель "Настройки"
+        /// </summary>
         private static void AddSettingsPanel(RibbonTab ribTab)
         {
             //create the panel source
@@ -219,7 +256,7 @@
                     _colorTheme == 1 // 1 - light
                     ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32.png"
                     : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, "", ""
+                    Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, "", "", "help/mpeskd"
                 ));
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
@@ -228,7 +265,7 @@
                     _colorTheme == 1 // 1 - light
                     ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32.png"
                     : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab7"), Orientation.Vertical, "", ""
+                    Language.GetItem(Invariables.LangItem, "tab7"), Orientation.Vertical, "", "", "help/mpeskd"
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
         }
@@ -285,7 +322,8 @@
                 descriptor.Description,
                 orientation,
                 descriptor.FullDescription,
-                GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage)
+                GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
+                "help/mpeskd"
             );
         }
 
@@ -307,7 +345,8 @@
                     descriptor.SubDescriptions[i],
                     orientation,
                     descriptor.SubFullDescriptions[i],
-                    GetHelpImageForFunction(descriptor.Name, descriptor.SubHelpImages[i])
+                    GetHelpImageForFunction(descriptor.Name, descriptor.SubHelpImages[i]),
+                    "help/mpeskd"
                 ));
             }
 

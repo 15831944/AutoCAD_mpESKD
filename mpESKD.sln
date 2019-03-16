@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28711.60
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mpESKD_2018", "mpESKD_2018\mpESKD_2018.csproj", "{06E3DA7D-EDAE-402E-BDE1-BE643E066C55}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mpESKD_2017", "mpESKD_2017\mpESKD_2017.csproj", "{5521EDFD-2121-4DAA-8041-E848C83A969F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mpESKD_2019", "mpESKD_2019\mpESKD_2019.csproj", "{6B3D5A9A-CB8E-442B-87A7-9195FD7CAC51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mpESKD_2020", "mpESKD_2020\mpESKD_2020.csproj", "{7E79B65C-3D79-4097-9A11-C4B2C8BE9E31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{6B3D5A9A-CB8E-442B-87A7-9195FD7CAC51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B3D5A9A-CB8E-442B-87A7-9195FD7CAC51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B3D5A9A-CB8E-442B-87A7-9195FD7CAC51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E79B65C-3D79-4097-9A11-C4B2C8BE9E31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E79B65C-3D79-4097-9A11-C4B2C8BE9E31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E79B65C-3D79-4097-9A11-C4B2C8BE9E31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E79B65C-3D79-4097-9A11-C4B2C8BE9E31}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

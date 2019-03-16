@@ -4,20 +4,21 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C606B042-13C8-4027-AD76-12161617CC07}</ProjectGuid>
+    <ProjectGuid>{7E79B65C-3D79-4097-9A11-C4B2C8BE9E31}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>mpESKD</RootNamespace>
-    <AssemblyName>mpESKD_2016</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <AssemblyName>mpESKD_2020</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;A2016</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;A2020</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -25,234 +26,250 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;A2016</DefineConstants>
+    <DefineConstants>TRACE;A2020</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="accoremgd">
-      <HintPath>C:\_Acad dlls\2016\accoremgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="acdbmgd">
-      <HintPath>C:\_Acad dlls\2016\acdbmgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="acmgd">
-      <HintPath>C:\_Acad dlls\2016\acmgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AdWindows">
-      <HintPath>C:\_Acad dlls\2016\AdWindows.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ModPlusAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlusAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ModPlusStyle">
-      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlusStyle.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ModPlus_2016">
-      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\ModPlus_2016.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\ModPlus\Extensions\System.Windows.Interactivity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\mpESKD_2013\Base\Attributes.cs">
+    <Page Include="..\mpeskd_2013\base\properties\controls\ControlStyles.xaml">
+      <Link>Base\Properties\Controls\ControlStyles.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\base\properties\controls\ControlStylesForEditor.xaml">
+      <Link>Base\Properties\Controls\ControlStylesForEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\base\properties\controls\DoubleTextBox.xaml">
+      <Link>Base\Properties\Controls\DoubleTextBox.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\base\properties\controls\IntTextBox.xaml">
+      <Link>Base\Properties\Controls\IntTextBox.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\base\properties\PaletteSettings.xaml">
+      <Link>Base\Properties\PaletteSettings.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\base\properties\PropertiesPalette.xaml">
+      <Link>Base\Properties\PropertiesPalette.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\base\styles\StyleEditor.xaml">
+      <Link>Base\Styles\StyleEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\functions\mpaxis\AxisValueEditor.xaml">
+      <Link>Functions\mpAxis\AxisValueEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\functions\mpsection\SectionValueEditor.xaml">
+      <Link>Functions\mpSection\SectionValueEditor.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\mpeskd_2013\functions\searchentities\SearchEntitiesSettings.xaml">
+      <Link>Functions\SearchEntities\SearchEntitiesSettings.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\mpeskd_2013\base\Attributes.cs">
       <Link>Base\Attributes.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\DefaultEntityJig.cs">
+    <Compile Include="..\mpeskd_2013\base\DefaultEntityJig.cs">
       <Link>Base\DefaultEntityJig.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\EntityReaderFactory.cs">
+    <Compile Include="..\mpeskd_2013\base\EntityReaderFactory.cs">
       <Link>Base\EntityReaderFactory.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\AxisMarkersPosition.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\AxisMarkersPosition.cs">
       <Link>Base\Enums\AxisMarkersPosition.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\AxisMarkerType.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\AxisMarkerType.cs">
       <Link>Base\Enums\AxisMarkerType.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\BreakLineType.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\BreakLineType.cs">
       <Link>Base\Enums\BreakLineType.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\EntityDirection.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\EntityDirection.cs">
       <Link>Base\Enums\EntityDirection.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\GripType.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\GripType.cs">
       <Link>Base\Enums\GripType.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\GroundLineFirstStrokeOffset.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\GroundLineFirstStrokeOffset.cs">
       <Link>Base\Enums\GroundLineFirstStrokeOffset.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\JigState.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\JigState.cs">
       <Link>Base\Enums\JigState.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\LayerActionOnCreateAnalog.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\LayerActionOnCreateAnalog.cs">
       <Link>Base\Enums\LayerActionOnCreateAnalog.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\PropertiesCategory.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\PropertiesCategory.cs">
       <Link>Base\Enums\PropertiesCategory.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\PropertyScope.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\PropertyScope.cs">
       <Link>Base\Enums\PropertyScope.cs</Link>
     </Compile>
     <Compile Include="..\mpESKD_2013\Base\Enums\SearchProceedOption.cs">
       <Link>Base\Enums\SearchProceedOption.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Enums\StyleType.cs">
+    <Compile Include="..\mpeskd_2013\base\enums\StyleType.cs">
       <Link>Base\Enums\StyleType.cs</Link>
     </Compile>
     <Compile Include="..\mpeskd_2013\base\enums\UpdateVariant.cs">
       <Link>Base\Enums\UpdateVariant.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Helpers\AcadHelpers.cs">
+    <Compile Include="..\mpeskd_2013\base\helpers\AcadHelpers.cs">
       <Link>Base\Helpers\AcadHelpers.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Helpers\GeometryHelpers.cs">
+    <Compile Include="..\mpeskd_2013\base\helpers\GeometryHelpers.cs">
       <Link>Base\Helpers\GeometryHelpers.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Helpers\JigHelper.cs">
+    <Compile Include="..\mpeskd_2013\base\helpers\JigHelper.cs">
       <Link>Base\Helpers\JigHelper.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Helpers\LayerHelper.cs">
+    <Compile Include="..\mpeskd_2013\base\helpers\LayerHelper.cs">
       <Link>Base\Helpers\LayerHelper.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Helpers\LocalizationHelper.cs">
+    <Compile Include="..\mpeskd_2013\base\helpers\LocalizationHelper.cs">
       <Link>Base\Helpers\LocalizationHelper.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Helpers\MathExtensions.cs">
+    <Compile Include="..\mpeskd_2013\base\helpers\MathExtensions.cs">
       <Link>Base\Helpers\MathExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Helpers\RelayCommand.cs">
+    <Compile Include="..\mpeskd_2013\base\helpers\RelayCommand.cs">
       <Link>Base\Helpers\RelayCommand.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Helpers\RibbonBuilder.cs">
+    <Compile Include="..\mpeskd_2013\base\helpers\RibbonBuilder.cs">
       <Link>Base\Helpers\RibbonBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Helpers\TextStyleHelper.cs">
+    <Compile Include="..\mpeskd_2013\base\helpers\TextStyleHelper.cs">
       <Link>Base\Helpers\TextStyleHelper.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\IIntellectualEntityDescriptor.cs">
+    <Compile Include="..\mpeskd_2013\base\IIntellectualEntityDescriptor.cs">
       <Link>Base\IIntellectualEntityDescriptor.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\IIntellectualEntityFunction.cs">
+    <Compile Include="..\mpeskd_2013\base\IIntellectualEntityFunction.cs">
       <Link>Base\IIntellectualEntityFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\IntellectualEntity.cs">
+    <Compile Include="..\mpeskd_2013\base\IntellectualEntity.cs">
       <Link>Base\IntellectualEntity.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Invariables.cs">
+    <Compile Include="..\mpeskd_2013\base\Invariables.cs">
       <Link>Base\Invariables.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Overrules\IntellectualEntityGripData.cs">
+    <Compile Include="..\mpeskd_2013\base\overrules\IntellectualEntityGripData.cs">
       <Link>Base\Overrules\IntellectualEntityGripData.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\Controls\ControlStyles.xaml.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\controls\ControlStyles.xaml.cs">
       <Link>Base\Properties\Controls\ControlStyles.xaml.cs</Link>
       <DependentUpon>ControlStyles.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\Controls\ControlStylesForEditor.xaml.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\controls\ControlStylesForEditor.xaml.cs">
       <Link>Base\Properties\Controls\ControlStylesForEditor.xaml.cs</Link>
       <DependentUpon>ControlStylesForEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\Controls\DoubleTextBox.xaml.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\controls\DoubleTextBox.xaml.cs">
       <Link>Base\Properties\Controls\DoubleTextBox.xaml.cs</Link>
       <DependentUpon>DoubleTextBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\Controls\IntTextBox.xaml.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\controls\IntTextBox.xaml.cs">
       <Link>Base\Properties\Controls\IntTextBox.xaml.cs</Link>
       <DependentUpon>IntTextBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\Converters\TextInputToVisibilityConverterForInt.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\converters\TextInputToVisibilityConverterForInt.cs">
       <Link>Base\Properties\Converters\TextInputToVisibilityConverterForInt.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\Converters\ToTextConverter.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\converters\ToTextConverter.cs">
       <Link>Base\Properties\Converters\ToTextConverter.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\Converters\ValidationRules.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\converters\ValidationRules.cs">
       <Link>Base\Properties\Converters\ValidationRules.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\Converters\ValueConverters.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\converters\ValueConverters.cs">
       <Link>Base\Properties\Converters\ValueConverters.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\EntityPropertyProvider.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\EntityPropertyProvider.cs">
       <Link>Base\Properties\EntityPropertyProvider.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\EnumPropertyValueConverter.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\EnumPropertyValueConverter.cs">
       <Link>Base\Properties\EnumPropertyValueConverter.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\IntellectualEntityProperty.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\IntellectualEntityProperty.cs">
       <Link>Base\Properties\IntellectualEntityProperty.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\PaletteSettings.xaml.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\PaletteSettings.xaml.cs">
       <Link>Base\Properties\PaletteSettings.xaml.cs</Link>
       <DependentUpon>PaletteSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\PropertiesHelpers.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\PropertiesHelpers.cs">
       <Link>Base\Properties\PropertiesHelpers.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\PropertiesPalette.xaml.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\PropertiesPalette.xaml.cs">
       <Link>Base\Properties\PropertiesPalette.xaml.cs</Link>
       <DependentUpon>PropertiesPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\PropertiesPaletteFunction.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\PropertiesPaletteFunction.cs">
       <Link>Base\Properties\PropertiesPaletteFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\SummaryProperty.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\SummaryProperty.cs">
       <Link>Base\Properties\SummaryProperty.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Properties\SummaryPropertyCollection.cs">
+    <Compile Include="..\mpeskd_2013\base\properties\SummaryPropertyCollection.cs">
       <Link>Base\Properties\SummaryPropertyCollection.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Styles\EntityStyles.cs">
+    <Compile Include="..\mpeskd_2013\base\styles\EntityStyles.cs">
       <Link>Base\Styles\EntityStyles.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Styles\Helpers.cs">
+    <Compile Include="..\mpeskd_2013\base\styles\Helpers.cs">
       <Link>Base\Styles\Helpers.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Styles\IntellectualEntityStyle.cs">
+    <Compile Include="..\mpeskd_2013\base\styles\IntellectualEntityStyle.cs">
       <Link>Base\Styles\IntellectualEntityStyle.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Styles\StyleEditor.xaml.cs">
+    <Compile Include="..\mpeskd_2013\base\styles\StyleEditor.xaml.cs">
       <Link>Base\Styles\StyleEditor.xaml.cs</Link>
       <DependentUpon>StyleEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\Styles\StyleManager.cs">
+    <Compile Include="..\mpeskd_2013\base\styles\StyleManager.cs">
       <Link>Base\Styles\StyleManager.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Base\TypeFactory.cs">
+    <Compile Include="..\mpeskd_2013\base\TypeFactory.cs">
       <Link>Base\TypeFactory.cs</Link>
     </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpaxis\Axis.cs">
       <Link>Functions\mpAxis\Axis.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpAxis\AxisDescriptor.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpaxis\AxisDescriptor.cs">
       <Link>Functions\mpAxis\AxisDescriptor.cs</Link>
     </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpaxis\AxisFunction.cs">
@@ -274,7 +291,7 @@
     <Compile Include="..\mpeskd_2013\functions\mpbreakline\BreakLine.cs">
       <Link>Functions\mpBreakLine\BreakLine.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpBreakLine\BreakLineDescriptor.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpbreakline\BreakLineDescriptor.cs">
       <Link>Functions\mpBreakLine\BreakLineDescriptor.cs</Link>
     </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpbreakline\BreakLineFunction.cs">
@@ -292,19 +309,19 @@
     <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLine.cs">
       <Link>Functions\mpGroundLine\GroundLine.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\GroundLineDescriptor.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLineDescriptor.cs">
       <Link>Functions\mpGroundLine\GroundLineDescriptor.cs</Link>
     </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpgroundline\GroundLineFunction.cs">
       <Link>Functions\mpGroundLine\GroundLineFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpgroundline\overrules\GroundLineGripPointOverrule.cs">
       <Link>Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpgroundline\overrules\GroundLineObjectOverrule.cs">
       <Link>Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpgroundline\overrules\GroundLineOsnapOverrule.cs">
       <Link>Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs</Link>
     </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpsection\overrules\SectionGripPointOverrule.cs">
@@ -319,13 +336,13 @@
     <Compile Include="..\mpeskd_2013\functions\mpsection\Section.cs">
       <Link>Functions\mpSection\Section.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpSection\SectionDescriptor.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpsection\SectionDescriptor.cs">
       <Link>Functions\mpSection\SectionDescriptor.cs</Link>
     </Compile>
     <Compile Include="..\mpeskd_2013\functions\mpsection\SectionFunction.cs">
       <Link>Functions\mpSection\SectionFunction.cs</Link>
     </Compile>
-    <Compile Include="..\mpESKD_2013\Functions\mpSection\SectionValueEditor.xaml.cs">
+    <Compile Include="..\mpeskd_2013\functions\mpsection\SectionValueEditor.xaml.cs">
       <Link>Functions\mpSection\SectionValueEditor.xaml.cs</Link>
       <DependentUpon>SectionValueEditor.xaml</DependentUpon>
     </Compile>
@@ -353,86 +370,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="..\mpESKD_2013\Base\Properties\Controls\ControlStyles.xaml">
-      <Link>Base\Properties\Controls\ControlStyles.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpESKD_2013\Base\Properties\Controls\ControlStylesForEditor.xaml">
-      <Link>Base\Properties\Controls\ControlStylesForEditor.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpESKD_2013\Base\Properties\Controls\DoubleTextBox.xaml">
-      <Link>Base\Properties\Controls\DoubleTextBox.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpESKD_2013\Base\Properties\Controls\IntTextBox.xaml">
-      <Link>Base\Properties\Controls\IntTextBox.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpESKD_2013\Base\Properties\PaletteSettings.xaml">
-      <Link>Base\Properties\PaletteSettings.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpESKD_2013\Base\Properties\PropertiesPalette.xaml">
-      <Link>Base\Properties\PropertiesPalette.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpESKD_2013\Base\Styles\StyleEditor.xaml">
-      <Link>Base\Styles\StyleEditor.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpeskd_2013\functions\mpaxis\AxisValueEditor.xaml">
-      <Link>Functions\mpAxis\AxisValueEditor.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpESKD_2013\Functions\mpSection\SectionValueEditor.xaml">
-      <Link>Functions\mpSection\SectionValueEditor.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\mpeskd_2013\functions\searchentities\SearchEntitiesSettings.xaml">
-      <Link>Functions\SearchEntities\SearchEntitiesSettings.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="..\mpESKD_2013\Resources\mpESKD_32x32.png">
-      <Link>Resources\mpESKD_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Resources\Properties_32x32.png">
-      <Link>Resources\Properties_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Resources\StyleEditor_32x32.png">
-      <Link>Resources\StyleEditor_32x32.png</Link>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="..\mpESKD_2013\Resources\Properties_32x32_dark.png">
-      <Link>Resources\Properties_32x32_dark.png</Link>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="..\mpESKD_2013\Resources\StyleEditor_32x32_dark.png">
-      <Link>Resources\StyleEditor_32x32_dark.png</Link>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="..\mpeskd_2013\functions\mpaxis\icons\mpAxis_32x32.png">
@@ -490,45 +427,86 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpgroundline\icons\mpGroundLine_32x32.png">
+      <Link>Functions\mpGroundLine\Icons\mpGroundLine_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpgroundline\icons\mpGroundLine_32x32_dark.png">
+      <Link>Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpgroundline\icons\mpGroundLineFromPolyline_32x32.png">
+      <Link>Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpgroundline\icons\mpGroundLineFromPolyline_32x32_dark.png">
+      <Link>Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpsection\icons\mpSection_32x32.png">
+      <Link>Functions\mpSection\Icons\mpSection_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpsection\icons\mpSection_32x32_dark.png">
+      <Link>Functions\mpSection\Icons\mpSection_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpsection\icons\mpSectionBroken_32x32.png">
+      <Link>Functions\mpSection\Icons\mpSectionBroken_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpsection\icons\mpSectionBroken_32x32_dark.png">
+      <Link>Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpsection\icons\mpSectionFromPolyline_32x32.png">
+      <Link>Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\functions\mpsection\icons\mpSectionFromPolyline_32x32_dark.png">
+      <Link>Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\resources\mpESKD_32x32.png">
+      <Link>Resources\mpESKD_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\resources\Properties_32x32.png">
+      <Link>Resources\Properties_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\resources\Properties_32x32_dark.png">
+      <Link>Resources\Properties_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\resources\StyleEditor_32x32.png">
+      <Link>Resources\StyleEditor_32x32.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\mpeskd_2013\resources\StyleEditor_32x32_dark.png">
+      <Link>Resources\StyleEditor_32x32_dark.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="..\mpESKD_2013\Resources\SearchEntities_32x32.png">
       <Link>Resources\SearchEntities_32x32.png</Link>
     </Resource>
     <Resource Include="..\mpESKD_2013\Resources\SearchEntities_32x32_dark.png">
       <Link>Resources\SearchEntities_32x32_dark.png</Link>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png">
-      <Link>Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png">
-      <Link>Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLine_32x32.png">
-      <Link>Functions\mpGroundLine\Icons\mpGroundLine_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png">
-      <Link>Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png</Link>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSectionBroken_32x32.png">
-      <Link>Functions\mpSection\Icons\mpSectionBroken_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png">
-      <Link>Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png">
-      <Link>Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png">
-      <Link>Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSection_32x32.png">
-      <Link>Functions\mpSection\Icons\mpSection_32x32.png</Link>
-    </Resource>
-    <Resource Include="..\mpESKD_2013\Functions\mpSection\Icons\mpSection_32x32_dark.png">
-      <Link>Functions\mpSection\Icons\mpSection_32x32_dark.png</Link>
     </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

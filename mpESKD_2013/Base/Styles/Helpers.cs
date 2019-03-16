@@ -12,6 +12,7 @@
     public static class StyleEditorWork
     {
         private static StyleEditor _styleEditor;
+       
         [CommandMethod("ModPlus", "mpStyleEditor", CommandFlags.Modal)]
         public static void OpenStyleEditor()
         {
