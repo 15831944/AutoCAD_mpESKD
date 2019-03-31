@@ -37,7 +37,7 @@
         public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
             // send statistic
-            Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
             try
             {
                 Overrule.Overruling = false;
@@ -85,7 +85,7 @@
         public void CreateSectionFromPolylineCommand()
         {
             // send statistic
-            Statistic.SendCommandStarting("mpSectionFromPolyline", MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting("mpSectionFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
             try
             {
                 var peo = new PromptEntityOptions("\n" + Language.GetItem(Invariables.LangItem, "msg6"))
@@ -167,7 +167,7 @@
         private static void CreateSection(bool isSimple)
         {
             // send statistic
-            Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 
             try
             {

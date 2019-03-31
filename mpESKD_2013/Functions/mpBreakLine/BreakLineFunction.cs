@@ -34,7 +34,7 @@
         public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
             // send statistic
-            Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
             try
             {
                 Overrule.Overruling = false;
@@ -80,7 +80,7 @@
         private static void CreateBreakLine(BreakLineType breakLineType)
         {
             // send statistic
-            Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
             try
             {
                 Overrule.Overruling = false;

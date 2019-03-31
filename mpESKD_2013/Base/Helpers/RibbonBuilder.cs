@@ -224,8 +224,8 @@
                     "mpESKDSearch",
                     Language.GetItem(Invariables.LangItem, "tab10"),
                     _colorTheme == 1 // 1 - light
-                        ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/SearchEntities_32x32.png"
-                        : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/SearchEntities_32x32_dark.png",
+                        ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/SearchEntities_32x32.png"
+                        : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/SearchEntities_32x32_dark.png",
                     Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, "", "", "help/mpeskd"
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
@@ -254,8 +254,8 @@
                     "mpStyleEditor",
                     Language.GetItem(Invariables.LangItem, "tab4"),
                     _colorTheme == 1 // 1 - light
-                    ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32.png"
-                    : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/StyleEditor_32x32_dark.png",
+                    ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/StyleEditor_32x32.png"
+                    : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/StyleEditor_32x32_dark.png",
                     Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, "", "", "help/mpeskd"
                 ));
             ribRowPanel.Items.Add(
@@ -263,8 +263,8 @@
                     "mpPropertiesPalette",
                     ConvertLName(Language.GetItem(Invariables.LangItem, "tab6")),
                     _colorTheme == 1 // 1 - light
-                    ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32.png"
-                    : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Resources/Properties_32x32_dark.png",
+                    ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/Properties_32x32.png"
+                    : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/Properties_32x32_dark.png",
                     Language.GetItem(Invariables.LangItem, "tab7"), Orientation.Vertical, "", "", "help/mpeskd"
                 ));
             ribSourcePanel.Items.Add(ribRowPanel);
@@ -356,24 +356,24 @@
         private static string GetBigIconForFunction(string functionName, string subFunctionName)
         {
             return _colorTheme == 1
-                ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
+                ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
                   functionName + "/Icons/" + subFunctionName + "_32x32.png"
-                : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
+                : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
                   functionName + "/Icons/" + subFunctionName + "_32x32_dark.png";
         }
 
         private static string GetSmallIconForFunction(string functionName, string subFunctionName)
         {
             return _colorTheme == 1
-                ? "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
+                ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
                    functionName + "/Icons/" + subFunctionName + "_16x16.png"
-                : "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
+                : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
                   functionName + "/Icons/" + subFunctionName + "_16x16_dark.png";
         }
 
         private static string GetHelpImageForFunction(string functionName, string imgName)
         {
-            return "pack://application:,,,/mpESKD_" + MpVersionData.CurCadVers + ";component/Functions/" +
+            return "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
                    functionName + "/Help/" + imgName;
         }
 

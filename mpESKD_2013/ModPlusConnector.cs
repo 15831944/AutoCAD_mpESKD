@@ -6,6 +6,10 @@ namespace mpESKD
 {
     public class ModPlusConnector : IModPlusFunctionInterface
     {
+        private static ModPlusConnector _instance;
+
+        public static ModPlusConnector Instance => _instance ?? (_instance = new ModPlusConnector());
+
         public SupportedProduct SupportedProduct => SupportedProduct.AutoCAD;
         
         public string Name => "mpESKD";

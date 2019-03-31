@@ -37,7 +37,7 @@
         public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
             // send statistic
-            Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
             try
             {
                 Overrule.Overruling = false;
@@ -82,7 +82,7 @@
         private static void CreateAxis()
         {
             // send statistic
-            Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
             try
             {
                 Overrule.Overruling = false;

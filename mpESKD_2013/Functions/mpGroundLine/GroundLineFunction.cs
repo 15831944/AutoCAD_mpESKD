@@ -36,7 +36,7 @@
         public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
             // send statistic
-            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 
             try
             {
@@ -80,7 +80,7 @@
         private void CreateGroundLine()
         {
             // send statistic
-            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 
             try
             {
@@ -176,7 +176,7 @@
         private void CreateGroundLineFromPolyline()
         {
             // send statistic
-            Statistic.SendCommandStarting("mpGroundLineFromPolyline", MpVersionData.CurCadVers);
+            Statistic.SendCommandStarting("mpGroundLineFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
             try
             {
                 var peo = new PromptEntityOptions("\n" + Language.GetItem(Invariables.LangItem, "msg6"))
