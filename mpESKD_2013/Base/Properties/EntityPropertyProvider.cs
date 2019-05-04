@@ -149,6 +149,9 @@ namespace mpESKD.Base.Properties
                 {
                     _intellectualEntity = intellectualEntity;
 
+                    Debug.Print($"Style name: {_intellectualEntity.Style}");
+                    Debug.Print($"Style guid: {_intellectualEntity.StyleGuid}");
+
                     var entityType = intellectualEntity.GetType();
 
                     foreach (var propertyInfo in entityType.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))

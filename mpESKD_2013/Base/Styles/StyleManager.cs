@@ -492,7 +492,12 @@
         /// </summary>
         public static string GetStyleNameByGuid(Type entityType, string guid)
         {
-            return EntityStyles.FirstOrDefault(s => s.EntityType == entityType && s.Guid == guid)?.Name;
+            IntellectualEntityStyle style = EntityStyles.FirstOrDefault(s => s.EntityType == entityType && s.Guid == guid);
+            if (style != null)
+                return style.Name;
+
+            // Стиль отсутствует в базе
+            return Language.GetItem(Invariables.LangItem, "h103");
         }
 
         /// <summary>

@@ -536,6 +536,7 @@ namespace mpESKD.Base
 
                     if (propertyInfo.Name == nameof(StyleGuid))
                     {
+                        StyleGuid = valueForProperty;
                         Style = StyleManager.GetStyleNameByGuid(GetType(), valueForProperty);
                     }
                     else if (propertyInfo.Name == nameof(Scale))
