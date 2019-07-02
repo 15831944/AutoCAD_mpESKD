@@ -112,7 +112,6 @@
                         property.Value = AcadHelpers.GetAnnotationScaleByName(value.ToString());
                     else
                         property.Value = value;
-
                 }
                 OnPropertyChanged();
             }

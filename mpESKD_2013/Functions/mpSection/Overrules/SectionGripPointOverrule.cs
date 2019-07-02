@@ -353,7 +353,7 @@
                 {
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite);
+                        var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                         using (var resBuf = Section.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
@@ -454,7 +454,7 @@
                 {
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite);
+                        var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                         using (var resBuf = Section.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
@@ -574,7 +574,7 @@
                     Section.BlockRecord.UpdateAnonymousBlocks();
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite);
+                        var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                         if (newInsertionPoint.HasValue)
                             ((BlockReference)blkRef).Position = newInsertionPoint.Value;
                         using (var resBuf = Section.GetDataForXData())
@@ -683,7 +683,7 @@
                 Section.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite);
+                    var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                     if (newInsertionPoint.HasValue)
                         ((BlockReference)blkRef).Position = newInsertionPoint.Value;
                     using (var resBuf = Section.GetDataForXData())
@@ -746,7 +746,7 @@
                 Section.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite);
+                    var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                     ((BlockReference)blkRef).Position = newInsertionPoint;
                     using (var resBuf = Section.GetDataForXData())
                     {

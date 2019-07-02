@@ -129,7 +129,7 @@
                 {
                     using (Transaction tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                     {
-                        var obj = tr.GetObject(ids[0], OpenMode.ForWrite);
+                        var obj = tr.GetObject(ids[0], OpenMode.ForWrite, true, true);
                         if (obj is BlockReference blockReference)
                         {
                             // axis

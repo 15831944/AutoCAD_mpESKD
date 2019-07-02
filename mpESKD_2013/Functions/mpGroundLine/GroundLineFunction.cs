@@ -151,7 +151,7 @@
                         {
                             using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                             {
-                                var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite);
+                                var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                                 obj.Erase(true);
                                 tr.Commit();
                             }
@@ -166,7 +166,7 @@
             {
                 using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
                 {
-                    var ent = tr.GetObject(groundLine.BlockId, OpenMode.ForWrite);
+                    var ent = tr.GetObject(groundLine.BlockId, OpenMode.ForWrite, true, true);
                     ent.XData = groundLine.GetDataForXData();
                     tr.Commit();
                 }
@@ -224,7 +224,7 @@
                             groundLine.UpdateEntities();
                             groundLine.BlockRecord.UpdateAnonymousBlocks();
 
-                            var ent = (BlockReference)tr.GetObject(groundLine.BlockId, OpenMode.ForWrite);
+                            var ent = (BlockReference)tr.GetObject(groundLine.BlockId, OpenMode.ForWrite, true, true);
                             ent.Position = pline.GetPoint3dAt(0);
                             ent.XData = groundLine.GetDataForXData();
                         }
@@ -239,7 +239,7 @@
                     {
                         using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                         {
-                            var dbObj = tr.GetObject(plineId, OpenMode.ForWrite);
+                            var dbObj = tr.GetObject(plineId, OpenMode.ForWrite, true, true);
                             dbObj.Erase(true);
                             tr.Commit();
                         }

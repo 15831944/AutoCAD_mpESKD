@@ -201,7 +201,7 @@
                     {
                         using (Transaction tr = Database.TransactionManager.StartTransaction())
                         {
-                            var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                            var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
                             if (blockReference != null) blockReference.Layer = layerName;
                             tr.Commit();
                         }
@@ -217,7 +217,7 @@
                                 using (Transaction tr = Database.TransactionManager.StartTransaction())
                                 {
                                     var blockReference =
-                                        tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                                        tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
                                     if (blockReference != null) blockReference.Layer = layerName;
                                     tr.Commit();
                                 }
@@ -230,7 +230,7 @@
                 if (Database.Clayer != ObjectId.Null && blkRefObjectId != ObjectId.Null)
                     using (Transaction tr = Database.TransactionManager.StartTransaction())
                     {
-                        var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                        var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
                         var layer = tr.GetObject(Database.Clayer, OpenMode.ForRead) as LayerTableRecord;
                         if (blockReference != null) blockReference.Layer = layer?.Name;
                         tr.Commit();
@@ -319,7 +319,7 @@
             {
                 using (var tr = Document.TransactionManager.StartTransaction())
                 {
-                    var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite) as BlockReference;
+                    var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
                     if (blockReference != null)
                     {
                         if (HasLineType(lineTypeName, tr))

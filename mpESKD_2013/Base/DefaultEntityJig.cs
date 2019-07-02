@@ -91,7 +91,7 @@
                 {
                     using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                     {
-                        var obj = (BlockReference)tr.GetObject(Entity.Id, OpenMode.ForWrite, true);
+                        var obj = (BlockReference)tr.GetObject(Entity.Id, OpenMode.ForWrite, true, true);
                         obj.Position = _intellectualEntity.InsertionPoint;
                         obj.BlockUnit = AcadHelpers.Database.Insunits;
                         tr.Commit();

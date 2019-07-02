@@ -15,8 +15,6 @@ namespace mpESKD.Base
     using System.Reflection;
     using System.Runtime.Serialization;
     using System.Runtime.Serialization.Formatters.Binary;
-    using System.Runtime.Serialization.Json;
-    using System.Text;
     using Autodesk.AutoCAD.Colors;
     using Enums;
     using ModPlusAPI.Annotations;
@@ -187,14 +185,14 @@ namespace mpESKD.Base
                         {
                             using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
                             {
-                                var blkRef = (BlockReference)tr.GetObject(BlockId, OpenMode.ForWrite);
-                                _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite);
+                                var blkRef = (BlockReference)tr.GetObject(BlockId, OpenMode.ForWrite, true, true);
+                                _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite, true, true);
                                 if (_blockRecord.GetBlockReferenceIds(true, true).Count <= 1)
                                 {
                                     //Debug.Print("Erasing");
                                     foreach (var objectId in _blockRecord)
                                     {
-                                        tr.GetObject(objectId, OpenMode.ForWrite).Erase();
+                                        tr.GetObject(objectId, OpenMode.ForWrite, true, true).Erase();
                                     }
                                 }
                                 else
@@ -215,8 +213,8 @@ namespace mpESKD.Base
 
                             using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
                             {
-                                var blkRef = (BlockReference)tr.GetObject(BlockId, OpenMode.ForWrite);
-                                _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite);
+                                var blkRef = (BlockReference)tr.GetObject(BlockId, OpenMode.ForWrite, true, true);
+                                _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite, true, true);
                                 _blockRecord.BlockScaling = BlockScaling.Uniform;
 
                                 var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
@@ -280,7 +278,7 @@ namespace mpESKD.Base
 
                 using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    blockTableRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite);
+                    blockTableRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite, true, true);
                     blockTableRecord.BlockScaling = BlockScaling.Uniform;
                     var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
                     foreach (var entity in _entities)
@@ -443,26 +441,19 @@ namespace mpESKD.Base
             try
             {
                 TypedValue typedValue1001 = resultBuffer.AsArray().FirstOrDefault(tv =>
-                    tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
+                    tv.TypeCode == (int) DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
                 if (typedValue1001.Value != null)
                 {
-                    //todo со временем убрать совсем
-                    var json = GetJsonFromXDataValues(resultBuffer);
-                    if (!string.IsNullOrEmpty(json))
-                    {
-                        using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json)))
-                        {
-                            WritePropertiesFromMemoryStream(skipPoints, ms);
-                        }
-                    }
-                    else
-                    {
-                        var binaryFormatter = new BinaryFormatter { Binder = new Binder() };
-                        var memoryStream = GetMemoryStreamFromResultBuffer(resultBuffer);
-                        var dataHolder = (DataHolder)binaryFormatter.Deserialize(memoryStream);
+                    var binaryFormatter = new BinaryFormatter { Binder = new Binder() };
+                    var memoryStream = GetMemoryStreamFromResultBuffer(resultBuffer);
+                    var deserialize = binaryFormatter.Deserialize(memoryStream);
+                    if (deserialize is DataHolder dataHolder)
                         WritePropertiesFromReadedData(skipPoints, dataHolder.Data);
-                    }
                 }
+            }
+            catch (SerializationException)
+            {
+                // ignore
             }
             catch (Exception exception)
             {
@@ -485,36 +476,7 @@ namespace mpESKD.Base
 
             return memoryStream;
         }
-
-        //todo со временем убрать совсем
-        private string GetJsonFromXDataValues(ResultBuffer resultBuffer)
-        {
-            string json = string.Empty;
-            foreach (TypedValue typedValue in resultBuffer.AsArray()
-                .Where(tv => tv.TypeCode == (int)DxfCode.ExtendedDataAsciiString))
-            {
-                json += typedValue.Value.ToString();
-            }
-
-            return json;
-        }
-
-        /// <summary>
-        /// Запись данных в интеллектуальный объект из объекта <see cref="MemoryStream"/>, представляющего собой Json
-        /// </summary>
-        /// <param name="skipPoints"></param>
-        /// <param name="ms"></param>
-        //todo со временем убрать совсем
-        private void WritePropertiesFromMemoryStream(bool skipPoints, MemoryStream ms)
-        {
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Dictionary<string, object>),
-                new DataContractJsonSerializerSettings { UseSimpleDictionaryFormat = true });
-            if (serializer.ReadObject(ms) is Dictionary<string, object> data)
-            {
-                WritePropertiesFromReadedData(skipPoints, data);
-            }
-        }
-
+        
         /// <summary>
         /// Запись свойств текущего экземпляра интеллектуального объекта, полученных из расширенных
         /// данных блока в виде словаря
@@ -605,7 +567,7 @@ namespace mpESKD.Base
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var entity = tr.GetObject(sourceEntity.BlockId, OpenMode.ForRead) as Entity;
-                        var destinationBlockReference = tr.GetObject(BlockId, OpenMode.ForWrite) as BlockReference;
+                        var destinationBlockReference = tr.GetObject(BlockId, OpenMode.ForWrite, true, true) as BlockReference;
                         if (entity != null && destinationBlockReference != null)
                         {
                             destinationBlockReference.LinetypeId = entity.LinetypeId;

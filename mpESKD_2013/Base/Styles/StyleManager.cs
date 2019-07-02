@@ -604,6 +604,7 @@
                             var layerName = propertyFromStyle.Value.ToString();
                             if (string.IsNullOrEmpty(layerName))
                                 layerName = Language.GetItem(Invariables.LangItem, "defl");
+                            
                             if (isOnEntityCreation)
                             {
                                 if (MainStaticSettings.Settings.UseLayerFromStyle)

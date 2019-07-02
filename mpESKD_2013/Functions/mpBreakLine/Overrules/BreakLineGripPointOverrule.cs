@@ -249,7 +249,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                 {
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(BreakLine.BlockId, OpenMode.ForWrite);
+                        var blkRef = tr.GetObject(BreakLine.BlockId, OpenMode.ForWrite, true, true);
                         using (var resBuf = BreakLine.GetDataForXData())
                         {
                             blkRef.XData = resBuf;

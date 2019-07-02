@@ -1,10 +1,11 @@
-﻿using System;
-using System.Xml.Linq;
-using Autodesk.AutoCAD.Colors;
-using Autodesk.AutoCAD.DatabaseServices;
-
-namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Helpers
 {
+    using System;
+    using System.Xml.Linq;
+    using Autodesk.AutoCAD.Colors;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using ModPlusAPI.Annotations;
+
     public static class LayerHelper
     {
         /// <summary>Проверка наличия слоя в документе по имени</summary>
@@ -23,6 +24,7 @@ namespace mpESKD.Base.Helpers
             }
             return false;
         }
+
         /// <summary>Получение LayerTableRecord по имени слоя</summary>
         /// <param name="layerName">Имя слоя</param>
         public static LayerTableRecord GetLayerTableRecordByLayerName(string layerName)
@@ -35,7 +37,7 @@ namespace mpESKD.Base.Helpers
                     if (lt != null)
                         foreach (ObjectId layerId in lt)
                         {
-                            var layer = tr.GetObject(layerId, OpenMode.ForWrite) as LayerTableRecord;
+                            var layer = tr.GetObject(layerId, OpenMode.ForRead) as LayerTableRecord;
                             if (layer != null && layer.Name.Equals(layerName))
                                 return layer;
                         }
@@ -43,6 +45,31 @@ namespace mpESKD.Base.Helpers
             }
             return null;
         }
+
+        /// <summary>
+        /// Проверка не заблокирован ли слой
+        /// </summary>
+        /// <param name="layerName">Имя слоя</param>
+        public static bool IsLockedLayer(string layerName)
+        {
+            using (AcadHelpers.Document.LockDocument())
+            {
+                using (OpenCloseTransaction tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    LayerTable lt = tr.GetObject(AcadHelpers.Database.LayerTableId, OpenMode.ForRead) as LayerTable;
+                    if (lt != null)
+                        foreach (ObjectId layerId in lt)
+                        {
+                            var layer = tr.GetObject(layerId, OpenMode.ForRead) as LayerTableRecord;
+                            if (layer != null && layer.Name.Equals(layerName))
+                                return layer.IsLocked;
+                        }
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>Создание слоя в текущем документе по данным, сохраненным в файле стилей</summary>
         /// <param name="layerXElement"></param>
         public static bool AddLayerFromXelement(XElement layerXElement)
@@ -72,6 +99,7 @@ namespace mpESKD.Base.Helpers
                 }
             return layerCreated;
         }
+
         // save layers to xml
         public static XElement SetLayerXml(LayerTableRecord layerTableRecord)
         {

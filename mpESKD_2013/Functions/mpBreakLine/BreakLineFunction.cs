@@ -131,7 +131,7 @@
                     {
                         using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                         {
-                            var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite);
+                            var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                             obj.Erase(true);
                             tr.Commit();
                         }
@@ -145,7 +145,7 @@
             {
                 using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
                 {
-                    var ent = tr.GetObject(breakLine.BlockId, OpenMode.ForWrite);
+                    var ent = tr.GetObject(breakLine.BlockId, OpenMode.ForWrite, true, true);
                     ent.XData = breakLine.GetDataForXData();
                     tr.Commit();
                 }

@@ -7,6 +7,7 @@
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Helpers;
+    using ModPlusAPI.Windows;
 
     public class SummaryPropertyCollection : ObservableCollection<SummaryProperty>
     {
@@ -14,10 +15,11 @@
         {
             foreach (ObjectId objectId in objectIds)
             {
-                EntityPropertyProvider data = new EntityPropertyProvider(objectId);
-                if (data.IsValid)
+                EntityPropertyProvider entityPropertyProvider = new EntityPropertyProvider(objectId);
+                if (entityPropertyProvider.IsValid)
                 {
-                    foreach (IntellectualEntityProperty entityProperty in data.Properties)
+                    entityPropertyProvider.OnLockedLayerEventHandler += EntityPropertyProviderOnOnLockedLayerEventHandler;
+                    foreach (IntellectualEntityProperty entityProperty in entityPropertyProvider.Properties)
                     {
                         var allowableSummaryProperty = this.FirstOrDefault(
                             si => si.EntityPropertyDataCollection
@@ -27,7 +29,7 @@
                                            ep.Value.GetType() == entityProperty.Value.GetType()));
                         if (allowableSummaryProperty == null)
                         {
-                            SummaryProperty summaryProperty = new SummaryProperty(data.EntityType);
+                            SummaryProperty summaryProperty = new SummaryProperty(entityPropertyProvider.EntityType);
                             summaryProperty.AddProperty(entityProperty);
                             Add(summaryProperty);
                         }
@@ -46,6 +48,8 @@
             data.PropertyChanged += Data_AnyPropertyChanged;
         }
 
+        private bool _hasObjectOnLockedLayer = false;
+
         private void Data_AnyPropertyChanged(object sender, EventArgs e)
         {
             foreach (SummaryProperty summaryProperty in this)
@@ -55,6 +59,18 @@
                     OnPropertyChanged(new PropertyChangedEventArgs(property.Name));
                 }
             }
+
+            if (_hasObjectOnLockedLayer)
+            {
+                _hasObjectOnLockedLayer = false;
+                MessageBox.Show("On locked layer", MessageBoxIcon.Close);
+            }
+        }
+
+        private void EntityPropertyProviderOnOnLockedLayerEventHandler(object sender, IntellectualEntityProperty e)
+        {
+            _hasObjectOnLockedLayer = true;
+            
         }
     }
 }

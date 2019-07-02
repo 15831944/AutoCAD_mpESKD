@@ -49,6 +49,11 @@ namespace mpESKD.Base.Properties
 
         public bool IsValid { get; set; }
 
+        /// <summary>
+        /// Событие, происходящее при попытке отредактировать свойство примитива, находящегося на заблокированном слое
+        /// </summary>
+        public event EventHandler<IntellectualEntityProperty> OnLockedLayerEventHandler;
+
         public bool Verify(ObjectId breakLineObjectId)
         {
             return !breakLineObjectId.IsNull &&
@@ -197,12 +202,12 @@ namespace mpESKD.Base.Properties
             if(_isModifiedFromAutocad)
                 return;
             Overrule.Overruling = false;
+            IntellectualEntityProperty intellectualEntityProperty = (IntellectualEntityProperty) sender;
             try
             {
-                IntellectualEntityProperty intellectualEntityProperty = (IntellectualEntityProperty) sender;
                 using (AcadHelpers.Document.LockDocument())
                 {
-                    using (var blockReference = _blkRefObjectId.Open(OpenMode.ForWrite) as BlockReference)
+                    using (var blockReference = _blkRefObjectId.Open(OpenMode.ForWrite, true, true) as BlockReference)
                     {
                         Type entityType = _intellectualEntity.GetType();
                         PropertyInfo propertyInfo = entityType.GetProperty(intellectualEntityProperty.Name);
@@ -247,7 +252,12 @@ namespace mpESKD.Base.Properties
             }
             catch (System.Exception exception)
             {
-                ExceptionBox.Show(exception);
+                if (exception.Message != "eOnLockedLayer")
+                    ExceptionBox.Show(exception);
+                else
+                {
+                    OnLockedLayerEventHandler?.Invoke(this, intellectualEntityProperty);
+                }
             }
 
             Overrule.Overruling = true;

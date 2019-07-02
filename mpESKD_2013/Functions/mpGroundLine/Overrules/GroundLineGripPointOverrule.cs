@@ -293,7 +293,7 @@
                 {
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
+                        var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
                         using (var resBuf = GroundLine.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
@@ -404,7 +404,7 @@
                     GroundLine.BlockRecord.UpdateAnonymousBlocks();
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
+                        var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
                         if (newInsertionPoint.HasValue)
                             ((BlockReference)blkRef).Position = newInsertionPoint.Value;
                         using (var resBuf = GroundLine.GetDataForXData())
@@ -513,7 +513,7 @@
                 GroundLine.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
+                    var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
                     if (newInsertionPoint.HasValue)
                         ((BlockReference)blkRef).Position = newInsertionPoint.Value;
                     using (var resBuf = GroundLine.GetDataForXData())
@@ -563,7 +563,7 @@
                 GroundLine.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite);
+                    var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
                     ((BlockReference)blkRef).Position = newInsertionPoint;
                     using (var resBuf = GroundLine.GetDataForXData())
                     {
