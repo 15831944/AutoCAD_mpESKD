@@ -91,10 +91,10 @@
                         {
                             foreach (SelectedObject selectedObject in psr.Value)
                             {
-                                if(selectedObject.ObjectId == ObjectId.Null)
+                                if (selectedObject.ObjectId == ObjectId.Null)
                                     continue;
                                 var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
-                                if (obj is BlockReference blockReference && 
+                                if (obj is BlockReference blockReference &&
                                     ExtendedDataHelpers.IsApplicable(blockReference))
                                 {
                                     objectIds.Add(selectedObject.ObjectId);
@@ -107,7 +107,12 @@
 
                     if (objectIds.Any())
                     {
-                        SetData(new SummaryPropertyCollection(objectIds));
+                        var summaryPropertyCollection = new SummaryPropertyCollection(objectIds);
+                        summaryPropertyCollection.OnLockedLayerEventHandler += delegate
+                        {
+                            ShowPropertiesControlsBySelection();
+                        };
+                        SetData(summaryPropertyCollection);
                     }
                 }
                 else StckMaxObjectsSelectedMessage.Visibility = System.Windows.Visibility.Visible;
@@ -170,7 +175,7 @@
                     var j = 1;
                     foreach (SummaryProperty summaryProperty in summaryPropertiesGroup.OrderBy(sp => sp.OrderIndex))
                     {
-                        if(summaryProperty.PropertyScope == PropertyScope.Hidden)
+                        if (summaryProperty.PropertyScope == PropertyScope.Hidden)
                             continue;
                         RowDefinition rowDefinition = new RowDefinition { Height = GridLength.Auto };
                         grid.RowDefinitions.Add(rowDefinition);
@@ -283,7 +288,7 @@
                                     BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
                                     grid.Children.Add(cb);
                                 }
-                                catch(Exception exception)
+                                catch (Exception exception)
                                 {
                                     ExceptionBox.Show(exception);
                                 }
@@ -439,7 +444,7 @@
         {
             try
             {
-                KeyValuePair<string, PropertyVisibilityDependencyAttribute> attribute = 
+                KeyValuePair<string, PropertyVisibilityDependencyAttribute> attribute =
                     visibilityDependencyAttributes.FirstOrDefault(a => a.Value.DependencyProperties.Contains(propertyName));
                 if (attribute.Key != null)
                 {

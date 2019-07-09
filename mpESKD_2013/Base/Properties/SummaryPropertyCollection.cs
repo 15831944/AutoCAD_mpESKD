@@ -7,6 +7,7 @@
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Helpers;
+    using ModPlusAPI;
     using ModPlusAPI.Windows;
 
     public class SummaryPropertyCollection : ObservableCollection<SummaryProperty>
@@ -42,6 +43,11 @@
             }
         }
 
+        /// <summary>
+        /// Событие, происходящее при попытке отредактировать свойство примитива, находящегося на заблокированном слое
+        /// </summary>
+        public event EventHandler OnLockedLayerEventHandler;
+
         public new void Add(SummaryProperty data)
         {
             base.Add(data);
@@ -63,14 +69,15 @@
             if (_hasObjectOnLockedLayer)
             {
                 _hasObjectOnLockedLayer = false;
-                MessageBox.Show("On locked layer", MessageBoxIcon.Close);
+                OnLockedLayerEventHandler?.Invoke(this, EventArgs.Empty);
+                // Один или несколько объектов расположены на заблокированном слое, обновить их невозможно
+                MessageBox.Show(Language.GetItem("mpESKD", "h104"), MessageBoxIcon.Alert);
             }
         }
 
         private void EntityPropertyProviderOnOnLockedLayerEventHandler(object sender, IntellectualEntityProperty e)
         {
             _hasObjectOnLockedLayer = true;
-            
         }
     }
 }
