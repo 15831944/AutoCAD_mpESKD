@@ -26,9 +26,10 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto" MinHeight="60"></RowDefinition>
         </Grid.RowDefinitions>
-        <Button Name="LmSettings" Margin="2" Padding="2" Background="Transparent"
+        <Button Name="LmSettings" Margin="2" Padding="4" MinWidth="0"
+                Background="Transparent" BorderThickness="0"
                 HorizontalAlignment="Right" Click="LmSettings_OnClick">
-            <Rectangle Width="20" Height="20" Fill="#FF696969">
+            <Rectangle Width="16" Height="16" Fill="DimGray">
                 <Rectangle.OpacityMask>
                     <VisualBrush Stretch="Uniform" Visual="{StaticResource AppbarSettings}"/>
                 </Rectangle.OpacityMask>

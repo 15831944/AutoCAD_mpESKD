@@ -271,7 +271,7 @@
                                             bool.TryParse(xmlValue, out var b) ? b : attribute.DefaultValue,
                                             ObjectId.Null));
                                     }
-                                    else if (valueType == typeof(Enum))
+                                    else if (valueType.IsEnum)
                                     {
                                         try
                                         {

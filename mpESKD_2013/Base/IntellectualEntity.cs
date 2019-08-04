@@ -587,6 +587,7 @@ namespace mpESKD.Base
         /// <param name="entity">Примитив автокада</param>
         public void SetImmutablePropertiesToNestedEntity(Entity entity)
         {
+            entity.Layer = "0";
             entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
             entity.LineWeight = LineWeight.ByBlock;
             entity.Linetype = "Continuous";
@@ -599,6 +600,7 @@ namespace mpESKD.Base
         /// <param name="entity">Примитив автокада</param>
         public void SetChangeablePropertiesToNestedEntity(Entity entity)
         {
+            entity.Layer = "0";
             entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
             entity.LineWeight = LineWeight.ByBlock;
             entity.Linetype = "ByBlock";
