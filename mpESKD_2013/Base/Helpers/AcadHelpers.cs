@@ -49,12 +49,14 @@
                     {
                         LayerTable lt = tr.GetObject(Database.LayerTableId, OpenMode.ForRead) as LayerTable;
                         if (lt != null)
+                        {
                             foreach (ObjectId layerId in lt)
                             {
-                                var layer = tr.GetObject(layerId, OpenMode.ForWrite) as LayerTableRecord;
-                                if (layer != null)
+                                var layer = tr.GetObject(layerId, OpenMode.ForRead) as LayerTableRecord;
+                                if (layer != null && !layer.IsErased && !layer.IsEraseStatusToggled)
                                     layers.Add(layer.Name);
                             }
+                        }
                     }
                 }
                 return layers;
@@ -98,8 +100,8 @@
                 {
                     using (OpenCloseTransaction tr = Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var txtstbl = (TextStyleTable)tr.GetObject(Database.TextStyleTableId, OpenMode.ForRead);
-                        foreach (ObjectId objectId in txtstbl)
+                        var textStyleTable = (TextStyleTable)tr.GetObject(Database.TextStyleTableId, OpenMode.ForRead);
+                        foreach (ObjectId objectId in textStyleTable)
                         {
                             var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
                             if (!textStyles.Contains(txtStl.Name))
@@ -122,7 +124,7 @@
         public static T Read<T>(this ObjectId objectId, bool openErased = false, bool forceOpenOnLockedLayer = true)
             where T : DBObject
         {
-            return (T)(objectId.GetObject(0, openErased, forceOpenOnLockedLayer) as T);
+            return objectId.GetObject(0, openErased, forceOpenOnLockedLayer) as T;
         }
 
         /// <summary>
@@ -136,7 +138,7 @@
         public static T Write<T>(this ObjectId objectId, bool openErased = false, bool forceOpenOnLockedLayer = true)
             where T : DBObject
         {
-            return (T)(objectId.GetObject(OpenMode.ForWrite, openErased, forceOpenOnLockedLayer) as T);
+            return objectId.GetObject(OpenMode.ForWrite, openErased, forceOpenOnLockedLayer) as T;
         }
 
         /// <summary>
@@ -338,9 +340,9 @@
         /// <summary>Проверка наличия типа линии в документе</summary>
         private static bool HasLineType(string lineTypeName, Transaction tr)
         {
-            var lttbl = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
-            if (lttbl != null)
-                return (lttbl.Has(lineTypeName));
+            var linetypeTable = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+            if (linetypeTable != null)
+                return (linetypeTable.Has(lineTypeName));
             return false;
         }
 
@@ -387,8 +389,8 @@
             {
                 using (OpenCloseTransaction tr = Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var txtstbl = (TextStyleTable)tr.GetObject(Database.TextStyleTableId, OpenMode.ForRead);
-                    foreach (ObjectId objectId in txtstbl)
+                    var textStyleTable = (TextStyleTable)tr.GetObject(Database.TextStyleTableId, OpenMode.ForRead);
+                    foreach (ObjectId objectId in textStyleTable)
                     {
                         var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
                         if (txtStl.Name.Equals(textStyleName))
@@ -414,7 +416,7 @@
                 BlockTableRecord blockTableRecord = (BlockTableRecord)tr.GetObject(Database.CurrentSpaceId, OpenMode.ForRead);
                 foreach (ObjectId objectId in blockTableRecord)
                 {
-                    if(objectId == ObjectId.Null)
+                    if (objectId == ObjectId.Null)
                         continue;
                     if (tr.GetObject(objectId, OpenMode.ForRead) is BlockReference blockReference)
                     {
@@ -448,12 +450,12 @@
                 if (!rat.Has(appName))
                 {
                     rat.UpgradeOpen();
-                    RegAppTableRecord ratr = new RegAppTableRecord
+                    var regAppTableRecord = new RegAppTableRecord
                     {
                         Name = appName
                     };
-                    rat.Add(ratr);
-                    tr.AddNewlyCreatedDBObject(ratr, true);
+                    rat.Add(regAppTableRecord);
+                    tr.AddNewlyCreatedDBObject(regAppTableRecord, true);
                 }
                 tr.Commit();
             }
