@@ -10,6 +10,7 @@
     using Base.Enums;
     using Base.Helpers;
     using ModPlusAPI;
+    using ModPlusAPI.Annotations;
     using ModPlusAPI.Windows;
 
     public static class SearchEntitiesCommand
@@ -39,7 +40,7 @@
                 if (settings.ShowDialog() == false)
                     return;
 
-                SearchProceedOption searchProceedOption = (SearchProceedOption) settings.CbSearchProceedOption.SelectedIndex;
+                SearchProceedOption searchProceedOption = (SearchProceedOption)settings.CbSearchProceedOption.SelectedIndex;
 
                 List<string> entitiesToProceed = new List<string>();
                 foreach (var item in settings.LbEntities.Items)
@@ -49,86 +50,66 @@
                         listBoxItem.Content is CheckBox checkBox &&
                         checkBox.IsChecked == true)
                     {
-                        entitiesToProceed.Add($"mp{((Type) checkBox.Tag).Name}");
+                        entitiesToProceed.Add($"mp{((Type)checkBox.Tag).Name}");
                     }
                 }
-                
+
                 if (!entitiesToProceed.Any())
                     return;
 
                 using (Transaction tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                 {
-                    List<BlockReference> blockReferences = new List<BlockReference>();
-                    var btr = (BlockTableRecord) tr.GetObject(AcadHelpers.Database.CurrentSpaceId, OpenMode.ForRead);
-                    foreach (var objectId in btr)
-                    {
-                        if (tr.GetObject(objectId, OpenMode.ForRead) is BlockReference blockReference &&
-                            blockReference.XData != null)
-                            blockReferences.Add(blockReference);
-                    }
+                    var btr = (BlockTableRecord)tr.GetObject(AcadHelpers.Database.CurrentSpaceId, OpenMode.ForRead);
+
+                    var blockReferences = GetBlockReferencesOfIntellectualEntities(entitiesToProceed, tr).ToList();
 
                     if (blockReferences.Any())
                     {
-                        for (var i = blockReferences.Count - 1; i >= 0; i--)
+                        switch (searchProceedOption)
                         {
-                            BlockReference blockReference = blockReferences[i];
-                            var typedValue = blockReference.XData.AsArray()
-                                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName);
-                            if (entitiesToProceed.Contains(typedValue.Value as string))
-                                continue;
-
-                            blockReferences.RemoveAt(i);
-                        }
-
-                        if (blockReferences.Any())
-                        {
-                            switch (searchProceedOption)
-                            {
-                                case SearchProceedOption.Select:
-                                    AcadHelpers.Editor.SetImpliedSelection(blockReferences.Select(b => b.ObjectId).ToArray());
-                                    break;
-                                case SearchProceedOption.RemoveData:
-                                    foreach (var blockReference in blockReferences)
+                            case SearchProceedOption.Select:
+                                AcadHelpers.Editor.SetImpliedSelection(blockReferences.Select(b => b.ObjectId).ToArray());
+                                break;
+                            case SearchProceedOption.RemoveData:
+                                foreach (var blockReference in blockReferences)
+                                {
+                                    blockReference.UpgradeOpen();
+                                    var typedValue = blockReference.XData.AsArray()
+                                        .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName);
+                                    blockReference.XData = new ResultBuffer(
+                                        new TypedValue((int)DxfCode.ExtendedDataRegAppName, typedValue.Value.ToString()));
+                                }
+                                MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
+                                break;
+                            case SearchProceedOption.Explode:
+                                btr.UpgradeOpen();
+                                foreach (var blockReference in blockReferences)
+                                {
+                                    blockReference.UpgradeOpen();
+                                    using (DBObjectCollection dbObjCol = new DBObjectCollection())
                                     {
-                                        blockReference.UpgradeOpen();
-                                        var typedValue = blockReference.XData.AsArray()
-                                            .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName);
-                                        blockReference.XData = new ResultBuffer(
-                                            new TypedValue((int)DxfCode.ExtendedDataRegAppName, typedValue.Value.ToString()));
-                                    }
-                                    MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
-                                    break;
-                                case SearchProceedOption.Explode:
-                                    btr.UpgradeOpen();
-                                    foreach (var blockReference in blockReferences)
-                                    {
-                                        blockReference.UpgradeOpen();
-                                        using (DBObjectCollection dbObjCol = new DBObjectCollection())
+                                        blockReference.Explode(dbObjCol);
+                                        foreach (DBObject dbObj in dbObjCol)
                                         {
-                                            blockReference.Explode(dbObjCol);
-                                            foreach (DBObject dbObj in dbObjCol)
-                                            {
-                                                Entity acEnt = dbObj as Entity;
+                                            Entity acEnt = dbObj as Entity;
 
-                                                btr.AppendEntity(acEnt);
-                                                tr.AddNewlyCreatedDBObject(dbObj, true);
-                                            }
+                                            btr.AppendEntity(acEnt);
+                                            tr.AddNewlyCreatedDBObject(dbObj, true);
                                         }
-                                        blockReference.Erase(true);
                                     }
-                                    MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
-                                    break;
-                                case SearchProceedOption.Delete:
-                                    foreach (var blockReference in blockReferences)
-                                    {
-                                        blockReference.UpgradeOpen();
-                                        blockReference.Erase(true);
-                                    }
-                                    MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
-                                    break;
-                            }
+                                    blockReference.Erase(true);
+                                }
+                                MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
+                                break;
+                            case SearchProceedOption.Delete:
+                                foreach (var blockReference in blockReferences)
+                                {
+                                    blockReference.UpgradeOpen();
+                                    blockReference.Erase(true);
+                                }
+                                MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
+                                break;
                         }
-                        else MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg10"));
                     }
                     else MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg10"));
 
@@ -138,6 +119,29 @@
             catch (System.Exception exception)
             {
                 ExceptionBox.Show(exception);
+            }
+        }
+
+        /// <summary>
+        /// Найти блоки в текущем пространстве, являющиеся интеллектуальными объектами
+        /// </summary>
+        /// <param name="typeNames">Список имен типов, интеллектуальные объекты которых нужно найти</param>
+        /// <param name="tr">Открытая транзакция</param>
+        /// <returns>Коллекция блоков</returns>
+        public static IEnumerable<BlockReference> GetBlockReferencesOfIntellectualEntities(
+            ICollection<string> typeNames, Transaction tr)
+        {
+            var btr = (BlockTableRecord)tr.GetObject(AcadHelpers.Database.CurrentSpaceId, OpenMode.ForRead);
+            foreach (var objectId in btr)
+            {
+                if (tr.GetObject(objectId, OpenMode.ForRead) is BlockReference blockReference &&
+                    blockReference.XData != null)
+                {
+                    var typedValue = blockReference.XData.AsArray()
+                        .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName);
+                    if (typeNames.Contains(typedValue.Value as string))
+                        yield return blockReference;
+                }
             }
         }
     }

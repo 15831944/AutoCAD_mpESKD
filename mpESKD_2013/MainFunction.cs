@@ -2,6 +2,7 @@
 {
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -18,6 +19,7 @@
     using Base.Helpers;
     using Functions.mpAxis;
     using Functions.mpSection;
+    using Functions.SearchEntities;
     using mpESKD.Base.Properties;
     using ModPlus;
     using ModPlusAPI;
@@ -49,6 +51,7 @@
             {
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             }
+
             // bedit watcher
             BeditCommandWatcher.Initialize();
             AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
@@ -263,6 +266,35 @@
             {
                 e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
                 e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+
+                // при открытии документа соберу все блоки в текущем пространстве (?) и вызову обновление их внутренних
+                // примитивов. Нужно, так как в некоторых случаях (пока не ясно в каких) внутренние примитивы отсутствуют
+                try
+                {
+                    var timer = Stopwatch.StartNew();
+                    using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfIntellectualEntities(
+                            TypeFactory.Instance.GetEntityCommandNames(), tr))
+                        {
+                            var ie = EntityReaderFactory.Instance.GetFromEntity(blockReference);
+                            if (ie != null)
+                            {
+                                blockReference.UpgradeOpen();
+                                ie.UpdateEntities();
+                                ie.GetBlockTableRecordForUndo(blockReference).UpdateAnonymousBlocks();
+                            }
+                        }
+
+                        tr.Commit();
+                    }
+                    timer.Stop();
+                    Debug.Print($"Time for update entities: {timer.ElapsedMilliseconds} milliseconds");
+                }
+                catch
+                {
+                    // ignore
+                }
             }
         }
 
