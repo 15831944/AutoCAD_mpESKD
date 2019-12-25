@@ -33,28 +33,36 @@ namespace mpESKD.Base.Overrules
                     point3dCollections = PointsForMinusGrip(num, eCS);
                     break;
             }
+
             short backupColor = worldDraw.SubEntityTraits.Color;
             FillType backupFillType = worldDraw.SubEntityTraits.FillType;
 
             worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
             worldDraw.SubEntityTraits.Color = GetGripColor();
             if (GripType != GripType.Mirror)
+            {
                 worldDraw.Geometry.Polygon(point3dCollections);
+            }
             else
             {
                 worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, eCS));
                 worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, eCS));
             }
+
             worldDraw.SubEntityTraits.FillType = FillType.FillNever;
+
             // обводка
             worldDraw.SubEntityTraits.Color = 250;
             if (GripType != GripType.Mirror)
+            {
                 worldDraw.Geometry.Polygon(point3dCollections);
+            }
             else
             {
                 worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, eCS));
                 worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, eCS));
             }
+
             // restore
             worldDraw.SubEntityTraits.Color = backupColor;
             worldDraw.SubEntityTraits.FillType = backupFillType;
@@ -76,19 +84,21 @@ namespace mpESKD.Base.Overrules
                         Plane plane1 = new Plane(plane.PointOnPlane, plane.Normal);
                         coordinateSystem3D = plane1.GetCoordinateSystem();
                     }
+
                     openCloseTransaction.Commit();
                 }
             }
+
             return coordinateSystem3D;
         }
 
         private Point3dCollection PointsForSquareGrip(double num, CoordinateSystem3d eCS)
         {
             Point3dCollection point3dCollections = new Point3dCollection();
-            point3dCollections.Add((GripPoint - (num * eCS.Xaxis)) - (num * eCS.Yaxis));
-            point3dCollections.Add((GripPoint - (num * eCS.Xaxis)) + (num * eCS.Yaxis));
-            point3dCollections.Add((GripPoint + (num * eCS.Xaxis)) + (num * eCS.Yaxis));
-            point3dCollections.Add((GripPoint + (num * eCS.Xaxis)) - (num * eCS.Yaxis));
+            point3dCollections.Add(GripPoint - (num * eCS.Xaxis) - (num * eCS.Yaxis));
+            point3dCollections.Add(GripPoint - (num * eCS.Xaxis) + (num * eCS.Yaxis));
+            point3dCollections.Add(GripPoint + (num * eCS.Xaxis) + (num * eCS.Yaxis));
+            point3dCollections.Add(GripPoint + (num * eCS.Xaxis) - (num * eCS.Yaxis));
 
             return point3dCollections;
         }
@@ -98,18 +108,18 @@ namespace mpESKD.Base.Overrules
             var num2 = num / 3;
             Point3dCollection point3dCollection = new Point3dCollection();
 
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis + num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint + num2 * eCS.Xaxis + num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint + num2 * eCS.Xaxis + num * eCS.Yaxis);
-            point3dCollection.Add(GripPoint - num2 * eCS.Xaxis + num * eCS.Yaxis);
-            point3dCollection.Add(GripPoint - num2 * eCS.Xaxis + num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis + num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis - num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint - num2 * eCS.Xaxis - num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint - num2 * eCS.Xaxis - num * eCS.Yaxis);
-            point3dCollection.Add(GripPoint + num2 * eCS.Xaxis - num * eCS.Yaxis);
-            point3dCollection.Add(GripPoint + num2 * eCS.Xaxis - num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis - num2 * eCS.Yaxis);
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis) + (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint + (num2 * eCS.Xaxis) + (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint + (num2 * eCS.Xaxis) + (num * eCS.Yaxis));
+            point3dCollection.Add(GripPoint - (num2 * eCS.Xaxis) + (num * eCS.Yaxis));
+            point3dCollection.Add(GripPoint - (num2 * eCS.Xaxis) + (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis) + (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis) - (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint - (num2 * eCS.Xaxis) - (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint - (num2 * eCS.Xaxis) - (num * eCS.Yaxis));
+            point3dCollection.Add(GripPoint + (num2 * eCS.Xaxis) - (num * eCS.Yaxis));
+            point3dCollection.Add(GripPoint + (num2 * eCS.Xaxis) - (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis) - (num2 * eCS.Yaxis));
 
             return point3dCollection;
         }
@@ -119,10 +129,10 @@ namespace mpESKD.Base.Overrules
             var num2 = num / 3;
             Point3dCollection point3dCollection = new Point3dCollection();
 
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis + num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis + num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis - num2 * eCS.Yaxis);
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis - num2 * eCS.Yaxis);
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis) + (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis) + (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis) - (num2 * eCS.Yaxis));
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis) - (num2 * eCS.Yaxis));
 
             return point3dCollection;
         }
@@ -131,13 +141,13 @@ namespace mpESKD.Base.Overrules
         {
             Point3dCollection point3dCollection = new Point3dCollection();
 
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis * 0.0 - num * eCS.Yaxis * 0.25);
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis * 0.75 + num * eCS.Yaxis * 1.25);
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis * 1.5 - num * eCS.Yaxis * 0.25);
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis * 1.0 - num * eCS.Yaxis * 0.25);
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis * 1.0 - num * eCS.Yaxis * 1.25);
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis * 0.5 - num * eCS.Yaxis * 1.25);
-            point3dCollection.Add(GripPoint - num * eCS.Xaxis * 0.5 - num * eCS.Yaxis * 0.25);
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 0.0) - (num * eCS.Yaxis * 0.25));
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 0.75) + (num * eCS.Yaxis * 1.25));
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 1.5) - (num * eCS.Yaxis * 0.25));
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 1.0) - (num * eCS.Yaxis * 0.25));
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 1.0) - (num * eCS.Yaxis * 1.25));
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 0.5) - (num * eCS.Yaxis * 1.25));
+            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 0.5) - (num * eCS.Yaxis * 0.25));
 
             return point3dCollection;
         }
@@ -146,13 +156,13 @@ namespace mpESKD.Base.Overrules
         {
             Point3dCollection point3dCollection = new Point3dCollection();
 
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis * 0.0 + num * eCS.Yaxis * 0.25);
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis * 0.75 - num * eCS.Yaxis * 1.25);
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis * 1.5 + num * eCS.Yaxis * 0.25);
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis * 1.0 + num * eCS.Yaxis * 0.25);
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis * 1.0 + num * eCS.Yaxis * 1.25);
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis * 0.5 + num * eCS.Yaxis * 1.25);
-            point3dCollection.Add(GripPoint + num * eCS.Xaxis * 0.5 + num * eCS.Yaxis * 0.25);
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 0.0) + (num * eCS.Yaxis * 0.25));
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 0.75) - (num * eCS.Yaxis * 1.25));
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 1.5) + (num * eCS.Yaxis * 0.25));
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 1.0) + (num * eCS.Yaxis * 0.25));
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 1.0) + (num * eCS.Yaxis * 1.25));
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 0.5) + (num * eCS.Yaxis * 1.25));
+            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 0.5) + (num * eCS.Yaxis * 0.25));
 
             return point3dCollection;
         }

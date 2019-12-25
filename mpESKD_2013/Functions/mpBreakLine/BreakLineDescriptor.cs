@@ -12,35 +12,36 @@
 
         /// <inheritdoc />
         public string Name => "mpBreakLine";
-        
+
         /// <inheritdoc />
         // "Линия обрыва"
-        public string LName => Language.GetItem(Invariables.LangItem, "h48"); 
-        
+        public string LName => Language.GetItem(Invariables.LangItem, "h48");
+
         /// <inheritdoc />
         // "Отрисовка линии обрыва по ГОСТ 2.303-68"
-        public string Description => Language.GetItem(Invariables.LangItem, "h56"); 
-        
+        public string Description => Language.GetItem(Invariables.LangItem, "h56");
+
         /// <inheritdoc />
         // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию обрыва по ГОСТ 2.303-68, путем указания двух точек"
         public string FullDescription => Language.GetItem(Invariables.LangItem, "h57");
-        
+
         /// <inheritdoc />
         public string ToolTipHelpImage => "Linear.png";
-        
+
         /// <inheritdoc />
         public List<string> SubFunctionsNames => new List<string>
         {
             "mpBreakLineCurve", "mpBreakLineCylinder"
         };
-        
+
         /// <inheritdoc />
         public List<string> SubFunctionsLNames => new List<string>
         {
             // "Криволинейный обрыв"
             Language.GetItem(Invariables.LangItem, "h58"),
+
             // "Цилиндрический обрыв"
-            Language.GetItem(Invariables.LangItem, "h59") 
+            Language.GetItem(Invariables.LangItem, "h59")
         };
 
         /// <inheritdoc />
@@ -48,8 +49,9 @@
         {
             // "Отрисовка криволинейного обрыва"
             Language.GetItem(Invariables.LangItem, "h60"),
-            //"Отрисовка цилиндрического обрыва"
-            Language.GetItem(Invariables.LangItem, "h61") 
+
+            // "Отрисовка цилиндрического обрыва"
+            Language.GetItem(Invariables.LangItem, "h61")
         };
 
         /// <inheritdoc />
@@ -57,8 +59,9 @@
         {
             // "Создание интеллектуального объекта на основе анонимного блока, описывающего криволинейный обрыв, путем указания двух точек"
             Language.GetItem(Invariables.LangItem, "h62"),
+
             // "Создание интеллектуального объекта на основе анонимного блока, описывающего цилиндрический обрыв, путем указания двух точек"
-            Language.GetItem(Invariables.LangItem, "h63") 
+            Language.GetItem(Invariables.LangItem, "h63")
         };
 
         /// <inheritdoc />

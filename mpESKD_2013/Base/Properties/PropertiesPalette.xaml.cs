@@ -35,8 +35,11 @@
             {
                 document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
             }
+
             if (AcadHelpers.Document != null)
+            {
                 ShowPropertiesControlsBySelection();
+            }
         }
 
         private void Documents_DocumentActivated(object sender, DocumentCollectionEventArgs e)
@@ -67,13 +70,16 @@
         {
             // Удаляем контролы свойств
             if (StackPanelProperties.Children.Count > 0)
+            {
                 StackPanelProperties.Children.Clear();
+            }
 
             PromptSelectionResult psr = AcadHelpers.Editor.SelectImplied();
             if (psr.Value == null || psr.Value.Count == 0)
             {
                 // Очищаем панель описания
                 ShowDescription(string.Empty);
+
                 // hide message
                 StckMaxObjectsSelectedMessage.Visibility = System.Windows.Visibility.Collapsed;
             }
@@ -92,7 +98,10 @@
                             foreach (SelectedObject selectedObject in psr.Value)
                             {
                                 if (selectedObject.ObjectId == ObjectId.Null)
+                                {
                                     continue;
+                                }
+
                                 var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                                 if (obj is BlockReference blockReference &&
                                     ExtendedDataHelpers.IsApplicable(blockReference))
@@ -115,7 +124,10 @@
                         SetData(summaryPropertyCollection);
                     }
                 }
-                else StckMaxObjectsSelectedMessage.Visibility = System.Windows.Visibility.Visible;
+                else
+                {
+                    StckMaxObjectsSelectedMessage.Visibility = System.Windows.Visibility.Visible;
+                }
             }
         }
 
@@ -176,7 +188,10 @@
                     foreach (SummaryProperty summaryProperty in summaryPropertiesGroup.OrderBy(sp => sp.OrderIndex))
                     {
                         if (summaryProperty.PropertyScope == PropertyScope.Hidden)
+                        {
                             continue;
+                        }
+
                         RowDefinition rowDefinition = new RowDefinition { Height = GridLength.Auto };
                         grid.RowDefinitions.Add(rowDefinition);
 
@@ -472,8 +487,11 @@
             {
                 var attribute = propertyInfo.GetCustomAttribute<PropertyVisibilityDependencyAttribute>();
                 if (attribute != null)
+                {
                     dictionary.Add(propertyInfo.Name, attribute);
+                }
             }
+
             return dictionary;
         }
 
@@ -483,7 +501,9 @@
         private void _OnGotFocus(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element)
+            {
                 ShowDescription(element.Tag.ToString());
+            }
         }
 
         /// <summary>
@@ -504,7 +524,9 @@
             {
                 var displayName = ModPlusAPI.Language.GetItem(Invariables.LangItem, summaryProperty.DisplayNameLocalizationKey);
                 if (!string.IsNullOrEmpty(displayName))
+                {
                     return displayName;
+                }
             }
             catch
             {
@@ -524,7 +546,9 @@
             {
                 var description = ModPlusAPI.Language.GetItem(Invariables.LangItem, summaryProperty.DescriptionLocalizationKey);
                 if (!string.IsNullOrEmpty(description))
+                {
                     return description;
+                }
             }
             catch
             {
@@ -569,7 +593,10 @@
                 Path = new PropertyPath("SummaryValue")
             };
             if (converter != null)
+            {
                 binding.Converter = converter;
+            }
+
             return binding;
         }
 
@@ -620,6 +647,7 @@
                                     ((TextBox)sender).Text = ltr.Name;
                                 }
                             }
+
                             tr.Commit();
                         }
                     }
@@ -649,7 +677,9 @@
         private void OpenSettings_OnClick(object sender, RoutedEventArgs e)
         {
             if (AcadHelpers.Document != null)
+            {
                 AcadHelpers.Document.SendStringToExecute("mpStyleEditor ", true, false, false);
+            }
         }
     }
 }

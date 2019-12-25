@@ -19,12 +19,12 @@
         /// Справа на лево
         /// </summary>
         RightToLeft,
-        
+
         /// <summary>
         /// Сверху вниз
         /// </summary>
         UpToBottom,
-        
+
         /// <summary>
         /// Снизу вверх
         /// </summary>
@@ -38,7 +38,7 @@
         /// </summary>
         public static List<string> LocalNames = new List<string>
         {
-            "Слева на право", 
+            "Слева на право",
             "Справа на лево",
             "Сверху вниз",
             "Снизу вверх"
@@ -49,10 +49,25 @@
         /// </summary>
         public static EntityDirection GetByLocalName(string local)
         {
-            if (local == LocalNames[0]) return EntityDirection.LeftToRight;
-            if (local == LocalNames[1]) return EntityDirection.RightToLeft;
-            if (local == LocalNames[2]) return EntityDirection.UpToBottom;
-            if (local == LocalNames[3]) return EntityDirection.BottomToUp;
+            if (local == LocalNames[0])
+            {
+                return EntityDirection.LeftToRight;
+            }
+
+            if (local == LocalNames[1])
+            {
+                return EntityDirection.RightToLeft;
+            }
+
+            if (local == LocalNames[2])
+            {
+                return EntityDirection.UpToBottom;
+            }
+
+            if (local == LocalNames[3])
+            {
+                return EntityDirection.BottomToUp;
+            }
 
             return EntityDirection.LeftToRight;
         }
@@ -62,10 +77,25 @@
         /// </summary>
         public static string GetLocalName(EntityDirection entityDirection)
         {
-            if (entityDirection == EntityDirection.LeftToRight) return LocalNames[0];
-            if (entityDirection == EntityDirection.RightToLeft) return LocalNames[1];
-            if (entityDirection == EntityDirection.UpToBottom) return LocalNames[2];
-            if (entityDirection == EntityDirection.BottomToUp) return LocalNames[3];
+            if (entityDirection == EntityDirection.LeftToRight)
+            {
+                return LocalNames[0];
+            }
+
+            if (entityDirection == EntityDirection.RightToLeft)
+            {
+                return LocalNames[1];
+            }
+
+            if (entityDirection == EntityDirection.UpToBottom)
+            {
+                return LocalNames[2];
+            }
+
+            if (entityDirection == EntityDirection.BottomToUp)
+            {
+                return LocalNames[3];
+            }
 
             return LocalNames[0];
         }
@@ -75,10 +105,25 @@
         /// </summary>
         public static EntityDirection Parse(string str)
         {
-            if (str == "LeftToRight") return EntityDirection.LeftToRight;
-            if (str == "RightToLeft") return EntityDirection.RightToLeft;
-            if (str == "UpToBottom") return EntityDirection.UpToBottom;
-            if (str == "BottomToUp") return EntityDirection.BottomToUp;
+            if (str == "LeftToRight")
+            {
+                return EntityDirection.LeftToRight;
+            }
+
+            if (str == "RightToLeft")
+            {
+                return EntityDirection.RightToLeft;
+            }
+
+            if (str == "UpToBottom")
+            {
+                return EntityDirection.UpToBottom;
+            }
+
+            if (str == "BottomToUp")
+            {
+                return EntityDirection.BottomToUp;
+            }
 
             return EntityDirection.LeftToRight;
         }
@@ -89,7 +134,10 @@
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is EntityDirection entityDirection)
+            {
                 return EntityDirectionHelper.GetLocalName(entityDirection);
+            }
+
             return string.Empty;
         }
 

@@ -6,7 +6,6 @@
     using System.ComponentModel;
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
-    using Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
 
@@ -70,6 +69,7 @@
             {
                 _hasObjectOnLockedLayer = false;
                 OnLockedLayerEventHandler?.Invoke(this, EventArgs.Empty);
+
                 // Один или несколько объектов расположены на заблокированном слое, обновить их невозможно
                 MessageBox.Show(Language.GetItem("mpESKD", "h104"), MessageBoxIcon.Alert);
             }

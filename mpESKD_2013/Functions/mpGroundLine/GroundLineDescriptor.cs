@@ -35,14 +35,14 @@
         public List<string> SubFunctionsLNames => new List<string>
         {
             // "Линия грунта из полилинии"
-            Language.GetItem(Invariables.LangItem, "h76") 
+            Language.GetItem(Invariables.LangItem, "h76")
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
             // "Конвертирование выбранной полилинии в линию обозначения грунта"
-            Language.GetItem(Invariables.LangItem, "h77") 
+            Language.GetItem(Invariables.LangItem, "h77")
         };
 
         /// <inheritdoc />

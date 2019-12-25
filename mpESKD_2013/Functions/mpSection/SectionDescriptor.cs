@@ -19,11 +19,11 @@
 
         /// <inheritdoc />
         // Отрисовка обозначения разреза (сечения) по ГОСТ 2.305-68
-        public string Description => Language.GetItem(Invariables.LangItem, "h80"); 
+        public string Description => Language.GetItem(Invariables.LangItem, "h80");
 
         /// <inheritdoc />
         // Создание интеллектуального объекта на основе анонимного блока, описывающего разрез (сечение) по ГОСТ 2.305-68
-        public string FullDescription => Language.GetItem(Invariables.LangItem, "h81"); 
+        public string FullDescription => Language.GetItem(Invariables.LangItem, "h81");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
@@ -40,6 +40,7 @@
         {
             // Ломаный разрез
             Language.GetItem(Invariables.LangItem, "h82"),
+
             // Разрез из полилинии
             Language.GetItem(Invariables.LangItem, "h83")
         };
@@ -49,6 +50,7 @@
         {
             // Отрисовка обозначения ломаного разреза (сечения) по ГОСТ 2.305-68
             Language.GetItem(Invariables.LangItem, "h84"),
+
             // Конвертирование выбранной полилинии в обозначение разреза
             Language.GetItem(Invariables.LangItem, "h85")
         };

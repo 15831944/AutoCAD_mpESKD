@@ -21,7 +21,9 @@
                 var fieldInfo = _enumType.GetField(Enum.GetName(_enumType, e));
                 var attr = fieldInfo.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>();
                 if (attr != null)
+                {
                     return ModPlusAPI.Language.GetItem(Invariables.LangItem, attr.LocalizationKey);
+                }
             }
 
             return value;

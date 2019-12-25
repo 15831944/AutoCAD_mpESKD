@@ -43,10 +43,10 @@
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(BreakLineDescriptor.Instance.Name);
-                
+
                 var breakLine = new BreakLine();
                 var blockReference = MainFunction.CreateBlock(breakLine);
-                
+
                 breakLine.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
 
                 InsertBreakLineWithJig(breakLine, blockReference);
@@ -66,11 +66,13 @@
         {
             CreateBreakLine(BreakLineType.Linear);
         }
+
         [CommandMethod("ModPlus", "mpBreakLineCurve", CommandFlags.Modal)]
         public void CreateCurvilinearBreakLine()
         {
             CreateBreakLine(BreakLineType.Curvilinear);
         }
+
         [CommandMethod("ModPlus", "mpBreakLineCylinder", CommandFlags.Modal)]
         public void CreateCylindricalBreakLine()
         {
@@ -121,8 +123,13 @@
                 if (status == PromptStatus.OK)
                 {
                     if (entityJig.JigState == JigState.PromptInsertPoint)
+                    {
                         entityJig.JigState = JigState.PromptNextPoint;
-                    else break;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 else
                 {
@@ -131,7 +138,7 @@
                     {
                         using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                         {
-                            var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
+                            var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                             obj.Erase(true);
                             tr.Commit();
                         }

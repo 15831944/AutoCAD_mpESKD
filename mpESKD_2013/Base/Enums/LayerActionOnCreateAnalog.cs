@@ -30,14 +30,20 @@
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value != null)
-                return (int) (LayerActionOnCreateAnalog) value;
+            {
+                return (int)(LayerActionOnCreateAnalog)value;
+            }
+
             throw new Exception("Cannot convert LayerActionOnCreateAnalog");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value != null)
+            {
                 return (LayerActionOnCreateAnalog)(int)value;
+            }
+
             throw new Exception("Cannot convert back LayerActionOnCreateAnalog");
         }
     }

@@ -41,12 +41,15 @@
                     {
                         return SamplerStatus.OK;
                     }
+
                     return SamplerStatus.Cancel;
                 }
+
                 if (Value.IsEqualTo(promptPointResult.Value, Tolerance))
                 {
                     return SamplerStatus.NoChange;
                 }
+
                 var value = promptPointResult.Value;
                 var point3D = value;
                 Value = value;

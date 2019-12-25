@@ -10,7 +10,6 @@
     using Base.Enums;
     using Base.Helpers;
     using ModPlusAPI;
-    using ModPlusAPI.Annotations;
     using ModPlusAPI.Windows;
 
     public static class SearchEntitiesCommand
@@ -38,7 +37,9 @@
                 }
 
                 if (settings.ShowDialog() == false)
+                {
                     return;
+                }
 
                 SearchProceedOption searchProceedOption = (SearchProceedOption)settings.CbSearchProceedOption.SelectedIndex;
 
@@ -55,7 +56,9 @@
                 }
 
                 if (!entitiesToProceed.Any())
+                {
                     return;
+                }
 
                 using (Transaction tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                 {
@@ -79,6 +82,7 @@
                                     blockReference.XData = new ResultBuffer(
                                         new TypedValue((int)DxfCode.ExtendedDataRegAppName, typedValue.Value.ToString()));
                                 }
+
                                 MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
                                 break;
                             case SearchProceedOption.Explode:
@@ -97,8 +101,10 @@
                                             tr.AddNewlyCreatedDBObject(dbObj, true);
                                         }
                                     }
+
                                     blockReference.Erase(true);
                                 }
+
                                 MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
                                 break;
                             case SearchProceedOption.Delete:
@@ -107,11 +113,15 @@
                                     blockReference.UpgradeOpen();
                                     blockReference.Erase(true);
                                 }
+
                                 MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
                                 break;
                         }
                     }
-                    else MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg10"));
+                    else
+                    {
+                        MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg10"));
+                    }
 
                     tr.Commit();
                 }
@@ -140,7 +150,9 @@
                     var typedValue = blockReference.XData.AsArray()
                         .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName);
                     if (typeNames.Contains(typedValue.Value as string))
+                    {
                         yield return blockReference;
+                    }
                 }
             }
         }

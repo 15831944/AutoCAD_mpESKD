@@ -6,7 +6,7 @@
     using Base;
     using ModPlusAPI;
 
-    public partial class SearchEntitiesSettings 
+    public partial class SearchEntitiesSettings
     {
         public SearchEntitiesSettings()
         {
@@ -19,7 +19,9 @@
             foreach (var item in LbEntities.Items)
             {
                 if (item is ListBoxItem listBoxItem && listBoxItem.Content is CheckBox checkBox)
+                {
                     checkBox.IsChecked = true;
+                }
             }
         }
 
@@ -28,7 +30,9 @@
             foreach (var item in LbEntities.Items)
             {
                 if (item is ListBoxItem listBoxItem && listBoxItem.Content is CheckBox checkBox)
+                {
                     checkBox.IsChecked = false;
+                }
             }
         }
 

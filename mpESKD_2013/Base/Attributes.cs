@@ -3,18 +3,18 @@
     using System;
     using System.Runtime.CompilerServices;
     using Enums;
-    using ModPlusAPI.Annotations;
+    using JetBrains.Annotations;
 
     public class EntityPropertyAttribute : Attribute
     {
         public EntityPropertyAttribute(
-            PropertiesCategory category, 
+            PropertiesCategory category,
             int orderIndex,
             string displayNameLocalizationKey,
             string descriptionLocalizationKey,
             object defaultValue,
-            object minimum, 
-            object maximum, 
+            object minimum,
+            object maximum,
             PropertyScope propertyScope = PropertyScope.PaletteAndStyleEditor,
             [CallerMemberName] string name = null)
         {
@@ -28,7 +28,7 @@
             Maximum = maximum;
             PropertyScope = propertyScope;
         }
-        
+
         /// <summary>
         /// Категория свойства
         /// </summary>
@@ -37,7 +37,7 @@
         /// <summary>
         /// Имя свойства
         /// </summary>
-        public string Name { get;  }
+        public string Name { get; }
 
         /// <summary>
         /// Индекс для сортировки
@@ -52,25 +52,25 @@
         /// <summary>
         /// Ключ локализации для описания свойства
         /// </summary>
-        public string DescriptionLocalizationKey { get;  }
-        
+        public string DescriptionLocalizationKey { get; }
+
         /// <summary>
         /// Значение по умолчанию
         /// </summary>
         [NotNull]
-        public object DefaultValue { get;  }
+        public object DefaultValue { get; }
 
         /// <summary>
         /// Минимальное значение. Для свойств типа int, double
         /// </summary>
         [CanBeNull]
-        public object Minimum { get;  }
+        public object Minimum { get; }
 
         /// <summary>
         /// Максимальное значение. Для свойств типа int, double
         /// </summary>
         [CanBeNull]
-        public object Maximum { get;  }
+        public object Maximum { get; }
 
         /// <summary>
         /// Область видимости свойства
@@ -139,12 +139,11 @@
         {
             DependencyProperties = dependencyProperties;
         }
-        
+
         /// <summary>
         /// Свойства, видимость которых зависит от свойства, для которого установлен атрибут
         /// </summary>
         public string[] DependencyProperties { get; }
-
     }
 
     /// <summary>

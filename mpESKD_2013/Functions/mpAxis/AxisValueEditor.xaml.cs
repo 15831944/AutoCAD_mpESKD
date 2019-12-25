@@ -29,6 +29,7 @@
                 ChangeSecondVisibility(false);
                 ChangeThirdVisibility(false);
             }
+
             // values
             TbFirstPrefix.Text = Axis.FirstTextPrefix;
             TbFirstText.Text = Axis.FirstText;
@@ -44,8 +45,10 @@
 
             TbBottomOrientText.Text = Axis.BottomOrientText;
             TbTopOrientText.Text = Axis.TopOrientText;
+
             // markers position
             CbMarkersPosition.SelectedItem = Axis.MarkersPosition;
+
             // focus
             TbFirstText.Focus();
         }
@@ -73,6 +76,7 @@
 
             Axis.BottomOrientText = TbBottomOrientText.Text;
             Axis.TopOrientText = TbTopOrientText.Text;
+
             // markers position
             Axis.MarkersPosition = (AxisMarkersPosition)CbMarkersPosition.SelectedItem;
         }
@@ -82,13 +86,23 @@
         void ChangeOrientVisibility()
         {
             if (Axis.MarkersPosition == AxisMarkersPosition.Both || Axis.MarkersPosition == AxisMarkersPosition.Top)
+            {
                 TbTopOrientText.Visibility = Axis.TopOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
-            else TbTopOrientText.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                TbTopOrientText.Visibility = Visibility.Collapsed;
+            }
 
             if (Axis.MarkersPosition == AxisMarkersPosition.Both || Axis.MarkersPosition == AxisMarkersPosition.Bottom)
+            {
                 TbBottomOrientText.Visibility =
                     Axis.BottomOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
-            else TbBottomOrientText.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                TbBottomOrientText.Visibility = Visibility.Collapsed;
+            }
         }
 
         void ChangeSecondVisibility(bool show)
@@ -102,6 +116,7 @@
                 TbSecondPrefix.Visibility = TbSecondText.Visibility = TbSecondSuffix.Visibility = Visibility.Collapsed;
             }
         }
+
         void ChangeThirdVisibility(bool show)
         {
             if (show)
@@ -118,7 +133,11 @@
 
         private void AxisValueEditor_OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape) DialogResult = false;
+            if (e.Key == Key.Escape)
+            {
+                DialogResult = false;
+            }
+
             if (e.Key == Key.Enter)
             {
                 OnAccept();

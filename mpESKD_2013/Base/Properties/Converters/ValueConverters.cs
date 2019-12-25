@@ -1,11 +1,11 @@
-﻿using System;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
-using ModPlusAPI;
-
-namespace mpESKD.Base.Properties.Converters
+﻿namespace mpESKD.Base.Properties.Converters
 {
+    using System;
+    using System.Globalization;
+    using System.Windows;
+    using System.Windows.Data;
+    using ModPlusAPI;
+
     public class IntValueConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -15,9 +15,15 @@ namespace mpESKD.Base.Properties.Converters
                 && (value == null || value is int))
             {
                 if (value == null)
+                {
                     return "*" + Language.GetItem(Invariables.LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
-                if (double.IsNaN((int) value))
+                }
+
+                if (double.IsNaN((int)value))
+                {
                     return "*" + Language.GetItem(Invariables.LangItem, "vc2") + "*"; // НЕ ОПРЕДЕЛЕНО
+                }
+
                 return string.Empty;
             }
 
@@ -29,6 +35,7 @@ namespace mpESKD.Base.Properties.Converters
             throw new NotImplementedException();
         }
     }
+
     /// <inheritdoc />
     /// <summary>
     /// Вспомогательное преобразование числового значения в строковое
@@ -37,29 +44,36 @@ namespace mpESKD.Base.Properties.Converters
     /// </summary>
     public class DoubleValueConverter : IValueConverter
     {
-        public object Convert
-            (object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(
+            object value, Type targetType, object parameter, CultureInfo culture)
         {
             // Если преобразовываем в строку
             if (targetType == typeof(string)
                 && (value == null || value is double))
             {
                 if (value == null)
+                {
                     return "*" + Language.GetItem(Invariables.LangItem, "vc1") + "*"; // РАЗЛИЧНЫЕ
-                if (double.IsNaN((double) value))
+                }
+
+                if (double.IsNaN((double)value))
+                {
                     return "*" + Language.GetItem(Invariables.LangItem, "vc2") + "*"; // НЕ ОПРЕДЕЛЕНО
+                }
+
                 return string.Empty;
             }
 
             return null;
         }
 
-        public object ConvertBack
-            (object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(
+            object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
     }
+
     /// <inheritdoc />
     /// <summary>Конвертер ширины колонки у Grid для использования в одновременном изменении
     /// ширины колонок у всех UserControl в палитре</summary>
@@ -68,14 +82,20 @@ namespace mpESKD.Base.Properties.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is string str && !str.Equals("*"))
+            {
                 return new GridLength(double.Parse(str));
+            }
+
             return new GridLength(1, GridUnitType.Star);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is GridLength gridLength)
+            {
                 return gridLength.Value.ToString(CultureInfo.InvariantCulture);
+            }
+
             return "*";
         }
     }

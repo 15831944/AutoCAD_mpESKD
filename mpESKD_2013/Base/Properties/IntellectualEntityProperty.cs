@@ -5,7 +5,7 @@
     using System.Runtime.CompilerServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Enums;
-    using ModPlusAPI.Annotations;
+    using JetBrains.Annotations;
 
     public class IntellectualEntityProperty : INotifyPropertyChanged
     {
@@ -27,15 +27,20 @@
             Name = attribute.Name;
             DisplayNameLocalizationKey = attribute.DisplayNameLocalizationKey;
             if (propertyNameKeyInStyleEditor != null)
+            {
                 DisplayNameLocalizationKeyForStyleEditor = propertyNameKeyInStyleEditor.LocalizationKey;
+            }
+
             DescriptionLocalizationKey = attribute.DescriptionLocalizationKey;
             if (value != null && value.GetType() == typeof(AnnotationScale))
+            {
                 DefaultValue = new AnnotationScale
                 {
-                    Name = attribute.DefaultValue.ToString(), 
-                    DrawingUnits = double.Parse(attribute.DefaultValue.ToString().Split(':')[0]), 
+                    Name = attribute.DefaultValue.ToString(),
+                    DrawingUnits = double.Parse(attribute.DefaultValue.ToString().Split(':')[0]),
                     PaperUnits = double.Parse(attribute.DefaultValue.ToString().Split(':')[1])
                 };
+            }
             else if (Name == "LayerName" && string.IsNullOrEmpty(attribute.DefaultValue.ToString()))
             {
                 DefaultValue = ModPlusAPI.Language.GetItem(Invariables.LangItem, "defl");
@@ -49,15 +54,20 @@
             Maximum = attribute.Maximum;
             Value = value;
             if (value is double d)
+            {
                 DoubleValue = d;
+            }
+
             if (value is int i)
+            {
                 IntValue = i;
+            }
 
             PropertyScope = attribute.PropertyScope;
         }
 
         public Type EntityType { get; }
-        
+
         /// <summary>
         /// Идентификатор блока-владельца. Свойство используется при работе палитры.
         /// При работе со стилями свойство равно ObjectId.Null
@@ -75,7 +85,7 @@
         public string DisplayNameLocalizationKeyForStyleEditor { get; } = string.Empty;
 
         public string DescriptionLocalizationKey { get; }
-        
+
         public object DefaultValue { get; }
 
         public object Value
@@ -83,7 +93,11 @@
             get => _value;
             set
             {
-                if (Equals(value, _value)) return;
+                if (Equals(value, _value))
+                {
+                    return;
+                }
+
                 _value = value;
                 OnPropertyChanged();
             }
@@ -97,7 +111,11 @@
             get => _doubleValue;
             set
             {
-                if (value.Equals(_doubleValue)) return;
+                if (value.Equals(_doubleValue))
+                {
+                    return;
+                }
+
                 _doubleValue = value;
                 _value = value;
                 OnPropertyChanged();
@@ -112,7 +130,11 @@
             get => _intValue;
             set
             {
-                if (value == _intValue) return;
+                if (value == _intValue)
+                {
+                    return;
+                }
+
                 _intValue = value;
                 _value = value;
                 OnPropertyChanged();

@@ -50,14 +50,19 @@ namespace mpESKD.Base.Styles
                     StyleManager.GetStyles(entityType).ForEach(style =>
                     {
                         if (style.Guid == currentStyleGuidForEntity)
+                        {
                             style.IsCurrent = true;
+                        }
+
                         entityStyles.Styles.Add(style);
                     });
                     _styles.Add(entityStyles);
                 });
                 TvStyles.ItemsSource = _styles;
                 if (_styles.Any())
+                {
                     BtCreateStyleFromEntity.IsEnabled = true;
+                }
             }
             catch (Exception exception)
             {
@@ -68,11 +73,16 @@ namespace mpESKD.Base.Styles
         private void TvStyles_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (BorderProperties.Child != null)
+            {
                 BorderProperties.Child = null;
+            }
 
             var item = e.NewValue;
             if (item != null)
+            {
                 BtAddNewStyle.IsEnabled = true;
+            }
+
             if (item is EntityStyles entityStyles)
             {
                 BtRemoveStyle.IsEnabled = false;
@@ -88,7 +98,10 @@ namespace mpESKD.Base.Styles
                 ShowStyleProperties(style);
                 SetImage(style.EntityType.Name);
             }
-            else SetImage(string.Empty);
+            else
+            {
+                SetImage(string.Empty);
+            }
         }
 
         private void ShowStyleProperties(IntellectualEntityStyle style)
@@ -191,7 +204,10 @@ namespace mpESKD.Base.Styles
                             var layers = AcadHelpers.Layers;
                             layers.Insert(0, ModPlusAPI.Language.GetItem(Invariables.LangItem, "defl")); // "По умолчанию"
                             if (!layers.Contains(style.GetLayerNameProperty()))
+                            {
                                 layers.Insert(1, style.GetLayerNameProperty());
+                            }
+
                             cb.ItemsSource = layers;
                             cb.Style = Resources["PropertyValueComboBoxForStyleEditor"] as Style;
                             SetDescription(cb, propertyDescription);
@@ -401,13 +417,17 @@ namespace mpESKD.Base.Styles
                 {
                     var displayName = ModPlusAPI.Language.GetItem(Invariables.LangItem, property.DisplayNameLocalizationKeyForStyleEditor);
                     if (!string.IsNullOrEmpty(displayName))
+                    {
                         return displayName;
+                    }
                 }
 
                 {
                     var displayName = ModPlusAPI.Language.GetItem(Invariables.LangItem, property.DisplayNameLocalizationKey);
                     if (!string.IsNullOrEmpty(displayName))
+                    {
                         return displayName;
+                    }
                 }
             }
             catch
@@ -428,7 +448,9 @@ namespace mpESKD.Base.Styles
             {
                 var description = ModPlusAPI.Language.GetItem(Invariables.LangItem, property.DescriptionLocalizationKey);
                 if (!string.IsNullOrEmpty(description))
+                {
                     return description;
+                }
             }
             catch
             {
@@ -454,7 +476,10 @@ namespace mpESKD.Base.Styles
                 Path = new PropertyPath("Value")
             };
             if (converter != null)
+            {
                 binding.Converter = converter;
+            }
+
             return binding;
         }
 
@@ -498,7 +523,9 @@ namespace mpESKD.Base.Styles
         private void _OnGotFocus(object sender, RoutedEventArgs e)
         {
             if (sender is FrameworkElement element)
+            {
                 ShowDescription(element.Tag.ToString());
+            }
         }
 
         /// <summary>
@@ -539,6 +566,7 @@ namespace mpESKD.Base.Styles
                                     ((TextBox)sender).Text = ltr.Name;
                                 }
                             }
+
                             tr.Commit();
                         }
                     }
@@ -551,7 +579,10 @@ namespace mpESKD.Base.Styles
         {
             var selected = TvStyles.SelectedItem;
             if (selected == null)
+            {
                 return;
+            }
+
             if (selected is EntityStyles entityStyles)
             {
                 var newStyle = new IntellectualEntityStyle(entityStyles.EntityType, true)
@@ -576,16 +607,24 @@ namespace mpESKD.Base.Styles
 
         private void SetImage(string entityTypeName)
         {
-            if (string.IsNullOrEmpty(entityTypeName)) VbImage.Child = null;
+            if (string.IsNullOrEmpty(entityTypeName))
+            {
+                VbImage.Child = null;
+            }
             else
             {
                 {
                     if (Resources["Image" + entityTypeName] is Canvas imgResource)
+                    {
                         VbImage.Child = imgResource;
+                    }
                 }
+
                 {
                     if (Resources["Image" + entityTypeName] is Viewbox imgResource)
+                    {
                         VbImage.Child = imgResource;
+                    }
                 }
             }
         }
@@ -595,8 +634,12 @@ namespace mpESKD.Base.Styles
         {
             var selected = TvStyles.SelectedItem;
             if (selected == null)
+            {
                 return;
+            }
+
             if (selected is IntellectualEntityStyle style && style.CanEdit)
+            {
                 if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(Invariables.LangItem, "h69"), MessageBoxIcon.Question))
                 {
                     foreach (EntityStyles entityStyles in _styles)
@@ -608,12 +651,15 @@ namespace mpESKD.Base.Styles
                                 var index = entityStyles.Styles.IndexOf(style);
                                 entityStyles.Styles[index - 1].IsCurrent = true;
                             }
+
                             entityStyles.Styles.Remove(style);
                             break;
                         }
                     }
+
                     StyleManager.RemoveStyle(style);
                 }
+            }
         }
 
         // set current style
@@ -621,7 +667,10 @@ namespace mpESKD.Base.Styles
         {
             var selected = TvStyles.SelectedItem;
             if (selected == null)
+            {
                 return;
+            }
+
             if (selected is IntellectualEntityStyle style)
             {
                 _styles.Single(es => es.EntityType == style.EntityType).SetCurrent(style);
@@ -633,7 +682,10 @@ namespace mpESKD.Base.Styles
         {
             var selected = TvStyles.SelectedItem;
             if (selected == null)
+            {
                 return;
+            }
+
             if (selected is IntellectualEntityStyle style)
             {
                 _styles.Single(es => es.EntityType == style.EntityType).SetCurrent(style);
@@ -679,12 +731,18 @@ namespace mpESKD.Base.Styles
 
         private void BtExpandCollapseImage_OnMouseEnter(object sender, MouseEventArgs e)
         {
-            if (sender is Button bt) bt.Opacity = 1.0;
+            if (sender is Button bt)
+            {
+                bt.Opacity = 1.0;
+            }
         }
 
         private void BtExpandCollapseImage_OnMouseLeave(object sender, MouseEventArgs e)
         {
-            if (sender is Button bt) bt.Opacity = 0.4;
+            if (sender is Button bt)
+            {
+                bt.Opacity = 0.4;
+            }
         }
 
         private GridLength _topRowHeight;
@@ -763,7 +821,9 @@ namespace mpESKD.Base.Styles
                     }
 
                     if (!string.IsNullOrEmpty(newStyleGuid))
+                    {
                         SearchInTreeViewByGuid(newStyleGuid);
+                    }
                 }
             }
             catch (Exception exception)
@@ -793,14 +853,20 @@ namespace mpESKD.Base.Styles
                                 treeViewItem.IsExpanded = true;
                                 treeViewItem.UpdateLayout();
                                 if (treeViewItem.ItemContainerGenerator.ContainerFromIndex(treeViewItem.Items.Count - 1) is TreeViewItem tvi)
+                                {
                                     tvi.IsSelected = true;
+                                }
+
                                 collapseIt = false;
                                 break;
                             }
                         }
                     }
+
                     if (collapseIt && TvStyles.ItemContainerGenerator.ContainerFromItem(item) is TreeViewItem tvItem)
+                    {
                         tvItem.IsExpanded = false;
+                    }
                 }
             }
         }

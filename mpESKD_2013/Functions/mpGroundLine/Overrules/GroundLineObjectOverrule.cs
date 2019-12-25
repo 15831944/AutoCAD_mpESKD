@@ -14,8 +14,13 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
 
         public static GroundLineObjectOverrule Instance()
         {
-            if (_groundLineObjectOverrule != null) return _groundLineObjectOverrule;
+            if (_groundLineObjectOverrule != null)
+            {
+                return _groundLineObjectOverrule;
+            }
+
             _groundLineObjectOverrule = new GroundLineObjectOverrule();
+
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _groundLineObjectOverrule.SetXDataFilter(GroundLineDescriptor.Instance.Name);
             return _groundLineObjectOverrule;
@@ -28,7 +33,8 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             {
                 try
                 {
-                    if(AcadHelpers.Document != null )
+                    if (AcadHelpers.Document != null)
+                    {
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                         {
@@ -39,12 +45,14 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
                                 groundLine.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
                             }
                         }
+                    }
                 }
                 catch (Exception exception)
                 {
                     ExceptionBox.Show(exception);
                 }
             }
+
             base.Close(dbObject);
         }
 

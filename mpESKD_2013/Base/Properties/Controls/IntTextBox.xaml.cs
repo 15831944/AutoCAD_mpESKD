@@ -1,14 +1,14 @@
-﻿using System;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
-using ModPlusAPI.Windows;
-
-namespace mpESKD.Base.Properties.Controls
+﻿namespace mpESKD.Base.Properties.Controls
 {
-    public partial class IntTextBox 
+    using System;
+    using System.Globalization;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Data;
+    using System.Windows.Input;
+    using ModPlusAPI.Windows;
+
+    public partial class IntTextBox
     {
         /// <summary>
         /// Свойство зависимостей для свойства Value
@@ -16,6 +16,7 @@ namespace mpESKD.Base.Properties.Controls
         public static readonly DependencyProperty ValueProperty
             = DependencyProperty.Register("Value", typeof(int?), typeof(IntTextBox),
                 new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
         /// <summary>
         /// Числовое значение или null.
         /// Если null - в текстовом окошке выводится ""
@@ -25,6 +26,7 @@ namespace mpESKD.Base.Properties.Controls
             get => (int?)GetValue(ValueProperty);
             set => SetValue(ValueProperty, value);
         }
+
         /// <summary>
         /// Maximum value for the Numeric Up Down control
         /// </summary>
@@ -62,8 +64,7 @@ namespace mpESKD.Base.Properties.Controls
             {
                 try
                 {
-                    BindingOperations.GetBindingExpression
-                        (TextBox, TextBox.TextProperty).UpdateTarget();
+                    BindingOperations.GetBindingExpression(TextBox, TextBox.TextProperty)?.UpdateTarget();
                 }
                 catch (Exception ex)
                 {
@@ -80,23 +81,27 @@ namespace mpESKD.Base.Properties.Controls
         {
             UpdateSourceOrTarget();
         }
+
         void UpdateSourceOrTarget()
         {
             try
             {
-                BindingExpression bindExpr = BindingOperations.GetBindingExpression
-                    (TextBox, TextBox.TextProperty);
+                BindingExpression bindExpr = BindingOperations.GetBindingExpression(
+                    TextBox, TextBox.TextProperty);
 
-                bindExpr.UpdateSource();
+                bindExpr?.UpdateSource();
 
-                if (bindExpr.HasError)
+                if (bindExpr != null && bindExpr.HasError)
+                {
                     bindExpr.UpdateTarget();
+                }
             }
             catch (Exception ex)
             {
                 ExceptionBox.Show(ex);
             }
         }
+
         private void Increase_Click(object sender, RoutedEventArgs e)
         {
             if (Value < Maximum)
@@ -114,19 +119,30 @@ namespace mpESKD.Base.Properties.Controls
                 RaiseEvent(new RoutedEventArgs(DecreaseClickedEvent));
             }
         }
+
         private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox tb)
+            {
                 if (int.TryParse(tb.Text, out int num))
                 {
-                    if (num < Minimum) tb.Text = Minimum.ToString(CultureInfo.InvariantCulture);
-                    else if (num > Maximum) tb.Text = Maximum.ToString(CultureInfo.InvariantCulture);
-                    //if (num < Minimum) Value = Minimum;
-                    //else if (num > Maximum) Value = Maximum;
-                    //else Value = num;
+                    if (num < Minimum)
+                    {
+                        tb.Text = Minimum.ToString(CultureInfo.InvariantCulture);
+                    }
+                    else if (num > Maximum)
+                    {
+                        tb.Text = Maximum.ToString(CultureInfo.InvariantCulture);
+                    }
+
+                    // if (num < Minimum) Value = Minimum;
+                    // else if (num > Maximum) Value = Maximum;
+                    // else Value = num;
                 }
+            }
         }
-        //Increase button clicked
+
+        // Increase button clicked
         private static readonly RoutedEvent IncreaseClickedEvent =
             EventManager.RegisterRoutedEvent("IncreaseClicked", RoutingStrategy.Bubble,
                 typeof(RoutedEventHandler), typeof(IntTextBox));
@@ -134,11 +150,11 @@ namespace mpESKD.Base.Properties.Controls
         /// <summary>The IncreaseClicked event is called when the Increase button clicked</summary>
         public event RoutedEventHandler IncreaseClicked
         {
-            add { AddHandler(IncreaseClickedEvent, value); }
-            remove { RemoveHandler(IncreaseClickedEvent, value); }
+            add => AddHandler(IncreaseClickedEvent, value);
+            remove => RemoveHandler(IncreaseClickedEvent, value);
         }
 
-        //Increase button clicked
+        // Increase button clicked
         private static readonly RoutedEvent DecreaseClickedEvent =
             EventManager.RegisterRoutedEvent("DecreaseClicked", RoutingStrategy.Bubble,
                 typeof(RoutedEventHandler), typeof(IntTextBox));
@@ -146,8 +162,8 @@ namespace mpESKD.Base.Properties.Controls
         /// <summary>The DecreaseClicked event is called when the Decrease button clicked</summary>
         public event RoutedEventHandler DecreaseClicked
         {
-            add { AddHandler(DecreaseClickedEvent, value); }
-            remove { RemoveHandler(DecreaseClickedEvent, value); }
+            add => AddHandler(DecreaseClickedEvent, value);
+            remove => RemoveHandler(DecreaseClickedEvent, value);
         }
 
         private void TextBox_OnTextInput(object sender, TextCompositionEventArgs e)
@@ -155,19 +171,19 @@ namespace mpESKD.Base.Properties.Controls
             var tb = (TextBox)sender;
             var text = tb.Text.Insert(tb.CaretIndex, e.Text);
 
-            //e.Handled = !_numMatch.IsMatch(text);
+            // e.Handled = !_numMatch.IsMatch(text);
             e.Handled = !int.TryParse(text, out int num);
         }
 
         private void SelectAddress(object sender, RoutedEventArgs e)
         {
-            TextBox tb = (TextBox) sender;
+            TextBox tb = (TextBox)sender;
             tb?.SelectAll();
         }
 
         private void SelectivelyIgnoreMouseButton(object sender, MouseButtonEventArgs e)
         {
-            TextBox tb = (TextBox) sender;
+            TextBox tb = (TextBox)sender;
             if (tb != null)
             {
                 if (!tb.IsKeyboardFocusWithin)

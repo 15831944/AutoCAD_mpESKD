@@ -30,7 +30,10 @@ namespace mpESKD.Base.Properties
                     }
                 }
             }
-            else IsValid = false;
+            else
+            {
+                IsValid = false;
+            }
         }
 
         /// <summary>
@@ -66,7 +69,9 @@ namespace mpESKD.Base.Properties
         {
             BlockReference blkRef = sender as BlockReference;
             if (blkRef != null)
+            {
                 Update(blkRef);
+            }
         }
 
         private void Create(BlockReference blockReference)
@@ -76,6 +81,7 @@ namespace mpESKD.Base.Properties
                 _blkRefObjectId = ObjectId.Null;
                 return;
             }
+
             var intellectualEntity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
             if (intellectualEntity != null)
             {
@@ -109,7 +115,7 @@ namespace mpESKD.Base.Properties
                         }
                         else if (attribute.Name == "LineType")
                         {
-                            IntellectualEntityProperty property = 
+                            IntellectualEntityProperty property =
                                 new IntellectualEntityProperty(attribute, keyForEditorAttribute, entityType, blockReference.Linetype, _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
@@ -119,7 +125,7 @@ namespace mpESKD.Base.Properties
                             var value = propertyInfo.GetValue(intellectualEntity);
                             if (value != null)
                             {
-                                IntellectualEntityProperty property = 
+                                IntellectualEntityProperty property =
                                     new IntellectualEntityProperty(attribute, keyForEditorAttribute, entityType, value, _blkRefObjectId);
                                 property.PropertyChanged += Property_PropertyChanged;
                                 Properties.Add(property);
@@ -149,6 +155,7 @@ namespace mpESKD.Base.Properties
                     _blkRefObjectId = ObjectId.Null;
                     return;
                 }
+
                 var intellectualEntity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
                 if (intellectualEntity != null)
                 {
@@ -194,15 +201,19 @@ namespace mpESKD.Base.Properties
             {
                 // ignore
             }
+
             _isModifiedFromAutocad = false;
         }
 
         private void Property_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(_isModifiedFromAutocad)
+            if (_isModifiedFromAutocad)
+            {
                 return;
+            }
+
             Overrule.Overruling = false;
-            IntellectualEntityProperty intellectualEntityProperty = (IntellectualEntityProperty) sender;
+            IntellectualEntityProperty intellectualEntityProperty = (IntellectualEntityProperty)sender;
             try
             {
                 using (AcadHelpers.Document.LockDocument())
@@ -224,26 +235,36 @@ namespace mpESKD.Base.Properties
                             else if (intellectualEntityProperty.Name == "LayerName")
                             {
                                 if (blockReference != null)
+                                {
                                     blockReference.Layer = intellectualEntityProperty.Value.ToString();
+                                }
                             }
                             else if (intellectualEntityProperty.Name == "LineType")
                             {
                                 if (blockReference != null)
+                                {
                                     blockReference.Linetype = intellectualEntityProperty.Value.ToString();
+                                }
                             }
                             else
+                            {
                                 propertyInfo.SetValue(_intellectualEntity, intellectualEntityProperty.Value);
+                            }
 
                             _intellectualEntity.UpdateEntities();
                             _intellectualEntity.GetBlockTableRecordWithoutTransaction(blockReference);
                             using (var resBuf = _intellectualEntity.GetDataForXData())
                             {
                                 if (blockReference != null)
+                                {
                                     blockReference.XData = resBuf;
+                                }
                             }
 
                             if (blockReference != null)
+                            {
                                 blockReference.ResetBlock();
+                            }
                         }
                     }
                 }
@@ -253,7 +274,9 @@ namespace mpESKD.Base.Properties
             catch (System.Exception exception)
             {
                 if (exception.Message != "eOnLockedLayer")
+                {
                     ExceptionBox.Show(exception);
+                }
                 else
                 {
                     OnLockedLayerEventHandler?.Invoke(this, intellectualEntityProperty);

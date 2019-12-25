@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Autodesk.AutoCAD.DatabaseServices;
-
-namespace mpESKD.Base.Properties
+﻿namespace mpESKD.Base.Properties
 {
+    using System;
+    using System.Collections.Generic;
+    using Autodesk.AutoCAD.DatabaseServices;
+
     /// <inheritdoc />
     /// <summary>
     /// Объект для сравнения значений типа Double
@@ -62,7 +62,7 @@ namespace mpESKD.Base.Properties
         /// <returns></returns>
         public static AnnotationScale AnnotationScaleFromString(string str)
         {
-            var defaultScale = new AnnotationScale {Name = "1:1", DrawingUnits = 1.0, PaperUnits = 1.0};
+            var defaultScale = new AnnotationScale { Name = "1:1", DrawingUnits = 1.0, PaperUnits = 1.0 };
             var splitted = str.Split(':');
             if (splitted.Length == 2)
             {
@@ -74,6 +74,7 @@ namespace mpESKD.Base.Properties
                 };
                 return scale;
             }
+
             return defaultScale;
         }
     }

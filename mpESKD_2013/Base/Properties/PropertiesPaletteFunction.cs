@@ -13,14 +13,13 @@
         private const string LangItem = "mpESKD";
         public static PaletteSet PaletteSet;
         private static PropertiesPalette _propertiesPalette;
+
         [CommandMethod("ModPlus", "mpPropertiesPalette", CommandFlags.Modal)]
         public static void Start()
         {
             try
             {
-                if (!(!bool.TryParse(
-                          UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "AddToMpPalette"),
-                          out bool b) | b))
+                if (!(!bool.TryParse(UserConfigFile.GetValue("mpESKD", "AddToMpPalette"), out bool b) | b))
                 {
                     MainFunction.RemoveFromMpPalette(false);
                     if (PaletteSet != null)
@@ -58,6 +57,7 @@
                     {
                         PaletteSet.Visible = false;
                     }
+
                     MainFunction.AddToMpPalette(true);
                 }
             }
@@ -66,6 +66,7 @@
                 ExceptionBox.Show(exception);
             }
         }
+
         private static void _paletteSet_Load(object sender, PalettePersistEventArgs e)
         {
             double num = (double)e.ConfigurationSection.ReadProperty("mpPropertiesPalette", 22.3);

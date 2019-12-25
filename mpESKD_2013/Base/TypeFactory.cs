@@ -36,13 +36,24 @@
         public IIntellectualEntityDescriptor GetDescriptor(Type entityType)
         {
             if (entityType == typeof(BreakLine))
+            {
                 return BreakLineDescriptor.Instance;
+            }
+
             if (entityType == typeof(Axis))
+            {
                 return AxisDescriptor.Instance;
+            }
+
             if (entityType == typeof(GroundLine))
+            {
                 return GroundLineDescriptor.Instance;
+            }
+
             if (entityType == typeof(Section))
+            {
                 return SectionDescriptor.Instance;
+            }
 
             return null;
         }

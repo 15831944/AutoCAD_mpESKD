@@ -1,7 +1,6 @@
 ﻿namespace mpESKD.Base.Helpers
 {
     using System;
-    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
@@ -13,6 +12,7 @@
     using Autodesk.AutoCAD.Runtime;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
     public static class AcadHelpers
     {
@@ -54,11 +54,14 @@
                             {
                                 var layer = tr.GetObject(layerId, OpenMode.ForRead) as LayerTableRecord;
                                 if (layer != null && !layer.IsErased && !layer.IsEraseStatusToggled)
+                                {
                                     layers.Add(layer.Name);
+                                }
                             }
                         }
                     }
                 }
+
                 return layers;
             }
         }
@@ -78,6 +81,7 @@
                         scales.Add(((AnnotationScale)objectContext).Name);
                     }
                 }
+
                 return scales;
             }
         }
@@ -105,10 +109,13 @@
                         {
                             var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
                             if (!textStyles.Contains(txtStl.Name))
+                            {
                                 textStyles.Add(txtStl.Name);
+                            }
                         }
                     }
                 }
+
                 return textStyles;
             }
         }
@@ -157,6 +164,7 @@
             {
                 blockTableRecord.AppendEntity(enity);
             }
+
             return new BlockReference(point, blockTableRecord.ObjectId);
         }
 
@@ -170,12 +178,18 @@
             {
                 var occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
                 if (occ != null)
+                {
                     foreach (var objectContext in occ)
                     {
                         var asc = objectContext as AnnotationScale;
-                        if (asc?.Name == name) return asc;
+                        if (asc?.Name == name)
+                        {
+                            return asc;
+                        }
                     }
+                }
             }
+
             return Database.Cannoscale;
         }
 
@@ -194,8 +208,11 @@
         public static void SetLayerByName(ObjectId blkRefObjectId, string layerName, XElement layerXmlData)
         {
             if (blkRefObjectId == ObjectId.Null)
+            {
                 return;
-            if (!layerName.Equals(Language.GetItem(Invariables.LangItem, "defl"))) // "По умолчанию"
+            }
+
+            if (!layerName.Equals(Language.GetItem(Invariables.LangItem, "defl"))) //// "По умолчанию"
             {
                 if (LayerHelper.HasLayer(layerName))
                 {
@@ -204,7 +221,11 @@
                         using (Transaction tr = Database.TransactionManager.StartTransaction())
                         {
                             var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
-                            if (blockReference != null) blockReference.Layer = layerName;
+                            if (blockReference != null)
+                            {
+                                blockReference.Layer = layerName;
+                            }
+
                             tr.Commit();
                         }
                     }
@@ -214,29 +235,41 @@
                     if (MainStaticSettings.Settings.IfNoLayer == 1)
                     {
                         if (LayerHelper.AddLayerFromXelement(layerXmlData))
+                        {
                             using (Document.LockDocument())
                             {
                                 using (Transaction tr = Database.TransactionManager.StartTransaction())
                                 {
                                     var blockReference =
                                         tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
-                                    if (blockReference != null) blockReference.Layer = layerName;
+                                    if (blockReference != null)
+                                    {
+                                        blockReference.Layer = layerName;
+                                    }
+
                                     tr.Commit();
                                 }
                             }
+                        }
                     }
                 }
             }
             else
             {
                 if (Database.Clayer != ObjectId.Null && blkRefObjectId != ObjectId.Null)
+                {
                     using (Transaction tr = Database.TransactionManager.StartTransaction())
                     {
                         var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
                         var layer = tr.GetObject(Database.Clayer, OpenMode.ForRead) as LayerTableRecord;
-                        if (blockReference != null) blockReference.Layer = layer?.Name;
+                        if (blockReference != null)
+                        {
+                            blockReference.Layer = layer?.Name;
+                        }
+
                         tr.Commit();
                     }
+                }
             }
         }
 
@@ -254,7 +287,10 @@
         {
 
             var lt = "Continuous";
-            if (ltid == ObjectId.Null) return lt;
+            if (ltid == ObjectId.Null)
+            {
+                return lt;
+            }
 
             using (Document.LockDocument())
             {
@@ -265,6 +301,7 @@
                     tr.Commit();
                 }
             }
+
             return lt;
         }
 
@@ -274,7 +311,10 @@
         public static ObjectId GetLineTypeObjectId(string ltname)
         {
             var ltid = ObjectId.Null;
-            if (string.IsNullOrEmpty(ltname)) return ObjectId.Null;
+            if (string.IsNullOrEmpty(ltname))
+            {
+                return ObjectId.Null;
+            }
 
             using (Document.LockDocument())
             {
@@ -282,6 +322,7 @@
                 {
                     var lttbl = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
                     if (lttbl != null)
+                    {
                         if (lttbl.Has(ltname))
                         {
                             ltid = lttbl[ltname];
@@ -299,24 +340,36 @@
                             catch (Autodesk.AutoCAD.Runtime.Exception exception)
                             {
                                 if (exception.ErrorStatus == ErrorStatus.FilerError)
+                                {
                                     MessageBox.Show(Language.GetItem(Invariables.LangItem, "err1") + ": " + filename, MessageBoxIcon.Close); // Не удалось найти файл
+                                }
                                 else if (exception.ErrorStatus == ErrorStatus.DuplicateRecordName)
                                 {
                                     // ignore
                                 }
-                                else MessageBox.Show(Language.GetItem(Invariables.LangItem, "err2") + ": " + ltname, MessageBoxIcon.Close); //Не удалось загрузить тип линий
+                                else
+                                {
+                                    MessageBox.Show(Language.GetItem(Invariables.LangItem, "err2") + ": " + ltname, MessageBoxIcon.Close); // Не удалось загрузить тип линий
+                                }
                             }
                         }
+                    }
+
                     tr.Commit();
                 }
             }
+
             return ltid;
         }
 
         /// <summary>Установка типа линии для блока согласно стиля</summary>
         public static void SetLineType(ObjectId blkRefObjectId, string lineTypeName)
         {
-            if (blkRefObjectId == ObjectId.Null) return;
+            if (blkRefObjectId == ObjectId.Null)
+            {
+                return;
+            }
+
             using (Document.LockDocument())
             {
                 using (var tr = Document.TransactionManager.StartTransaction())
@@ -325,13 +378,18 @@
                     if (blockReference != null)
                     {
                         if (HasLineType(lineTypeName, tr))
+                        {
                             blockReference.Linetype = lineTypeName;
+                        }
                         else
                         {
                             if (LoadLineType(lineTypeName))
+                            {
                                 blockReference.Linetype = lineTypeName;
+                            }
                         }
                     }
+
                     tr.Commit();
                 }
             }
@@ -342,7 +400,10 @@
         {
             var linetypeTable = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
             if (linetypeTable != null)
-                return (linetypeTable.Has(lineTypeName));
+            {
+                return linetypeTable.Has(lineTypeName);
+            }
+
             return false;
         }
 
@@ -368,6 +429,7 @@
                     }
                 }
             }
+
             if (!loaded)
             {
                 try
@@ -380,6 +442,7 @@
                     // ignore
                 }
             }
+
             return loaded;
         }
 
@@ -394,10 +457,13 @@
                     {
                         var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
                         if (txtStl.Name.Equals(textStyleName))
+                        {
                             return objectId;
+                        }
                     }
                 }
             }
+
             return ObjectId.Null;
         }
 
@@ -417,14 +483,20 @@
                 foreach (ObjectId objectId in blockTableRecord)
                 {
                     if (objectId == ObjectId.Null)
+                    {
                         continue;
+                    }
+
                     if (tr.GetObject(objectId, OpenMode.ForRead) is BlockReference blockReference)
                     {
                         var xData = blockReference.GetXDataForApplication(appName);
                         if (xData != null)
+                        {
                             list.Add(EntityReaderFactory.Instance.GetFromEntity<T>(blockReference));
+                        }
                     }
                 }
+
                 tr.Commit();
             }
 
@@ -457,6 +529,7 @@
                     rat.Add(regAppTableRecord);
                     tr.AddNewlyCreatedDBObject(regAppTableRecord, true);
                 }
+
                 tr.Commit();
             }
         }
@@ -471,16 +544,25 @@
         {
             DBObject dbObject = rxObject as DBObject;
             if (dbObject == null)
+            {
                 return false;
+            }
+
             if (checkIsNullId)
+            {
                 if (dbObject.ObjectId == ObjectId.Null)
+                {
                     return false;
+                }
+            }
+
             if (dbObject is BlockReference)
             {
                 // Всегда нужно проверять по наличию расширенных данных
                 // иначе может привести к фаталам при работе с динамическими блоками
                 return IsIntellectualEntity(dbObject, appName);
             }
+
             return false;
         }
 
@@ -490,7 +572,10 @@
         public static bool IsApplicable(BlockReference blockReference)
         {
             if (blockReference.XData == null)
+            {
                 return false;
+            }
+
             var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
             var typedValue = blockReference.XData.AsArray()
                 .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()));

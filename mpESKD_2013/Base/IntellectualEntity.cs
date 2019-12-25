@@ -17,7 +17,7 @@ namespace mpESKD.Base
     using System.Runtime.Serialization.Formatters.Binary;
     using Autodesk.AutoCAD.Colors;
     using Enums;
-    using ModPlusAPI.Annotations;
+    using JetBrains.Annotations;
     using ModPlusAPI.FunctionDataHelpers.mpESKD;
     using Styles;
 
@@ -111,22 +111,28 @@ namespace mpESKD.Base
             get
             {
                 if (_scale != null)
+                {
                     return _scale;
+                }
+
                 return new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1 };
             }
+
             set
             {
                 var oldScale = _scale;
                 _scale = value;
                 if (oldScale != null && oldScale != value)
+                {
                     ProcessScaleChange(oldScale, value);
+                }
             }
         }
 
         protected virtual void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
         {
         }
-        
+
         /// <summary>
         /// Тип линии. Свойство является абстрактным, так как в зависимости от интеллектуального примитива
         /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 4
@@ -189,7 +195,7 @@ namespace mpESKD.Base
                                 _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite, true, true);
                                 if (_blockRecord.GetBlockReferenceIds(true, true).Count <= 1)
                                 {
-                                    //Debug.Print("Erasing");
+                                    // Debug.Print("Erasing");
                                     foreach (var objectId in _blockRecord)
                                     {
                                         tr.GetObject(objectId, OpenMode.ForWrite, true, true).Erase();
@@ -200,7 +206,7 @@ namespace mpESKD.Base
                                     _blockRecord = new BlockTableRecord { Name = "*U", BlockScaling = BlockScaling.Uniform };
                                     using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
                                     {
-                                        //Debug.Print("Creating new (no erasing)");
+                                        // Debug.Print("Creating new (no erasing)");
                                         blockTable.Add(_blockRecord);
                                         tr.AddNewlyCreatedDBObject(_blockRecord, true);
                                     }
@@ -218,7 +224,8 @@ namespace mpESKD.Base
                                 _blockRecord.BlockScaling = BlockScaling.Uniform;
 
                                 var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
-                                //Debug.Print("Transformed copy");
+
+                                // Debug.Print("Transformed copy");
                                 foreach (var entity in _entities)
                                 {
                                     if (entity.Visible)
@@ -237,7 +244,7 @@ namespace mpESKD.Base
                     }
                     else if (!IsValueCreated)
                     {
-                        //Debug.Print("Value not created");
+                        // Debug.Print("Value not created");
                         var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
                         foreach (var entity in _entities)
                         {
@@ -365,6 +372,7 @@ namespace mpESKD.Base
             {
                 // ReSharper disable once UseObjectOrCollectionInitializer
                 var resultBuffer = new ResultBuffer();
+
                 // 1001 - DxfCode.ExtendedDataRegAppName. AppName
                 resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, appName));
 
@@ -385,7 +393,8 @@ namespace mpESKD.Base
                                 propertiesDataDictionary.Add(propertyInfo.Name, vector.AsString());
                                 break;
                             case List<Point3d> list:
-                                var str = string.Join("#",
+                                var str = string.Join(
+                                    "#",
                                     list.Select(p => (p.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS).AsString()));
                                 propertiesDataDictionary.Add(propertyInfo.Name, str);
                                 break;
@@ -441,14 +450,16 @@ namespace mpESKD.Base
             try
             {
                 TypedValue typedValue1001 = resultBuffer.AsArray().FirstOrDefault(tv =>
-                    tv.TypeCode == (int) DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
+                    tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
                 if (typedValue1001.Value != null)
                 {
                     var binaryFormatter = new BinaryFormatter { Binder = new Binder() };
                     var memoryStream = GetMemoryStreamFromResultBuffer(resultBuffer);
                     var deserialize = binaryFormatter.Deserialize(memoryStream);
                     if (deserialize is DataHolder dataHolder)
+                    {
                         WritePropertiesFromReadedData(skipPoints, dataHolder.Data);
+                    }
                 }
             }
             catch (SerializationException)
@@ -476,7 +487,7 @@ namespace mpESKD.Base
 
             return memoryStream;
         }
-        
+
         /// <summary>
         /// Запись свойств текущего экземпляра интеллектуального объекта, полученных из расширенных
         /// данных блока в виде словаря
@@ -494,7 +505,9 @@ namespace mpESKD.Base
                         ? data[propertyInfo.Name].ToString()
                         : string.Empty;
                     if (string.IsNullOrEmpty(valueForProperty))
+                    {
                         continue;
+                    }
 
                     if (propertyInfo.Name == nameof(StyleGuid))
                     {
@@ -508,7 +521,10 @@ namespace mpESKD.Base
                     else if (propertyInfo.PropertyType == typeof(Point3d))
                     {
                         if (skipPoints)
+                        {
                             continue;
+                        }
+
                         var vector = valueForProperty.ParseToPoint3d().GetAsVector();
                         var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
                         propertyInfo.SetValue(this, point);
@@ -516,7 +532,10 @@ namespace mpESKD.Base
                     else if (propertyInfo.PropertyType == typeof(List<Point3d>))
                     {
                         if (skipPoints)
+                        {
                             continue;
+                        }
+
                         List<Point3d> points = new List<Point3d>();
                         foreach (string s in valueForProperty.Split('#'))
                         {
@@ -571,8 +590,10 @@ namespace mpESKD.Base
                         if (entity != null && destinationBlockReference != null)
                         {
                             destinationBlockReference.LinetypeId = entity.LinetypeId;
-                            if(copyLayer)
+                            if (copyLayer)
+                            {
                                 destinationBlockReference.Layer = entity.Layer;
+                            }
                         }
 
                         tr.Commit();

@@ -54,9 +54,9 @@
                 var section = new Section(sectionLastIntegerValue, sectionLastLetterValue);
 
                 var blockReference = MainFunction.CreateBlock(section);
-                
+
                 section.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
-                
+
                 InsertSectionWithJig(true, section, blockReference);
             }
             catch (System.Exception exception)
@@ -97,7 +97,10 @@
                 peo.AddAllowedClass(typeof(Polyline), true);
 
                 var per = AcadHelpers.Editor.GetEntity(peo);
-                if (per.Status != PromptStatus.OK) return;
+                if (per.Status != PromptStatus.OK)
+                {
+                    return;
+                }
 
                 /* Регистрация ЕСКД приложения должна запускаться при запуске
                  * функции, т.к. регистрация происходит в текущем документе
@@ -126,11 +129,17 @@
                             for (int i = 0; i < pline.NumberOfVertices; i++)
                             {
                                 if (i == 0)
+                                {
                                     section.InsertionPoint = pline.GetPoint3dAt(i);
+                                }
                                 else if (i == pline.NumberOfVertices - 1)
+                                {
                                     section.EndPoint = pline.GetPoint3dAt(i);
+                                }
                                 else
+                                {
                                     section.MiddlePoints.Add(pline.GetPoint3dAt(i));
+                                }
                             }
 
                             section.UpdateEntities();
@@ -140,6 +149,7 @@
                             ent.Position = pline.GetPoint3dAt(0);
                             ent.XData = section.GetDataForXData();
                         }
+
                         tr.Commit();
                     }
 
@@ -215,8 +225,13 @@
                     if (isSimple)
                     {
                         if (entityJig.JigState == JigState.PromptInsertPoint)
+                        {
                             entityJig.JigState = JigState.PromptNextPoint;
-                        else break;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     else
                     {
@@ -250,7 +265,7 @@
                         {
                             using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                             {
-                                var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
+                                var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                                 obj.Erase(true);
                                 tr.Commit();
                             }
@@ -285,8 +300,13 @@
                     sections.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
                     var v = sections.Last().Designation;
                     if (int.TryParse(v, out var i))
+                    {
                         sectionLastIntegerValue = i.ToString();
-                    else sectionLastLetterValue = v;
+                    }
+                    else
+                    {
+                        sectionLastLetterValue = v;
+                    }
                 }
             }
         }
@@ -301,7 +321,9 @@
             {
                 SectionValueEditor sectionValueEditor = new SectionValueEditor { Section = section };
                 if (sectionValueEditor.ShowDialog() == true)
+                {
                     saveBack = true;
+                }
             }
             else
             {
@@ -316,8 +338,8 @@
                 {
                     blockReference.XData = resBuf;
                 }
-                
             }
+
             section.Dispose();
         }
     }

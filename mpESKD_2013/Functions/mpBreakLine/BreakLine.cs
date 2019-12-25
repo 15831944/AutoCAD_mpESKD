@@ -47,11 +47,20 @@ namespace mpESKD.Functions.mpBreakLine
             get
             {
                 if (BreakLineType == BreakLineType.Linear)
+                {
                     return 15.0;
+                }
+
                 if (BreakLineType == BreakLineType.Curvilinear)
+                {
                     return 1.0;
+                }
+
                 if (BreakLineType == BreakLineType.Cylindrical)
+                {
                     return 1.0;
+                }
+
                 return 15.0;
             }
         }
@@ -86,12 +95,10 @@ namespace mpESKD.Functions.mpBreakLine
         #region Points
 
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
-        public Point3d MiddlePoint => new Point3d
-        (
+        public Point3d MiddlePoint => new Point3d(
             (InsertionPoint.X + EndPoint.X) / 2,
             (InsertionPoint.Y + EndPoint.Y) / 2,
-            (InsertionPoint.Z + EndPoint.Z) / 2
-        );
+            (InsertionPoint.Z + EndPoint.Z) / 2);
 
         #endregion
 
@@ -107,8 +114,13 @@ namespace mpESKD.Functions.mpBreakLine
             {
                 var entities = new List<Entity> { _mainPolyline };
                 foreach (var e in entities)
+                {
                     if (e != null)
+                    {
                         SetImmutablePropertiesToNestedEntity(e);
+                    }
+                }
+
                 return entities;
             }
         }
@@ -142,6 +154,7 @@ namespace mpESKD.Functions.mpBreakLine
                 ExceptionBox.Show(exception);
             }
         }
+
         /// <summary>
         /// Построение "базового" простого варианта ЕСКД примитива
         /// Тот вид, который висит на мышке при создании и указании точки вставки
@@ -154,7 +167,7 @@ namespace mpESKD.Functions.mpBreakLine
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                var tmpEndPoint = new Point3d(InsertionPointOCS.X + BreakLineMinLength * scale, InsertionPointOCS.Y, InsertionPointOCS.Z);
+                var tmpEndPoint = new Point3d(InsertionPointOCS.X + (BreakLineMinLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
 
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
@@ -192,30 +205,33 @@ namespace mpESKD.Functions.mpBreakLine
                     pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(endPoint, insertionPoint, insertionPoint, Overhang * scale));
                     bulges.Add(0.0);
                 }
+
                 // Первая точка, соответствующая ручке
                 pts.Add(insertionPoint.ConvertPoint3dToPoint2d());
                 bulges.Add(0.0);
-                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - BreakWidth / 2.0 * scale));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) - (BreakWidth / 2.0 * scale)));
                 bulges.Add(0.0);
                 pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,
-                    ModPlus.Helpers.GeometryHelpers.ConvertPoint2DToPoint3D(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - BreakWidth / 4.0 * scale)),
+                    ModPlus.Helpers.GeometryHelpers.ConvertPoint2DToPoint3D(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) - (BreakWidth / 4.0 * scale))),
                     BreakHeight / 2.0 * scale));
                 bulges.Add(0.0);
                 pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(insertionPoint, ModPlus.Helpers.GeometryHelpers.ConvertPoint2DToPoint3D(
-                    ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 + BreakWidth / 4.0 * scale)), -BreakHeight / 2.0 * scale));
+                    ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) + (BreakWidth / 4.0 * scale))), -BreakHeight / 2.0 * scale));
                 bulges.Add(0.0);
-                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 + BreakWidth / 2.0 * scale));
+                pts.Add(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) + (BreakWidth / 2.0 * scale)));
                 bulges.Add(0.0);
+
                 // Конечная точка, соответствующая ручке
                 pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
                 bulges.Add(0.0);
                 if (Overhang > 0)
                 {
-                    pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length + Overhang * scale));
+                    pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length + (Overhang * scale)));
                     bulges.Add(0.0);
                 }
             }
+
             if (BreakLineType == BreakLineType.Curvilinear)
             {
                 if (Overhang > 0)
@@ -223,10 +239,10 @@ namespace mpESKD.Functions.mpBreakLine
                     pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                         insertionPoint,
                         ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(endPoint, insertionPoint, insertionPoint, Overhang / 100.0 * length),
-                        -Overhang / 200.0 * length
-                    ));
+                        -Overhang / 200.0 * length));
                     bulges.Add(length / 10 / length / 4 * 2);
                 }
+
                 // Первая точка, соответствующая ручке
                 pts.Add(insertionPoint.ConvertPoint3dToPoint2d());
                 bulges.Add(length / 10 / length / 2 * 4);
@@ -234,6 +250,7 @@ namespace mpESKD.Functions.mpBreakLine
                 // Средняя точка
                 pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 2));
                 bulges.Add(-length / 10 / length / 2 * 4);
+
                 // Конечная точка, соответствующая ручке
                 pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
                 bulges.Add(0);
@@ -242,11 +259,11 @@ namespace mpESKD.Functions.mpBreakLine
                     pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                         insertionPoint,
                         ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, endPoint, Overhang / 100.0 * length),
-                        -Overhang / 200.0 * length
-                    ));
+                        -Overhang / 200.0 * length));
                     bulges.Add(length / 10 / length / 4 * 2);
                 }
             }
+
             if (BreakLineType == BreakLineType.Cylindrical)
             {
                 // first
@@ -255,30 +272,30 @@ namespace mpESKD.Functions.mpBreakLine
                 pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,
                     ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, insertionPoint, length / 10.0),
-                    length / 10
-                ));
+                    length / 10));
                 bulges.Add(-length / 10 / length / 2 * 3);
-                //center
+
+                // center
                 pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 2));
                 bulges.Add(length / 10 / length / 2 * 3);
                 pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,
                     ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, insertionPoint, length - (length / 10.0)),
-                    -length / 10
-                    ));
+                    -length / 10));
                 bulges.Add(0.392699081698724);
+
                 // endpoint
                 pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
                 bulges.Add(0.392699081698724);
                 pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,
                     ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, insertionPoint, length - (length / 10.0)),
-                    length / 10
-                ));
+                    length / 10));
                 bulges.Add(length / 10 / length / 2 * 3);
                 pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 2));
                 bulges.Add(0.0);
             }
+
             return pts;
         }
 

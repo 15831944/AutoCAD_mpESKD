@@ -36,10 +36,12 @@ namespace mpESKD.Base.Helpers
             {
                 var splitted = str.Split('$');
                 if (splitted.Length == 3)
+                {
                     return new Point3d(
                         double.Parse(splitted[0]),
                         double.Parse(splitted[1]),
                         double.Parse(splitted[2]));
+                }
             }
 
             return Point3d.Origin;

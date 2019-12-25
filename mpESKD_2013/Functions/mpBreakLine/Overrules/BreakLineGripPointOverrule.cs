@@ -17,10 +17,16 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
     public class BreakLineGripPointsOverrule : GripOverrule
     {
         protected static BreakLineGripPointsOverrule _breakLineGripPointOverrule;
+
         public static BreakLineGripPointsOverrule Instance()
         {
-            if (_breakLineGripPointOverrule != null) return _breakLineGripPointOverrule;
+            if (_breakLineGripPointOverrule != null)
+            {
+                return _breakLineGripPointOverrule;
+            }
+
             _breakLineGripPointOverrule = new BreakLineGripPointsOverrule();
+
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _breakLineGripPointOverrule.SetXDataFilter(BreakLineDescriptor.Instance.Name);
             return _breakLineGripPointOverrule;
@@ -39,6 +45,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                     // Чтобы "отключить" точку вставки блока, нужно получить сначала блок
                     // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
                     BlockReference blkRef = (BlockReference)entity;
+
                     // Удаляем стандартную ручку позиции блока (точки вставки)
                     GripData toRemove = null;
                     foreach (GripData gd in grips)
@@ -49,11 +56,17 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                             break;
                         }
                     }
-                    if (toRemove != null) grips.Remove(toRemove);
+
+                    if (toRemove != null)
+                    {
+                        grips.Remove(toRemove);
+                    }
+
                     // Получаем экземпляр класса, который описывает как должен выглядеть примитив
                     // т.е. правила построения графики внутри блока
                     // Информация собирается по XData и свойствам самого блока
                     var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(entity);
+
                     // Паранойя программиста =)
                     if (breakLine != null)
                     {
@@ -66,6 +79,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                             GripPoint = breakLine.InsertionPoint // вот эта точка из экземпляра класса breakline
                         };
                         grips.Add(gp);
+
                         // получаем среднюю ручку
                         gp = new BreakLineGrip
                         {
@@ -75,6 +89,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                             GripPoint = breakLine.MiddlePoint
                         };
                         grips.Add(gp);
+
                         // получаем конечную ручку
                         gp = new BreakLineGrip
                         {
@@ -125,7 +140,8 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                                     if (gripPoint.BreakLine.EndPoint.Equals(newPt))
                                     {
                                         // Если точки совпали, то задаем минимальное значение
-                                        tmpInsertionPoint = new Point3d(gripPoint.BreakLine.EndPoint.X + gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale(),
+                                        tmpInsertionPoint = new Point3d(
+                                            gripPoint.BreakLine.EndPoint.X + (gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale()),
                                             gripPoint.BreakLine.EndPoint.Y, gripPoint.BreakLine.EndPoint.Z);
                                     }
 
@@ -155,21 +171,31 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                                 {
                                     var scale = gripPoint.BreakLine.GetScale();
                                     gripPoint.BreakLine.EndPoint = new Point3d(
-                                        ((BlockReference)entity).Position.X + gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale(),
+                                        ((BlockReference)entity).Position.X + (gripPoint.BreakLine.BreakLineMinLength * scale * gripPoint.BreakLine.BlockTransform.GetScale()),
                                         ((BlockReference)entity).Position.Y, ((BlockReference)entity).Position.Z);
                                 }
+
                                 // С конечной точкой все просто
-                                else gripPoint.BreakLine.EndPoint = gripPoint.GripPoint + offset;
+                                else
+                                {
+                                    gripPoint.BreakLine.EndPoint = gripPoint.GripPoint + offset;
+                                }
                             }
 
                             // Вот тут происходит перерисовка примитивов внутри блока
                             gripPoint.BreakLine.UpdateEntities();
                             gripPoint.BreakLine.BlockRecord.UpdateAnonymousBlocks();
                         }
-                        else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                        else
+                        {
+                            base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                        }
                     }
                 }
-                else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                else
+                {
+                    base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                }
             }
             catch (Exception exception)
             {
@@ -184,11 +210,13 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name);
         }
     }
+
     /* Так как у линии обрыва все точки одинаковы, то достаточно создать одно переопределение
      * Если есть сильная разница, то можно создавать несколько GripData. Однако нужны тесты
      */
+
     /// <summary>Описание ручки линии обрыва</summary>
-    public class BreakLineGrip : IntellectualEntityGripData //<-- Там будут определены типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
+    public class BreakLineGrip : IntellectualEntityGripData // <-- Там будут определены типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
     {
         public BreakLineGrip()
         {
@@ -196,12 +224,13 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
             ModeKeywordsDisabled = true;
         }
+
         // Экземпляр класса breakLine, связанный с этой ручкой
         public BreakLine BreakLine { get; set; }
-        
+
         // Имя ручки
         public BreakLineGripName GripName { get; set; }
-        
+
         // Подсказка в зависимости от имени ручки
         public override string GetTooltip()
         {
@@ -212,17 +241,19 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                     {
                         return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
                     }
+
                 case BreakLineGripName.MiddleGrip: return Language.GetItem(Invariables.LangItem, "gp2"); // move
             }
+
             return base.GetTooltip();
         }
-        
+
         // Временное значение первой ручки
         private Point3d _startGripTmp;
-        
+
         // временное значение последней ручки
         private Point3d _endGripTmp;
-        
+
         // Обработка изменения статуса ручки
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
@@ -233,9 +264,15 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                 if (newStatus == Status.GripStart)
                 {
                     if (GripName == BreakLineGripName.StartGrip)
+                    {
                         _startGripTmp = GripPoint;
+                    }
+
                     if (GripName == BreakLineGripName.EndGrip)
+                    {
                         _endGripTmp = GripPoint;
+                    }
+
                     if (GripName == BreakLineGripName.MiddleGrip)
                     {
                         _startGripTmp = BreakLine.InsertionPoint;
@@ -254,23 +291,31 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                         {
                             blkRef.XData = resBuf;
                         }
+
                         tr.Commit();
                     }
+
                     BreakLine.Dispose();
                 }
-                
+
                 // При отмене перемещения возвращаем временные значения
                 if (newStatus == Status.GripAbort)
                 {
                     if (_startGripTmp != null & GripName == BreakLineGripName.StartGrip)
+                    {
                         BreakLine.InsertionPoint = GripPoint;
+                    }
+
                     if (GripName == BreakLineGripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
                     {
                         BreakLine.InsertionPoint = _startGripTmp;
                         BreakLine.EndPoint = _endGripTmp;
                     }
+
                     if (_endGripTmp != null & GripName == BreakLineGripName.EndGrip)
+                    {
                         BreakLine.EndPoint = GripPoint;
+                    }
                 }
 
                 base.OnGripStatusChanged(entityId, newStatus);

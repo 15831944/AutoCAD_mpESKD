@@ -54,13 +54,13 @@
                 var axis = new Axis(axisLastHorizontalValue, axisLastVerticalValue);
 
                 var blockReference = MainFunction.CreateBlock(axis);
-                
+
                 axis.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
 
                 // Отключаю видимость кружков направления
                 axis.TopOrientMarkerVisible = false;
                 axis.BottomOrientMarkerVisible = false;
-                
+
                 InsertAxisWithJig(axis, blockReference);
             }
             catch (Exception exception)
@@ -128,8 +128,13 @@
                 if (status == PromptStatus.OK)
                 {
                     if (entityJig.JigState == JigState.PromptInsertPoint)
+                    {
                         entityJig.JigState = JigState.PromptNextPoint;
-                    else break;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 else
                 {
@@ -137,7 +142,7 @@
                     {
                         using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                         {
-                            var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
+                            var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                             obj.Erase(true);
                             tr.Commit();
                         }
@@ -173,8 +178,13 @@
                 {
                     var s = a.FirstText;
                     if (int.TryParse(s, out var i))
+                    {
                         allIntegerValues.Add(i);
-                    else allLetterValues.Add(s);
+                    }
+                    else
+                    {
+                        allLetterValues.Add(s);
+                    }
                 });
                 if (allIntegerValues.Any())
                 {
@@ -200,29 +210,32 @@
             {
                 AxisValueEditor axisValueEditor = new AxisValueEditor { Axis = axis };
                 if (axisValueEditor.ShowDialog() == true)
+                {
                     saveBack = true;
+                }
             }
             else
             {
                 MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg4"));
-                //var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
-                //AcadHelpers.WriteMessageInDebug("\nLocation:");
+
+                // var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
+                // AcadHelpers.WriteMessageInDebug("\nLocation:");
 
                 //// точка двойного клика:
-                //AcadHelpers.WriteMessageInDebug("\nStandard: " + location); 
+                // AcadHelpers.WriteMessageInDebug("\nStandard: " + location); 
                 ////AcadHelpers.WriteMessageInDebug("\nTransform: " + location.TransformBy(axis.BlockTransform));
                 ////AcadHelpers.WriteMessageInDebug("\nTransform inverse: " + location.TransformBy(axis.BlockTransform.Inverse()));
-                //AcadHelpers.WriteMessageInDebug("\nTexr point:");
-                //AcadHelpers.WriteMessageInDebug("\nStandard:" + axis.BottomFirstDBText.Position);
+                // AcadHelpers.WriteMessageInDebug("\nTexr point:");
+                // AcadHelpers.WriteMessageInDebug("\nStandard:" + axis.BottomFirstDBText.Position);
 
                 //// точка текста, трансформируемая в координаты блока
-                //AcadHelpers.WriteMessageInDebug("\nTransform:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform));
+                // AcadHelpers.WriteMessageInDebug("\nTransform:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform));
                 ////AcadHelpers.WriteMessageInDebug("\n" + (v - location).Length.ToString(CultureInfo.InvariantCulture));
 
-                //var displMat = Matrix3d.Displacement(blockReference.Position - Point3d.Origin);
-                //var btr = (BlockTableRecord)tr.GetObject(blockReference.BlockTableRecord, OpenMode.ForWrite);
-                //foreach (ObjectId objectId in btr)
-                //{
+                // var displMat = Matrix3d.Displacement(blockReference.Position - Point3d.Origin);
+                // var btr = (BlockTableRecord)tr.GetObject(blockReference.BlockTableRecord, OpenMode.ForWrite);
+                // foreach (ObjectId objectId in btr)
+                // {
                 //    var ent = tr.GetObject(objectId, OpenMode.ForWrite);
                 //    if (ent is DBText text && text.Visible)
                 //    {
@@ -243,8 +256,9 @@
                 //        blockReference.RecordGraphicsModified(true);
                 //        AcadHelpers.Document.TransactionManager.FlushGraphics();
                 //    }
-                //}
+                // }
             }
+
             if (saveBack)
             {
                 axis.UpdateEntities();
@@ -254,6 +268,7 @@
                     blockReference.XData = resBuf;
                 }
             }
+
             axis.Dispose();
         }
     }

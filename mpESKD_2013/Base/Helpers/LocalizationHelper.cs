@@ -10,12 +10,20 @@
     {
         static LocalizationHelper()
         {
-            if(EnumPropertiesLocalizationValues == null)
+            if (EnumPropertiesLocalizationValues == null)
+            {
                 EnumPropertiesLocalizationValues = new Dictionary<Type, List<string>>();
-            if(CategoryLocalizationNames == null)
+            }
+
+            if (CategoryLocalizationNames == null)
+            {
                 CategoryLocalizationNames = new Dictionary<string, string>();
-            if(EntityLocalizationNames == null)
+            }
+
+            if (EntityLocalizationNames == null)
+            {
                 EntityLocalizationNames = new Dictionary<Type, string>();
+            }
         }
 
         /// <summary>
@@ -41,7 +49,10 @@
         public static List<string> GetEnumPropertyLocalizationFields(Type enumType)
         {
             if (EnumPropertiesLocalizationValues.ContainsKey(enumType))
+            {
                 return EnumPropertiesLocalizationValues[enumType];
+            }
+
             List<string> enumPropertyLocalizationValues = new List<string>();
             foreach (FieldInfo fieldInfo in enumType.GetFields().Where(f => f.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>() != null))
             {
@@ -76,7 +87,9 @@
         public static string GetEntityLocalizationName(Type entityType)
         {
             if (EntityLocalizationNames.ContainsKey(entityType))
+            {
                 return EntityLocalizationNames[entityType];
+            }
 
             var attribute = entityType.GetCustomAttribute<IntellectualEntityDisplayNameKeyAttribute>();
             if (attribute != null)
@@ -85,7 +98,10 @@
                 {
                     var localName = ModPlusAPI.Language.GetItem(Invariables.LangItem, attribute.LocalizationKey);
                     if (!EntityLocalizationNames.ContainsKey(entityType))
+                    {
                         EntityLocalizationNames.Add(entityType, localName);
+                    }
+
                     return localName;
                 }
                 catch
@@ -105,13 +121,18 @@
         public static string GetCategoryLocalizationName(PropertiesCategory category)
         {
             if (CategoryLocalizationNames.ContainsKey(category.ToString()))
+            {
                 return CategoryLocalizationNames[category.ToString()];
+            }
 
             var type = category.GetType();
             foreach (FieldInfo fieldInfo in type.GetFields().Where(f => f.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>() != null))
             {
                 if (fieldInfo.Name != category.ToString())
+                {
                     continue;
+                }
+
                 var attribute = fieldInfo.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>();
                 if (attribute != null)
                 {
@@ -119,7 +140,10 @@
                     {
                         var localName = ModPlusAPI.Language.GetItem(Invariables.LangItem, attribute.LocalizationKey);
                         if (!CategoryLocalizationNames.ContainsKey(category.ToString()))
+                        {
                             CategoryLocalizationNames.Add(category.ToString(), localName);
+                        }
+
                         return localName;
                     }
                     catch

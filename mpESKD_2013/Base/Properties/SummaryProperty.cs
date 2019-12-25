@@ -8,9 +8,9 @@
     using Autodesk.AutoCAD.DatabaseServices;
     using Enums;
     using Helpers;
-    using ModPlusAPI.Annotations;
+    using ModPlusAPI.Mvvm;
 
-    public class SummaryProperty : INotifyPropertyChanged
+    public class SummaryProperty : VmBase
     {
         public SummaryProperty(Type entityType)
         {
@@ -38,7 +38,11 @@
             get
             {
                 var p = EntityPropertyDataCollection.FirstOrDefault();
-                if (p != null) return p.Category;
+                if (p != null)
+                {
+                    return p.Category;
+                }
+
                 return PropertiesCategory.Undefined;
             }
         }
@@ -49,7 +53,10 @@
             {
                 var property = EntityPropertyDataCollection.FirstOrDefault();
                 if (property != null)
+                {
                     return property.OrderIndex;
+                }
+
                 return 0;
             }
         }
@@ -76,53 +83,61 @@
 
                     if (valueType == typeof(AnnotationScale))
                     {
-                        var scales = values.Select(v => ((AnnotationScale) v).Name).ToList();
+                        var scales = values.Select(v => ((AnnotationScale)v).Name).ToList();
                         if (scales.Distinct().Count() > 1)
+                        {
                             return different;
+                        }
+
                         return scales.First();
                     }
 
                     if (valueType == typeof(int))
                     {
                         if (values.Cast<int>().Distinct().Count() > 1)
+                        {
                             return null;
+                        }
                     }
 
                     if (valueType == typeof(double))
                     {
                         if (values.Cast<double>().Distinct(new DoubleEqComparer()).Count() > 1)
+                        {
                             return null;
+                        }
                     }
 
                     if (valueType == typeof(string))
                     {
                         if (values.Cast<string>().Distinct().Count() > 1)
+                        {
                             return different;
+                        }
                     }
-                    
+
                     return value;
                 }
+
                 return undefined;
             }
+
             set
             {
                 foreach (IntellectualEntityProperty property in EntityPropertyDataCollection)
                 {
                     if (property.Value.GetType() == typeof(AnnotationScale))
+                    {
                         property.Value = AcadHelpers.GetAnnotationScaleByName(value.ToString());
+                    }
                     else
+                    {
                         property.Value = value;
+                    }
                 }
+
                 OnPropertyChanged();
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

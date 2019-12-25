@@ -15,8 +15,13 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
 
         public static BreakLineObjectOverrule Instance()
         {
-            if (_breakLineObjectOverrule != null) return _breakLineObjectOverrule;
+            if (_breakLineObjectOverrule != null)
+            {
+                return _breakLineObjectOverrule;
+            }
+
             _breakLineObjectOverrule = new BreakLineObjectOverrule();
+
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _breakLineObjectOverrule.SetXDataFilter(BreakLineDescriptor.Instance.Name);
             return _breakLineObjectOverrule;
@@ -30,6 +35,7 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                 try
                 {
                     if (AcadHelpers.Document != null)
+                    {
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                         {
@@ -40,12 +46,14 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                                 breakLine.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
                             }
                         }
+                    }
                 }
                 catch (Exception exception)
                 {
                     ExceptionBox.Show(exception);
                 }
             }
+
             base.Close(dbObject);
         }
 

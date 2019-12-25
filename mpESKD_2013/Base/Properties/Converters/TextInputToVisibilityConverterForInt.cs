@@ -1,10 +1,10 @@
-﻿using System;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
-
-namespace mpESKD.Base.Properties.Converters
+﻿namespace mpESKD.Base.Properties.Converters
 {
+    using System;
+    using System.Globalization;
+    using System.Windows;
+    using System.Windows.Data;
+
     public class TextInputToVisibilityConverterForInt : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -14,7 +14,7 @@ namespace mpESKD.Base.Properties.Converters
                 && values[2] is bool)
             {
                 object val = values[0];
-                bool hasTxt = !(string.IsNullOrEmpty((string)values[1]));
+                bool hasTxt = !string.IsNullOrEmpty((string)values[1]);
                 bool focused = (bool)values[2];
 
                 bool valIsNull = val == null;
@@ -28,6 +28,7 @@ namespace mpESKD.Base.Properties.Converters
                     return Visibility.Collapsed;
                 }
             }
+
             return Visibility.Visible;
         }
 
@@ -36,6 +37,7 @@ namespace mpESKD.Base.Properties.Converters
             throw new NotImplementedException();
         }
     }
+
     /// <inheritdoc />
     /// <summary>Конвертер для определения: отображать ли текст с подсказкой в поле ввода</summary>
     public class TextInputToVisibilityConverterForDouble : IMultiValueConverter
@@ -53,15 +55,15 @@ namespace mpESKD.Base.Properties.Converters
         /// <param name="parameter"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public object Convert
-            (object[] values, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(
+            object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if ((values[0] == null || values[0] is string || values[0] is double)
                 && values[1] is string
                 && values[2] is bool)
             {
                 object val = values[0];
-                bool hasTxt = !(string.IsNullOrEmpty((string)values[1]));
+                bool hasTxt = !string.IsNullOrEmpty((string)values[1]);
                 bool focused = (bool)values[2];
 
                 bool valIsNull = val == null;
@@ -75,11 +77,12 @@ namespace mpESKD.Base.Properties.Converters
                     return Visibility.Collapsed;
                 }
             }
+
             return Visibility.Visible;
         }
 
-        public object[] ConvertBack
-            (object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        public object[] ConvertBack(
+            object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

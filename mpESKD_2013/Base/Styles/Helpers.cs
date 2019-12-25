@@ -1,34 +1,36 @@
 ﻿namespace mpESKD.Base.Styles
 {
-    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System;
     using System.Globalization;
     using System.Windows.Data;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
     using Properties;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
-    
     public static class StyleEditorWork
     {
         private static StyleEditor _styleEditor;
-       
+
         [CommandMethod("ModPlus", "mpStyleEditor", CommandFlags.Modal)]
         public static void OpenStyleEditor()
         {
             if (_styleEditor == null)
             {
                 _styleEditor = new StyleEditor();
-                _styleEditor.Closed += styleEditor_Closed;
+                _styleEditor.Closed += (sender, args) => _styleEditor = null;
             }
-            if (_styleEditor.IsLoaded) _styleEditor.Activate();
-            else AcApp.ShowModalWindow(AcApp.MainWindow.Handle, _styleEditor, false);
+
+            if (_styleEditor.IsLoaded)
+            {
+                _styleEditor.Activate();
+            }
+            else
+            {
+                AcApp.ShowModalWindow(AcApp.MainWindow.Handle, _styleEditor, false);
+            }
         }
 
-        static void styleEditor_Closed(object sender, EventArgs e)
-        {
-            _styleEditor = null;
-        }
         public static void ShowDescription(string description)
         {
             if (_styleEditor != null)
@@ -43,7 +45,10 @@
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is AnnotationScale annotationScale)
+            {
                 return annotationScale.Name;
+            }
+
             return string.Empty;
         }
 

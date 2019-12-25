@@ -13,6 +13,7 @@
     using Base.Overrules;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+
     // ReSharper disable once RedundantNameQualifier
     using Section = mpSection.Section;
 
@@ -22,8 +23,13 @@
 
         public static SectionGripPointOverrule Instance()
         {
-            if (_instance != null) return _instance;
+            if (_instance != null)
+            {
+                return _instance;
+            }
+
             _instance = new SectionGripPointOverrule();
+
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _instance.SetXDataFilter(SectionDescriptor.Instance.Name);
             return _instance;
@@ -59,7 +65,7 @@
 
                             var removeVertexGrip = new SectionRemoveVertexGrip(section, index + 1)
                             {
-                                GripPoint = section.MiddlePoints[index] - Vector3d.YAxis * 20 * curViewUnitSize
+                                GripPoint = section.MiddlePoints[index] - (Vector3d.YAxis * 20 * curViewUnitSize)
                             };
                             grips.Add(removeVertexGrip);
                         }
@@ -78,7 +84,8 @@
                         {
                             if (i == 0)
                             {
-                                var addVertexGrip = new SectionAddVertexGrip(section,
+                                var addVertexGrip = new SectionAddVertexGrip(
+                                    section,
                                     section.InsertionPoint, section.MiddlePoints[i])
                                 {
                                     GripPoint = GeometryHelpers.GetMiddlePoint3d(section.InsertionPoint, section.MiddlePoints[i])
@@ -87,17 +94,20 @@
                             }
                             else
                             {
-                                var addVertexGrip = new SectionAddVertexGrip(section,
+                                var addVertexGrip = new SectionAddVertexGrip(
+                                    section,
                                     section.MiddlePoints[i - 1], section.MiddlePoints[i])
                                 {
                                     GripPoint = GeometryHelpers.GetMiddlePoint3d(section.MiddlePoints[i - 1], section.MiddlePoints[i])
                                 };
                                 grips.Add(addVertexGrip);
                             }
+
                             // last segment
                             if (i == section.MiddlePoints.Count - 1)
                             {
-                                var addVertexGrip = new SectionAddVertexGrip(section,
+                                var addVertexGrip = new SectionAddVertexGrip(
+                                    section,
                                     section.MiddlePoints[i], section.EndPoint)
                                 {
                                     GripPoint = GeometryHelpers.GetMiddlePoint3d(section.MiddlePoints[i], section.EndPoint)
@@ -119,19 +129,18 @@
 
                         #region Reverse Grips
 
-
                         var reverseGrip = new SectionReverseGrip(section)
                         {
                             GripPoint = section.EntityDirection == EntityDirection.LeftToRight
-                                ? section.TopShelfEndPoint - Vector3d.XAxis * 20 * curViewUnitSize
-                                : section.TopShelfEndPoint + Vector3d.XAxis * 20 * curViewUnitSize
+                                ? section.TopShelfEndPoint - (Vector3d.XAxis * 20 * curViewUnitSize)
+                                : section.TopShelfEndPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
                         };
                         grips.Add(reverseGrip);
                         reverseGrip = new SectionReverseGrip(section)
                         {
                             GripPoint = section.EntityDirection == EntityDirection.LeftToRight
-                                ? section.BottomShelfEndPoint - Vector3d.XAxis * 20 * curViewUnitSize
-                                : section.BottomShelfEndPoint + Vector3d.XAxis * 20 * curViewUnitSize
+                                ? section.BottomShelfEndPoint - (Vector3d.XAxis * 20 * curViewUnitSize)
+                                : section.BottomShelfEndPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
                         };
                         grips.Add(reverseGrip);
 
@@ -210,24 +219,42 @@
                                 var deltaY = topStrokeVector.DotProduct(offset) / section.BlockTransform.GetScale();
                                 var deltaX = topShelfVector.DotProduct(offset) / section.BlockTransform.GetScale();
                                 if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
+                                {
                                     section.AlongTopShelfTextOffset = deltaX;
+                                }
                                 else
+                                {
                                     section.AlongTopShelfTextOffset = textGrip.CachedAlongTopShelfTextOffset + deltaX;
+                                }
 
                                 if (double.IsNaN(textGrip.CachedAcrossTopShelfTextOffset))
+                                {
                                     section.AcrossTopShelfTextOffset = deltaY;
+                                }
                                 else
+                                {
                                     section.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
+                                }
 
                                 if (MainStaticSettings.Settings.SectionDependentTextMovement)
                                 {
                                     if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
+                                    {
                                         section.AlongBottomShelfTextOffset = deltaX;
-                                    else section.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
+                                    }
+                                    else
+                                    {
+                                        section.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
+                                    }
 
                                     if (double.IsNaN(textGrip.CachedAcrossBottomShelfTextOffset))
+                                    {
                                         section.AcrossBottomShelfTextOffset = deltaY;
-                                    else section.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
+                                    }
+                                    else
+                                    {
+                                        section.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
+                                    }
                                 }
                             }
 
@@ -241,24 +268,42 @@
                                 var deltaX = bottomShelfVector.DotProduct(offset) / section.BlockTransform.GetScale();
 
                                 if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
+                                {
                                     section.AlongBottomShelfTextOffset = deltaX;
-                                else section.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
+                                }
+                                else
+                                {
+                                    section.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
+                                }
 
                                 if (double.IsNaN(textGrip.CachedAcrossBottomShelfTextOffset))
+                                {
                                     section.AcrossBottomShelfTextOffset = deltaY;
-                                else section.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
+                                }
+                                else
+                                {
+                                    section.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
+                                }
 
                                 if (MainStaticSettings.Settings.SectionDependentTextMovement)
                                 {
                                     if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
+                                    {
                                         section.AlongTopShelfTextOffset = deltaX;
+                                    }
                                     else
+                                    {
                                         section.AlongTopShelfTextOffset = textGrip.CachedAlongTopShelfTextOffset + deltaX;
+                                    }
 
                                     if (double.IsNaN(textGrip.CachedAcrossTopShelfTextOffset))
+                                    {
                                         section.AcrossTopShelfTextOffset = deltaY;
+                                    }
                                     else
+                                    {
                                         section.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
+                                    }
                                 }
                             }
 
@@ -269,7 +314,10 @@
                         {
                             addVertexGrip.NewPoint = addVertexGrip.GripPoint + offset;
                         }
-                        else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                        else
+                        {
+                            base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                        }
                     }
                 }
                 else
@@ -313,7 +361,6 @@
             _points = new List<Point3d> { Section.InsertionPoint };
             _points.AddRange(Section.MiddlePoints);
             _points.Add(Section.EndPoint);
-
         }
 
         private readonly List<Point3d> _points;
@@ -358,8 +405,10 @@
                         {
                             blkRef.XData = resBuf;
                         }
+
                         tr.Commit();
                     }
+
                     Section.Dispose();
                 }
 
@@ -369,10 +418,17 @@
                     if (_gripTmp != null)
                     {
                         if (GripIndex == 0)
+                        {
                             Section.InsertionPoint = _gripTmp;
+                        }
                         else if (GripIndex == Section.MiddlePoints.Count + 1)
+                        {
                             Section.EndPoint = _gripTmp;
-                        else Section.MiddlePoints[GripIndex - 1] = _gripTmp;
+                        }
+                        else
+                        {
+                            Section.MiddlePoints[GripIndex - 1] = _gripTmp;
+                        }
                     }
                 }
 
@@ -394,10 +450,12 @@
                 worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
                 worldDraw.SubEntityTraits.Color = 40;
                 worldDraw.Geometry.WorldLine(_points[GripIndex - 1], _points[GripIndex]);
+
                 // restore
                 worldDraw.SubEntityTraits.Color = backupColor;
                 worldDraw.SubEntityTraits.FillType = backupFillType;
             }
+
             return base.WorldDraw(worldDraw, entityId, type, imageGripPoint, dGripSize);
         }
     }
@@ -459,8 +517,10 @@
                         {
                             blkRef.XData = resBuf;
                         }
+
                         tr.Commit();
                     }
+
                     Section.Dispose();
                 }
 
@@ -532,7 +592,7 @@
 
         public override string GetTooltip()
         {
-            return Language.GetItem(Invariables.LangItem, "gp4"); //  "Добавить вершину";
+            return Language.GetItem(Invariables.LangItem, "gp4"); // "Добавить вершину";
         }
 
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
@@ -570,13 +630,17 @@
                     {
                         Section.MiddlePoints.Insert(Section.MiddlePoints.IndexOf(GripLeftPoint.Value) + 1, NewPoint);
                     }
+
                     Section.UpdateEntities();
                     Section.BlockRecord.UpdateAnonymousBlocks();
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                         if (newInsertionPoint.HasValue)
+                        {
                             ((BlockReference)blkRef).Position = newInsertionPoint.Value;
+                        }
+
                         using (var resBuf = Section.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
@@ -685,7 +749,10 @@
                 {
                     var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                     if (newInsertionPoint.HasValue)
+                    {
                         ((BlockReference)blkRef).Position = newInsertionPoint.Value;
+                    }
+
                     using (var resBuf = Section.GetDataForXData())
                     {
                         blkRef.XData = resBuf;

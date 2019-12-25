@@ -1,13 +1,13 @@
-﻿using System;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
-using ModPlusAPI.Windows;
-
-namespace mpESKD.Base.Properties.Controls
+﻿namespace mpESKD.Base.Properties.Controls
 {
+    using System;
+    using System.Globalization;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Data;
+    using System.Windows.Input;
+    using ModPlusAPI.Windows;
+
     public partial class DoubleTextBox
     {
         /// <summary>
@@ -15,7 +15,8 @@ namespace mpESKD.Base.Properties.Controls
         /// </summary>
         public static readonly DependencyProperty ValueProperty
             = DependencyProperty.Register("Value", typeof(double?), typeof(DoubleTextBox),
-                new FrameworkPropertyMetadata(0.0,
+                new FrameworkPropertyMetadata(
+                    0.0,
                     FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         /// <summary>
@@ -27,6 +28,7 @@ namespace mpESKD.Base.Properties.Controls
             get => (double?)GetValue(ValueProperty);
             set => SetValue(ValueProperty, value);
         }
+
         /// <summary>
         /// Maximum value for the Numeric Up Down control
         /// </summary>
@@ -41,12 +43,12 @@ namespace mpESKD.Base.Properties.Controls
             DependencyProperty.Register("Maximum", typeof(double), typeof(DoubleTextBox), new UIPropertyMetadata(double.MaxValue));
 
         /// <summary>
-        /// Minimum value of the numeric up down conrol.
+        /// Minimum value of the numeric up down control.
         /// </summary>
         public double Minimum
         {
-            get { return (double)GetValue(MinimumProperty); }
-            set { SetValue(MinimumProperty, value); }
+            get => (double)GetValue(MinimumProperty);
+            set => SetValue(MinimumProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for Minimum.  This enables animation, styling, binding, etc...
@@ -57,6 +59,7 @@ namespace mpESKD.Base.Properties.Controls
         {
             InitializeComponent();
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -68,7 +71,7 @@ namespace mpESKD.Base.Properties.Controls
             {
                 try
                 {
-                    BindingOperations.GetBindingExpression(TextBox, TextBox.TextProperty).UpdateTarget();
+                    BindingOperations.GetBindingExpression(TextBox, TextBox.TextProperty)?.UpdateTarget();
                 }
                 catch (Exception ex)
                 {
@@ -86,12 +89,21 @@ namespace mpESKD.Base.Properties.Controls
             var tb = sender as TextBox;
             if (double.TryParse(tb?.Text, out double num))
             {
-                if (num < Minimum) Value = Minimum;
-                else if (num > Maximum) Value = Maximum;
-                else Value = num;
+                if (num < Minimum)
+                {
+                    Value = Minimum;
+                }
+                else if (num > Maximum)
+                {
+                    Value = Maximum;
+                }
+                else
+                {
+                    Value = num;
+                }
+
                 UpdateSourceOrTarget();
             }
-
         }
 
         void UpdateSourceOrTarget()
@@ -99,13 +111,15 @@ namespace mpESKD.Base.Properties.Controls
             try
             {
 
-                BindingExpression bindExpr = BindingOperations.GetBindingExpression
-                    (TextBox, TextBox.TextProperty);
+                BindingExpression bindExpr = BindingOperations.GetBindingExpression(
+                    TextBox, TextBox.TextProperty);
 
-                bindExpr.UpdateSource();
+                bindExpr?.UpdateSource();
 
-                if (bindExpr.HasError)
+                if (bindExpr != null && bindExpr.HasError)
+                {
                     bindExpr.UpdateTarget();
+                }
             }
             catch (Exception ex)
             {
@@ -115,11 +129,19 @@ namespace mpESKD.Base.Properties.Controls
 
         private void TextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            if(sender is TextBox tb)
-            if (double.TryParse(tb.Text, out double num))
+            if (sender is TextBox tb)
             {
-                if (num < Minimum) tb.Text = Minimum.ToString(CultureInfo.InvariantCulture);
-                else if (num > Maximum) tb.Text = Maximum.ToString(CultureInfo.InvariantCulture);
+                if (double.TryParse(tb.Text, out double num))
+                {
+                    if (num < Minimum)
+                    {
+                        tb.Text = Minimum.ToString(CultureInfo.InvariantCulture);
+                    }
+                    else if (num > Maximum)
+                    {
+                        tb.Text = Maximum.ToString(CultureInfo.InvariantCulture);
+                    }
+                }
             }
         }
 
@@ -128,19 +150,19 @@ namespace mpESKD.Base.Properties.Controls
             var tb = (TextBox)sender;
             var text = tb.Text.Insert(tb.CaretIndex, e.Text);
 
-            //e.Handled = !_numMatch.IsMatch(text);
+            // e.Handled = !_numMatch.IsMatch(text);
             e.Handled = !double.TryParse(text, out double num) || num < Minimum;
         }
-        
+
         private void SelectAddress(object sender, RoutedEventArgs e)
         {
-            TextBox tb = ((TextBox) sender);
+            TextBox tb = (TextBox)sender;
             tb?.SelectAll();
         }
 
-        private void SelectivelyIgnoreMouseButton(object sender,MouseButtonEventArgs e)
+        private void SelectivelyIgnoreMouseButton(object sender, MouseButtonEventArgs e)
         {
-            TextBox tb = ((TextBox) sender);
+            TextBox tb = (TextBox)sender;
             if (tb != null)
             {
                 if (!tb.IsKeyboardFocusWithin)

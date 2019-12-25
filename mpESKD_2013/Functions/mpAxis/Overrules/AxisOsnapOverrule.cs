@@ -15,10 +15,16 @@ namespace mpESKD.Functions.mpAxis.Overrules
     public class AxisOsnapOverrule : OsnapOverrule
     {
         protected static AxisOsnapOverrule _axisOsnapOverrule;
+
         public static AxisOsnapOverrule Instance()
         {
-            if (_axisOsnapOverrule != null) return _axisOsnapOverrule;
+            if (_axisOsnapOverrule != null)
+            {
+                return _axisOsnapOverrule;
+            }
+
             _axisOsnapOverrule = new AxisOsnapOverrule();
+
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _axisOsnapOverrule.SetXDataFilter(AxisDescriptor.Instance.Name);
             return _axisOsnapOverrule;
@@ -42,14 +48,19 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         {
                             snapPoints.Add(axis.BottomMarkerPoint);
                             if (axis.BottomOrientMarkerVisible)
+                            {
                                 snapPoints.Add(axis.BottomOrientPoint);
+                            }
                         }
+
                         if (axis.MarkersPosition == AxisMarkersPosition.Both ||
                             axis.MarkersPosition == AxisMarkersPosition.Top)
                         {
                             snapPoints.Add(axis.TopMarkerPoint);
                             if (axis.TopOrientMarkerVisible)
+                            {
                                 snapPoints.Add(axis.TopOrientPoint);
+                            }
                         }
                     }
                 }
@@ -58,7 +69,10 @@ namespace mpESKD.Functions.mpAxis.Overrules
                     ExceptionBox.Show(exception);
                 }
             }
-            else base.GetObjectSnapPoints(entity, snapMode, gsSelectionMark, pickPoint, lastPoint, viewTransform, snapPoints, geometryIds);
+            else
+            {
+                base.GetObjectSnapPoints(entity, snapMode, gsSelectionMark, pickPoint, lastPoint, viewTransform, snapPoints, geometryIds);
+            }
         }
 
         public override bool IsApplicable(RXObject overruledSubject)

@@ -1,11 +1,11 @@
 ﻿namespace mpESKD.Functions.mpAxis.Overrules
 {
+    using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
+    using Base;
     using Base.Helpers;
     using ModPlusAPI.Windows;
-    using System.Diagnostics;
-    using Base;
 
     public class AxisObjectOverrule : ObjectOverrule
     {
@@ -13,8 +13,13 @@
 
         public static AxisObjectOverrule Instance()
         {
-            if (_instance != null) return _instance;
+            if (_instance != null)
+            {
+                return _instance;
+            }
+
             _instance = new AxisObjectOverrule();
+
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _instance.SetXDataFilter(AxisDescriptor.Instance.Name);
             return _instance;
@@ -28,6 +33,7 @@
                 try
                 {
                     if (AcadHelpers.Document != null)
+                    {
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                         {
@@ -38,12 +44,14 @@
                                 axis.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
                             }
                         }
+                    }
                 }
                 catch (Exception exception)
                 {
                     ExceptionBox.Show(exception);
                 }
             }
+
             base.Close(dbObject);
         }
 

@@ -1,6 +1,5 @@
 ﻿namespace mpESKD
 {
-    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
     using System;
     using System.Diagnostics;
     using System.IO;
@@ -20,9 +19,10 @@
     using Functions.mpAxis;
     using Functions.mpSection;
     using Functions.SearchEntities;
-    using mpESKD.Base.Properties;
     using ModPlus;
     using ModPlusAPI;
+    using mpESKD.Base.Properties;
+    using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
     public class MainFunction : IExtensionApplication
     {
@@ -40,9 +40,9 @@
 
             // palette
             var loadPropertiesPalette =
-                bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "AutoLoad"), out var b) & b;
+                bool.TryParse(UserConfigFile.GetValue("mpESKD", "AutoLoad"), out var b) & b;
             var addPropertiesPaletteToMpPalette =
-                bool.TryParse(UserConfigFile.GetValue(UserConfigFile.ConfigFileZone.Settings, "mpESKD", "AddToMpPalette"), out b) & b;
+                bool.TryParse(UserConfigFile.GetValue("mpESKD", "AddToMpPalette"), out b) & b;
             if (loadPropertiesPalette & !addPropertiesPaletteToMpPalette)
             {
                 PropertiesPaletteFunction.Start();
@@ -55,7 +55,6 @@
             // bedit watcher
             BeditCommandWatcher.Initialize();
             AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
-
 
             AcadHelpers.Documents.DocumentCreated += Documents_DocumentCreated;
             AcadHelpers.Documents.DocumentActivated += Documents_DocumentActivated;
@@ -82,7 +81,10 @@
             {
                 var mpcoStylesPath = Path.Combine(Constants.UserDataDirectory, "Styles");
                 if (!Directory.Exists(mpcoStylesPath))
+                {
                     Directory.CreateDirectory(mpcoStylesPath);
+                }
+
                 // set public parameter
                 StylesPath = mpcoStylesPath;
             }
@@ -98,19 +100,25 @@
         public void CreateRibbon()
         {
             if (Autodesk.Windows.ComponentManager.Ribbon == null)
+            {
                 return;
+            }
+
             RibbonBuilder.BuildRibbon();
         }
 
         private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
         {
-            //now one Ribbon item is initialized, but the Ribbon control
-            //may not be available yet, so check if before
+            // now one Ribbon item is initialized, but the Ribbon control
+            // may not be available yet, so check if before
             if (Autodesk.Windows.ComponentManager.Ribbon == null)
+            {
                 return;
+            }
+
             RibbonBuilder.BuildRibbon();
 
-            //and remove the event handler
+            // and remove the event handler
             Autodesk.Windows.ComponentManager.ItemInitialized -= ComponentManager_ItemInitialized;
         }
 
@@ -122,7 +130,11 @@
             var pt = e.Location;
 
             PromptSelectionResult psr = AcadHelpers.Editor.SelectImplied();
-            if (psr.Status != PromptStatus.OK) return;
+            if (psr.Status != PromptStatus.OK)
+            {
+                return;
+            }
+
             ObjectId[] ids = psr.Value.GetObjectIds();
 
             if (ids.Length == 1)
@@ -140,14 +152,22 @@
                             {
                                 AxisFunction.DoubleClickEdit(blockReference, location, tr);
                             }
+
                             // section
                             else if (ExtendedDataHelpers.IsIntellectualEntity(blockReference, SectionDescriptor.Instance.Name))
                             {
                                 SectionFunction.DoubleClickEdit(blockReference, location, tr);
                             }
-                            else BeditCommandWatcher.UseBedit = true;
+                            else
+                            {
+                                BeditCommandWatcher.UseBedit = true;
+                            }
                         }
-                        else BeditCommandWatcher.UseBedit = true;
+                        else
+                        {
+                            BeditCommandWatcher.UseBedit = true;
+                        }
+
                         tr.Commit();
                     }
                 }
@@ -171,13 +191,17 @@
                             blockTableRecord.BlockScaling = BlockScaling.Uniform;
                             objectId = blockTableRecord.AppendEntity(blockReference);
                         }
+
                         transaction.AddNewlyCreatedDBObject(blockReference, true);
                         transaction.AddNewlyCreatedDBObject(intellectualEntity.BlockRecord, true);
                     }
+
                     transaction.Commit();
                 }
+
                 intellectualEntity.BlockId = objectId;
             }
+
             return blockReference;
         }
 
@@ -196,6 +220,7 @@
                         flag = true;
                     }
                 }
+
                 if (!flag)
                 {
                     PropertiesPalette lmPalette = new PropertiesPalette();
@@ -211,11 +236,13 @@
                     }
                 }
             }
+
             if (PropertiesPaletteFunction.PaletteSet != null)
             {
                 PropertiesPaletteFunction.PaletteSet.Visible = false;
             }
         }
+
         public static void RemoveFromMpPalette(bool fromSettings)
         {
             PaletteSet mpPaletteSet = MpPalette.MpPaletteSet;
@@ -235,6 +262,7 @@
                     }
                 }
             }
+
             if (PropertiesPaletteFunction.PaletteSet != null)
             {
                 PropertiesPaletteFunction.PaletteSet.Visible = true;
@@ -247,6 +275,7 @@
                 }
             }
         }
+
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             if (args.Name.Contains("ModPlus_"))
@@ -254,6 +283,7 @@
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
                 PropertiesPaletteFunction.Start();
             }
+
             return null;
         }
         #endregion
@@ -288,6 +318,7 @@
 
                         tr.Commit();
                     }
+
                     timer.Stop();
                     Debug.Print($"Time for update entities: {timer.ElapsedMilliseconds} milliseconds");
                 }
@@ -320,7 +351,10 @@
                         foreach (SelectedObject selectedObject in psr.Value)
                         {
                             if (selectedObject.ObjectId == ObjectId.Null)
+                            {
                                 continue;
+                            }
+
                             var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                             if (obj is BlockReference blockReference &&
                                 ExtendedDataHelpers.IsApplicable(blockReference))
@@ -334,8 +368,11 @@
                     }
                 }
             }
+
             if (detach)
+            {
                 DetachCreateAnalogContextMenu();
+            }
         }
 
         [CommandMethod("ModPlus", "mpESKDCreateAnalog", CommandFlags.UsePickSet)]
@@ -352,7 +389,10 @@
                         foreach (SelectedObject selectedObject in psr.Value)
                         {
                             if (selectedObject.ObjectId == ObjectId.Null)
+                            {
                                 continue;
+                            }
+
                             var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                             if (obj is BlockReference blockReference)
                             {
@@ -368,19 +408,27 @@
                 {
                     var copyLayer = true;
                     if (MainStaticSettings.Settings.LayerActionOnCreateAnalog == LayerActionOnCreateAnalog.NotCopy)
+                    {
                         copyLayer = false;
+                    }
                     else if (MainStaticSettings.Settings.LayerActionOnCreateAnalog == LayerActionOnCreateAnalog.Ask)
                     {
-                        PromptKeywordOptions promptKeywordOptions = 
+                        PromptKeywordOptions promptKeywordOptions =
                             new PromptKeywordOptions("\n" + Language.GetItem(Invariables.LangItem, "msg8"), "Yes No");
                         var promptResult = AcadHelpers.Editor.GetKeywords(promptKeywordOptions);
                         if (promptResult.Status == PromptStatus.OK)
                         {
                             if (promptResult.StringResult == "No")
+                            {
                                 copyLayer = false;
+                            }
                         }
-                        else copyLayer = false;
+                        else
+                        {
+                            copyLayer = false;
+                        }
                     }
+
                     var function = TypeFactory.Instance.GetEntityFunctionTypes().FirstOrDefault(f =>
                     {
                         var functionName = $"{intellectualEntity.GetType().Name}Function";
@@ -403,6 +451,7 @@
                 menuItem.Click += CreateAnalogMenuItem_Click;
                 _intellectualEntityContextMenu.MenuItems.Add(menuItem);
             }
+
             var rxObject = RXObject.GetClass(typeof(BlockReference));
             Autodesk.AutoCAD.ApplicationServices.Application.AddObjectContextMenuExtension(rxObject, _intellectualEntityContextMenu);
         }
@@ -411,7 +460,6 @@
         {
             AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
                 "_.mpESKDCreateAnalog ", false, false, false);
-
         }
 
         private static void DetachCreateAnalogContextMenu()
@@ -436,15 +484,18 @@
         {
             AcApp.DocumentManager.DocumentLockModeChanged += DocumentManager_DocumentLockModeChanged;
         }
+
         private static void DocumentManager_DocumentLockModeChanged(object sender, Autodesk.AutoCAD.ApplicationServices.DocumentLockModeChangedEventArgs e)
         {
             try
             {
                 if (!UseBedit)
+                {
                     if (e.GlobalCommandName == "BEDIT")
                     {
                         e.Veto();
                     }
+                }
             }
             catch (System.Exception exception)
             {

@@ -114,7 +114,7 @@ namespace mpESKD.Functions.mpGroundLine
         /// Главная полилиния примитива
         /// </summary>
         private Polyline _mainPolyline;
-        
+
         /// <summary>
         /// Список штрихов
         /// </summary>
@@ -125,26 +125,36 @@ namespace mpESKD.Functions.mpGroundLine
         {
             get
             {
-                var entities = new List<Entity> ();
+                var entities = new List<Entity>();
                 entities.AddRange(_strokes);
                 foreach (var e in entities)
+                {
                     if (e != null)
+                    {
                         SetImmutablePropertiesToNestedEntity(e);
-                if(_mainPolyline != null)
+                    }
+                }
+
+                if (_mainPolyline != null)
+                {
                     SetChangeablePropertiesToNestedEntity(_mainPolyline);
+                }
+
                 entities.Add(_mainPolyline);
 
                 return entities;
             }
         }
-        
+
         /// <summary>
         /// Перестроение точек - помещение EndPoint в список
         /// </summary>
         public void RebasePoints()
         {
             if (!MiddlePoints.Contains(EndPoint))
+            {
                 MiddlePoints.Add(EndPoint);
+            }
         }
 
         /// <inheritdoc />
@@ -183,7 +193,7 @@ namespace mpESKD.Functions.mpGroundLine
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                var tmpEndPoint = new Point3d(InsertionPointOCS.X + GroundLineMinLength * scale, InsertionPointOCS.Y, InsertionPointOCS.Z);
+                var tmpEndPoint = new Point3d(InsertionPointOCS.X + (GroundLineMinLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength)
@@ -256,33 +266,52 @@ namespace mpESKD.Functions.mpGroundLine
                 if (Math.Abs(summDistanceAtSegment) < 0.0001)
                 {
                     if (FirstStrokeOffset == GroundLineFirstStrokeOffset.ByHalfSpace)
+                    {
                         distance = Space / 2.0 * scale;
+                    }
                     else if (FirstStrokeOffset == GroundLineFirstStrokeOffset.BySpace)
+                    {
                         distance = Space * scale;
-                    else distance = StrokeOffset * scale;
+                    }
+                    else
+                    {
+                        distance = StrokeOffset * scale;
+                    }
                 }
                 else
                 {
                     if (strokeIndex == 0)
+                    {
                         distance = Space * scale;
+                    }
+
                     if (strokeIndex == 1 || strokeIndex == 2)
+                    {
                         distance = StrokeOffset * scale;
+                    }
                 }
 
                 if (strokeIndex == 2)
+                {
                     strokeIndex = 0;
-                else strokeIndex++;
+                }
+                else
+                {
+                    strokeIndex++;
+                }
 
                 summDistanceAtSegment += distance;
 
                 if (summDistanceAtSegment >= segmentLength)
+                {
                     break;
+                }
 
                 var firstStrokePoint = _mainPolyline.GetPointAtDist(distanceAtSegmentStart + summDistanceAtSegment);
                 var helpPoint =
-                    firstStrokePoint + segmentVector.Negate().GetNormal() * StrokeLength * scale * Math.Cos(StrokeAngle.DegreeToRadian());
+                    firstStrokePoint + (segmentVector.Negate().GetNormal() * StrokeLength * scale * Math.Cos(StrokeAngle.DegreeToRadian()));
                 var secondStrokePoint =
-                    helpPoint + perpendicular * StrokeLength * scale * Math.Sin(StrokeAngle.DegreeToRadian());
+                    helpPoint + (perpendicular * StrokeLength * scale * Math.Sin(StrokeAngle.DegreeToRadian()));
                 Line stroke = new Line(firstStrokePoint, secondStrokePoint);
                 SetImmutablePropertiesToNestedEntity(stroke);
 
@@ -291,7 +320,9 @@ namespace mpESKD.Functions.mpGroundLine
 
                 Debug.Assert(overflowIndex < 1000, "Overflow in stroke creation");
                 if (overflowIndex >= 1000)
+                {
                     break;
+                }
             }
 
             return segmentStrokeDependencies;

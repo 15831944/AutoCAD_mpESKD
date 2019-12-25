@@ -3,21 +3,27 @@
 namespace mpESKD.Functions.mpBreakLine.Overrules
 {
     using System;
+    using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
+    using Base;
     using Base.Helpers;
     using ModPlusAPI.Windows;
-    using System.Diagnostics;
-    using Base;
 
     public class BreakLineOsnapOverrule : OsnapOverrule
     {
         protected static BreakLineOsnapOverrule _breakLineOsnapOverrule;
+
         public static BreakLineOsnapOverrule Instance()
         {
-            if (_breakLineOsnapOverrule != null) return _breakLineOsnapOverrule;
+            if (_breakLineOsnapOverrule != null)
+            {
+                return _breakLineOsnapOverrule;
+            }
+
             _breakLineOsnapOverrule = new BreakLineOsnapOverrule();
+
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _breakLineOsnapOverrule.SetXDataFilter(BreakLineDescriptor.Instance.Name);
             return _breakLineOsnapOverrule;
@@ -43,7 +49,10 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
                     ExceptionBox.Show(exception);
                 }
             }
-            else base.GetObjectSnapPoints(entity, snapMode, gsSelectionMark, pickPoint, lastPoint, viewTransform, snapPoints, geometryIds);
+            else
+            {
+                base.GetObjectSnapPoints(entity, snapMode, gsSelectionMark, pickPoint, lastPoint, viewTransform, snapPoints, geometryIds);
+            }
         }
 
         public override bool IsApplicable(RXObject overruledSubject)

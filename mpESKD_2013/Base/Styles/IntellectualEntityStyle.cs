@@ -2,15 +2,14 @@
 {
     using System;
     using System.Collections.ObjectModel;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
     using System.Windows;
     using System.Xml.Linq;
     using Enums;
-    using ModPlusAPI.Annotations;
+    using JetBrains.Annotations;
+    using ModPlusAPI.Mvvm;
     using Properties;
 
-    public class IntellectualEntityStyle : INotifyPropertyChanged
+    public class IntellectualEntityStyle : VmBase
     {
         private string _name;
         private string _description;
@@ -22,11 +21,13 @@
             EntityType = entityType;
             Properties = new ObservableCollection<IntellectualEntityProperty>();
             if (fillDefaultProperties)
+            {
                 this.FillStyleDefaultProperties(EntityType);
+            }
         }
 
         public ObservableCollection<IntellectualEntityProperty> Properties { get; }
-        
+
         /// <summary>
         /// Тип интеллектуального примитива, к которому относится стиль
         /// </summary>
@@ -40,12 +41,16 @@
             get => _name;
             set
             {
-                if (value == _name) return;
+                if (value == _name)
+                {
+                    return;
+                }
+
                 _name = value;
                 OnPropertyChanged();
             }
         }
-        
+
         /// <summary>
         /// Описание стиля
         /// </summary>
@@ -54,7 +59,11 @@
             get => _description;
             set
             {
-                if (value == _description) return;
+                if (value == _description)
+                {
+                    return;
+                }
+
                 _description = value;
                 OnPropertyChanged();
             }
@@ -74,7 +83,7 @@
         /// Xml данные слоя
         /// </summary>
         public XElement LayerXmlData { get; set; }
-        
+
         /// <summary>
         /// Xml данные текстового стиля (может быть null)
         /// </summary>
@@ -114,14 +123,6 @@
                 _isCurrent = value;
                 OnPropertyChanged(nameof(IsCurrent));
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

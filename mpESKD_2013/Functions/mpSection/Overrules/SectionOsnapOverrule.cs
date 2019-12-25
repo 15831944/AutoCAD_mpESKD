@@ -15,8 +15,13 @@
 
         public static SectionOsnapOverrule Instance()
         {
-            if (_instance != null) return _instance;
+            if (_instance != null)
+            {
+                return _instance;
+            }
+
             _instance = new SectionOsnapOverrule();
+
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _instance.SetXDataFilter(SectionDescriptor.Instance.Name);
             return _instance;
@@ -30,7 +35,7 @@
             {
                 try
                 {
-                    var groundLine = EntityReaderFactory.Instance.GetFromEntity<mpSection.Section>(entity); 
+                    var groundLine = EntityReaderFactory.Instance.GetFromEntity<mpSection.Section>(entity);
                     if (groundLine != null)
                     {
                         snapPoints.Add(groundLine.InsertionPoint);
@@ -43,7 +48,10 @@
                     ExceptionBox.Show(exception);
                 }
             }
-            else base.GetObjectSnapPoints(entity, snapMode, gsSelectionMark, pickPoint, lastPoint, viewTransform, snapPoints, geometryIds);
+            else
+            {
+                base.GetObjectSnapPoints(entity, snapMode, gsSelectionMark, pickPoint, lastPoint, viewTransform, snapPoints, geometryIds);
+            }
         }
 
         public override bool IsApplicable(RXObject overruledSubject)

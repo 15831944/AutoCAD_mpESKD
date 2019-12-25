@@ -19,8 +19,13 @@
 
         public static GroundLineGripPointOverrule Instance()
         {
-            if (_instance != null) return _instance;
+            if (_instance != null)
+            {
+                return _instance;
+            }
+
             _instance = new GroundLineGripPointOverrule();
+
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _instance.SetXDataFilter(GroundLineDescriptor.Instance.Name);
             return _instance;
@@ -53,7 +58,7 @@
                         {
                             var removeVertexGrip = new GroundLineRemoveVertexGrip(groundLine, 0)
                             {
-                                GripPoint = groundLine.InsertionPoint - Vector3d.YAxis * 20 * curViewUnitSize
+                                GripPoint = groundLine.InsertionPoint - (Vector3d.YAxis * 20 * curViewUnitSize)
                             };
                             grips.Add(removeVertexGrip);
                         }
@@ -69,7 +74,7 @@
 
                             var removeVertexGrip = new GroundLineRemoveVertexGrip(groundLine, index + 1)
                             {
-                                GripPoint = groundLine.MiddlePoints[index] - Vector3d.YAxis * 20 * curViewUnitSize
+                                GripPoint = groundLine.MiddlePoints[index] - (Vector3d.YAxis * 20 * curViewUnitSize)
                             };
                             grips.Add(removeVertexGrip);
                         }
@@ -85,7 +90,7 @@
                         {
                             var removeVertexGrip = new GroundLineRemoveVertexGrip(groundLine, groundLine.MiddlePoints.Count + 1)
                             {
-                                GripPoint = groundLine.EndPoint - Vector3d.YAxis * 20 * curViewUnitSize
+                                GripPoint = groundLine.EndPoint - (Vector3d.YAxis * 20 * curViewUnitSize)
                             };
                             grips.Add(removeVertexGrip);
                         }
@@ -97,7 +102,8 @@
                         {
                             if (i == 0)
                             {
-                                var addVertexGrip = new GroundLineAddVertexGrip(groundLine,
+                                var addVertexGrip = new GroundLineAddVertexGrip(
+                                    groundLine,
                                     groundLine.InsertionPoint, groundLine.MiddlePoints[i])
                                 {
                                     GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.InsertionPoint, groundLine.MiddlePoints[i])
@@ -106,17 +112,20 @@
                             }
                             else
                             {
-                                var addVertexGrip = new GroundLineAddVertexGrip(groundLine,
+                                var addVertexGrip = new GroundLineAddVertexGrip(
+                                    groundLine,
                                     groundLine.MiddlePoints[i - 1], groundLine.MiddlePoints[i])
                                 {
                                     GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.MiddlePoints[i - 1], groundLine.MiddlePoints[i])
                                 };
                                 grips.Add(addVertexGrip);
                             }
+
                             // last segment
                             if (i == groundLine.MiddlePoints.Count - 1)
                             {
-                                var addVertexGrip = new GroundLineAddVertexGrip(groundLine,
+                                var addVertexGrip = new GroundLineAddVertexGrip(
+                                    groundLine,
                                     groundLine.MiddlePoints[i], groundLine.EndPoint)
                                 {
                                     GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.MiddlePoints[i], groundLine.EndPoint)
@@ -131,14 +140,14 @@
                                 var addVertexGrip = new GroundLineAddVertexGrip(groundLine, groundLine.EndPoint, null)
                                 {
                                     GripPoint = groundLine.EndPoint +
-                                                (groundLine.EndPoint - groundLine.MiddlePoints.Last()).GetNormal() * 20 * curViewUnitSize
+                                                ((groundLine.EndPoint - groundLine.MiddlePoints.Last()).GetNormal() * 20 * curViewUnitSize)
                                 };
                                 grips.Add(addVertexGrip);
 
                                 addVertexGrip = new GroundLineAddVertexGrip(groundLine, null, groundLine.InsertionPoint)
                                 {
                                     GripPoint = groundLine.InsertionPoint +
-                                                (groundLine.InsertionPoint - groundLine.MiddlePoints.First()).GetNormal() * 20 * curViewUnitSize
+                                                ((groundLine.InsertionPoint - groundLine.MiddlePoints.First()).GetNormal() * 20 * curViewUnitSize)
                                 };
                                 grips.Add(addVertexGrip);
                             }
@@ -146,15 +155,15 @@
                             {
                                 var addVertexGrip = new GroundLineAddVertexGrip(groundLine, groundLine.EndPoint, null)
                                 {
-                                    GripPoint = groundLine.EndPoint + 
-                                                (groundLine.InsertionPoint - groundLine.EndPoint).GetNormal() * 20 * curViewUnitSize
+                                    GripPoint = groundLine.EndPoint +
+                                                ((groundLine.InsertionPoint - groundLine.EndPoint).GetNormal() * 20 * curViewUnitSize)
                                 };
                                 grips.Add(addVertexGrip);
 
                                 addVertexGrip = new GroundLineAddVertexGrip(groundLine, null, groundLine.EndPoint)
                                 {
                                     GripPoint = groundLine.InsertionPoint +
-                                                (groundLine.EndPoint - groundLine.InsertionPoint ).GetNormal() * 20 * curViewUnitSize
+                                                ((groundLine.EndPoint - groundLine.InsertionPoint).GetNormal() * 20 * curViewUnitSize)
                                 };
                                 grips.Add(addVertexGrip);
 
@@ -170,15 +179,14 @@
 
                         var reverseGrip = new GroundLineReverseGrip(groundLine)
                         {
-                            GripPoint = groundLine.InsertionPoint + Vector3d.YAxis * 20 * curViewUnitSize
+                            GripPoint = groundLine.InsertionPoint + (Vector3d.YAxis * 20 * curViewUnitSize)
                         };
                         grips.Add(reverseGrip);
                         reverseGrip = new GroundLineReverseGrip(groundLine)
                         {
-                            GripPoint = groundLine.EndPoint + Vector3d.YAxis * 20 * curViewUnitSize
+                            GripPoint = groundLine.EndPoint + (Vector3d.YAxis * 20 * curViewUnitSize)
                         };
                         grips.Add(reverseGrip);
-                        
                     }
                 }
             }
@@ -222,10 +230,16 @@
                             addVertexGrip.NewPoint = addVertexGrip.GripPoint + offset;
                         }
 
-                        else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                        else
+                        {
+                            base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                        }
                     }
                 }
-                else base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                else
+                {
+                    base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                }
             }
             catch (Exception exception)
             {
@@ -298,8 +312,10 @@
                         {
                             blkRef.XData = resBuf;
                         }
+
                         tr.Commit();
                     }
+
                     GroundLine.Dispose();
                 }
 
@@ -309,10 +325,17 @@
                     if (_gripTmp != null)
                     {
                         if (GripIndex == 0)
+                        {
                             GroundLine.InsertionPoint = _gripTmp;
+                        }
                         else if (GripIndex == GroundLine.MiddlePoints.Count + 1)
+                        {
                             GroundLine.EndPoint = _gripTmp;
-                        else GroundLine.MiddlePoints[GripIndex - 1] = _gripTmp;
+                        }
+                        else
+                        {
+                            GroundLine.MiddlePoints[GripIndex - 1] = _gripTmp;
+                        }
                     }
                 }
 
@@ -362,7 +385,7 @@
 
         public override string GetTooltip()
         {
-            return Language.GetItem(Invariables.LangItem, "gp4"); //  "Добавить вершину";
+            return Language.GetItem(Invariables.LangItem, "gp4"); // "Добавить вершину";
         }
 
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
@@ -400,13 +423,17 @@
                     {
                         GroundLine.MiddlePoints.Insert(GroundLine.MiddlePoints.IndexOf(GripLeftPoint.Value) + 1, NewPoint);
                     }
+
                     GroundLine.UpdateEntities();
                     GroundLine.BlockRecord.UpdateAnonymousBlocks();
                     using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
                         if (newInsertionPoint.HasValue)
+                        {
                             ((BlockReference)blkRef).Position = newInsertionPoint.Value;
+                        }
+
                         using (var resBuf = GroundLine.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
@@ -515,7 +542,10 @@
                 {
                     var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
                     if (newInsertionPoint.HasValue)
+                    {
                         ((BlockReference)blkRef).Position = newInsertionPoint.Value;
+                    }
+
                     using (var resBuf = GroundLine.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
@@ -558,7 +588,7 @@
                 GroundLine.InsertionPoint = newInsertionPoint;
                 GroundLine.MiddlePoints.Reverse();
                 GroundLine.BlockTransform = GroundLine.BlockTransform.Inverse();
-                
+
                 GroundLine.UpdateEntities();
                 GroundLine.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())

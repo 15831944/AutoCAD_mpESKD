@@ -47,7 +47,7 @@
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
-                
+
                 var groundLine = new GroundLine();
                 var blockReference = MainFunction.CreateBlock(groundLine);
 
@@ -91,7 +91,7 @@
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
-                
+
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();
 
@@ -151,7 +151,7 @@
                         {
                             using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
                             {
-                                var obj = (BlockReference) tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
+                                var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                                 obj.Erase(true);
                                 tr.Commit();
                             }
@@ -188,14 +188,18 @@
                 peo.AddAllowedClass(typeof(Polyline), true);
 
                 var per = AcadHelpers.Editor.GetEntity(peo);
-                if (per.Status != PromptStatus.OK) return;
+                if (per.Status != PromptStatus.OK)
+                {
+                    return;
+                }
 
                 /* Регистрация ЕСКД приложения должна запускаться при запуске
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataHelpers.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
-                //style
+
+                // style
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();
 
@@ -214,11 +218,17 @@
                             for (int i = 0; i < pline.NumberOfVertices; i++)
                             {
                                 if (i == 0)
+                                {
                                     groundLine.InsertionPoint = pline.GetPoint3dAt(i);
+                                }
                                 else if (i == pline.NumberOfVertices - 1)
+                                {
                                     groundLine.EndPoint = pline.GetPoint3dAt(i);
+                                }
                                 else
+                                {
                                     groundLine.MiddlePoints.Add(pline.GetPoint3dAt(i));
+                                }
                             }
 
                             groundLine.UpdateEntities();
@@ -228,6 +238,7 @@
                             ent.Position = pline.GetPoint3dAt(0);
                             ent.XData = groundLine.GetDataForXData();
                         }
+
                         tr.Commit();
                     }
 

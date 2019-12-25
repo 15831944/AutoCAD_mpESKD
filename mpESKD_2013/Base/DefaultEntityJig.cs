@@ -64,15 +64,19 @@
                                 _intellectualEntity.InsertionPoint = value;
                             });
                     case JigState.PromptNextPoint:
-                    {
-                        var basePoint = _insertionPoint.Value;
-                        if (PreviousPoint != null)
-                            basePoint = PreviousPoint.Value;
-                        return _nextPoint.Acquire(prompts, "\n" + _promptForNextPoint, basePoint, value =>
+                        {
+                            var basePoint = _insertionPoint.Value;
+                            if (PreviousPoint != null)
+                            {
+                                basePoint = PreviousPoint.Value;
+                            }
+
+                            return _nextPoint.Acquire(prompts, "\n" + _promptForNextPoint, basePoint, value =>
                         {
                             _intellectualEntity.EndPoint = value;
                         });
-                    }
+                        }
+
                     default:
                         return SamplerStatus.NoChange;
                 }
@@ -96,15 +100,18 @@
                         obj.BlockUnit = AcadHelpers.Database.Insunits;
                         tr.Commit();
                     }
+
                     _intellectualEntity.UpdateEntities();
                     _intellectualEntity.BlockRecord.UpdateAnonymousBlocks();
                 }
+
                 return true;
             }
             catch
             {
                 // ignored
             }
+
             return false;
         }
     }

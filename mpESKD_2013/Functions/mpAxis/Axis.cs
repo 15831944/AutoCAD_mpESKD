@@ -40,15 +40,18 @@ namespace mpESKD.Functions.mpAxis
         /// <summary>Минимальная длина от точки вставки до конечной точки</summary>
         public double AxisMinLength => 1.0;
 
-
         protected override void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
         {
             base.ProcessScaleChange(oldScale, newScale);
             if (oldScale != null && newScale != null)
+            {
                 if (MainStaticSettings.Settings.AxisLineTypeScaleProportionScale)
+                {
                     LineTypeScale = LineTypeScale * newScale.GetNumericScale() / oldScale.GetNumericScale();
+                }
+            }
         }
-        
+
         /// <inheritdoc />
         [EntityProperty(PropertiesCategory.General, 4, "p19", "d19", "осевая", null, null)]
         public override string LineType { get; set; } = "осевая";
@@ -89,6 +92,7 @@ namespace mpESKD.Functions.mpAxis
             {
                 var oldFracture = BottomFractureOffset;
                 _bottomFractureOffset = value;
+
                 // нужно сместить зависимые точки
                 var vecNorm = (EndPoint - InsertionPoint).GetNormal() * (value - oldFracture) * GetScale();
                 BottomOrientPoint = BottomOrientPoint + vecNorm;
@@ -291,12 +295,10 @@ namespace mpESKD.Functions.mpAxis
         #region Points and Grips
 
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
-        public Point3d MiddlePoint => new Point3d
-        (
+        public Point3d MiddlePoint => new Point3d(
             (InsertionPoint.X + EndPoint.X) / 2,
             (InsertionPoint.Y + EndPoint.Y) / 2,
-            (InsertionPoint.Z + EndPoint.Z) / 2
-        );
+            (InsertionPoint.Z + EndPoint.Z) / 2);
 
         [SaveToXData]
         public double BottomLineAngle { get; set; }
@@ -312,15 +314,16 @@ namespace mpESKD.Functions.mpAxis
                 var angleA = baseVector.GetAngleTo(EndPoint - InsertionPoint, Vector3d.ZAxis);
                 var bottomLineLength = Fracture / Math.Cos(BottomLineAngle) * GetFullScale();
                 _bottomMarkerPoint = new Point3d(
-                    EndPoint.X + bottomLineLength * Math.Cos(angleA + BottomLineAngle),
-                    EndPoint.Y + bottomLineLength * Math.Sin(angleA + BottomLineAngle),
+                    EndPoint.X + (bottomLineLength * Math.Cos(angleA + BottomLineAngle)),
+                    EndPoint.Y + (bottomLineLength * Math.Sin(angleA + BottomLineAngle)),
                     EndPoint.Z);
-                return _bottomMarkerPoint + (EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetFullScale();
+                return _bottomMarkerPoint + ((EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetFullScale());
             }
+
             set
             {
                 _bottomMarkerPoint = value;
-                BottomLineAngle = (EndPoint - InsertionPoint).GetAngleTo(value - EndPoint - (EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetFullScale(), Vector3d.ZAxis);
+                BottomLineAngle = (EndPoint - InsertionPoint).GetAngleTo(value - EndPoint - ((EndPoint - InsertionPoint).GetNormal() * BottomFractureOffset * GetFullScale()), Vector3d.ZAxis);
             }
         }
 
@@ -338,15 +341,16 @@ namespace mpESKD.Functions.mpAxis
                 var angleA = baseVector.GetAngleTo(InsertionPoint - EndPoint, Vector3d.ZAxis);
                 var topLineLength = Fracture / Math.Cos(TopLineAngle) * GetFullScale();
                 _topMarkerPoint = new Point3d(
-                    InsertionPoint.X + topLineLength * Math.Cos(angleA + TopLineAngle),
-                    InsertionPoint.Y + topLineLength * Math.Sin(angleA + TopLineAngle),
+                    InsertionPoint.X + (topLineLength * Math.Cos(angleA + TopLineAngle)),
+                    InsertionPoint.Y + (topLineLength * Math.Sin(angleA + TopLineAngle)),
                     InsertionPoint.Z);
-                return _topMarkerPoint + (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetFullScale();
+                return _topMarkerPoint + ((InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetFullScale());
             }
+
             set
             {
                 _topMarkerPoint = value;
-                TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint - (InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetFullScale(), Vector3d.ZAxis);
+                TopLineAngle = (InsertionPoint - EndPoint).GetAngleTo(value - InsertionPoint - ((InsertionPoint - EndPoint).GetNormal() * TopFractureOffset * GetFullScale()), Vector3d.ZAxis);
             }
         }
 
@@ -357,9 +361,13 @@ namespace mpESKD.Functions.mpAxis
             {
                 var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
                 if (double.IsNaN(BottomOrientMarkerOffset) || Math.Abs(BottomOrientMarkerOffset) < 0.0001)
+                {
                     BottomOrientMarkerOffset = MarkersDiameter + 10.0;
-                return BottomMarkerPoint + mainLineVectorNormal * BottomOrientMarkerOffset * GetFullScale();
+                }
+
+                return BottomMarkerPoint + (mainLineVectorNormal * BottomOrientMarkerOffset * GetFullScale());
             }
+
             set
             {
                 var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
@@ -375,9 +383,13 @@ namespace mpESKD.Functions.mpAxis
             {
                 var mainLineVectorNormal = (InsertionPoint - EndPoint).GetPerpendicularVector().GetNormal();
                 if (double.IsNaN(TopOrientMarkerOffset) || Math.Abs(TopOrientMarkerOffset) < 0.0001)
+                {
                     TopOrientMarkerOffset = MarkersDiameter + 10.0;
-                return TopMarkerPoint - mainLineVectorNormal * TopOrientMarkerOffset * GetFullScale();
+                }
+
+                return TopMarkerPoint - (mainLineVectorNormal * TopOrientMarkerOffset * GetFullScale());
             }
+
             set
             {
                 var mainLineVectorNormal = (EndPoint - InsertionPoint).GetPerpendicularVector().GetNormal();
@@ -388,8 +400,11 @@ namespace mpESKD.Functions.mpAxis
 
         // Получение управляющих точек в системе координат блока для отрисовки содержимого
         private Point3d BottomMarkerPointOCS => BottomMarkerPoint.TransformBy(BlockTransform.Inverse());
+
         private Point3d TopMarkerPointOCS => TopMarkerPoint.TransformBy(BlockTransform.Inverse());
+
         private Point3d BottomOrientPointOCS => BottomOrientPoint.TransformBy(BlockTransform.Inverse());
+
         private Point3d TopOrientPointOCS => TopOrientPoint.TransformBy(BlockTransform.Inverse());
 
         #endregion
@@ -541,13 +556,17 @@ namespace mpESKD.Functions.mpAxis
                     _topOrientDBText
                 };
                 foreach (var e in entities)
+                {
                     if (e != null && !(e is DBText))
                     {
                         SetImmutablePropertiesToNestedEntity(e);
                     }
+                }
 
                 if (_mainLine != null)
+                {
                     SetChangeablePropertiesToNestedEntity(_mainLine);
+                }
 
                 entities.Add(_mainLine);
 
@@ -578,6 +597,7 @@ namespace mpESKD.Functions.mpAxis
                     // Задание второй точки
                     SetEntitiesPoints(InsertionPointOCS, EndPointOCS, BottomMarkerPointOCS, TopMarkerPointOCS, scale);
                 }
+
                 UpdateTextEntities();
             }
             catch (Exception exception)
@@ -598,9 +618,9 @@ namespace mpESKD.Functions.mpAxis
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                var tmpEndPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y - AxisMinLength * scale, InsertionPointOCS.Z);
-                var tmpBottomMarkerPoint = new Point3d(tmpEndPoint.X, tmpEndPoint.Y - Fracture * scale, tmpEndPoint.Z);
-                var tmpTopMarkerPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y + Fracture * scale, InsertionPointOCS.Z);
+                var tmpEndPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y - (AxisMinLength * scale), InsertionPointOCS.Z);
+                var tmpBottomMarkerPoint = new Point3d(tmpEndPoint.X, tmpEndPoint.Y - (Fracture * scale), tmpEndPoint.Z);
+                var tmpTopMarkerPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y + (Fracture * scale), InsertionPointOCS.Z);
 
                 SetEntitiesPoints(InsertionPointOCS, tmpEndPoint, tmpBottomMarkerPoint, tmpTopMarkerPoint, scale);
             }
@@ -630,9 +650,10 @@ namespace mpESKD.Functions.mpAxis
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Bottom)
             {
-                var firstMarkerCenter = bottomMarkerPoint + mainVector.GetNormal() * MarkersDiameter / 2 * scale;
+                var firstMarkerCenter = bottomMarkerPoint + (mainVector.GetNormal() * MarkersDiameter / 2 * scale);
+
                 // bottom line
-                var bottomLineStartPoint = endPoint + mainVector.GetNormal() * BottomFractureOffset * scale;
+                var bottomLineStartPoint = endPoint + (mainVector.GetNormal() * BottomFractureOffset * scale);
                 if (BottomFractureOffset > 0)
                 {
                     _bottomFractureOffsetLine = new Line
@@ -646,14 +667,16 @@ namespace mpESKD.Functions.mpAxis
                 _bottomMarkerLine = new Line
                 {
                     StartPoint = bottomLineStartPoint,
-                    EndPoint = bottomLineStartPoint + markerLineVector.GetNormal() * (markerLineVector.Length - MarkersDiameter * scale / 2.0)
+                    EndPoint = bottomLineStartPoint + (markerLineVector.GetNormal() * (markerLineVector.Length - (MarkersDiameter * scale / 2.0)))
                 };
+
                 // markers
                 _bottomFirstMarker = new Circle
                 {
                     Center = firstMarkerCenter,
                     Diameter = MarkersDiameter * scale
                 };
+
                 // text
                 if (!string.IsNullOrEmpty(FirstTextPrefix) ||
                     !string.IsNullOrEmpty(FirstText) ||
@@ -674,16 +697,18 @@ namespace mpESKD.Functions.mpAxis
                         Diameter = (MarkersDiameter - 2) * scale
                     };
                 }
+
                 // Если количество маркеров больше 1
                 if (MarkersCount > 1)
                 {
                     // Значит второй маркер точно есть (независимо от 3-го)
-                    var secontMarkerCenter = firstMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
+                    var secontMarkerCenter = firstMarkerCenter + (mainVector.GetNormal() * MarkersDiameter * scale);
                     _bottomSecondMarker = new Circle
                     {
                         Center = secontMarkerCenter,
                         Diameter = MarkersDiameter * scale
                     };
+
                     // text
                     if (!string.IsNullOrEmpty(SecondTextPrefix) ||
                         !string.IsNullOrEmpty(SecondText) ||
@@ -704,15 +729,17 @@ namespace mpESKD.Functions.mpAxis
                             Diameter = (MarkersDiameter - 2) * scale
                         };
                     }
+
                     // Если количество маркеров больше двух, тогда рисую 3-ий маркер
                     if (MarkersCount > 2)
                     {
-                        var thirdMarkerCenter = secontMarkerCenter + mainVector.GetNormal() * MarkersDiameter * scale;
+                        var thirdMarkerCenter = secontMarkerCenter + (mainVector.GetNormal() * MarkersDiameter * scale);
                         _bottomThirdMarker = new Circle
                         {
                             Center = thirdMarkerCenter,
                             Diameter = MarkersDiameter * scale
                         };
+
                         // text
                         if (!string.IsNullOrEmpty(ThirdTextPrefix) ||
                             !string.IsNullOrEmpty(ThirdText) ||
@@ -740,12 +767,13 @@ namespace mpESKD.Functions.mpAxis
 
                 if (BottomOrientMarkerVisible)
                 {
-                    var bottomOrientMarkerCenter = BottomOrientPointOCS + mainVector.GetNormal() * MarkersDiameter / 2.0 * scale;
+                    var bottomOrientMarkerCenter = BottomOrientPointOCS + (mainVector.GetNormal() * MarkersDiameter / 2.0 * scale);
                     _bottomOrientMarker = new Circle
                     {
                         Center = bottomOrientMarkerCenter,
                         Diameter = MarkersDiameter * scale
                     };
+
                     // line
                     var _bottomOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, bottomOrientMarkerCenter, firstMarkerCenter,
@@ -760,12 +788,14 @@ namespace mpESKD.Functions.mpAxis
                             StartPoint = _bottomOrientLineStartPoint,
                             EndPoint = _bottomOrientLineEndPoint
                         };
+
                         // arrow
                         if (!(Math.Abs((_bottomOrientLineEndPoint - _bottomOrientLineStartPoint).Length) < ArrowsSize * scale) &&
                             ArrowsSize != 0)
                         {
                             _bottomOrientArrow = new Polyline(2);
-                            var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(_bottomOrientLineEndPoint,
+                            var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                _bottomOrientLineEndPoint,
                                 _bottomOrientLineStartPoint,
                                 _bottomOrientLineEndPoint, ArrowsSize * scale);
                             _bottomOrientArrow.AddVertexAt(0, arrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
@@ -801,9 +831,10 @@ namespace mpESKD.Functions.mpAxis
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Top)
             {
-                var firstMarkerCenter = topMarkerPoint - mainVector.GetNormal() * MarkersDiameter / 2 * scale;
+                var firstMarkerCenter = topMarkerPoint - (mainVector.GetNormal() * MarkersDiameter / 2 * scale);
+
                 // top line
-                var topLineStartPoint = insertionPoint - mainVector.GetNormal() * TopFractureOffset * scale;
+                var topLineStartPoint = insertionPoint - (mainVector.GetNormal() * TopFractureOffset * scale);
                 if (TopFractureOffset > 0)
                 {
                     _topFractureOffsetLine = new Line
@@ -817,14 +848,16 @@ namespace mpESKD.Functions.mpAxis
                 _topMarkerLine = new Line
                 {
                     StartPoint = topLineStartPoint,
-                    EndPoint = topLineStartPoint + markerLineVector.GetNormal() * (markerLineVector.Length - MarkersDiameter * scale / 2.0)
+                    EndPoint = topLineStartPoint + (markerLineVector.GetNormal() * (markerLineVector.Length - (MarkersDiameter * scale / 2.0)))
                 };
+
                 // markers
                 _topFirstMarker = new Circle
                 {
                     Center = firstMarkerCenter,
                     Diameter = MarkersDiameter * scale
                 };
+
                 // text
                 if (!string.IsNullOrEmpty(FirstTextPrefix) ||
                     !string.IsNullOrEmpty(FirstText) ||
@@ -845,16 +878,18 @@ namespace mpESKD.Functions.mpAxis
                         Diameter = (MarkersDiameter - 2) * scale
                     };
                 }
+
                 // Если количество маркеров больше 1
                 if (MarkersCount > 1)
                 {
                     // Значит второй маркер точно есть (независимо от 3-го)
-                    var secontMarkerCenter = firstMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
+                    var secontMarkerCenter = firstMarkerCenter - (mainVector.GetNormal() * MarkersDiameter * scale);
                     _topSecondMarker = new Circle
                     {
                         Center = secontMarkerCenter,
                         Diameter = MarkersDiameter * scale
                     };
+
                     // text
                     if (!string.IsNullOrEmpty(SecondTextPrefix) ||
                         !string.IsNullOrEmpty(SecondText) ||
@@ -875,15 +910,17 @@ namespace mpESKD.Functions.mpAxis
                             Diameter = (MarkersDiameter - 2) * scale
                         };
                     }
+
                     // Если количество маркеров больше двух, тогда рисую 3-ий маркер
                     if (MarkersCount > 2)
                     {
-                        var thirdMarkerCenter = secontMarkerCenter - mainVector.GetNormal() * MarkersDiameter * scale;
+                        var thirdMarkerCenter = secontMarkerCenter - (mainVector.GetNormal() * MarkersDiameter * scale);
                         _topThirdMarker = new Circle
                         {
                             Center = thirdMarkerCenter,
                             Diameter = MarkersDiameter * scale
                         };
+
                         // text
                         if (!string.IsNullOrEmpty(ThirdTextPrefix) ||
                             !string.IsNullOrEmpty(ThirdText) ||
@@ -911,12 +948,13 @@ namespace mpESKD.Functions.mpAxis
 
                 if (TopOrientMarkerVisible)
                 {
-                    var topOrientMarkerCenter = TopOrientPointOCS - mainVector.GetNormal() * MarkersDiameter / 2.0 * scale;
+                    var topOrientMarkerCenter = TopOrientPointOCS - (mainVector.GetNormal() * MarkersDiameter / 2.0 * scale);
                     _topOrientMarker = new Circle
                     {
                         Center = topOrientMarkerCenter,
                         Diameter = MarkersDiameter * scale
                     };
+
                     // line
                     var _topOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, topOrientMarkerCenter, firstMarkerCenter,
@@ -931,13 +969,16 @@ namespace mpESKD.Functions.mpAxis
                             StartPoint = _topOrientLineStartPoint,
                             EndPoint = _topOrientLineEndPoint
                         };
+
                         // arrow
                         if (!(Math.Abs((_topOrientLineEndPoint - _topOrientLineStartPoint).Length) < ArrowsSize * scale) &&
                             ArrowsSize != 0)
                         {
                             _topOrientArrow = new Polyline(2);
+
                             // arrow draw
-                            var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(_topOrientLineEndPoint,
+                            var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                _topOrientLineEndPoint,
                                 _topOrientLineStartPoint,
                                 _topOrientLineEndPoint, ArrowsSize * scale);
                             _topOrientArrow.AddVertexAt(0, arrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
@@ -973,28 +1014,63 @@ namespace mpESKD.Functions.mpAxis
         private void UpdateTextEntities()
         {
             SetFirstTextOnCreation();
-            if (_bottomFirstDBText != null) _bottomFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
-            if (_bottomSecondDBText != null) _bottomSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
-            if (_bottomThirdDBText != null) _bottomThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
-            if (_topFirstDBText != null) _topFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
-            if (_topSecondDBText != null) _topSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
-            if (_topThirdDBText != null) _topThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
-            if (_bottomOrientDBText != null) _bottomOrientDBText.TextString = BottomOrientText;
-            if (_topOrientDBText != null) _topOrientDBText.TextString = TopOrientText;
+            if (_bottomFirstDBText != null)
+            {
+                _bottomFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
+            }
+
+            if (_bottomSecondDBText != null)
+            {
+                _bottomSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
+            }
+
+            if (_bottomThirdDBText != null)
+            {
+                _bottomThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
+            }
+
+            if (_topFirstDBText != null)
+            {
+                _topFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
+            }
+
+            if (_topSecondDBText != null)
+            {
+                _topSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
+            }
+
+            if (_topThirdDBText != null)
+            {
+                _topThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
+            }
+
+            if (_bottomOrientDBText != null)
+            {
+                _bottomOrientDBText.TextString = BottomOrientText;
+            }
+
+            if (_topOrientDBText != null)
+            {
+                _topOrientDBText.TextString = TopOrientText;
+            }
         }
 
         private void SetFirstTextOnCreation()
         {
-            //if (EndPointOCS == Point3d.Origin)
+            // if (EndPointOCS == Point3d.Origin)
             //    return;
             if (IsValueCreated)
             {
                 var check = 1 / Math.Sqrt(2);
                 var v = (EndPointOCS - InsertionPointOCS).GetNormal();
                 if ((v.X > check || v.X < -check) && (v.Y < check || v.Y > -check))
+                {
                     FirstText = GetFirstTextValueByLastAxis("Horizontal");
+                }
                 else
+                {
                     FirstText = GetFirstTextValueByLastAxis("Vertical");
+                }
             }
         }
 
@@ -1016,6 +1092,7 @@ namespace mpESKD.Functions.mpAxis
                             _newHorizontalMarkValue = (i + 1).ToString();
                             return _newHorizontalMarkValue;
                         }
+
                         if (Invariables.AxisRusAlphabet.Contains(LastHorizontalValue))
                         {
                             var index = Invariables.AxisRusAlphabet.IndexOf(LastHorizontalValue);
@@ -1024,17 +1101,22 @@ namespace mpESKD.Functions.mpAxis
                                 _newHorizontalMarkValue = Invariables.AxisRusAlphabet[0];
                                 return _newHorizontalMarkValue;
                             }
+
                             _newHorizontalMarkValue = Invariables.AxisRusAlphabet[index + 1];
                             return _newHorizontalMarkValue;
                         }
+
                         _newHorizontalMarkValue = "А";
                         return _newHorizontalMarkValue;
                     }
+
                     return _newHorizontalMarkValue;
                 }
+
                 _newHorizontalMarkValue = "А";
                 return _newHorizontalMarkValue;
             }
+
             if (direction.Equals("Vertical"))
             {
                 if (!string.IsNullOrEmpty(LastVerticalValue))
@@ -1046,6 +1128,7 @@ namespace mpESKD.Functions.mpAxis
                             _newVerticalMarkValue = (i + 1).ToString();
                             return _newVerticalMarkValue;
                         }
+
                         if (Invariables.AxisRusAlphabet.Contains(LastVerticalValue))
                         {
                             var index = Invariables.AxisRusAlphabet.IndexOf(LastVerticalValue);
@@ -1054,17 +1137,22 @@ namespace mpESKD.Functions.mpAxis
                                 _newVerticalMarkValue = Invariables.AxisRusAlphabet[0];
                                 return _newVerticalMarkValue;
                             }
+
                             _newVerticalMarkValue = Invariables.AxisRusAlphabet[index + 1];
                             return _newVerticalMarkValue;
                         }
+
                         _newVerticalMarkValue = "1";
                         return _newVerticalMarkValue;
                     }
+
                     return _newVerticalMarkValue;
                 }
+
                 _newVerticalMarkValue = "1";
                 return _newVerticalMarkValue;
             }
+
             return string.Empty;
         }
         #endregion

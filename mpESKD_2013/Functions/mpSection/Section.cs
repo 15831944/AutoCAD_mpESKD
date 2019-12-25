@@ -188,7 +188,7 @@ namespace mpESKD.Functions.mpSection
         private readonly string LastIntegerValue = string.Empty;
 
         private readonly string LastLetterValue = string.Empty;
-        
+
         /// <summary>
         /// Отступ средней точки верхнего текста вдоль верхней полки
         /// </summary>
@@ -290,8 +290,13 @@ namespace mpESKD.Functions.mpSection
                 };
                 entities.AddRange(_middleStrokes);
                 foreach (var e in entities)
+                {
                     if (e != null)
+                    {
                         SetImmutablePropertiesToNestedEntity(e);
+                    }
+                }
+
                 return entities;
             }
         }
@@ -331,7 +336,9 @@ namespace mpESKD.Functions.mpSection
         public void RebasePoints()
         {
             if (!MiddlePoints.Contains(EndPoint))
+            {
                 MiddlePoints.Add(EndPoint);
+            }
         }
 
         private void MakeSimplyEntity(UpdateVariant variant, double scale)
@@ -341,7 +348,7 @@ namespace mpESKD.Functions.mpSection
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                var tmpEndPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y - SectionMinLength * scale, InsertionPointOCS.Z);
+                var tmpEndPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y - (SectionMinLength * scale), InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength)
@@ -384,8 +391,8 @@ namespace mpESKD.Functions.mpSection
             var bottomStrokeNormalVector = (bottomStrokeEndPoint - endPoint).GetNormal();
 
             // shelf lines
-            var topShelfStartPoint = insertionPoint + topStrokeNormalVector * GetShelfOffset() * scale;
-            var topShelfEndPoint = topShelfStartPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale;
+            var topShelfStartPoint = insertionPoint + (topStrokeNormalVector * GetShelfOffset() * scale);
+            var topShelfEndPoint = topShelfStartPoint + (topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale);
             TopShelfEndPoint = topShelfEndPoint.TransformBy(BlockTransform);
             _topShelfLine = new Line
             {
@@ -393,8 +400,8 @@ namespace mpESKD.Functions.mpSection
                 EndPoint = topShelfEndPoint
             };
 
-            var bottomShelfStartPoint = endPoint + bottomStrokeNormalVector * GetShelfOffset() * scale;
-            var bottomShelfEndPoint = bottomShelfStartPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfLength * scale;
+            var bottomShelfStartPoint = endPoint + (bottomStrokeNormalVector * GetShelfOffset() * scale);
+            var bottomShelfEndPoint = bottomShelfStartPoint + (bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfLength * scale);
             BottomShelfEndPoint = bottomShelfEndPoint.TransformBy(BlockTransform);
             _bottomShelfLine = new Line
             {
@@ -403,13 +410,13 @@ namespace mpESKD.Functions.mpSection
             };
 
             // shelf arrows
-            var topShelfArrowStartPoint = topShelfStartPoint + topStrokeNormalVector.GetPerpendicularVector() * ShelfArrowLength * scale;
+            var topShelfArrowStartPoint = topShelfStartPoint + (topStrokeNormalVector.GetPerpendicularVector() * ShelfArrowLength * scale);
             _topShelfArrow = new Polyline(2);
             _topShelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
             _topShelfArrow.AddVertexAt(1, topShelfStartPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
 
             var bottomShelfArrowStartPoint =
-                bottomShelfStartPoint + bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfArrowLength * scale;
+                bottomShelfStartPoint + (bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfArrowLength * scale);
             _bottomShelfArrow = new Polyline(2);
             _bottomShelfArrow.AddVertexAt(0, bottomShelfArrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
             _bottomShelfArrow.AddVertexAt(1, bottomShelfStartPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
@@ -437,8 +444,8 @@ namespace mpESKD.Functions.mpSection
                     Attachment = AttachmentPoint.MiddleCenter
                 };
 
-                //TextActualHeight = _topMText.ActualHeight;
-                //TextActualWidth = _topMText.ActualWidth;
+                // TextActualHeight = _topMText.ActualHeight;
+                // TextActualWidth = _topMText.ActualWidth;
 
                 var check = 1 / Math.Sqrt(2);
 
@@ -454,17 +461,15 @@ namespace mpESKD.Functions.mpSection
                         acrossShelfTextOffset = _topMText.ActualWidth / 2;
                     }
 
-                    var tempPoint = topShelfEndPoint + (topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset;
-                    var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
+                    var tempPoint = topShelfEndPoint + ((topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset);
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
                     _topMText.Location = topTextCenterPoint;
-
-
                 }
                 else
                 {
                     var tempPoint = topShelfEndPoint +
-                                    (topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2));
-                    var topTextCenterPoint = tempPoint + topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2)));
+                                    ((topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2)));
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2))));
                     _topMText.Location = topTextCenterPoint;
                 }
 
@@ -482,16 +487,16 @@ namespace mpESKD.Functions.mpSection
                         acrossShelfTextOffset = _topMText.ActualWidth / 2;
                     }
 
-                    var tempPoint = bottomShelfEndPoint + (bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * alongShelfTextOffset;
-                    var bottomTextCenterPoint = tempPoint + bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset);
+                    var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * alongShelfTextOffset);
+                    var bottomTextCenterPoint = tempPoint + (bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
                     _bottomMText.Location = bottomTextCenterPoint;
                 }
                 else
                 {
-                    var tempPoint = bottomShelfEndPoint + (bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() *
-                                    (AlongBottomShelfTextOffset + (_bottomMText.ActualWidth / 2));
+                    var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() *
+                                    (AlongBottomShelfTextOffset + (_bottomMText.ActualWidth / 2)));
                     var bottomTextCenterPoint =
-                        tempPoint + bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (_bottomMText.ActualHeight / 2)));
+                        tempPoint + (bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (_bottomMText.ActualHeight / 2))));
                     _bottomMText.Location = bottomTextCenterPoint;
                 }
 
@@ -499,6 +504,7 @@ namespace mpESKD.Functions.mpSection
             }
 
             _middleStrokes.Clear();
+
             // middle strokes
             if (MiddlePoints.Any())
             {
@@ -515,12 +521,14 @@ namespace mpESKD.Functions.mpSection
                     var nextPoint = points[i + 1];
 
                     var middleStrokePolyline = new Polyline(3);
-                    middleStrokePolyline.AddVertexAt(0,
-                        (currentPoint + (previousPoint - currentPoint).GetNormal() * middleStrokeLength).ConvertPoint3dToPoint2d(),
+                    middleStrokePolyline.AddVertexAt(
+                        0,
+                        (currentPoint + ((previousPoint - currentPoint).GetNormal() * middleStrokeLength)).ConvertPoint3dToPoint2d(),
                         0, strokesWidth, strokesWidth);
                     middleStrokePolyline.AddVertexAt(1, currentPoint.ConvertPoint3dToPoint2d(), 0, strokesWidth, strokesWidth);
-                    middleStrokePolyline.AddVertexAt(2,
-                        (currentPoint + (nextPoint - currentPoint).GetNormal() * middleStrokeLength).ConvertPoint3dToPoint2d(),
+                    middleStrokePolyline.AddVertexAt(
+                        2,
+                        (currentPoint + ((nextPoint - currentPoint).GetNormal() * middleStrokeLength)).ConvertPoint3dToPoint2d(),
                         0, strokesWidth, strokesWidth);
 
                     _middleStrokes.Add(middleStrokePolyline);
@@ -536,7 +544,10 @@ namespace mpESKD.Functions.mpSection
             if (string.IsNullOrEmpty(DesignationPrefix) &&
                 string.IsNullOrEmpty(Designation) &&
                 string.IsNullOrEmpty(SheetNumber))
+            {
                 return false;
+            }
+
             return true;
         }
 
@@ -548,15 +559,21 @@ namespace mpESKD.Functions.mpSection
         private Point3d GetBottomStrokeEndPoint(Point3d insertionPoint, Point3d endPoint, List<Point3d> middlePoints, double scale)
         {
             if (MiddlePoints.Any())
-                return endPoint + (endPoint - middlePoints.Last()).GetNormal() * StrokeLength * scale;
-            return endPoint + (endPoint - insertionPoint).GetNormal() * StrokeLength * scale;
+            {
+                return endPoint + ((endPoint - middlePoints.Last()).GetNormal() * StrokeLength * scale);
+            }
+
+            return endPoint + ((endPoint - insertionPoint).GetNormal() * StrokeLength * scale);
         }
 
         private Point3d GetTopStrokeEndPoint(Point3d insertionPoint, Point3d endPoint, List<Point3d> middlePoints, double scale)
         {
             if (MiddlePoints.Any())
-                return insertionPoint + (insertionPoint - middlePoints.First()).GetNormal() * StrokeLength * scale;
-            return insertionPoint + (insertionPoint - endPoint).GetNormal() * StrokeLength * scale;
+            {
+                return insertionPoint + ((insertionPoint - middlePoints.First()).GetNormal() * StrokeLength * scale);
+            }
+
+            return insertionPoint + ((insertionPoint - endPoint).GetNormal() * StrokeLength * scale);
         }
 
         private void SetFirstTextOnCreation()
@@ -591,10 +608,12 @@ namespace mpESKD.Functions.mpSection
                 }
 
                 if (setStandard)
+                {
                     Designation = "А";
+                }
             }
         }
-        
+
         /// <summary>
         /// Содержимое для MText в зависимости от значений
         /// </summary>
@@ -605,7 +624,9 @@ namespace mpESKD.Functions.mpSection
             SetFirstTextOnCreation();
 
             if (!HasTextValue())
+            {
                 return string.Empty;
+            }
 
             var prefixAndDesignation = DesignationPrefix + Designation;
             var allWithSameHeight = $"{DesignationPrefix}{Designation} ({SheetNumber})";
@@ -614,27 +635,35 @@ namespace mpESKD.Functions.mpSection
 
             // Если номер не указан, то обычный текст
             if (string.IsNullOrEmpty(SheetNumber))
+            {
                 return prefixAndDesignation;
+            }
 
             // Иначе форматированный текст для многострочного текста
-            
+
             if (isForTopText)
             {
                 if (SheetNumberPosition == AxisMarkersPosition.Both || SheetNumberPosition == AxisMarkersPosition.Top)
                 {
                     // Если номер указан, но высоты текста одинаковые, то обычный текст с номером
                     if (isSameTextHeight)
+                    {
                         return allWithSameHeight;
+                    }
 
                     return allWithDifferentHeight;
                 }
+
                 return prefixAndDesignation;
             }
 
             if (SheetNumberPosition == AxisMarkersPosition.Both || SheetNumberPosition == AxisMarkersPosition.Bottom)
             {
                 if (isSameTextHeight)
+                {
                     return allWithSameHeight;
+                }
+
                 return allWithDifferentHeight;
             }
 

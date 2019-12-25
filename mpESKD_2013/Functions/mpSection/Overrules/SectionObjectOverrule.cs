@@ -13,8 +13,11 @@
 
         public static SectionObjectOverrule Instance()
         {
-            if (_instance != null) 
+            if (_instance != null)
+            {
                 return _instance;
+            }
+
             _instance = new SectionObjectOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
@@ -30,6 +33,7 @@
                 try
                 {
                     if (AcadHelpers.Document != null)
+                    {
                         if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
                             dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
                         {
@@ -40,12 +44,14 @@
                                 axis.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
                             }
                         }
+                    }
                 }
                 catch (Exception exception)
                 {
                     ExceptionBox.Show(exception);
                 }
             }
+
             base.Close(dbObject);
         }
 

@@ -43,7 +43,9 @@
                 if (entityStyle != style)
                 {
                     if (entityStyle.IsCurrent)
+                    {
                         entityStyle.IsCurrent = false;
+                    }
                 }
             }
 
