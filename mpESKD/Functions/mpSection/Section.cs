@@ -11,6 +11,7 @@ namespace mpESKD.Functions.mpSection
     using Base.Enums;
     using Base.Helpers;
     using ModPlusAPI.Windows;
+    using Overrules.Grips;
 
     [IntellectualEntityDisplayNameKey("h79")]
     public class Section : IntellectualEntity
@@ -221,7 +222,7 @@ namespace mpESKD.Functions.mpSection
         public Point3d BottomShelfEndPoint { get; private set; }
 
         /// <summary>
-        /// Направление разреза: слева на право или справа на лево. Меняется при работе ручки (<see cref="Overrules.SectionReverseGrip.OnHotGrip"/>)
+        /// Направление разреза: слева на право или справа на лево. Меняется при работе ручки (<see cref="SectionReverseGrip.OnHotGrip"/>)
         /// Используется для определения положения ручки (<see cref="Overrules.SectionGripPointOverrule"/>)
         /// </summary>
         [SaveToXData]

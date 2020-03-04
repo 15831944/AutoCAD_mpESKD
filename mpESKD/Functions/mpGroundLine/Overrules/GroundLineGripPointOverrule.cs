@@ -1,16 +1,12 @@
 ﻿namespace mpESKD.Functions.mpGroundLine.Overrules
 {
-    using System.Diagnostics;
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
-    using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Enums;
     using Base.Helpers;
-    using Base.Overrules;
-    using ModPlusAPI;
+    using Grips;
     using ModPlusAPI.Windows;
 
     public class GroundLineGripPointOverrule : GripOverrule
@@ -192,7 +188,8 @@
             }
             catch (Exception exception)
             {
-                ExceptionBox.Show(exception);
+                if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+                    ExceptionBox.Show(exception);
             }
         }
 
@@ -229,7 +226,6 @@
                         {
                             addVertexGrip.NewPoint = addVertexGrip.GripPoint + offset;
                         }
-
                         else
                         {
                             base.MoveGripPointsAt(entity, grips, offset, bitFlags);
@@ -243,7 +239,8 @@
             }
             catch (Exception exception)
             {
-                ExceptionBox.Show(exception);
+                if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+                    ExceptionBox.Show(exception);
             }
         }
 
@@ -252,359 +249,6 @@
         public override bool IsApplicable(RXObject overruledSubject)
         {
             return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name);
-        }
-    }
-
-    /// <summary>
-    /// Ручка вершин
-    /// </summary>
-    public class GroundLineVertexGrip : IntellectualEntityGripData
-    {
-        public GroundLineVertexGrip(GroundLine groundLine, int index)
-        {
-            GroundLine = groundLine;
-            GripIndex = index;
-            GripType = GripType.Point;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
-        }
-
-        /// <summary>
-        /// Экземпляр класса Section
-        /// </summary>
-        public GroundLine GroundLine { get; }
-
-        /// <summary>
-        /// Индекс точки
-        /// </summary>
-        public int GripIndex { get; }
-
-        // Подсказка в зависимости от имени ручки
-        public override string GetTooltip()
-        {
-            return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
-        }
-
-        // Временное значение ручки
-        private Point3d _gripTmp;
-
-        public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
-        {
-            try
-            {
-                // При начале перемещения запоминаем первоначальное положение ручки
-                // Запоминаем начальные значения
-                if (newStatus == Status.GripStart)
-                {
-                    _gripTmp = GripPoint;
-                }
-
-                // При удачном перемещении ручки записываем новые значения в расширенные данные
-                // По этим данным я потом получаю экземпляр класса groundLine
-                if (newStatus == Status.GripEnd)
-                {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
-                    {
-                        var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
-                        using (var resBuf = GroundLine.GetDataForXData())
-                        {
-                            blkRef.XData = resBuf;
-                        }
-
-                        tr.Commit();
-                    }
-
-                    GroundLine.Dispose();
-                }
-
-                // При отмене перемещения возвращаем временные значения
-                if (newStatus == Status.GripAbort)
-                {
-                    if (_gripTmp != null)
-                    {
-                        if (GripIndex == 0)
-                        {
-                            GroundLine.InsertionPoint = _gripTmp;
-                        }
-                        else if (GripIndex == GroundLine.MiddlePoints.Count + 1)
-                        {
-                            GroundLine.EndPoint = _gripTmp;
-                        }
-                        else
-                        {
-                            GroundLine.MiddlePoints[GripIndex - 1] = _gripTmp;
-                        }
-                    }
-                }
-
-                base.OnGripStatusChanged(entityId, newStatus);
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Ручка добавления вершины
-    /// </summary>
-    public class GroundLineAddVertexGrip : IntellectualEntityGripData
-    {
-        public GroundLineAddVertexGrip(GroundLine groundLine, Point3d? leftPoint, Point3d? rightPoint)
-        {
-            GroundLine = groundLine;
-            GripLeftPoint = leftPoint;
-            GripRightPoint = rightPoint;
-            GripType = GripType.Plus;
-            RubberBandLineDisabled = true;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
-        }
-
-        /// <summary>
-        /// Экземпляр класса Section
-        /// </summary>
-        public GroundLine GroundLine { get; }
-
-        /// <summary>
-        /// Левая точка
-        /// </summary>
-        public Point3d? GripLeftPoint { get; }
-
-        /// <summary>
-        /// Правая точка
-        /// </summary>
-        public Point3d? GripRightPoint { get; }
-
-        public Point3d NewPoint { get; set; }
-
-        public override string GetTooltip()
-        {
-            return Language.GetItem(Invariables.LangItem, "gp4"); // "Добавить вершину";
-        }
-
-        public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
-        {
-            if (newStatus == Status.GripStart)
-            {
-                AcadHelpers.Editor.TurnForcedPickOn();
-                AcadHelpers.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
-            }
-
-            if (newStatus == Status.GripEnd)
-            {
-                AcadHelpers.Editor.TurnForcedPickOff();
-                AcadHelpers.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
-                using (GroundLine)
-                {
-                    Point3d? newInsertionPoint = null;
-
-                    if (GripLeftPoint == GroundLine.InsertionPoint)
-                    {
-                        GroundLine.MiddlePoints.Insert(0, NewPoint);
-                    }
-                    else if (GripLeftPoint == null)
-                    {
-                        GroundLine.MiddlePoints.Insert(0, GroundLine.InsertionPoint);
-                        GroundLine.InsertionPoint = NewPoint;
-                        newInsertionPoint = NewPoint;
-                    }
-                    else if (GripRightPoint == null)
-                    {
-                        GroundLine.MiddlePoints.Add(GroundLine.EndPoint);
-                        GroundLine.EndPoint = NewPoint;
-                    }
-                    else
-                    {
-                        GroundLine.MiddlePoints.Insert(GroundLine.MiddlePoints.IndexOf(GripLeftPoint.Value) + 1, NewPoint);
-                    }
-
-                    GroundLine.UpdateEntities();
-                    GroundLine.BlockRecord.UpdateAnonymousBlocks();
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
-                    {
-                        var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
-                        if (newInsertionPoint.HasValue)
-                        {
-                            ((BlockReference)blkRef).Position = newInsertionPoint.Value;
-                        }
-
-                        using (var resBuf = GroundLine.GetDataForXData())
-                        {
-                            blkRef.XData = resBuf;
-                        }
-
-                        tr.Commit();
-                    }
-                }
-            }
-
-            if (newStatus == Status.GripAbort)
-            {
-                AcadHelpers.Editor.TurnForcedPickOff();
-                AcadHelpers.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
-            }
-
-            base.OnGripStatusChanged(entityId, newStatus);
-        }
-
-        private void AddNewVertex_EdOnPointMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
-        {
-            try
-            {
-                if (GripLeftPoint.HasValue)
-                {
-                    Line leftLine = new Line(GripLeftPoint.Value, pointMonitorEventArgs.Context.ComputedPoint)
-                    {
-                        ColorIndex = 150
-                    };
-                    pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(leftLine);
-                }
-
-                if (GripRightPoint.HasValue)
-                {
-                    Line rightLine = new Line(pointMonitorEventArgs.Context.ComputedPoint, GripRightPoint.Value)
-                    {
-                        ColorIndex = 150
-                    };
-                    pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(rightLine);
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-    }
-
-    /// <summary>
-    /// Ручка удаления вершины
-    /// </summary>
-    public class GroundLineRemoveVertexGrip : IntellectualEntityGripData
-    {
-        public GroundLineRemoveVertexGrip(GroundLine groundLine, int index)
-        {
-            GroundLine = groundLine;
-            GripIndex = index;
-            GripType = GripType.Minus;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
-        }
-
-        /// <summary>
-        /// Экземпляр класса Section
-        /// </summary>
-        public GroundLine GroundLine { get; }
-
-        /// <summary>
-        /// Индекс точки
-        /// </summary>
-        public int GripIndex { get; }
-
-        // Подсказка в зависимости от имени ручки
-        public override string GetTooltip()
-        {
-            return Language.GetItem(Invariables.LangItem, "gp3"); // "Удалить вершину";
-        }
-
-        public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
-        {
-            using (GroundLine)
-            {
-                Point3d? newInsertionPoint = null;
-
-                if (GripIndex == 0)
-                {
-                    GroundLine.InsertionPoint = GroundLine.MiddlePoints[0];
-                    newInsertionPoint = GroundLine.MiddlePoints[0];
-                    GroundLine.MiddlePoints.RemoveAt(0);
-                }
-                else if (GripIndex == GroundLine.MiddlePoints.Count + 1)
-                {
-                    GroundLine.EndPoint = GroundLine.MiddlePoints.Last();
-                    GroundLine.MiddlePoints.RemoveAt(GroundLine.MiddlePoints.Count - 1);
-                }
-                else
-                {
-                    GroundLine.MiddlePoints.RemoveAt(GripIndex - 1);
-                }
-
-                GroundLine.UpdateEntities();
-                GroundLine.BlockRecord.UpdateAnonymousBlocks();
-                using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
-                    if (newInsertionPoint.HasValue)
-                    {
-                        ((BlockReference)blkRef).Position = newInsertionPoint.Value;
-                    }
-
-                    using (var resBuf = GroundLine.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
-
-                    tr.Commit();
-                }
-            }
-
-            return ReturnValue.GetNewGripPoints;
-        }
-    }
-
-    /// <summary>
-    /// Ручка реверса линии грунта
-    /// </summary>
-    public class GroundLineReverseGrip : IntellectualEntityGripData
-    {
-        public GroundLineReverseGrip(GroundLine groundLine)
-        {
-            GroundLine = groundLine;
-            GripType = GripType.Mirror;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
-        }
-
-        /// <summary>
-        /// Экземпляр класса Section
-        /// </summary>
-        public GroundLine GroundLine { get; }
-
-        public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
-        {
-            using (GroundLine)
-            {
-                Point3d newInsertionPoint = GroundLine.EndPoint;
-                GroundLine.EndPoint = GroundLine.InsertionPoint;
-                GroundLine.InsertionPoint = newInsertionPoint;
-                GroundLine.MiddlePoints.Reverse();
-                GroundLine.BlockTransform = GroundLine.BlockTransform.Inverse();
-
-                GroundLine.UpdateEntities();
-                GroundLine.BlockRecord.UpdateAnonymousBlocks();
-                using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
-                    ((BlockReference)blkRef).Position = newInsertionPoint;
-                    using (var resBuf = GroundLine.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
-
-                    tr.Commit();
-                }
-            }
-
-            return ReturnValue.GetNewGripPoints;
         }
     }
 }

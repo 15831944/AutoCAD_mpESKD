@@ -16,7 +16,7 @@
     <DebugType>none</DebugType>
     <CodeAnalysisRuleSet>$(SolutionDir)\ModPlus.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -173,21 +173,35 @@
     <Compile Include="Base\Styles\StyleEditor.xaml.cs">
       <DependentUpon>StyleEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Functions\mpAxis\Overrules\Grips\AxisGrip.cs" />
+    <Compile Include="Functions\mpAxis\Overrules\Grips\AxisGripName.cs" />
     <Compile Include="Functions\mpBreakLine\BreakLine.cs" />
     <Compile Include="Functions\mpBreakLine\BreakLineFunction.cs" />
     <Compile Include="Functions\mpBreakLine\BreakLineDescriptor.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs" />
     <Compile Include="Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs" />
+    <Compile Include="Functions\mpBreakLine\Overrules\Grips\BreakLineGrip.cs" />
+    <Compile Include="Functions\mpBreakLine\Overrules\Grips\BreakLineGripName.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLine.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLineFunction.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLineDescriptor.cs" />
+    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineAddVertexGrip.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs" />
+    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineRemoveVertexGrip.cs" />
+    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineReverseGrip.cs" />
+    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineVertexGrip.cs" />
+    <Compile Include="Functions\mpSection\Overrules\Grips\SectionAddVertexGrip.cs" />
     <Compile Include="Functions\mpSection\Overrules\SectionGripPointOverrule.cs" />
     <Compile Include="Functions\mpSection\Overrules\SectionObjectOverrule.cs" />
     <Compile Include="Functions\mpSection\Overrules\SectionOsnapOverrule.cs" />
+    <Compile Include="Functions\mpSection\Overrules\Grips\SectionRemoveVertexGrip.cs" />
+    <Compile Include="Functions\mpSection\Overrules\Grips\SectionReverseGrip.cs" />
+    <Compile Include="Functions\mpSection\Overrules\Grips\SectionTextGrip.cs" />
+    <Compile Include="Functions\mpSection\Overrules\Grips\SectionVertexGrip.cs" />
+    <Compile Include="Functions\mpSection\Overrules\Grips\TextGripName.cs" />
     <Compile Include="Functions\mpSection\Section.cs" />
     <Compile Include="Functions\mpSection\SectionFunction.cs" />
     <Compile Include="Functions\mpSection\SectionDescriptor.cs" />
@@ -432,9 +446,6 @@
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug (
 "$(ModPlusPostBuild)" "AutoCAD" "$(TargetPath)"
-)
-if $(ConfigurationName) == Release (
-"$(ModPlusPostBuild)" "AutoCAD" "$(TargetPath)" "s"
 )</PostBuildEvent>
   </PropertyGroup>
 </Project>
