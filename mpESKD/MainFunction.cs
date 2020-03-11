@@ -478,7 +478,7 @@
     public class BeditCommandWatcher
     {
         /// <summary>True - использовать редактор блоков. False - не использовать</summary>
-        public static bool UseBedit;
+        public static bool UseBedit = true;
 
         public static void Initialize()
         {
