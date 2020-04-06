@@ -170,7 +170,7 @@
         /// <param name="axisLastVerticalValue"></param>
         private static void FindLastAxisValues(ref string axisLastHorizontalValue, ref string axisLastVerticalValue)
         {
-            if (MainStaticSettings.Settings.AxisSaveLastTextAndContinueNew)
+            if (MainSettings.Instance.AxisSaveLastTextAndContinueNew)
             {
                 List<int> allIntegerValues = new List<int>();
                 List<string> allLetterValues = new List<string>();
@@ -206,7 +206,7 @@
             var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blockReference);
             axis.UpdateEntities();
             bool saveBack = false;
-            if (MainStaticSettings.Settings.AxisUsePluginTextEditor)
+            if (MainSettings.Instance.AxisUsePluginTextEditor)
             {
                 AxisValueEditor axisValueEditor = new AxisValueEditor { Axis = axis };
                 if (axisValueEditor.ShowDialog() == true)

@@ -641,7 +641,7 @@
                         {
                             if (isOnEntityCreation)
                             {
-                                if (MainStaticSettings.Settings.UseScaleFromStyle)
+                                if (MainSettings.Instance.UseScaleFromStyle)
                                 {
                                     propertyInfo.SetValue(entity, propertyFromStyle.Value);
                                 }
@@ -665,7 +665,7 @@
 
                             if (isOnEntityCreation)
                             {
-                                if (MainStaticSettings.Settings.UseLayerFromStyle)
+                                if (MainSettings.Instance.UseLayerFromStyle)
                                 {
                                     propertyInfo.SetValue(entity, layerName);
                                     AcadHelpers.SetLayerByName(entity.BlockId, layerName, style.LayerXmlData);
@@ -687,7 +687,7 @@
                             var apply = false;
                             if (isOnEntityCreation)
                             {
-                                if (MainStaticSettings.Settings.UseTextStyleFromStyle)
+                                if (MainSettings.Instance.UseTextStyleFromStyle)
                                 {
                                     apply = true;
                                 }
@@ -706,7 +706,7 @@
                                 }
                                 else
                                 {
-                                    if (MainStaticSettings.Settings.IfNoTextStyle == 1 &&
+                                    if (MainSettings.Instance.IfNoTextStyle == 1 &&
                                         TextStyleHelper.CreateTextStyle(style.TextStyleXmlData))
                                     {
                                         propertyInfo.SetValue(entity, textStyleName);

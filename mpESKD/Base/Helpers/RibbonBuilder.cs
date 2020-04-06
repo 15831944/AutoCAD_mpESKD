@@ -17,6 +17,9 @@
 
     public class RibbonBuilder
     {
+        private static bool _wasActive;
+        private static int _colorTheme = 1;
+
         public static void BuildRibbon()
         {
             if (!IsLoaded())
@@ -83,8 +86,6 @@
             }
         }
 
-        private static bool _wasActive = false;
-
         private static void AcadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
         {
             if (e.Name.Equals("WSCURRENT"))
@@ -99,8 +100,6 @@
                 BuildRibbon();
             }
         }
-
-        private static int _colorTheme = 1;
 
         private static void GetColorTheme()
         {

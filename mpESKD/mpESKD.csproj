@@ -109,6 +109,7 @@
     <Compile Include="Base\Binder.cs" />
     <Compile Include="Base\Enums\LayerActionOnCreateAnalog.cs" />
     <Compile Include="Base\Enums\SearchProceedOption.cs" />
+    <Compile Include="Base\Helpers\ExtendedDataHelpers.cs" />
     <Compile Include="Base\Invariables.cs" />
     <Compile Include="Base\DefaultEntityJig.cs" />
     <Compile Include="Base\EntityReaderFactory.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="Base\Styles\IntellectualEntityStyle.cs" />
     <Compile Include="Base\Styles\StyleManager.cs" />
     <Compile Include="Base\TypeFactory.cs" />
+    <Compile Include="BeditCommandWatcher.cs" />
     <Compile Include="Functions\mpAxis\Axis.cs" />
     <Compile Include="Functions\mpAxis\AxisFunction.cs" />
     <Compile Include="Functions\mpAxis\AxisDescriptor.cs" />

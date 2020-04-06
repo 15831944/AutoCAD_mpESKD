@@ -1,14 +1,16 @@
-﻿<mps:ModPlusWindow x:Class="mpESKD.Base.Properties.PaletteSettings"
-                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                     xmlns:mps="https://modplus.org/winfx/xaml/controls"
-                     SizeToContent="WidthAndHeight" KeyDown="LmSettings_OnKeyDown" ResizeMode="NoResize">
+﻿<mps:ModPlusWindow 
+    x:Class="mpESKD.Base.Properties.PaletteSettings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mps="https://modplus.org/winfx/xaml/controls"
+    xmlns:mpEskd="clr-namespace:mpESKD" Topmost="True"
+    SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="D:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -20,14 +22,15 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <CheckBox Name="ChkAutoLoad" Grid.Row="0" VerticalAlignment="Center"
-                  Content="{Binding Source={StaticResource Lang}, XPath=h2}"
-                  Checked="ChkAutoLoad_OnChecked_OnUnchecked"
-                  Unchecked="ChkAutoLoad_OnChecked_OnUnchecked"/>
-        <CheckBox Name="ChkAddToMpPalette" Grid.Row="1" VerticalAlignment="Center"
-                  Content="{Binding Source={StaticResource Lang}, XPath=h3}"
-                  Checked="ChkAddToMpPalette_OnChecked_OnUnchecked"
-                  Unchecked="ChkAddToMpPalette_OnChecked_OnUnchecked"/>
+        <Grid.DataContext>
+            <mpEskd:MainSettings/>
+        </Grid.DataContext>
+        <CheckBox Grid.Row="0" VerticalAlignment="Center"
+                  IsChecked="{Binding Path=AutoLoad, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Content="{Binding Source={StaticResource Lang}, XPath=h2}"/>
+        <CheckBox Grid.Row="1" VerticalAlignment="Center"
+                  IsChecked="{Binding Path=AddToMpPalette, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Content="{Binding Source={StaticResource Lang}, XPath=h3}"/>
         <Button Name="BtClose" Grid.Row="5"
                 HorizontalAlignment="Center"
                 Content="{Binding Source={StaticResource Lang}, XPath=close}"

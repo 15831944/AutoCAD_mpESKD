@@ -86,8 +86,8 @@
             }
             else
             {
-                if (MainStaticSettings.Settings.MaxSelectedObjects == 0 ||
-                    MainStaticSettings.Settings.MaxSelectedObjects >= psr.Value.Count)
+                var maxSelectedObjects = MainSettings.Instance.MaxSelectedObjects;
+                if (maxSelectedObjects == 0 || maxSelectedObjects >= psr.Value.Count)
                 {
                     StckMaxObjectsSelectedMessage.Visibility = System.Windows.Visibility.Collapsed;
 
@@ -658,20 +658,13 @@
 
         private void LmSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            PaletteSettings lmSetting = new PaletteSettings()
-            {
-                Topmost = true
-            };
+            var lmSetting = new PaletteSettings();
             lmSetting.ShowDialog();
 
-            if (!lmSetting.ChkAddToMpPalette.IsChecked ?? true)
-            {
-                MainFunction.RemoveFromMpPalette(true);
-            }
+            if (MainSettings.Instance.AddToMpPalette)
+                MainFunction.AddToMpPalette();
             else
-            {
-                MainFunction.AddToMpPalette(true);
-            }
+                MainFunction.RemoveFromMpPalette(true);
         }
 
         // open settings

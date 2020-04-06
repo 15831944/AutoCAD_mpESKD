@@ -292,7 +292,7 @@
         /// </summary>
         private static void FindLastSectionValues(ref string sectionLastLetterValue, ref string sectionLastIntegerValue)
         {
-            if (MainStaticSettings.Settings.SectionSaveLastTextAndContinueNew)
+            if (MainSettings.Instance.SectionSaveLastTextAndContinueNew)
             {
                 var sections = AcadHelpers.GetAllIntellectualEntitiesInCurrentSpace<Section>(typeof(Section));
                 if (sections.Any())
@@ -317,7 +317,7 @@
             var section = EntityReaderFactory.Instance.GetFromEntity<Section>(blockReference);
             section.UpdateEntities();
             bool saveBack = false;
-            if (MainStaticSettings.Settings.SectionUsePluginTextEditor)
+            if (MainSettings.Instance.SectionUsePluginTextEditor)
             {
                 SectionValueEditor sectionValueEditor = new SectionValueEditor { Section = section };
                 if (sectionValueEditor.ShowDialog() == true)

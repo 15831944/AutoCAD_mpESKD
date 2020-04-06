@@ -712,9 +712,6 @@ namespace mpESKD.Base.Styles
         // При закрытии сохраняю все стили в файлы
         private void StyleEditor_OnClosed(object sender, EventArgs e)
         {
-            // reload static settings
-            MainStaticSettings.ReloadSettings();
-
             // save styles
             foreach (EntityStyles entityStyles in _styles)
             {

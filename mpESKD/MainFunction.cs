@@ -10,7 +10,6 @@
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
-    using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.AutoCAD.Windows;
     using Base;
@@ -26,6 +25,14 @@
 
     public class MainFunction : IExtensionApplication
     {
+        private static ContextMenuExtension _intellectualEntityContextMenu;
+
+        /// <summary>
+        /// Путь к папке хранения пользовательских стилей
+        /// </summary>
+        public static string StylesPath { get; private set; } = string.Empty;
+
+        /// <inheritdoc />
         public void Initialize()
         {
             StartUpInitialize();
@@ -39,10 +46,9 @@
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
 
             // palette
-            var loadPropertiesPalette =
-                bool.TryParse(UserConfigFile.GetValue("mpESKD", "AutoLoad"), out var b) & b;
-            var addPropertiesPaletteToMpPalette =
-                bool.TryParse(UserConfigFile.GetValue("mpESKD", "AddToMpPalette"), out b) & b;
+            var loadPropertiesPalette = MainSettings.Instance.AutoLoad;
+            var addPropertiesPaletteToMpPalette = MainSettings.Instance.AddToMpPalette;
+
             if (loadPropertiesPalette & !addPropertiesPaletteToMpPalette)
             {
                 PropertiesPaletteFunction.Start();
@@ -65,6 +71,7 @@
             }
         }
 
+        /// <inheritdoc />
         public void Terminate()
         {
             TypeFactory.Instance.GetEntityFunctionTypes().ForEach(f => f.Terminate());
@@ -73,7 +80,9 @@
             DetachCreateAnalogContextMenu();
         }
 
-        /// <summary>Инициализация</summary>
+        /// <summary>
+        /// Инициализация
+        /// </summary>
         public static void StartUpInitialize()
         {
             var curDir = Constants.CurrentDirectory;
@@ -96,6 +105,9 @@
             }
         }
 
+        /// <summary>
+        /// Создание вкладки на ленте
+        /// </summary>
         [CommandMethod("ModPlus", "mpESKDCreateRibbonTab", CommandFlags.Modal)]
         public void CreateRibbon()
         {
@@ -107,71 +119,73 @@
             RibbonBuilder.BuildRibbon();
         }
 
-        private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
+        /// <summary>
+        /// Команда "Создать аналог"
+        /// </summary>
+        [CommandMethod("ModPlus", "mpESKDCreateAnalog", CommandFlags.UsePickSet)]
+        public void CreateAnalogCommand()
         {
-            // now one Ribbon item is initialized, but the Ribbon control
-            // may not be available yet, so check if before
-            if (Autodesk.Windows.ComponentManager.Ribbon == null)
-            {
+            var psr = AcadHelpers.Editor.SelectImplied();
+            if (psr.Value == null || psr.Value.Count != 1) 
                 return;
-            }
 
-            RibbonBuilder.BuildRibbon();
-
-            // and remove the event handler
-            Autodesk.Windows.ComponentManager.ItemInitialized -= ComponentManager_ItemInitialized;
-        }
-
-        public static string StylesPath = string.Empty;
-
-        /// <summary>Обработка двойного клика по блоку</summary>
-        private static void AcApp_BeginDoubleClick(object sender, BeginDoubleClickEventArgs e)
-        {
-            var pt = e.Location;
-
-            PromptSelectionResult psr = AcadHelpers.Editor.SelectImplied();
-            if (psr.Status != PromptStatus.OK)
+            IntellectualEntity intellectualEntity = null;
+            using (AcadHelpers.Document.LockDocument())
             {
-                return;
-            }
-
-            ObjectId[] ids = psr.Value.GetObjectIds();
-
-            if (ids.Length == 1)
-            {
-                Point3d location = pt;
-                using (AcadHelpers.Document.LockDocument())
+                using (var tr = new OpenCloseTransaction())
                 {
-                    using (Transaction tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                    foreach (SelectedObject selectedObject in psr.Value)
                     {
-                        var obj = tr.GetObject(ids[0], OpenMode.ForWrite, true, true);
+                        if (selectedObject.ObjectId == ObjectId.Null)
+                        {
+                            continue;
+                        }
+
+                        var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference blockReference)
                         {
-                            // axis
-                            if (ExtendedDataHelpers.IsIntellectualEntity(blockReference, AxisDescriptor.Instance.Name))
-                            {
-                                AxisFunction.DoubleClickEdit(blockReference, location, tr);
-                            }
-
-                            // section
-                            else if (ExtendedDataHelpers.IsIntellectualEntity(blockReference, SectionDescriptor.Instance.Name))
-                            {
-                                SectionFunction.DoubleClickEdit(blockReference, location, tr);
-                            }
-                            else
-                            {
-                                BeditCommandWatcher.UseBedit = true;
-                            }
+                            intellectualEntity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
                         }
-                        else
-                        {
-                            BeditCommandWatcher.UseBedit = true;
-                        }
-
-                        tr.Commit();
                     }
+
+                    tr.Commit();
                 }
             }
+
+            if (intellectualEntity == null)
+                return;
+
+            var copyLayer = true;
+            var layerActionOnCreateAnalog = MainSettings.Instance.LayerActionOnCreateAnalog;
+            if (layerActionOnCreateAnalog == LayerActionOnCreateAnalog.NotCopy)
+            {
+                copyLayer = false;
+            }
+            else if (layerActionOnCreateAnalog == LayerActionOnCreateAnalog.Ask)
+            {
+                var promptKeywordOptions =
+                    new PromptKeywordOptions("\n" + Language.GetItem(Invariables.LangItem, "msg8"), "Yes No");
+                var promptResult = AcadHelpers.Editor.GetKeywords(promptKeywordOptions);
+                if (promptResult.Status == PromptStatus.OK)
+                {
+                    if (promptResult.StringResult == "No")
+                    {
+                        copyLayer = false;
+                    }
+                }
+                else
+                {
+                    copyLayer = false;
+                }
+            }
+
+            var function = TypeFactory.Instance.GetEntityFunctionTypes().FirstOrDefault(f =>
+            {
+                var functionName = $"{intellectualEntity.GetType().Name}Function";
+                var fName = f.GetType().Name;
+                return fName == functionName;
+            });
+            function?.CreateAnalog(intellectualEntity, copyLayer);
         }
 
         public static BlockReference CreateBlock(IntellectualEntity intellectualEntity)
@@ -205,17 +219,18 @@
             return blockReference;
         }
 
-        #region Properties palette
-
-        public static void AddToMpPalette(bool show)
+        /// <summary>
+        /// Подключение палитры свойств интеллектуальных примитивов к палитре ModPlus
+        /// </summary>
+        public static void AddToMpPalette()
         {
-            PaletteSet mpPaletteSet = MpPalette.MpPaletteSet;
+            var mpPaletteSet = MpPalette.MpPaletteSet;
             if (mpPaletteSet != null)
             {
-                bool flag = false;
+                var flag = false;
                 foreach (Palette palette in mpPaletteSet)
                 {
-                    if (palette.Name.Equals(Language.GetItem(Invariables.LangItem, "h11"))) // Свойства примитивов ModPlus
+                    if (palette.Name.Equals(Language.GetItem(Invariables.LangItem, "h11"))) //// Свойства примитивов ModPlus
                     {
                         flag = true;
                     }
@@ -223,17 +238,15 @@
 
                 if (!flag)
                 {
-                    PropertiesPalette lmPalette = new PropertiesPalette();
+                    var lmPalette = new PropertiesPalette();
                     mpPaletteSet.Add(Language.GetItem(Invariables.LangItem, "h11"), new ElementHost
                     {
                         AutoSize = true,
                         Dock = DockStyle.Fill,
                         Child = lmPalette
                     });
-                    if (show)
-                    {
-                        mpPaletteSet.Visible = true;
-                    }
+                    
+                    mpPaletteSet.Visible = true;
                 }
             }
 
@@ -243,12 +256,16 @@
             }
         }
 
+        /// <summary>
+        /// Отключение палитры свойств интеллектуальных примитивов от палитры ModPlus
+        /// </summary>
+        /// <param name="fromSettings">True - метод запущен из окна настроек палитры</param>
         public static void RemoveFromMpPalette(bool fromSettings)
         {
-            PaletteSet mpPaletteSet = MpPalette.MpPaletteSet;
+            var mpPaletteSet = MpPalette.MpPaletteSet;
             if (mpPaletteSet != null)
             {
-                int num = 0;
+                var num = 0;
                 while (num < mpPaletteSet.Count)
                 {
                     if (!mpPaletteSet[num].Name.Equals(Language.GetItem(Invariables.LangItem, "h11")))
@@ -276,77 +293,138 @@
             }
         }
 
-        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
         {
-            if (args.Name.Contains("ModPlus_"))
+            // now one Ribbon item is initialized, but the Ribbon control
+            // may not be available yet, so check if before
+            if (Autodesk.Windows.ComponentManager.Ribbon == null)
             {
-                AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-                PropertiesPaletteFunction.Start();
+                return;
             }
+
+            RibbonBuilder.BuildRibbon();
+
+            // and remove the event handler
+            Autodesk.Windows.ComponentManager.ItemInitialized -= ComponentManager_ItemInitialized;
+        }
+
+        /// <summary>Обработка двойного клика по блоку</summary>
+        private static void AcApp_BeginDoubleClick(object sender, BeginDoubleClickEventArgs e)
+        {
+            var pt = e.Location;
+
+            var psr = AcadHelpers.Editor.SelectImplied();
+            if (psr.Status != PromptStatus.OK)
+            {
+                return;
+            }
+
+            var ids = psr.Value.GetObjectIds();
+
+            if (ids.Length != 1) 
+                return;
+
+            using (AcadHelpers.Document.LockDocument())
+            {
+                using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                {
+                    var obj = tr.GetObject(ids[0], OpenMode.ForWrite, true, true);
+                    if (obj is BlockReference blockReference)
+                    {
+                        // axis
+                        if (ExtendedDataHelpers.IsIntellectualEntity(blockReference, AxisDescriptor.Instance.Name))
+                        {
+                            AxisFunction.DoubleClickEdit(blockReference, pt, tr);
+                        }
+
+                        // section
+                        else if (ExtendedDataHelpers.IsIntellectualEntity(blockReference, SectionDescriptor.Instance.Name))
+                        {
+                            SectionFunction.DoubleClickEdit(blockReference, pt, tr);
+                        }
+                        else
+                        {
+                            BeditCommandWatcher.UseBedit = true;
+                        }
+                    }
+                    else
+                    {
+                        BeditCommandWatcher.UseBedit = true;
+                    }
+
+                    tr.Commit();
+                }
+            }
+        }
+        
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            if (!args.Name.Contains("ModPlus_"))
+                return null;
+
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            PropertiesPaletteFunction.Start();
 
             return null;
         }
-        #endregion
-
-        #region Create Analog Command (and context menu)
-
-        private void Documents_DocumentActivated(object sender, DocumentCollectionEventArgs e)
+        
+        private static void Documents_DocumentActivated(object sender, DocumentCollectionEventArgs e)
         {
-            if (e.Document != null)
+            if (e.Document == null)
+                return;
+
+            e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
+            e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+
+            // при открытии документа соберу все блоки в текущем пространстве (?) и вызову обновление их внутренних
+            // примитивов. Нужно, так как в некоторых случаях (пока не ясно в каких) внутренние примитивы отсутствуют
+            try
             {
-                e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
-                e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
-
-                // при открытии документа соберу все блоки в текущем пространстве (?) и вызову обновление их внутренних
-                // примитивов. Нужно, так как в некоторых случаях (пока не ясно в каких) внутренние примитивы отсутствуют
-                try
+                var timer = Stopwatch.StartNew();
+                using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var timer = Stopwatch.StartNew();
-                    using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
+                    foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfIntellectualEntities(
+                        TypeFactory.Instance.GetEntityCommandNames(), tr))
                     {
-                        foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfIntellectualEntities(
-                            TypeFactory.Instance.GetEntityCommandNames(), tr))
+                        var ie = EntityReaderFactory.Instance.GetFromEntity(blockReference);
+                        if (ie != null)
                         {
-                            var ie = EntityReaderFactory.Instance.GetFromEntity(blockReference);
-                            if (ie != null)
-                            {
-                                blockReference.UpgradeOpen();
-                                ie.UpdateEntities();
-                                ie.GetBlockTableRecordForUndo(blockReference).UpdateAnonymousBlocks();
-                            }
+                            blockReference.UpgradeOpen();
+                            ie.UpdateEntities();
+                            ie.GetBlockTableRecordForUndo(blockReference).UpdateAnonymousBlocks();
                         }
-
-                        tr.Commit();
                     }
 
-                    timer.Stop();
-                    Debug.Print($"Time for update entities: {timer.ElapsedMilliseconds} milliseconds");
+                    tr.Commit();
                 }
-                catch
-                {
-                    // ignore
-                }
-            }
-        }
 
-        private void Documents_DocumentCreated(object sender, DocumentCollectionEventArgs e)
-        {
-            if (e.Document != null)
+                timer.Stop();
+                Debug.Print($"Time for update entities: {timer.ElapsedMilliseconds} milliseconds");
+            }
+            catch
             {
-                e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
-                e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+                // ignore
             }
         }
 
-        private void Document_ImpliedSelectionChanged(object sender, EventArgs e)
+        private static void Documents_DocumentCreated(object sender, DocumentCollectionEventArgs e)
         {
-            PromptSelectionResult psr = AcadHelpers.Editor.SelectImplied();
-            bool detach = true;
+            if (e.Document == null) 
+                return;
+
+            e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
+            e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+        }
+
+        private static void Document_ImpliedSelectionChanged(object sender, EventArgs e)
+        {
+            var psr = AcadHelpers.Editor.SelectImplied();
+            var detach = true;
             if (psr.Value != null && psr.Value.Count == 1)
             {
                 using (AcadHelpers.Document.LockDocument())
                 {
-                    using (OpenCloseTransaction tr = new OpenCloseTransaction())
+                    using (var tr = new OpenCloseTransaction())
                     {
                         foreach (SelectedObject selectedObject in psr.Value)
                         {
@@ -374,74 +452,7 @@
                 DetachCreateAnalogContextMenu();
             }
         }
-
-        [CommandMethod("ModPlus", "mpESKDCreateAnalog", CommandFlags.UsePickSet)]
-        public void CreateAnalogCommand()
-        {
-            PromptSelectionResult psr = AcadHelpers.Editor.SelectImplied();
-            if (psr.Value != null && psr.Value.Count == 1)
-            {
-                IntellectualEntity intellectualEntity = null;
-                using (AcadHelpers.Document.LockDocument())
-                {
-                    using (OpenCloseTransaction tr = new OpenCloseTransaction())
-                    {
-                        foreach (SelectedObject selectedObject in psr.Value)
-                        {
-                            if (selectedObject.ObjectId == ObjectId.Null)
-                            {
-                                continue;
-                            }
-
-                            var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
-                            if (obj is BlockReference blockReference)
-                            {
-                                intellectualEntity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
-                            }
-                        }
-
-                        tr.Commit();
-                    }
-                }
-
-                if (intellectualEntity != null)
-                {
-                    var copyLayer = true;
-                    if (MainStaticSettings.Settings.LayerActionOnCreateAnalog == LayerActionOnCreateAnalog.NotCopy)
-                    {
-                        copyLayer = false;
-                    }
-                    else if (MainStaticSettings.Settings.LayerActionOnCreateAnalog == LayerActionOnCreateAnalog.Ask)
-                    {
-                        PromptKeywordOptions promptKeywordOptions =
-                            new PromptKeywordOptions("\n" + Language.GetItem(Invariables.LangItem, "msg8"), "Yes No");
-                        var promptResult = AcadHelpers.Editor.GetKeywords(promptKeywordOptions);
-                        if (promptResult.Status == PromptStatus.OK)
-                        {
-                            if (promptResult.StringResult == "No")
-                            {
-                                copyLayer = false;
-                            }
-                        }
-                        else
-                        {
-                            copyLayer = false;
-                        }
-                    }
-
-                    var function = TypeFactory.Instance.GetEntityFunctionTypes().FirstOrDefault(f =>
-                    {
-                        var functionName = $"{intellectualEntity.GetType().Name}Function";
-                        var fName = f.GetType().Name;
-                        return fName == functionName;
-                    });
-                    function?.CreateAnalog(intellectualEntity, copyLayer);
-                }
-            }
-        }
-
-        private static ContextMenuExtension _intellectualEntityContextMenu;
-
+        
         private static void AttachCreateAnalogContextMenu()
         {
             if (_intellectualEntityContextMenu == null)
@@ -453,7 +464,8 @@
             }
 
             var rxObject = RXObject.GetClass(typeof(BlockReference));
-            Autodesk.AutoCAD.ApplicationServices.Application.AddObjectContextMenuExtension(rxObject, _intellectualEntityContextMenu);
+            Autodesk.AutoCAD.ApplicationServices.Application.AddObjectContextMenuExtension(
+                rxObject, _intellectualEntityContextMenu);
         }
 
         private static void CreateAnalogMenuItem_Click(object sender, EventArgs e)
@@ -464,43 +476,12 @@
 
         private static void DetachCreateAnalogContextMenu()
         {
-            if (_intellectualEntityContextMenu != null)
-            {
-                var rxObject = RXObject.GetClass(typeof(BlockReference));
-                Autodesk.AutoCAD.ApplicationServices.Application.RemoveObjectContextMenuExtension(rxObject, _intellectualEntityContextMenu);
-            }
-        }
+            if (_intellectualEntityContextMenu == null)
+                return;
 
-        #endregion
-    }
-
-    /// <summary>Слежение за командой "редактор блоков" автокада</summary>
-    public class BeditCommandWatcher
-    {
-        /// <summary>True - использовать редактор блоков. False - не использовать</summary>
-        public static bool UseBedit = true;
-
-        public static void Initialize()
-        {
-            AcApp.DocumentManager.DocumentLockModeChanged += DocumentManager_DocumentLockModeChanged;
-        }
-
-        private static void DocumentManager_DocumentLockModeChanged(object sender, Autodesk.AutoCAD.ApplicationServices.DocumentLockModeChangedEventArgs e)
-        {
-            try
-            {
-                if (!UseBedit)
-                {
-                    if (e.GlobalCommandName == "BEDIT")
-                    {
-                        e.Veto();
-                    }
-                }
-            }
-            catch (System.Exception exception)
-            {
-                AcadHelpers.WriteMessageInDebug($"\nException {exception.Message}");
-            }
+            var rxObject = RXObject.GetClass(typeof(BlockReference));
+            Autodesk.AutoCAD.ApplicationServices.Application.RemoveObjectContextMenuExtension(
+                rxObject, _intellectualEntityContextMenu);
         }
     }
 }

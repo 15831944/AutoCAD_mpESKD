@@ -2,8 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Xml.Linq;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -32,7 +30,7 @@
         {
             get
             {
-                ObjectContextManager ocm = Database.ObjectContextManager;
+                var ocm = Database.ObjectContextManager;
                 return ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
             }
         }
@@ -45,12 +43,12 @@
                 var layers = new List<string>();
                 using (Document.LockDocument())
                 {
-                    using (OpenCloseTransaction tr = Database.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        LayerTable lt = tr.GetObject(Database.LayerTableId, OpenMode.ForRead) as LayerTable;
+                        var lt = tr.GetObject(Database.LayerTableId, OpenMode.ForRead) as LayerTable;
                         if (lt != null)
                         {
-                            foreach (ObjectId layerId in lt)
+                            foreach (var layerId in lt)
                             {
                                 var layer = tr.GetObject(layerId, OpenMode.ForRead) as LayerTableRecord;
                                 if (layer != null && !layer.IsErased && !layer.IsEraseStatusToggled)
@@ -76,7 +74,7 @@
                 if (ocm != null)
                 {
                     var occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
-                    foreach (ObjectContext objectContext in occ)
+                    foreach (var objectContext in occ)
                     {
                         scales.Add(((AnnotationScale)objectContext).Name);
                     }
@@ -99,13 +97,13 @@
         {
             get
             {
-                List<string> textStyles = new List<string>();
+                var textStyles = new List<string>();
                 using (Document.LockDocument())
                 {
-                    using (OpenCloseTransaction tr = Database.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var textStyleTable = (TextStyleTable)tr.GetObject(Database.TextStyleTableId, OpenMode.ForRead);
-                        foreach (ObjectId objectId in textStyleTable)
+                        foreach (var objectId in textStyleTable)
                         {
                             var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
                             if (!textStyles.Contains(txtStl.Name))
@@ -156,11 +154,11 @@
         /// <returns></returns>
         public static BlockReference GetBlockReference(Point3d point, IEnumerable<Entity> entities)
         {
-            BlockTableRecord blockTableRecord = new BlockTableRecord
+            var blockTableRecord = new BlockTableRecord
             {
                 Name = "*U"
             };
-            foreach (Entity enity in entities)
+            foreach (var enity in entities)
             {
                 blockTableRecord.AppendEntity(enity);
             }
@@ -218,7 +216,7 @@
                 {
                     using (Document.LockDocument())
                     {
-                        using (Transaction tr = Database.TransactionManager.StartTransaction())
+                        using (var tr = Database.TransactionManager.StartTransaction())
                         {
                             var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
                             if (blockReference != null)
@@ -232,13 +230,13 @@
                 }
                 else
                 {
-                    if (MainStaticSettings.Settings.IfNoLayer == 1)
+                    if (MainSettings.Instance.IfNoLayer == 1)
                     {
                         if (LayerHelper.AddLayerFromXelement(layerXmlData))
                         {
                             using (Document.LockDocument())
                             {
-                                using (Transaction tr = Database.TransactionManager.StartTransaction())
+                                using (var tr = Database.TransactionManager.StartTransaction())
                                 {
                                     var blockReference =
                                         tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
@@ -258,7 +256,7 @@
             {
                 if (Database.Clayer != ObjectId.Null && blkRefObjectId != ObjectId.Null)
                 {
-                    using (Transaction tr = Database.TransactionManager.StartTransaction())
+                    using (var tr = Database.TransactionManager.StartTransaction())
                     {
                         var blockReference = tr.GetObject(blkRefObjectId, OpenMode.ForWrite, true, true) as BlockReference;
                         var layer = tr.GetObject(Database.Clayer, OpenMode.ForRead) as LayerTableRecord;
@@ -285,7 +283,6 @@
         /// <returns></returns>
         public static string GetLineTypeName(ObjectId ltid)
         {
-
             var lt = "Continuous";
             if (ltid == ObjectId.Null)
             {
@@ -450,10 +447,10 @@
         {
             using (Document.LockDocument())
             {
-                using (OpenCloseTransaction tr = Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var textStyleTable = (TextStyleTable)tr.GetObject(Database.TextStyleTableId, OpenMode.ForRead);
-                    foreach (ObjectId objectId in textStyleTable)
+                    foreach (var objectId in textStyleTable)
                     {
                         var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
                         if (txtStl.Name.Equals(textStyleName))
@@ -475,12 +472,12 @@
         /// <returns></returns>
         public static List<T> GetAllIntellectualEntitiesInCurrentSpace<T>(Type entityType) where T : IntellectualEntity
         {
-            List<T> list = new List<T>();
+            var list = new List<T>();
             var appName = $"mp{entityType.Name}";
             using (var tr = Database.TransactionManager.StartOpenCloseTransaction())
             {
-                BlockTableRecord blockTableRecord = (BlockTableRecord)tr.GetObject(Database.CurrentSpaceId, OpenMode.ForRead);
-                foreach (ObjectId objectId in blockTableRecord)
+                var blockTableRecord = (BlockTableRecord)tr.GetObject(Database.CurrentSpaceId, OpenMode.ForRead);
+                foreach (var objectId in blockTableRecord)
                 {
                     if (objectId == ObjectId.Null)
                     {
@@ -501,103 +498,6 @@
             }
 
             return list;
-        }
-    }
-
-    /// <summary>Вспомогательные методы работы с расширенными данными
-    /// Есть аналогичные в MpCadHelpers. Некоторые будут совпадать
-    /// но все-равно делаю отдельно</summary>
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static class ExtendedDataHelpers
-    {
-        /// <summary>
-        /// Добавление регистрации приложения в соответствующую таблицу чертежа
-        /// </summary>
-        public static void AddRegAppTableRecord(string appName)
-        {
-            using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
-            {
-                RegAppTable rat =
-                    (RegAppTable)tr.GetObject(AcadHelpers.Database.RegAppTableId, OpenMode.ForRead, false);
-                if (!rat.Has(appName))
-                {
-                    rat.UpgradeOpen();
-                    var regAppTableRecord = new RegAppTableRecord
-                    {
-                        Name = appName
-                    };
-                    rat.Add(regAppTableRecord);
-                    tr.AddNewlyCreatedDBObject(regAppTableRecord, true);
-                }
-
-                tr.Commit();
-            }
-        }
-
-        /// <summary>
-        /// Проверка поддерживаемости примитива для Overrule
-        /// </summary>
-        /// <param name="rxObject"></param>
-        /// <param name="appName"></param>
-        /// <param name="checkIsNullId">comment #16 - http://adn-cis.org/forum/index.php?topic=8910.15 </param>
-        public static bool IsApplicable(RXObject rxObject, string appName, bool checkIsNullId = false)
-        {
-            DBObject dbObject = rxObject as DBObject;
-            if (dbObject == null)
-            {
-                return false;
-            }
-
-            if (checkIsNullId)
-            {
-                if (dbObject.ObjectId == ObjectId.Null)
-                {
-                    return false;
-                }
-            }
-
-            if (dbObject is BlockReference)
-            {
-                // Всегда нужно проверять по наличию расширенных данных
-                // иначе может привести к фаталам при работе с динамическими блоками
-                return IsIntellectualEntity(dbObject, appName);
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Проверка поддерживаемости вставки блока путем проверки наличия XData с поддерживаемым кодом 1001
-        /// </summary>
-        public static bool IsApplicable(BlockReference blockReference)
-        {
-            if (blockReference.XData == null)
-            {
-                return false;
-            }
-
-            var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
-            var typedValue = blockReference.XData.AsArray()
-                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()));
-            return typedValue.Value != null;
-        }
-
-        /// <summary>
-        /// Проверка по XData вхождения блока, что он является любым ЕСКД примитивом
-        /// </summary>
-        /// <param name="blkRef">Вхождение блока</param>
-        /// <param name="appName"></param>
-        /// <returns></returns>
-        public static bool IsIntellectualEntity(Entity blkRef, string appName)
-        {
-            ResultBuffer rb = blkRef.GetXDataForApplication(appName);
-            return rb != null;
-        }
-
-        public static bool IsIntellectualEntity(DBObject dbObject, string appName)
-        {
-            ResultBuffer rb = dbObject.GetXDataForApplication(appName);
-            return rb != null;
         }
     }
 }

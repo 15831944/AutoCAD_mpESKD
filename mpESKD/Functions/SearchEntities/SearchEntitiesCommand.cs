@@ -46,7 +46,6 @@
                 List<string> entitiesToProceed = new List<string>();
                 foreach (var item in settings.LbEntities.Items)
                 {
-
                     if (item is ListBoxItem listBoxItem &&
                         listBoxItem.Content is CheckBox checkBox &&
                         checkBox.IsChecked == true)

@@ -117,7 +117,7 @@
 
         public override bool WorldDraw(WorldDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint, double dGripSize)
         {
-            if (GripIndex > 0 && MainStaticSettings.Settings.SectionShowHelpLineOnSelection)
+            if (GripIndex > 0 && MainSettings.Instance.SectionShowHelpLineOnSelection)
             {
                 short backupColor = worldDraw.SubEntityTraits.Color;
                 FillType backupFillType = worldDraw.SubEntityTraits.FillType;

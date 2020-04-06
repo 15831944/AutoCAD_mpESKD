@@ -46,7 +46,7 @@ namespace mpESKD.Functions.mpAxis
             base.ProcessScaleChange(oldScale, newScale);
             if (oldScale != null && newScale != null)
             {
-                if (MainStaticSettings.Settings.AxisLineTypeScaleProportionScale)
+                if (MainSettings.Instance.AxisLineTypeScaleProportionScale)
                 {
                     LineTypeScale = LineTypeScale * newScale.GetNumericScale() / oldScale.GetNumericScale();
                 }
@@ -584,7 +584,6 @@ namespace mpESKD.Functions.mpAxis
                 var scale = GetScale();
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
-
                     // Задание точки вставки (т.е. второй точки еще нет)
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }

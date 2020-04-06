@@ -110,7 +110,6 @@
         {
             try
             {
-
                 BindingExpression bindExpr = BindingOperations.GetBindingExpression(
                     TextBox, TextBox.TextProperty);
 

@@ -233,7 +233,7 @@
                                     section.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
                                 }
 
-                                if (MainStaticSettings.Settings.SectionDependentTextMovement)
+                                if (MainSettings.Instance.SectionDependentTextMovement)
                                 {
                                     if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
                                     {
@@ -282,7 +282,7 @@
                                     section.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
                                 }
 
-                                if (MainStaticSettings.Settings.SectionDependentTextMovement)
+                                if (MainSettings.Instance.SectionDependentTextMovement)
                                 {
                                     if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
                                     {

@@ -648,7 +648,7 @@
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.DataContext>
-                    <mpEskd:MainSettings></mpEskd:MainSettings>
+                    <mpEskd:MainSettings/>
                 </Grid.DataContext>
                 <Grid.Resources>
                     <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource ModPlusCheckBox}">
