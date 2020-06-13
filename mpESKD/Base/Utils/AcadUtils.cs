@@ -342,7 +342,10 @@
                             {
                                 if (exception.ErrorStatus == ErrorStatus.FilerError)
                                 {
-                                    MessageBox.Show(Language.GetItem(Invariables.LangItem, "err1") + ": " + filename, MessageBoxIcon.Close); // Не удалось найти файл
+                                    // Не удалось найти файл
+                                    MessageBox.Show(
+                                        $"{Language.GetItem(Invariables.LangItem, "err1")}: {filename}",
+                                        MessageBoxIcon.Close);
                                 }
                                 else if (exception.ErrorStatus == ErrorStatus.DuplicateRecordName)
                                 {
@@ -350,7 +353,10 @@
                                 }
                                 else
                                 {
-                                    MessageBox.Show(Language.GetItem(Invariables.LangItem, "err2") + ": " + lineTypeName, MessageBoxIcon.Close); // Не удалось загрузить тип линий
+                                    // Не удалось загрузить тип линий
+                                    MessageBox.Show(
+                                        $"{Language.GetItem(Invariables.LangItem, "err2")}: {lineTypeName}", 
+                                        MessageBoxIcon.Close);
                                 }
                             }
                         }

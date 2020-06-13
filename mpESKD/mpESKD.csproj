@@ -109,6 +109,8 @@
     <Compile Include="Base\Binder.cs" />
     <Compile Include="Base\Enums\LayerActionOnCreateAnalog.cs" />
     <Compile Include="Base\Enums\SearchProceedOption.cs" />
+    <Compile Include="Base\Overrules\IntellectualEntityObjectOverrule.cs" />
+    <Compile Include="Base\Overrules\IntellectualEntityOsnapOverrule.cs" />
     <Compile Include="Base\Properties\Converters\ColumnWidthConverter.cs" />
     <Compile Include="Base\Properties\DoubleEqComparer.cs" />
     <Compile Include="Base\Styles\AnnotationScaleValueConverter.cs" />
@@ -168,32 +170,26 @@
     <Compile Include="Functions\mpAxis\AxisValueEditor.xaml.cs">
       <DependentUpon>AxisValueEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Functions\mpAxis\Overrules\AxisGripPointOverrule.cs" />
-    <Compile Include="Functions\mpAxis\Overrules\AxisObjectOverrule.cs" />
-    <Compile Include="Functions\mpAxis\Overrules\AxisOsnapOverrule.cs" />
+    <Compile Include="Functions\mpAxis\AxisGripPointOverrule.cs" />
     <Compile Include="Base\Styles\StyleEditor.xaml.cs">
       <DependentUpon>StyleEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Functions\mpAxis\Overrules\Grips\AxisGrip.cs" />
-    <Compile Include="Functions\mpAxis\Overrules\Grips\AxisGripName.cs" />
+    <Compile Include="Functions\mpAxis\Grips\AxisGrip.cs" />
+    <Compile Include="Functions\mpAxis\Grips\AxisGripName.cs" />
     <Compile Include="Functions\mpBreakLine\BreakLine.cs" />
     <Compile Include="Functions\mpBreakLine\BreakLineFunction.cs" />
     <Compile Include="Functions\mpBreakLine\BreakLineDescriptor.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\Grips\BreakLineGrip.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\Grips\BreakLineGripName.cs" />
+    <Compile Include="Functions\mpBreakLine\BreakLineGripPointOverrule.cs" />
+    <Compile Include="Functions\mpBreakLine\Grips\BreakLineGrip.cs" />
+    <Compile Include="Functions\mpBreakLine\Grips\BreakLineGripName.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLine.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLineFunction.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLineDescriptor.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineAddVertexGrip.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineRemoveVertexGrip.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineReverseGrip.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineVertexGrip.cs" />
+    <Compile Include="Functions\mpGroundLine\Grips\GroundLineAddVertexGrip.cs" />
+    <Compile Include="Functions\mpGroundLine\GroundLineGripPointOverrule.cs" />
+    <Compile Include="Functions\mpGroundLine\Grips\GroundLineRemoveVertexGrip.cs" />
+    <Compile Include="Functions\mpGroundLine\Grips\GroundLineReverseGrip.cs" />
+    <Compile Include="Functions\mpGroundLine\Grips\GroundLineVertexGrip.cs" />
     <Compile Include="Functions\mpLevelMark\LevelMark.cs" />
     <Compile Include="Functions\mpLevelMark\LevelMarkAlignSetup.xaml.cs">
       <DependentUpon>LevelMarkAlignSetup.xaml</DependentUpon>
@@ -204,20 +200,16 @@
     <Compile Include="Functions\mpLevelMark\LevelMarkValueEditor.xaml.cs">
       <DependentUpon>LevelMarkValueEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Functions\mpLevelMark\Overrules\Grips\LevelMarkGrip.cs" />
-    <Compile Include="Functions\mpLevelMark\Overrules\Grips\LevelMarkGripName.cs" />
-    <Compile Include="Functions\mpLevelMark\Overrules\LevelMarkGripPointOverrule.cs" />
-    <Compile Include="Functions\mpLevelMark\Overrules\LevelMarkObjectOverrule.cs" />
-    <Compile Include="Functions\mpLevelMark\Overrules\LevelMarkOsnapOverrule.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionAddVertexGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\SectionGripPointOverrule.cs" />
-    <Compile Include="Functions\mpSection\Overrules\SectionObjectOverrule.cs" />
-    <Compile Include="Functions\mpSection\Overrules\SectionOsnapOverrule.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionRemoveVertexGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionReverseGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionTextGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionVertexGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\TextGripName.cs" />
+    <Compile Include="Functions\mpLevelMark\Grips\LevelMarkGrip.cs" />
+    <Compile Include="Functions\mpLevelMark\Grips\LevelMarkGripName.cs" />
+    <Compile Include="Functions\mpLevelMark\LevelMarkGripPointOverrule.cs" />
+    <Compile Include="Functions\mpSection\Grips\SectionAddVertexGrip.cs" />
+    <Compile Include="Functions\mpSection\SectionGripPointOverrule.cs" />
+    <Compile Include="Functions\mpSection\Grips\SectionRemoveVertexGrip.cs" />
+    <Compile Include="Functions\mpSection\Grips\SectionReverseGrip.cs" />
+    <Compile Include="Functions\mpSection\Grips\SectionTextGrip.cs" />
+    <Compile Include="Functions\mpSection\Grips\SectionVertexGrip.cs" />
+    <Compile Include="Functions\mpSection\Grips\TextGripName.cs" />
     <Compile Include="Functions\mpSection\Section.cs" />
     <Compile Include="Functions\mpSection\SectionFunction.cs" />
     <Compile Include="Functions\mpSection\SectionDescriptor.cs" />

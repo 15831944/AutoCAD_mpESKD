@@ -622,14 +622,14 @@ namespace mpESKD.Base.Styles
             else
             {
                 {
-                    if (Resources["Image" + entityTypeName] is Canvas imgResource)
+                    if (Resources[$"Image{entityTypeName}"] is Canvas imgResource)
                     {
                         VbImage.Child = imgResource;
                     }
                 }
 
                 {
-                    if (Resources["Image" + entityTypeName] is Viewbox imgResource)
+                    if (Resources[$"Image{entityTypeName}"] is Viewbox imgResource)
                     {
                         VbImage.Child = imgResource;
                     }
@@ -708,9 +708,7 @@ namespace mpESKD.Base.Styles
                 if (entityStyles.HasStylesWithSameName)
                 {
                     ModPlusAPI.Windows.MessageBox.Show(
-                        ModPlusAPI.Language.GetItem(Invariables.LangItem, "h70") + " \"" + entityStyles.DisplayName +
-                        "\" " + ModPlusAPI.Language.GetItem(Invariables.LangItem, "h71") + "\"!" + Environment.NewLine +
-                        ModPlusAPI.Language.GetItem(Invariables.LangItem, "h72"), MessageBoxIcon.Alert);
+                        $"{ModPlusAPI.Language.GetItem(Invariables.LangItem, "h70")} \"{entityStyles.DisplayName}\" {ModPlusAPI.Language.GetItem(Invariables.LangItem, "h71")}\"!{Environment.NewLine}{ModPlusAPI.Language.GetItem(Invariables.LangItem, "h72")}", MessageBoxIcon.Alert);
                     e.Cancel = true;
                     return;
                 }
@@ -790,7 +788,7 @@ namespace mpESKD.Base.Styles
             {
                 Hide();
                 var promptEntityOptions =
-                    new PromptEntityOptions("\n" + ModPlusAPI.Language.GetItem(Invariables.LangItem, "msg3"));
+                    new PromptEntityOptions($"\n{ModPlusAPI.Language.GetItem(Invariables.LangItem, "msg3")}");
                 promptEntityOptions.SetRejectMessage("\nWrong entity");
                 promptEntityOptions.AllowNone = false;
                 promptEntityOptions.AddAllowedClass(typeof(BlockReference), true);

@@ -670,7 +670,7 @@ namespace mpESKD.Base
         /// <summary>
         /// Установка свойств для примитивов, которые не меняются
         /// </summary>
-        /// <param name="entity">Примитив автокада</param>
+        /// <param name="entity">Примитив AutoCAD</param>
         public void SetImmutablePropertiesToNestedEntity(Entity entity)
         {
             entity.Layer = "0";
@@ -683,7 +683,7 @@ namespace mpESKD.Base
         /// <summary>
         /// Установка свойств для примитива, которые могут меняться "из вне" (ByBlock)
         /// </summary>
-        /// <param name="entity">Примитив автокада</param>
+        /// <param name="entity">Примитив AutoCAD</param>
         public void SetChangeablePropertiesToNestedEntity(Entity entity)
         {
             entity.Layer = "0";

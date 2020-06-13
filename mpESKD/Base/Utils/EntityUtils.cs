@@ -4,8 +4,6 @@
     using System.Windows;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
-    using Autodesk.AutoCAD.Geometry;
-    using ModPlusAPI.Windows;
 
     /// <summary>
     /// Утилиты для объектов
@@ -40,59 +38,6 @@
             dbText.Linetype = "ByBlock";
             dbText.LineWeight = LineWeight.ByBlock;
             dbText.TextStyleId = AcadUtils.GetTextStyleIdByName(textStyle);
-        }
-
-        /// <summary>
-        /// Обработка объекта в методе Close класса <see cref="ObjectOverrule"/>
-        /// </summary>
-        /// <param name="dbObject">Instance of <see cref="DBObject"/></param>
-        /// <param name="intellectualEntity">Метод получения объекта из блока</param>
-        public static void ObjectOverruleProcess(DBObject dbObject, Func<IntellectualEntity> intellectualEntity)
-        {
-            try
-            {
-                if (AcadUtils.Document == null)
-                    return;
-
-                if ((dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadUtils.Database) ||
-                    (dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData))
-                {
-                    var entity = intellectualEntity.Invoke();
-                    if (entity == null) 
-                        return;
-
-                    entity.UpdateEntities();
-                    entity.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
-                }
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-        }
-
-        /// <summary>
-        /// Обработка объекта в методе GetObjectSnapPoints класса <see cref="OsnapOverrule"/>
-        /// </summary>
-        /// <param name="entity">Instance of <see cref="Entity"/></param>
-        /// <param name="snapPoints">Коллекция точек для привязки</param>
-        public static void OsnapOverruleProcess(Entity entity, Point3dCollection snapPoints)
-        {
-            try
-            {
-                var intellectualEntity = EntityReaderService.Instance.GetFromEntity(entity);
-                if (intellectualEntity != null)
-                {
-                    foreach (var point3d in intellectualEntity.GetPointsForOsnap())
-                    {
-                        snapPoints.Add(point3d);
-                    }
-                }
-            }
-            catch (Autodesk.AutoCAD.Runtime.Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
         }
 
         /// <summary>

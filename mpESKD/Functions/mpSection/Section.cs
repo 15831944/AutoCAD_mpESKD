@@ -9,8 +9,8 @@
     using Base.Attributes;
     using Base.Enums;
     using Base.Utils;
+    using Grips;
     using ModPlusAPI.Windows;
-    using Overrules.Grips;
 
     /// <summary>
     /// Разрез
@@ -223,7 +223,7 @@
 
         /// <summary>
         /// Направление разреза: слева на право или справа на лево. Меняется при работе ручки (<see cref="SectionReverseGrip.OnHotGrip"/>)
-        /// Используется для определения положения ручки (<see cref="Overrules.SectionGripPointOverrule"/>)
+        /// Используется для определения положения ручки (<see cref="SectionGripPointOverrule"/>)
         /// </summary>
         [SaveToXData]
         public EntityDirection EntityDirection { get; set; } = EntityDirection.LeftToRight;

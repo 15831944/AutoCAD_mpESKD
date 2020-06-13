@@ -168,7 +168,7 @@
                 var entityExpander = new Expander
                 {
                     IsExpanded = true,
-                    Header = LocalizationUtils.GetEntityLocalizationName(entityGroup.Key) + " [" + c + "]",
+                    Header = $"{LocalizationUtils.GetEntityLocalizationName(entityGroup.Key)} [{c}]",
                     Style = Resources["EntityExpander"] as Style
                 };
 

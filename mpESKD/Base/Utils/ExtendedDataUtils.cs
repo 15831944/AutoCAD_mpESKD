@@ -79,7 +79,41 @@
 
             var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
             var typedValue = blockReference.XData.AsArray()
-                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(tv.Value.ToString()));
+                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName &&
+                                      applicableCommands.Contains(tv.Value.ToString()));
+            return typedValue.Value != null;
+        }
+
+        /// <summary>
+        /// Проверка поддерживаемости вставки блока путем проверки наличия XData с поддерживаемым кодом 1001
+        /// </summary>
+        /// <param name="rxObject"><see cref="RXObject"/></param>
+        /// <param name="checkIsNullId">comment #16 - http://adn-cis.org/forum/index.php?topic=8910.15 </param>
+        public static bool IsApplicable(RXObject rxObject, bool checkIsNullId)
+        {
+            var dbObject = rxObject as DBObject;
+            if (dbObject == null)
+            {
+                return false;
+            }
+
+            if (checkIsNullId)
+            {
+                if (dbObject.ObjectId == ObjectId.Null)
+                {
+                    return false;
+                }
+            }
+
+            if (dbObject.XData == null)
+            {
+                return false;
+            }
+
+            var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
+            var typedValue = dbObject.XData.AsArray()
+                .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && 
+                                      applicableCommands.Contains(tv.Value.ToString()));
             return typedValue.Value != null;
         }
 

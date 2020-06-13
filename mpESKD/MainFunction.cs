@@ -14,6 +14,7 @@
     using Autodesk.AutoCAD.Windows;
     using Base;
     using Base.Enums;
+    using Base.Overrules;
     using Base.Styles;
     using Base.Utils;
     using Functions.mpAxis;
@@ -48,6 +49,11 @@
 
             Overrule.Overruling = true;
 
+            Overrule.AddOverrule(
+                RXObject.GetClass(typeof(BlockReference)), IntellectualEntityObjectOverrule.Instance(), true);
+            Overrule.AddOverrule(
+                RXObject.GetClass(typeof(BlockReference)), IntellectualEntityOsnapOverrule.Instance(), true);
+
             // ribbon build for
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
 
@@ -81,6 +87,11 @@
         public void Terminate()
         {
             TypeFactory.Instance.GetEntityFunctionTypes().ForEach(f => f.Terminate());
+
+            Overrule.RemoveOverrule(
+                RXObject.GetClass(typeof(BlockReference)), IntellectualEntityObjectOverrule.Instance());
+            Overrule.RemoveOverrule(
+                RXObject.GetClass(typeof(BlockReference)), IntellectualEntityOsnapOverrule.Instance());
 
             // remove context menu
             DetachCreateAnalogContextMenu();
@@ -192,7 +203,7 @@
             else if (layerActionOnCreateAnalog == LayerActionOnCreateAnalog.Ask)
             {
                 var promptKeywordOptions =
-                    new PromptKeywordOptions("\n" + Language.GetItem(Invariables.LangItem, "msg8"), "Yes No");
+                    new PromptKeywordOptions($"\n{Language.GetItem(Invariables.LangItem, "msg8")}", "Yes No");
                 var promptResult = AcadUtils.Editor.GetKeywords(promptKeywordOptions);
                 if (promptResult.Status == PromptStatus.OK)
                 {

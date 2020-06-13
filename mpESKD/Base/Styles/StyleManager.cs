@@ -44,7 +44,7 @@
             entityTypes.ForEach(et =>
             {
                 bool needToCreate;
-                var stylesFile = Path.Combine(MainFunction.StylesPath, et.Name + "Styles.xml");
+                var stylesFile = Path.Combine(MainFunction.StylesPath, $"{et.Name}Styles.xml");
                 if (File.Exists(stylesFile))
                 {
                     try
@@ -80,7 +80,8 @@
             {
                 var systemStyle = new IntellectualEntityStyle(et)
                 {
-                    Name = LocalizationUtils.GetEntityLocalizationName(et) + " [" + Language.GetItem(Invariables.LangItem, "h12") + "]",
+                    Name =
+                        $"{LocalizationUtils.GetEntityLocalizationName(et)} [{Language.GetItem(Invariables.LangItem, "h12")}]",
                     Description = TypeFactory.Instance.GetSystemStyleLocalizedDescription(et),
                     Guid = "00000000-0000-0000-0000-000000000000",
                     StyleType = StyleType.System
@@ -201,7 +202,7 @@
         /// <param name="entityType">Тип примитива</param>
         private static void LoadStylesFromXmlFile(Type entityType)
         {
-            var stylesFile = Path.Combine(MainFunction.StylesPath, entityType.Name + "Styles.xml");
+            var stylesFile = Path.Combine(MainFunction.StylesPath, $"{entityType.Name}Styles.xml");
             if (File.Exists(stylesFile))
             {
                 for (var i = EntityStyles.Count - 1; i >= 0; i--)
@@ -369,7 +370,7 @@
         /// <param name="entityType">Тип интеллектуального объекта</param>
         public static void SaveStylesToXml(Type entityType)
         {
-            var stylesFile = Path.Combine(MainFunction.StylesPath, entityType.Name + "Styles.xml");
+            var stylesFile = Path.Combine(MainFunction.StylesPath, $"{entityType.Name}Styles.xml");
 
             // Если файла нет, то создаем
             if (!File.Exists(stylesFile))
@@ -498,7 +499,7 @@
         /// <returns></returns>
         private static string GetFunctionNameByStyleType(Type styleType)
         {
-            return "mp" + styleType.Name.Replace("Style", string.Empty);
+            return $"mp{styleType.Name.Replace("Style", string.Empty)}";
         }
 
         /// <summary>

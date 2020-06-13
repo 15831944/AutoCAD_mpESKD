@@ -13,7 +13,6 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Overrules;
 
     /// <inheritdoc />
     public class SectionFunction : IIntellectualEntityFunction
@@ -22,16 +21,12 @@
         public void Initialize()
         {
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SectionGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SectionOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SectionObjectOverrule.Instance(), true);
         }
 
         /// <inheritdoc />
         public void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SectionGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SectionOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SectionObjectOverrule.Instance());
         }
 
         /// <inheritdoc />

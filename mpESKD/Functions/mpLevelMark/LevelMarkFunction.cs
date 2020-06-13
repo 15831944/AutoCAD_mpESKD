@@ -12,7 +12,6 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Overrules;
     using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
     /// <inheritdoc />
@@ -22,16 +21,12 @@
         public void Initialize()
         {
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkObjectOverrule.Instance(), true);
         }
 
         /// <inheritdoc/>
         public void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkObjectOverrule.Instance());
         }
 
         /// <inheritdoc/>
