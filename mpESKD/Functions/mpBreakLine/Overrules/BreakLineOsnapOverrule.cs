@@ -1,20 +1,20 @@
-﻿// ReSharper disable InconsistentNaming
-
-namespace mpESKD.Functions.mpBreakLine.Overrules
+﻿namespace mpESKD.Functions.mpBreakLine.Overrules
 {
     using System;
     using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
-    using Base;
-    using Base.Helpers;
-    using ModPlusAPI.Windows;
+    using Base.Utils;
 
+    /// <inheritdoc />
     public class BreakLineOsnapOverrule : OsnapOverrule
     {
-        protected static BreakLineOsnapOverrule _breakLineOsnapOverrule;
+        private static BreakLineOsnapOverrule _breakLineOsnapOverrule;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         public static BreakLineOsnapOverrule Instance()
         {
             if (_breakLineOsnapOverrule != null)
@@ -29,25 +29,14 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             return _breakLineOsnapOverrule;
         }
 
+        /// <inheritdoc />
         public override void GetObjectSnapPoints(Entity entity, ObjectSnapModes snapMode, IntPtr gsSelectionMark, Point3d pickPoint,
             Point3d lastPoint, Matrix3d viewTransform, Point3dCollection snapPoints, IntegerCollection geometryIds)
         {
             Debug.Print("BreakLineOsnapOverrule");
             if (IsApplicable(entity))
             {
-                try
-                {
-                    var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>(entity);
-                    if (breakLine != null)
-                    {
-                        snapPoints.Add(breakLine.InsertionPoint);
-                        snapPoints.Add(breakLine.EndPoint);
-                    }
-                }
-                catch (Autodesk.AutoCAD.Runtime.Exception exception)
-                {
-                    ExceptionBox.Show(exception);
-                }
+                EntityUtils.OsnapOverruleProcess(entity, snapPoints);
             }
             else
             {
@@ -55,9 +44,10 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             }
         }
 
+        /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name);
         }
     }
 }

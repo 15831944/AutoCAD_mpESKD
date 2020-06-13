@@ -6,17 +6,21 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
+    using Base.Utils;
     using Grips;
     using ModPlusAPI.Windows;
 
     // ReSharper disable once RedundantNameQualifier
     using Section = mpSection.Section;
 
+    /// <inheritdoc />
     public class SectionGripPointOverrule : GripOverrule
     {
         private static SectionGripPointOverrule _instance;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         public static SectionGripPointOverrule Instance()
         {
             if (_instance != null)
@@ -31,7 +35,9 @@
             return _instance;
         }
 
-        public override void GetGripPoints(Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
+        /// <inheritdoc />
+        public override void GetGripPoints(
+            Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
         {
             try
             {
@@ -40,7 +46,7 @@
                     // Удаляю все ручки - это удалит ручку вставки блока
                     grips.Clear();
 
-                    var section = EntityReaderFactory.Instance.GetFromEntity<Section>(entity);
+                    var section = EntityReaderService.Instance.GetFromEntity<Section>(entity);
                     if (section != null)
                     {
                         // insertion (start) grip
@@ -84,7 +90,7 @@
                                     section,
                                     section.InsertionPoint, section.MiddlePoints[i])
                                 {
-                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(section.InsertionPoint, section.MiddlePoints[i])
+                                    GripPoint = GeometryUtils.GetMiddlePoint3d(section.InsertionPoint, section.MiddlePoints[i])
                                 };
                                 grips.Add(addVertexGrip);
                             }
@@ -94,7 +100,7 @@
                                     section,
                                     section.MiddlePoints[i - 1], section.MiddlePoints[i])
                                 {
-                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(section.MiddlePoints[i - 1], section.MiddlePoints[i])
+                                    GripPoint = GeometryUtils.GetMiddlePoint3d(section.MiddlePoints[i - 1], section.MiddlePoints[i])
                                 };
                                 grips.Add(addVertexGrip);
                             }
@@ -106,7 +112,7 @@
                                     section,
                                     section.MiddlePoints[i], section.EndPoint)
                                 {
-                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(section.MiddlePoints[i], section.EndPoint)
+                                    GripPoint = GeometryUtils.GetMiddlePoint3d(section.MiddlePoints[i], section.EndPoint)
                                 };
                                 grips.Add(addVertexGrip);
                             }
@@ -116,7 +122,7 @@
                         {
                             var addVertexGrip = new SectionAddVertexGrip(section, section.InsertionPoint, section.EndPoint)
                             {
-                                GripPoint = GeometryHelpers.GetMiddlePoint3d(section.InsertionPoint, section.EndPoint)
+                                GripPoint = GeometryUtils.GetMiddlePoint3d(section.InsertionPoint, section.EndPoint)
                             };
                             grips.Add(addVertexGrip);
                         }
@@ -175,34 +181,38 @@
             }
         }
 
-        public override void MoveGripPointsAt(Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
+        /// <inheritdoc />
+        public override void MoveGripPointsAt(
+            Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
         {
             try
             {
                 if (IsApplicable(entity))
                 {
-                    foreach (GripData gripData in grips)
+                    foreach (var gripData in grips)
                     {
                         if (gripData is SectionVertexGrip vertexGrip)
                         {
+                            var section = vertexGrip.Section;
+
                             if (vertexGrip.GripIndex == 0)
                             {
                                 ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                                vertexGrip.Section.InsertionPoint = vertexGrip.GripPoint + offset;
+                                section.InsertionPoint = vertexGrip.GripPoint + offset;
                             }
-                            else if (vertexGrip.GripIndex == vertexGrip.Section.MiddlePoints.Count + 1)
+                            else if (vertexGrip.GripIndex == section.MiddlePoints.Count + 1)
                             {
-                                vertexGrip.Section.EndPoint = vertexGrip.GripPoint + offset;
+                                section.EndPoint = vertexGrip.GripPoint + offset;
                             }
                             else
                             {
-                                vertexGrip.Section.MiddlePoints[vertexGrip.GripIndex - 1] =
+                                section.MiddlePoints[vertexGrip.GripIndex - 1] =
                                     vertexGrip.GripPoint + offset;
                             }
 
                             // Вот тут происходит перерисовка примитивов внутри блока
-                            vertexGrip.Section.UpdateEntities();
-                            vertexGrip.Section.BlockRecord.UpdateAnonymousBlocks();
+                            section.UpdateEntities();
+                            section.BlockRecord.UpdateAnonymousBlocks();
                         }
                         else if (gripData is SectionTextGrip textGrip)
                         {
@@ -329,11 +339,10 @@
             }
         }
 
-        // Проверка поддерживаемости примитива
-        // Проверка происходит по наличию XData с определенным AppName
+        /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, SectionDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, SectionDescriptor.Instance.Name);
         }
     }
 }

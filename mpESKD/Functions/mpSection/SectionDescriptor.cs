@@ -4,10 +4,14 @@
     using Base;
     using ModPlusAPI;
 
+    /// <inheritdoc />
     public class SectionDescriptor : IIntellectualEntityDescriptor
     {
         private static SectionDescriptor _instance;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         public static SectionDescriptor Instance => _instance ?? (_instance = new SectionDescriptor());
 
         /// <inheritdoc />
@@ -18,7 +22,7 @@
         public string LName => Language.GetItem(Invariables.LangItem, "h79");
 
         /// <inheritdoc />
-        // Отрисовка обозначения разреза (сечения) по ГОСТ 2.305-68
+        // Создание обозначения разреза (сечения) по ГОСТ 2.305-68
         public string Description => Language.GetItem(Invariables.LangItem, "h80");
 
         /// <inheritdoc />

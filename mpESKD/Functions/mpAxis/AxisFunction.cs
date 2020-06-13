@@ -1,6 +1,5 @@
 ﻿namespace mpESKD.Functions.mpAxis
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -9,19 +8,20 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
+    using Base.Styles;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Base.Styles;
     using Overrules;
     using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
+    /// <inheritdoc />
     public class AxisFunction : IIntellectualEntityFunction
     {
         /// <inheritdoc />
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance(), true);
         }
@@ -29,11 +29,12 @@
         /// <inheritdoc />
         public void Terminate()
         {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointsOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance());
         }
 
+        /// <inheritdoc />
         public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
             // send statistic
@@ -46,7 +47,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(AxisDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(AxisDescriptor.Instance.Name);
 
                 var axisLastHorizontalValue = string.Empty;
                 var axisLastVerticalValue = string.Empty;
@@ -73,6 +74,9 @@
             }
         }
 
+        /// <summary>
+        /// Команда создания прямой оси
+        /// </summary>
         [CommandMethod("ModPlus", "mpAxis", CommandFlags.Modal)]
         public void CreateAxisCommand()
         {
@@ -81,8 +85,9 @@
 
         private static void CreateAxis()
         {
-            // send statistic
+#if !DEBUG
             Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+#endif
             try
             {
                 Overrule.Overruling = false;
@@ -91,7 +96,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(AxisDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(AxisDescriptor.Instance.Name);
 
                 var style = StyleManager.GetCurrentStyle(typeof(Axis));
 
@@ -120,11 +125,10 @@
             var entityJig = new DefaultEntityJig(
                 axis,
                 blockReference,
-                new Point3d(0, -1, 0),
-                Language.GetItem(Invariables.LangItem, "msg2"));
+                new Point3d(0, -1, 0));
             do
             {
-                var status = AcadHelpers.Editor.Drag(entityJig).Status;
+                var status = AcadUtils.Editor.Drag(entityJig).Status;
                 if (status == PromptStatus.OK)
                 {
                     if (entityJig.JigState == JigState.PromptInsertPoint)
@@ -138,9 +142,9 @@
                 }
                 else
                 {
-                    using (AcadHelpers.Document.LockDocument())
+                    using (AcadUtils.Document.LockDocument())
                     {
-                        using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                        using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                         {
                             var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                             obj.Erase(true);
@@ -150,11 +154,12 @@
 
                     break;
                 }
-            } while (true);
+            }
+            while (true);
 
             if (!axis.BlockId.IsErased)
             {
-                using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                 {
                     var ent = tr.GetObject(axis.BlockId, OpenMode.ForWrite, true, true);
                     ent.XData = axis.GetDataForXData();
@@ -166,15 +171,15 @@
         /// <summary>
         /// Поиск последних цифровых и буквенных значений осей на текущем виде
         /// </summary>
-        /// <param name="axisLastHorizontalValue"></param>
-        /// <param name="axisLastVerticalValue"></param>
+        /// <param name="axisLastHorizontalValue">Последнее значение для горизонтальной оси</param>
+        /// <param name="axisLastVerticalValue">Последнее значение для вертикальной оси</param>
         private static void FindLastAxisValues(ref string axisLastHorizontalValue, ref string axisLastVerticalValue)
         {
             if (MainSettings.Instance.AxisSaveLastTextAndContinueNew)
             {
-                List<int> allIntegerValues = new List<int>();
-                List<string> allLetterValues = new List<string>();
-                AcadHelpers.GetAllIntellectualEntitiesInCurrentSpace<Axis>(typeof(Axis)).ForEach(a =>
+                var allIntegerValues = new List<int>();
+                var allLetterValues = new List<string>();
+                AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<Axis>(typeof(Axis)).ForEach(a =>
                 {
                     var s = a.FirstText;
                     if (int.TryParse(s, out var i))
@@ -198,78 +203,6 @@
                     axisLastHorizontalValue = allLetterValues.Last();
                 }
             }
-        }
-
-        public static void DoubleClickEdit(BlockReference blockReference, Point3d location, Transaction tr)
-        {
-            BeditCommandWatcher.UseBedit = false;
-            var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(blockReference);
-            axis.UpdateEntities();
-            bool saveBack = false;
-            if (MainSettings.Instance.AxisUsePluginTextEditor)
-            {
-                AxisValueEditor axisValueEditor = new AxisValueEditor { Axis = axis };
-                if (axisValueEditor.ShowDialog() == true)
-                {
-                    saveBack = true;
-                }
-            }
-            else
-            {
-                MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg4"));
-
-                // var v = axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform);
-                // AcadHelpers.WriteMessageInDebug("\nLocation:");
-
-                //// точка двойного клика:
-                // AcadHelpers.WriteMessageInDebug("\nStandard: " + location); 
-                ////AcadHelpers.WriteMessageInDebug("\nTransform: " + location.TransformBy(axis.BlockTransform));
-                ////AcadHelpers.WriteMessageInDebug("\nTransform inverse: " + location.TransformBy(axis.BlockTransform.Inverse()));
-                // AcadHelpers.WriteMessageInDebug("\nTexr point:");
-                // AcadHelpers.WriteMessageInDebug("\nStandard:" + axis.BottomFirstDBText.Position);
-
-                //// точка текста, трансформируемая в координаты блока
-                // AcadHelpers.WriteMessageInDebug("\nTransform:" + axis.BottomFirstDBText.Position.TransformBy(axis.BlockTransform));
-                ////AcadHelpers.WriteMessageInDebug("\n" + (v - location).Length.ToString(CultureInfo.InvariantCulture));
-
-                // var displMat = Matrix3d.Displacement(blockReference.Position - Point3d.Origin);
-                // var btr = (BlockTableRecord)tr.GetObject(blockReference.BlockTableRecord, OpenMode.ForWrite);
-                // foreach (ObjectId objectId in btr)
-                // {
-                //    var ent = tr.GetObject(objectId, OpenMode.ForWrite);
-                //    if (ent is DBText text && text.Visible)
-                //    {
-                //        AcadHelpers.WriteMessageInDebug("text position: " + text.Position);
-                //        //var text = axis.BottomFirstDBText;
-                //        text.Visible = false;
-                //        blockReference.RecordGraphicsModified(true);
-                //        AcadHelpers.Document.TransactionManager.FlushGraphics();
-                //        text.TransformBy(displMat);
-                //        ObjectId[] ids = new ObjectId[0];
-                //        InplaceTextEditor.Invoke(text, ref ids);
-                //        if (text.IsModified)
-                //        {
-                //            // 
-                //        }
-                //        text.TransformBy(displMat.Inverse());
-                //        text.Visible = true;
-                //        blockReference.RecordGraphicsModified(true);
-                //        AcadHelpers.Document.TransactionManager.FlushGraphics();
-                //    }
-                // }
-            }
-
-            if (saveBack)
-            {
-                axis.UpdateEntities();
-                axis.BlockRecord.UpdateAnonymousBlocks();
-                using (var resBuf = axis.GetDataForXData())
-                {
-                    blockReference.XData = resBuf;
-                }
-            }
-
-            axis.Dispose();
         }
     }
 }

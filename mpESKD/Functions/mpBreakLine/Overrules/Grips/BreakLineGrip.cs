@@ -4,28 +4,40 @@
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Helpers;
+    using Base.Enums;
     using Base.Overrules;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
 
-    /// <summary>Описание ручки линии обрыва</summary>
-    public class BreakLineGrip : IntellectualEntityGripData // <-- Там будут определены типы точек и их ViewportDraw в зависимости от типа. Пока ничего этого нет
+    /// <summary>
+    /// Описание ручки линии обрыва
+    /// </summary>
+    public class BreakLineGrip : IntellectualEntityGripData
     {
-        public BreakLineGrip()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BreakLineGrip"/> class.
+        /// </summary>
+        /// <param name="breakLine">Экземпляр класса <see cref="mpBreakLine.BreakLine"/>, связанный с этой ручкой</param>
+        /// <param name="gripName">Имя ручки</param>
+        public BreakLineGrip(BreakLine breakLine, BreakLineGripName gripName)
         {
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
+            BreakLine = breakLine;
+            GripName = gripName;
+            GripType = GripType.Point;
         }
 
-        // Экземпляр класса breakLine, связанный с этой ручкой
-        public BreakLine BreakLine { get; set; }
+        /// <summary>
+        /// Экземпляр класса <see cref="mpBreakLine.BreakLine"/>, связанный с этой ручкой
+        /// </summary>
+        public BreakLine BreakLine { get; }
 
-        // Имя ручки
-        public BreakLineGripName GripName { get; set; }
+        /// <summary>
+        /// Имя ручки
+        /// </summary>
+        public BreakLineGripName GripName { get; }
 
-        // Подсказка в зависимости от имени ручки
+        /// <inheritdoc />
         public override string GetTooltip()
         {
             switch (GripName)
@@ -48,7 +60,7 @@
         // временное значение последней ручки
         private Point3d _endGripTmp;
 
-        // Обработка изменения статуса ручки
+        /// <inheritdoc />
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
             try
@@ -75,10 +87,10 @@
                 }
 
                 // При удачном перемещении ручки записываем новые значения в расширенные данные
-                // По этим данным я потом получаю экземпляр класса breakline
+                // По этим данным я потом получаю экземпляр класса BreakLine
                 if (newStatus == Status.GripEnd)
                 {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(BreakLine.BlockId, OpenMode.ForWrite, true, true);
                         using (var resBuf = BreakLine.GetDataForXData())

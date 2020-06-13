@@ -1,23 +1,24 @@
 ﻿namespace mpESKD.Functions.mpBreakLine
 {
-    using Autodesk.AutoCAD.Runtime;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Overrules;
-    using Base.Helpers;
     using Base.Styles;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Overrules;
 
+    /// <inheritdoc />
     public class BreakLineFunction : IIntellectualEntityFunction
     {
         /// <inheritdoc />
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance(), true);
         }
@@ -25,7 +26,7 @@
         /// <inheritdoc />
         public void Terminate()
         {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointsOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance());
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance());
         }
@@ -33,8 +34,9 @@
         /// <inheritdoc />
         public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
-            // send statistic
+#if !DEBUG
             Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+#endif
             try
             {
                 Overrule.Overruling = false;
@@ -42,7 +44,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(BreakLineDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(BreakLineDescriptor.Instance.Name);
 
                 var breakLine = new BreakLine();
                 var blockReference = MainFunction.CreateBlock(breakLine);
@@ -90,7 +92,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(BreakLineDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(BreakLineDescriptor.Instance.Name);
                 var style = StyleManager.GetCurrentStyle(typeof(BreakLine));
                 var breakLine = new BreakLine();
 
@@ -115,11 +117,10 @@
             var entityJig = new DefaultEntityJig(
                 breakLine,
                 blockReference,
-                new Point3d(15, 0, 0),
-                Language.GetItem(Invariables.LangItem, "msg2"));
+                new Point3d(15, 0, 0));
             do
             {
-                var status = AcadHelpers.Editor.Drag(entityJig).Status;
+                var status = AcadUtils.Editor.Drag(entityJig).Status;
                 if (status == PromptStatus.OK)
                 {
                     if (entityJig.JigState == JigState.PromptInsertPoint)
@@ -134,9 +135,9 @@
                 else
                 {
                     // mark to remove
-                    using (AcadHelpers.Document.LockDocument())
+                    using (AcadUtils.Document.LockDocument())
                     {
-                        using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                        using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                         {
                             var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                             obj.Erase(true);
@@ -146,11 +147,12 @@
 
                     break;
                 }
-            } while (true);
+            } 
+            while (true);
 
             if (!breakLine.BlockId.IsErased)
             {
-                using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                 {
                     var ent = tr.GetObject(breakLine.BlockId, OpenMode.ForWrite, true, true);
                     ent.XData = breakLine.GetDataForXData();

@@ -1,32 +1,33 @@
-﻿// ReSharper disable InconsistentNaming
-
-#pragma warning disable CS0618
-
+﻿// ReSharper disable RedundantNameQualifier
 namespace mpESKD.Base
 {
-    using Autodesk.AutoCAD.DatabaseServices;
-    using Autodesk.AutoCAD.Colors;
-    using Autodesk.AutoCAD.Geometry;
-    using Attributes;
-    using Enums;
-    using Helpers;
-    using JetBrains.Annotations;
-    using ModPlusAPI.FunctionDataHelpers.mpESKD;
-    using ModPlusAPI.Windows;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
-    using Styles;
     using System.Reflection;
     using System.Runtime.Serialization;
     using System.Runtime.Serialization.Formatters.Binary;
+    using Autodesk.AutoCAD.Colors;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using JetBrains.Annotations;
+    using ModPlusAPI.FunctionDataHelpers.mpESKD;
+    using ModPlusAPI.Windows;
+    using mpESKD.Base.Attributes;
+    using mpESKD.Base.Enums;
+    using mpESKD.Base.Styles;
+    using Utils;
 
     /// <summary>
     /// Абстрактный класс интеллектуального примитива
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "<Ожидание>")]
     public abstract class IntellectualEntity : IDisposable
     {
+        private BlockTableRecord _blockRecord;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="IntellectualEntity"/> class.
         /// </summary>
@@ -41,9 +42,11 @@ namespace mpESKD.Base
             BlockRecord = blockTableRecord;
         }
 
-        /// <summary>Инициализация экземпляра класса IntellectualEntity без заполнения данными
-        /// В данном случае уже все данные получены и нужно только "построить" 
-        /// базовые примитивы</summary>
+        /// <summary>
+        /// Инициализация экземпляра класса IntellectualEntity без заполнения данными
+        /// В данном случае уже все данные получены и нужно только "построить" базовые примитивы
+        /// </summary>
+        /// <param name="blockId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
         protected IntellectualEntity(ObjectId blockId)
         {
             BlockId = blockId;
@@ -67,7 +70,7 @@ namespace mpESKD.Base
         /// если не требуется, то просто не использовать её
         /// </summary>
         [SaveToXData]
-        public Point3d EndPoint { get; set; } = Point3d.Origin;
+        public virtual Point3d EndPoint { get; set; } = Point3d.Origin;
 
         /// <summary>
         /// Конечная точка примитива в системе координат блока для работы с геометрией в
@@ -75,6 +78,11 @@ namespace mpESKD.Base
         /// если не требуется, то просто не использовать её
         /// </summary>
         public Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
+
+        /// <summary>
+        /// Минимальное расстояние между точками (обычно начальной и конечной точкой)
+        /// </summary>
+        public abstract double MinDistanceBetweenPoints { get; }
 
         /// <summary>
         /// Коллекция примитивов, создающих графическое представление интеллектуального примитива
@@ -85,33 +93,40 @@ namespace mpESKD.Base
         /// <summary>
         /// Коллекция примитивов, которая передается в BlockReference
         /// </summary>
-        private IEnumerable<Entity> _entities
+        private IEnumerable<Entity> _entitiesToBeDrawn
         {
             get { return Entities.Where(e => e != null); }
         }
 
+        /// <summary>
+        /// Is value created
+        /// </summary>
         public bool IsValueCreated { get; set; }
 
-        /// <summary>Матрица трансформации BlockReference</summary>
+        /// <summary>
+        /// Матрица трансформации BlockReference
+        /// </summary>
         public Matrix3d BlockTransform { get; set; }
 
         /// <summary>
         /// Стиль примитива. Свойство используется для работы палитры, а стиль задается через свойство <see cref="StyleGuid"/>
         /// </summary>
-        [EntityProperty(PropertiesCategory.General, 1, "h50", "h52", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.General, 1, "h50", "", propertyScope: PropertyScope.Palette, descLocalKey: "h52")]
         public string Style { get; set; } = string.Empty;
 
         /// <summary>
         /// Имя слоя
         /// </summary>
-        [EntityProperty(PropertiesCategory.General, 2, "p7", "d7", "", null, null)]
+        [EntityProperty(PropertiesCategory.General, 2, "p7", "", descLocalKey: "d7")]
         [SaveToXData]
         public string LayerName { get; set; } = string.Empty;
 
         private AnnotationScale _scale;
 
-        /// <summary>Масштаб примитива</summary>
-        [EntityProperty(PropertiesCategory.General, 3, "p5", "d5", "1:1", null, null)]
+        /// <summary>
+        /// Масштаб примитива
+        /// </summary>
+        [EntityProperty(PropertiesCategory.General, 3, "p5", "1:1", descLocalKey: "d5")]
         [SaveToXData]
         public AnnotationScale Scale
         {
@@ -136,6 +151,11 @@ namespace mpESKD.Base
             }
         }
 
+        /// <summary>
+        /// Метод обработки события изменения масштаба
+        /// </summary>
+        /// <param name="oldScale">Старый масштаб</param>
+        /// <param name="newScale">Новый масштаб</param>
         protected virtual void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
         {
         }
@@ -178,14 +198,21 @@ namespace mpESKD.Base
             return GetScale() * BlockTransform.GetScale();
         }
 
+        /// <summary>
+        /// Возвращает коллекцию точек, которые используются для привязки
+        /// </summary>
+        public abstract IEnumerable<Point3d> GetPointsForOsnap();
+
         #region Block
 
-        // ObjectId "примитива"
+        /// <summary>
+        /// Идентификатор (ObjectId) блока
+        /// </summary>
         public ObjectId BlockId { get; set; }
 
-        // Описание блока
-        private BlockTableRecord _blockRecord;
-
+        /// <summary>
+        /// Запись (описание) блока
+        /// </summary>
         public BlockTableRecord BlockRecord
         {
             get
@@ -194,9 +221,9 @@ namespace mpESKD.Base
                 {
                     if (!BlockId.IsNull)
                     {
-                        using (AcadHelpers.Document.LockDocument())
+                        using (AcadUtils.Document.LockDocument())
                         {
-                            using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                            using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                             {
                                 var blkRef = (BlockReference)tr.GetObject(BlockId, OpenMode.ForWrite, true, true);
                                 _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite, true, true);
@@ -211,7 +238,7 @@ namespace mpESKD.Base
                                 else
                                 {
                                     _blockRecord = new BlockTableRecord { Name = "*U", BlockScaling = BlockScaling.Uniform };
-                                    using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
+                                    using (var blockTable = AcadUtils.Database.BlockTableId.Write<BlockTable>())
                                     {
                                         // Debug.Print("Creating new (no erasing)");
                                         blockTable.Add(_blockRecord);
@@ -224,7 +251,7 @@ namespace mpESKD.Base
                                 tr.Commit();
                             }
 
-                            using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                            using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                             {
                                 var blkRef = (BlockReference)tr.GetObject(BlockId, OpenMode.ForWrite, true, true);
                                 _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite, true, true);
@@ -233,7 +260,7 @@ namespace mpESKD.Base
                                 var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
 
                                 // Debug.Print("Transformed copy");
-                                foreach (var entity in _entities)
+                                foreach (var entity in _entitiesToBeDrawn)
                                 {
                                     if (entity.Visible)
                                     {
@@ -246,14 +273,14 @@ namespace mpESKD.Base
                                 tr.Commit();
                             }
 
-                            AcadHelpers.Document.TransactionManager.FlushGraphics();
+                            AcadUtils.Document.TransactionManager.FlushGraphics();
                         }
                     }
                     else if (!IsValueCreated)
                     {
                         // Debug.Print("Value not created");
                         var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
-                        foreach (var entity in _entities)
+                        foreach (var entity in _entitiesToBeDrawn)
                         {
                             var transformedCopy = entity.GetTransformedCopy(matrix3D);
                             _blockRecord.AppendEntity(transformedCopy);
@@ -272,30 +299,34 @@ namespace mpESKD.Base
             set => _blockRecord = value;
         }
 
-        public BlockTableRecord GetBlockTableRecordForUndo(BlockReference blkRef)
+        /// <summary>
+        /// Возвращает <see cref="BlockTableRecord"/> для обработки команды Undo
+        /// </summary>
+        /// <param name="blockReference"><see cref="BlockReference"/></param>
+        public BlockTableRecord GetBlockTableRecordForUndo(BlockReference blockReference)
         {
             BlockTableRecord blockTableRecord;
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
-                using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                 {
                     blockTableRecord = new BlockTableRecord { Name = "*U", BlockScaling = BlockScaling.Uniform };
-                    using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
+                    using (var blockTable = AcadUtils.Database.BlockTableId.Write<BlockTable>())
                     {
                         blockTable.Add(blockTableRecord);
                         tr.AddNewlyCreatedDBObject(blockTableRecord, true);
                     }
 
-                    blkRef.BlockTableRecord = blockTableRecord.Id;
+                    blockReference.BlockTableRecord = blockTableRecord.Id;
                     tr.Commit();
                 }
 
-                using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    blockTableRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite, true, true);
+                    blockTableRecord = (BlockTableRecord)tr.GetObject(blockReference.BlockTableRecord, OpenMode.ForWrite, true, true);
                     blockTableRecord.BlockScaling = BlockScaling.Uniform;
                     var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
-                    foreach (var entity in _entities)
+                    foreach (var entity in _entitiesToBeDrawn)
                     {
                         var transformedCopy = entity.GetTransformedCopy(matrix3D);
                         blockTableRecord.AppendEntity(transformedCopy);
@@ -310,16 +341,21 @@ namespace mpESKD.Base
             return blockTableRecord;
         }
 
-        public BlockTableRecord GetBlockTableRecordWithoutTransaction(BlockReference blkRef)
+#pragma warning disable CS0618 // Тип или член устарел
+        /// <summary>
+        /// Возвращает описание блока с открытием без использования транзакции
+        /// </summary>
+        /// <param name="blockReference">Вхождение блока</param>
+        public BlockTableRecord GetBlockTableRecordWithoutTransaction(BlockReference blockReference)
         {
             BlockTableRecord blockTableRecord;
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
-                using (blockTableRecord = blkRef.BlockTableRecord.Open(OpenMode.ForWrite) as BlockTableRecord)
+                using (blockTableRecord = blockReference.BlockTableRecord.Open(OpenMode.ForWrite) as BlockTableRecord)
                 {
                     if (blockTableRecord != null)
                     {
-                        foreach (ObjectId objectId in blockTableRecord)
+                        foreach (var objectId in blockTableRecord)
                         {
                             using (var ent = objectId.Open(OpenMode.ForWrite))
                             {
@@ -327,7 +363,7 @@ namespace mpESKD.Base
                             }
                         }
 
-                        foreach (Entity entity in _entities)
+                        foreach (var entity in _entitiesToBeDrawn)
                         {
                             using (entity)
                             {
@@ -341,11 +377,15 @@ namespace mpESKD.Base
             _blockRecord = blockTableRecord;
             return blockTableRecord;
         }
+#pragma warning restore CS0618 // Тип или член устарел
 
         #endregion
 
-        /// <summary>Получение свойств блока, которые присуще примитиву</summary>
-        public void GetPropertiesFromCadEntity(Entity entity)
+        /// <summary>
+        /// Получение свойств блока, которые присуще примитиву
+        /// </summary>
+        /// <param name="entity">Объект <see cref="DBObject"/></param>
+        public void GetPropertiesFromCadEntity(DBObject entity)
         {
             var blockReference = (BlockReference)entity;
             if (blockReference != null)
@@ -355,7 +395,9 @@ namespace mpESKD.Base
             }
         }
 
-        /// <summary>Идентификатор стиля</summary>
+        /// <summary>
+        /// Идентификатор стиля
+        /// </summary>
         [SaveToXData]
         public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
 
@@ -383,8 +425,8 @@ namespace mpESKD.Base
                 // 1001 - DxfCode.ExtendedDataRegAppName. AppName
                 resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataRegAppName, appName));
 
-                Dictionary<string, object> propertiesDataDictionary = new Dictionary<string, object>();
-                foreach (PropertyInfo propertyInfo in GetType().GetProperties())
+                var propertiesDataDictionary = new Dictionary<string, object>();
+                foreach (var propertyInfo in GetType().GetProperties())
                 {
                     var attribute = propertyInfo.GetCustomAttribute<SaveToXDataAttribute>();
                     if (attribute != null)
@@ -421,18 +463,18 @@ namespace mpESKD.Base
                  * данных вынесен в ModPlusAPI, которая имеет всегда одинаковое имя и версию
                  */
 
-                DataHolder dataHolder = new DataHolder(propertiesDataDictionary);
+                var dataHolder = new DataHolder(propertiesDataDictionary);
                 var binaryFormatter = new BinaryFormatter();
-                using (MemoryStream ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     binaryFormatter.Serialize(ms, dataHolder);
                     ms.Position = 0;
-                    AcadHelpers.WriteMessageInDebug($"MemoryStream Length: {ms.Length} bytes or {ms.Length / 1024} KB");
-                    int kMaxChunkSize = 127;
-                    for (int i = 0; i < ms.Length; i += kMaxChunkSize)
+                    AcadUtils.WriteMessageInDebug($"MemoryStream Length: {ms.Length} bytes or {ms.Length / 1024} KB");
+                    var kMaxChunkSize = 127;
+                    for (var i = 0; i < ms.Length; i += kMaxChunkSize)
                     {
                         var length = (int)Math.Min(ms.Length - i, kMaxChunkSize);
-                        byte[] dataChunk = new byte[length];
+                        var dataChunk = new byte[length];
                         ms.Read(dataChunk, 0, length);
                         resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataBinaryChunk, dataChunk));
                     }
@@ -450,13 +492,13 @@ namespace mpESKD.Base
         /// <summary>
         /// Установка значений свойств, отмеченных атрибутом <see cref="SaveToXDataAttribute"/> из расширенных данных примитива AutoCAD
         /// </summary>
-        /// <param name="resultBuffer"></param>
-        /// <param name="skipPoints"></param>
+        /// <param name="resultBuffer"><see cref="ResultBuffer"/></param>
+        /// <param name="skipPoints">Пропускать ли точки</param>
         public void SetPropertiesValuesFromXData(ResultBuffer resultBuffer, bool skipPoints = false)
         {
             try
             {
-                TypedValue typedValue1001 = resultBuffer.AsArray().FirstOrDefault(tv =>
+                var typedValue1001 = resultBuffer.AsArray().FirstOrDefault(tv =>
                     tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
                 if (typedValue1001.Value != null)
                 {
@@ -483,7 +525,7 @@ namespace mpESKD.Base
         {
             var memoryStream = new MemoryStream();
 
-            foreach (TypedValue typedValue in resultBuffer.AsArray()
+            foreach (var typedValue in resultBuffer.AsArray()
                 .Where(tv => tv.TypeCode == (int)DxfCode.ExtendedDataBinaryChunk))
             {
                 var dataChunk = (byte[])typedValue.Value;
@@ -499,38 +541,54 @@ namespace mpESKD.Base
         /// Запись свойств текущего экземпляра интеллектуального объекта, полученных из расширенных
         /// данных блока в виде словаря
         /// </summary>
-        /// <param name="skipPoints"></param>
-        /// <param name="data"></param>
+        /// <param name="skipPoints">Пропускать ли точки</param>
+        /// <param name="data">Словарь данных</param>
         private void WritePropertiesFromReadedData(bool skipPoints, Dictionary<string, object> data)
         {
-            foreach (PropertyInfo propertyInfo in GetType().GetProperties())
+            /*
+             * Сначала нужно установить свойство LineTypeScale
+             * Затем нужно заполнить свойство Scale, так как масштаб может использоваться в сеттерах
+             * многих свойств. А если он еще не установлен из словаря data, то будет браться по умолчанию 1:1
+             * И только потом можно устанавливать прочие свойства
+             */
+
+            var properties = GetType().GetProperties();
+
+            var property = properties.FirstOrDefault(p => p.Name == nameof(LineTypeScale));
+            if (property != null && data.TryGetValue(nameof(LineTypeScale), out var dataValue))
+            {
+                property.SetValue(this, dataValue);
+                data.Remove(nameof(LineTypeScale));
+            }
+            
+            property = properties.FirstOrDefault(p => p.Name == nameof(Scale));
+            if (property != null && data.TryGetValue(nameof(Scale), out dataValue))
+            {
+                Scale = AcadUtils.GetAnnotationScaleByName(dataValue?.ToString() ?? string.Empty);
+                data.Remove(nameof(Scale));
+            }
+
+            foreach (var propertyInfo in properties)
             {
                 var attribute = propertyInfo.GetCustomAttribute<SaveToXDataAttribute>();
                 if (attribute != null && data.ContainsKey(propertyInfo.Name))
                 {
-                    string valueForProperty = data[propertyInfo.Name] != null
+                    var valueForProperty = data[propertyInfo.Name] != null
                         ? data[propertyInfo.Name].ToString()
                         : string.Empty;
+                    
                     if (string.IsNullOrEmpty(valueForProperty))
-                    {
                         continue;
-                    }
 
                     if (propertyInfo.Name == nameof(StyleGuid))
                     {
                         StyleGuid = valueForProperty;
                         Style = StyleManager.GetStyleNameByGuid(GetType(), valueForProperty);
                     }
-                    else if (propertyInfo.Name == nameof(Scale))
-                    {
-                        Scale = AcadHelpers.GetAnnotationScaleByName(valueForProperty);
-                    }
                     else if (propertyInfo.PropertyType == typeof(Point3d))
                     {
                         if (skipPoints)
-                        {
                             continue;
-                        }
 
                         var vector = valueForProperty.ParseToPoint3d().GetAsVector();
                         var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
@@ -539,12 +597,10 @@ namespace mpESKD.Base
                     else if (propertyInfo.PropertyType == typeof(List<Point3d>))
                     {
                         if (skipPoints)
-                        {
                             continue;
-                        }
 
-                        List<Point3d> points = new List<Point3d>();
-                        foreach (string s in valueForProperty.Split('#'))
+                        var points = new List<Point3d>();
+                        foreach (var s in valueForProperty.Split('#'))
                         {
                             var vector = s.ParseToPoint3d().GetAsVector();
                             var point = (InsertionPointOCS + vector).TransformBy(BlockTransform);
@@ -581,16 +637,18 @@ namespace mpESKD.Base
         /// Копирование свойств, отмеченных атрибутом <see cref="SaveToXDataAttribute"/> из расширенных данных примитива AutoCAD
         /// в текущий интеллектуальный примитив
         /// </summary>
+        /// <param name="sourceEntity">Интеллектуальный объекта</param>
+        /// <param name="copyLayer">Копировать слой</param>
         public void SetPropertiesFromIntellectualEntity(IntellectualEntity sourceEntity, bool copyLayer)
         {
-            ResultBuffer dataForXData = sourceEntity.GetDataForXData();
+            var dataForXData = sourceEntity.GetDataForXData();
             if (dataForXData != null)
             {
                 SetPropertiesValuesFromXData(dataForXData, true);
 
                 if (sourceEntity.BlockId != ObjectId.Null)
                 {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var entity = tr.GetObject(sourceEntity.BlockId, OpenMode.ForRead) as Entity;
                         var destinationBlockReference = tr.GetObject(BlockId, OpenMode.ForWrite, true, true) as BlockReference;

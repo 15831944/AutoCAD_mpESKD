@@ -8,21 +8,30 @@ namespace mpESKD.Functions.mpBreakLine
     using Base;
     using Base.Attributes;
     using Base.Enums;
-    using Base.Helpers;
+    using Base.Utils;
     using ModPlusAPI.Windows;
 
+    /// <summary>
+    /// Линия обрыва
+    /// </summary>
     [IntellectualEntityDisplayNameKey("h48")]
     public class BreakLine : IntellectualEntity
     {
         #region Constructors
 
-        /// <inheritdoc />
-        public BreakLine(ObjectId blockId) : base(blockId)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BreakLine"/> class.
+        /// </summary>
+        public BreakLine()
         {
         }
 
-        /// <summary>Инициализация экземпляра класса BreakLine для создания</summary>
-        public BreakLine()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BreakLine"/> class.
+        /// </summary>
+        /// <param name="blockId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
+        public BreakLine(ObjectId blockId)
+            : base(blockId)
         {
         }
 
@@ -41,51 +50,46 @@ namespace mpESKD.Functions.mpBreakLine
         /// <inheritdoc />
         /// В примитиве не используется!
         public override string TextStyle { get; set; }
-
-        /// <summary>Минимальная длина линии обрыва от точки вставки до конечной точки</summary>
-        public double BreakLineMinLength
+        
+        /// <inheritdoc />
+        public override double MinDistanceBetweenPoints
         {
             get
             {
-                if (BreakLineType == BreakLineType.Linear)
+                switch (BreakLineType)
                 {
-                    return 15.0;
+                    case BreakLineType.Linear:
+                        return 15.0;
+                    case BreakLineType.Curvilinear:
+                    case BreakLineType.Cylindrical:
+                        return 1.0;
+                    default:
+                        return 15.0;
                 }
-
-                if (BreakLineType == BreakLineType.Curvilinear)
-                {
-                    return 1.0;
-                }
-
-                if (BreakLineType == BreakLineType.Cylindrical)
-                {
-                    return 1.0;
-                }
-
-                return 15.0;
             }
         }
 
-        /// <summary>Тип линии обрыва: линейный, криволинейный, цилиндрический</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "p1", "d1", BreakLineType.Linear, null, null)]
+        /// <summary>
+        /// Тип линии обрыва: линейный, криволинейный, цилиндрический
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p1", BreakLineType.Linear, descLocalKey: "d1")]
         [SaveToXData]
         public BreakLineType BreakLineType { get; set; } = BreakLineType.Linear;
 
-        /// <summary>Выступ линии обрыва за границы "обрываемого" объекта</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 2, "p2", "d2", 2, 0, 10)]
-        [PropertyNameKeyInStyleEditor("p2-1")]
+        /// <summary>
+        /// Выступ линии обрыва за границы "обрываемого" объекта
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p2", 2, 0, 10, descLocalKey: "d2", nameSymbol: "a")]
         [SaveToXData]
         public int Overhang { get; set; } = 2;
 
         /// <summary>Ширина Обрыва для линейного обрыва</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p3", "d3", 5, 1, 10)]
-        [PropertyNameKeyInStyleEditor("p3-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p3", 5, 1, 10, descLocalKey: "d3", nameSymbol: "w")]
         [SaveToXData]
         public int BreakWidth { get; set; } = 5;
 
         /// <summary>Длина обрыва для линейного обрыва</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, "p4", "d4", 10, 1, 13)]
-        [PropertyNameKeyInStyleEditor("p4-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p4", 10, 1, 13, descLocalKey: "d4", nameSymbol: "h")]
         [SaveToXData]
         public int BreakHeight { get; set; } = 10;
 
@@ -93,16 +97,12 @@ namespace mpESKD.Functions.mpBreakLine
 
         #region Geometry
 
-        #region Points
-
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
         public Point3d MiddlePoint => new Point3d(
             (InsertionPoint.X + EndPoint.X) / 2,
             (InsertionPoint.Y + EndPoint.Y) / 2,
             (InsertionPoint.Z + EndPoint.Z) / 2);
-
-        #endregion
-
+        
         /// <summary>
         /// Главная полилиния примитива
         /// </summary>
@@ -127,6 +127,13 @@ namespace mpESKD.Functions.mpBreakLine
         }
 
         /// <inheritdoc />
+        public override IEnumerable<Point3d> GetPointsForOsnap()
+        {
+            yield return InsertionPoint;
+            yield return EndPoint;
+        }
+
+        /// <inheritdoc />
         public override void UpdateEntities()
         {
             try
@@ -138,7 +145,7 @@ namespace mpESKD.Functions.mpBreakLine
                     // Задание точки вставки (т.е. второй точки еще нет)
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
-                else if (length < BreakLineMinLength * scale)
+                else if (length < MinDistanceBetweenPoints * scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
                     MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
@@ -168,17 +175,19 @@ namespace mpESKD.Functions.mpBreakLine
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                var tmpEndPoint = new Point3d(InsertionPointOCS.X + (BreakLineMinLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
+                var tmpEndPoint = new Point3d(
+                    InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
 
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
             }
-            else if (variant == UpdateVariant.SetEndPointMinLength) // изменение вершин полилинии
+            else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, BreakLineMinLength * scale);
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                    InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
@@ -188,12 +197,8 @@ namespace mpESKD.Functions.mpBreakLine
         /// <summary>
         /// Получение точек для построения базовой полилинии
         /// </summary>
-        /// <param name="scale">Масштабный коэффициент</param>
-        /// <param name="insertionPoint">Первая точка (точка вставки)</param>
-        /// <param name="endPoint">Вторая (конечная) точка</param>
-        /// <param name="bulges">Список выпуклостей</param>
-        /// <returns></returns>
-        private Point2dCollection PointsToCreatePolyline(double scale, Point3d insertionPoint, Point3d endPoint, out List<double> bulges)
+        private Point2dCollection PointsToCreatePolyline(
+            double scale, Point3d insertionPoint, Point3d endPoint, out List<double> bulges)
         {
             var length = endPoint.DistanceTo(insertionPoint);
             bulges = new List<double>();

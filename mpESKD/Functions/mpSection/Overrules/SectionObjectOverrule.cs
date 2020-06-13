@@ -4,13 +4,16 @@
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Helpers;
-    using ModPlusAPI.Windows;
+    using Base.Utils;
 
+    /// <inheritdoc />
     public class SectionObjectOverrule : ObjectOverrule
     {
         private static SectionObjectOverrule _instance;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         public static SectionObjectOverrule Instance()
         {
             if (_instance != null)
@@ -25,39 +28,23 @@
             return _instance;
         }
 
+        /// <inheritdoc />
         public override void Close(DBObject dbObject)
         {
             Debug.Print("SectionObjectOverrule");
             if (IsApplicable(dbObject))
             {
-                try
-                {
-                    if (AcadHelpers.Document != null)
-                    {
-                        if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
-                            dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
-                        {
-                            var axis = EntityReaderFactory.Instance.GetFromEntity<mpSection.Section>((Entity)dbObject);
-                            if (axis != null)
-                            {
-                                axis.UpdateEntities();
-                                axis.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
-                            }
-                        }
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ExceptionBox.Show(exception);
-                }
+                EntityUtils.ObjectOverruleProcess(
+                    dbObject, () => EntityReaderService.Instance.GetFromEntity<mpSection.Section>(dbObject));
             }
 
             base.Close(dbObject);
         }
 
+        /// <inheritdoc/>
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, SectionDescriptor.Instance.Name, true);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, SectionDescriptor.Instance.Name, true);
         }
     }
 }

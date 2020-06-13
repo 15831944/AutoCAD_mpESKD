@@ -1,41 +1,64 @@
-﻿// ReSharper disable InconsistentNaming
-namespace mpESKD.Base.Overrules
+﻿namespace mpESKD.Base.Overrules
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.GraphicsInterface;
     using Enums;
 
+    /// <inheritdoc />
     public abstract class IntellectualEntityGripData : GripData
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IntellectualEntityGripData"/> class.
+        /// </summary>
+        protected IntellectualEntityGripData()
+        {
+            // отключение контекстного меню и возможности менять команду
+            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
+            ModeKeywordsDisabled = true;
+        }
+
         /// <summary>
         /// Тип ручки примитива
         /// </summary>
         public GripType GripType { get; set; }
 
-        public override bool ViewportDraw(ViewportDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint,
-            int gripSizeInPixels)
+        /// <inheritdoc />
+        public override bool ViewportDraw(
+            ViewportDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint, int gripSizeInPixels)
         {
-            CoordinateSystem3d eCS = GetECS(entityId);
-            Point2d numPixelsInUnitSquare = worldDraw.Viewport.GetNumPixelsInUnitSquare(GripPoint);
-            double num = gripSizeInPixels / numPixelsInUnitSquare.X;
+            var ecs = GetECS(entityId);
+            var numPixelsInUnitSquare = worldDraw.Viewport.GetNumPixelsInUnitSquare(GripPoint);
+            var num = gripSizeInPixels / numPixelsInUnitSquare.X;
 
-            Point3dCollection point3dCollections = new Point3dCollection();
+            var point3dCollections = new Point3dCollection();
             switch (GripType)
             {
                 case GripType.Point:
-                    point3dCollections = PointsForSquareGrip(num, eCS);
+                    point3dCollections = PointsForSquareGrip(num, ecs);
                     break;
                 case GripType.Plus:
-                    point3dCollections = PointsForPlusGrip(num, eCS);
+                    point3dCollections = PointsForPlusGrip(num, ecs);
                     break;
                 case GripType.Minus:
-                    point3dCollections = PointsForMinusGrip(num, eCS);
+                    point3dCollections = PointsForMinusGrip(num, ecs);
+                    break;
+                case GripType.BasePoint:
+                    point3dCollections = PointsForSquareGrip(num, ecs);
                     break;
             }
 
-            short backupColor = worldDraw.SubEntityTraits.Color;
-            FillType backupFillType = worldDraw.SubEntityTraits.FillType;
+            var backupColor = worldDraw.SubEntityTraits.Color;
+            var backupFillType = worldDraw.SubEntityTraits.FillType;
+
+            // Дополнительный круг и отрезки для точки отсчета
+            if (GripType == GripType.BasePoint)
+            {
+                worldDraw.SubEntityTraits.Color = 110;
+                worldDraw.Geometry.WorldLine(GripPoint - (num * 3 * ecs.Xaxis), GripPoint + (num * 3 * ecs.Xaxis));
+                worldDraw.Geometry.WorldLine(GripPoint - (num * 3 * ecs.Yaxis), GripPoint + (num * 3 * ecs.Yaxis));
+                worldDraw.Geometry.Circle(GripPoint, num * 2, Vector3d.ZAxis);
+            }
 
             worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
             worldDraw.SubEntityTraits.Color = GetGripColor();
@@ -45,8 +68,8 @@ namespace mpESKD.Base.Overrules
             }
             else
             {
-                worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, eCS));
-                worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, eCS));
+                worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, ecs));
+                worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, ecs));
             }
 
             worldDraw.SubEntityTraits.FillType = FillType.FillNever;
@@ -59,10 +82,10 @@ namespace mpESKD.Base.Overrules
             }
             else
             {
-                worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, eCS));
-                worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, eCS));
+                worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, ecs));
+                worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, ecs));
             }
-
+            
             // restore
             worldDraw.SubEntityTraits.Color = backupColor;
             worldDraw.SubEntityTraits.FillType = backupFillType;
@@ -70,18 +93,19 @@ namespace mpESKD.Base.Overrules
             return true;
         }
 
-        protected CoordinateSystem3d GetECS(ObjectId entityId)
+        // ReSharper disable once InconsistentNaming
+        private static CoordinateSystem3d GetECS(ObjectId entityId)
         {
-            CoordinateSystem3d coordinateSystem3D = new CoordinateSystem3d(Point3d.Origin, Vector3d.XAxis, Vector3d.YAxis);
+            var coordinateSystem3D = new CoordinateSystem3d(Point3d.Origin, Vector3d.XAxis, Vector3d.YAxis);
             if (!entityId.IsNull)
             {
-                using (OpenCloseTransaction openCloseTransaction = new OpenCloseTransaction())
+                using (var openCloseTransaction = new OpenCloseTransaction())
                 {
-                    Entity obj = (Entity)openCloseTransaction.GetObject(entityId, OpenMode.ForRead);
+                    var obj = (Entity)openCloseTransaction.GetObject(entityId, OpenMode.ForRead);
                     if (obj != null)
                     {
-                        Plane plane = obj.GetPlane();
-                        Plane plane1 = new Plane(plane.PointOnPlane, plane.Normal);
+                        var plane = obj.GetPlane();
+                        var plane1 = new Plane(plane.PointOnPlane, plane.Normal);
                         coordinateSystem3D = plane1.GetCoordinateSystem();
                     }
 
@@ -92,79 +116,84 @@ namespace mpESKD.Base.Overrules
             return coordinateSystem3D;
         }
 
-        private Point3dCollection PointsForSquareGrip(double num, CoordinateSystem3d eCS)
+        private Point3dCollection PointsForSquareGrip(double num, CoordinateSystem3d ecs)
         {
-            Point3dCollection point3dCollections = new Point3dCollection();
-            point3dCollections.Add(GripPoint - (num * eCS.Xaxis) - (num * eCS.Yaxis));
-            point3dCollections.Add(GripPoint - (num * eCS.Xaxis) + (num * eCS.Yaxis));
-            point3dCollections.Add(GripPoint + (num * eCS.Xaxis) + (num * eCS.Yaxis));
-            point3dCollections.Add(GripPoint + (num * eCS.Xaxis) - (num * eCS.Yaxis));
-
-            return point3dCollections;
+            var horUnit = num * ecs.Xaxis;
+            var verUnit = num * ecs.Yaxis;
+            return new Point3dCollection
+            {
+                GripPoint - horUnit - verUnit,
+                GripPoint - horUnit + verUnit,
+                GripPoint + horUnit + verUnit,
+                GripPoint + horUnit - verUnit
+            };
         }
 
-        private Point3dCollection PointsForPlusGrip(double num, CoordinateSystem3d eCS)
+        private Point3dCollection PointsForPlusGrip(double num, CoordinateSystem3d ecs)
         {
             var num2 = num / 3;
-            Point3dCollection point3dCollection = new Point3dCollection();
-
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis) + (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint + (num2 * eCS.Xaxis) + (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint + (num2 * eCS.Xaxis) + (num * eCS.Yaxis));
-            point3dCollection.Add(GripPoint - (num2 * eCS.Xaxis) + (num * eCS.Yaxis));
-            point3dCollection.Add(GripPoint - (num2 * eCS.Xaxis) + (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis) + (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis) - (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint - (num2 * eCS.Xaxis) - (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint - (num2 * eCS.Xaxis) - (num * eCS.Yaxis));
-            point3dCollection.Add(GripPoint + (num2 * eCS.Xaxis) - (num * eCS.Yaxis));
-            point3dCollection.Add(GripPoint + (num2 * eCS.Xaxis) - (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis) - (num2 * eCS.Yaxis));
-
-            return point3dCollection;
+            var horUnit = num * ecs.Xaxis;
+            var verUnit = num * ecs.Yaxis;
+            return new Point3dCollection
+            {
+                GripPoint + horUnit + (num2 * ecs.Yaxis),
+                GripPoint + (num2 * ecs.Xaxis) + (num2 * ecs.Yaxis),
+                GripPoint + (num2 * ecs.Xaxis) + verUnit,
+                GripPoint - (num2 * ecs.Xaxis) + verUnit,
+                GripPoint - (num2 * ecs.Xaxis) + (num2 * ecs.Yaxis),
+                GripPoint - horUnit + (num2 * ecs.Yaxis),
+                GripPoint - horUnit - (num2 * ecs.Yaxis),
+                GripPoint - (num2 * ecs.Xaxis) - (num2 * ecs.Yaxis),
+                GripPoint - (num2 * ecs.Xaxis) - verUnit,
+                GripPoint + (num2 * ecs.Xaxis) - verUnit,
+                GripPoint + (num2 * ecs.Xaxis) - (num2 * ecs.Yaxis),
+                GripPoint + horUnit - (num2 * ecs.Yaxis)
+            };
         }
 
-        private Point3dCollection PointsForMinusGrip(double num, CoordinateSystem3d eCS)
+        private Point3dCollection PointsForMinusGrip(double num, CoordinateSystem3d ecs)
         {
             var num2 = num / 3;
-            Point3dCollection point3dCollection = new Point3dCollection();
-
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis) + (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis) + (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis) - (num2 * eCS.Yaxis));
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis) - (num2 * eCS.Yaxis));
-
-            return point3dCollection;
+            var horUnit = num * ecs.Xaxis;
+            return new Point3dCollection
+            {
+                GripPoint - horUnit + (num2 * ecs.Yaxis),
+                GripPoint + horUnit + (num2 * ecs.Yaxis),
+                GripPoint + horUnit - (num2 * ecs.Yaxis),
+                GripPoint - horUnit - (num2 * ecs.Yaxis)
+            };
         }
 
-        private Point3dCollection PointsForReverseGripFirstArrow(double num, CoordinateSystem3d eCS)
+        private Point3dCollection PointsForReverseGripFirstArrow(double num, CoordinateSystem3d ecs)
         {
-            Point3dCollection point3dCollection = new Point3dCollection();
-
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 0.0) - (num * eCS.Yaxis * 0.25));
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 0.75) + (num * eCS.Yaxis * 1.25));
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 1.5) - (num * eCS.Yaxis * 0.25));
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 1.0) - (num * eCS.Yaxis * 0.25));
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 1.0) - (num * eCS.Yaxis * 1.25));
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 0.5) - (num * eCS.Yaxis * 1.25));
-            point3dCollection.Add(GripPoint - (num * eCS.Xaxis * 0.5) - (num * eCS.Yaxis * 0.25));
-
-            return point3dCollection;
+            var horUnit = num * ecs.Xaxis;
+            var verUnit = num * ecs.Yaxis;
+            return new Point3dCollection
+            {
+                GripPoint - (verUnit * 0.25),
+                GripPoint - (horUnit * 0.75) + (verUnit * 1.25),
+                GripPoint - (horUnit * 1.5) - (verUnit * 0.25),
+                GripPoint - (horUnit * 1.0) - (verUnit * 0.25),
+                GripPoint - (horUnit * 1.0) - (verUnit * 1.25),
+                GripPoint - (horUnit * 0.5) - (verUnit * 1.25),
+                GripPoint - (horUnit * 0.5) - (verUnit * 0.25)
+            };
         }
 
-        private Point3dCollection PointsForReverseGripSecondArrow(double num, CoordinateSystem3d eCS)
+        private Point3dCollection PointsForReverseGripSecondArrow(double num, CoordinateSystem3d ecs)
         {
-            Point3dCollection point3dCollection = new Point3dCollection();
-
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 0.0) + (num * eCS.Yaxis * 0.25));
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 0.75) - (num * eCS.Yaxis * 1.25));
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 1.5) + (num * eCS.Yaxis * 0.25));
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 1.0) + (num * eCS.Yaxis * 0.25));
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 1.0) + (num * eCS.Yaxis * 1.25));
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 0.5) + (num * eCS.Yaxis * 1.25));
-            point3dCollection.Add(GripPoint + (num * eCS.Xaxis * 0.5) + (num * eCS.Yaxis * 0.25));
-
-            return point3dCollection;
+            var horUnit = num * ecs.Xaxis;
+            var verUnit = num * ecs.Yaxis;
+            return new Point3dCollection
+            {
+                GripPoint + (verUnit * 0.25),
+                GripPoint + (horUnit * 0.75) - (verUnit * 1.25),
+                GripPoint + (horUnit * 1.5) + (verUnit * 0.25),
+                GripPoint + (horUnit * 1.0) + (verUnit * 0.25),
+                GripPoint + (horUnit * 1.0) + (verUnit * 1.25),
+                GripPoint + (horUnit * 0.5) + (verUnit * 1.25),
+                GripPoint + (horUnit * 0.5) + (verUnit * 0.25)
+            };
         }
 
         private short GetGripColor()

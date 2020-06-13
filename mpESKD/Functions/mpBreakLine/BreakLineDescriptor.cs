@@ -4,6 +4,7 @@
     using Base;
     using ModPlusAPI;
 
+    /// <inheritdoc />
     public class BreakLineDescriptor : IIntellectualEntityDescriptor
     {
         private static BreakLineDescriptor _instance;
@@ -18,7 +19,7 @@
         public string LName => Language.GetItem(Invariables.LangItem, "h48");
 
         /// <inheritdoc />
-        // "Отрисовка линии обрыва по ГОСТ 2.303-68"
+        // "Создание линии обрыва по ГОСТ 2.303-68"
         public string Description => Language.GetItem(Invariables.LangItem, "h56");
 
         /// <inheritdoc />
@@ -31,7 +32,8 @@
         /// <inheritdoc />
         public List<string> SubFunctionsNames => new List<string>
         {
-            "mpBreakLineCurve", "mpBreakLineCylinder"
+            "mpBreakLineCurve", 
+            "mpBreakLineCylinder"
         };
 
         /// <inheritdoc />
@@ -47,10 +49,10 @@
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
-            // "Отрисовка криволинейного обрыва"
+            // "Создание криволинейного обрыва"
             Language.GetItem(Invariables.LangItem, "h60"),
 
-            // "Отрисовка цилиндрического обрыва"
+            // "Создание цилиндрического обрыва"
             Language.GetItem(Invariables.LangItem, "h61")
         };
 

@@ -1,28 +1,37 @@
 ﻿namespace mpESKD.Functions.mpAxis
 {
     using System.Windows;
-    using System.Windows.Input;
     using Base;
     using Base.Enums;
 
+    /// <summary>
+    /// Редактор значений прямой оси
+    /// </summary>
     public partial class AxisValueEditor
     {
-        public Axis Axis;
+        private readonly Axis _intellectualEntity;
 
-        public AxisValueEditor()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AxisValueEditor"/> class.
+        /// </summary>
+        /// <param name="intellectualEntity">Редактируемый экземпляр интеллектуального объекта</param>
+        public AxisValueEditor(IntellectualEntity intellectualEntity)
         {
+            _intellectualEntity = (Axis)intellectualEntity;
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h67");
+            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h41");
+
+            SetValues();
         }
 
-        private void AxisValueEditor_OnLoaded(object sender, RoutedEventArgs e)
+        private void SetValues()
         {
             // visibility
             ChangeOrientVisibility();
-            if (Axis.MarkersCount > 1)
+            if (_intellectualEntity.MarkersCount > 1)
             {
                 ChangeSecondVisibility(true);
-                ChangeThirdVisibility(Axis.MarkersCount > 2);
+                ChangeThirdVisibility(_intellectualEntity.MarkersCount > 2);
             }
             else
             {
@@ -31,23 +40,23 @@
             }
 
             // values
-            TbFirstPrefix.Text = Axis.FirstTextPrefix;
-            TbFirstText.Text = Axis.FirstText;
-            TbFirstSuffix.Text = Axis.FirstTextSuffix;
+            TbFirstPrefix.Text = _intellectualEntity.FirstTextPrefix;
+            TbFirstText.Text = _intellectualEntity.FirstText;
+            TbFirstSuffix.Text = _intellectualEntity.FirstTextSuffix;
 
-            TbSecondPrefix.Text = Axis.SecondTextPrefix;
-            TbSecondText.Text = Axis.SecondText;
-            TbSecondSuffix.Text = Axis.SecondTextSuffix;
+            TbSecondPrefix.Text = _intellectualEntity.SecondTextPrefix;
+            TbSecondText.Text = _intellectualEntity.SecondText;
+            TbSecondSuffix.Text = _intellectualEntity.SecondTextSuffix;
 
-            TbThirdPrefix.Text = Axis.ThirdTextPrefix;
-            TbThirdText.Text = Axis.ThirdText;
-            TbThirdSuffix.Text = Axis.ThirdTextSuffix;
+            TbThirdPrefix.Text = _intellectualEntity.ThirdTextPrefix;
+            TbThirdText.Text = _intellectualEntity.ThirdText;
+            TbThirdSuffix.Text = _intellectualEntity.ThirdTextSuffix;
 
-            TbBottomOrientText.Text = Axis.BottomOrientText;
-            TbTopOrientText.Text = Axis.TopOrientText;
+            TbBottomOrientText.Text = _intellectualEntity.BottomOrientText;
+            TbTopOrientText.Text = _intellectualEntity.TopOrientText;
 
             // markers position
-            CbMarkersPosition.SelectedItem = Axis.MarkersPosition;
+            CbMarkersPosition.SelectedItem = _intellectualEntity.MarkersPosition;
 
             // focus
             TbFirstText.Focus();
@@ -62,42 +71,42 @@
         private void OnAccept()
         {
             // values
-            Axis.FirstTextPrefix = TbFirstPrefix.Text;
-            Axis.FirstText = TbFirstText.Text;
-            Axis.FirstTextSuffix = TbFirstSuffix.Text;
+            _intellectualEntity.FirstTextPrefix = TbFirstPrefix.Text;
+            _intellectualEntity.FirstText = TbFirstText.Text;
+            _intellectualEntity.FirstTextSuffix = TbFirstSuffix.Text;
 
-            Axis.SecondTextPrefix = TbSecondPrefix.Text;
-            Axis.SecondText = TbSecondText.Text;
-            Axis.SecondTextSuffix = TbSecondSuffix.Text;
+            _intellectualEntity.SecondTextPrefix = TbSecondPrefix.Text;
+            _intellectualEntity.SecondText = TbSecondText.Text;
+            _intellectualEntity.SecondTextSuffix = TbSecondSuffix.Text;
 
-            Axis.ThirdTextPrefix = TbThirdPrefix.Text;
-            Axis.ThirdText = TbThirdText.Text;
-            Axis.ThirdTextSuffix = TbThirdSuffix.Text;
+            _intellectualEntity.ThirdTextPrefix = TbThirdPrefix.Text;
+            _intellectualEntity.ThirdText = TbThirdText.Text;
+            _intellectualEntity.ThirdTextSuffix = TbThirdSuffix.Text;
 
-            Axis.BottomOrientText = TbBottomOrientText.Text;
-            Axis.TopOrientText = TbTopOrientText.Text;
+            _intellectualEntity.BottomOrientText = TbBottomOrientText.Text;
+            _intellectualEntity.TopOrientText = TbTopOrientText.Text;
 
             // markers position
-            Axis.MarkersPosition = (AxisMarkersPosition)CbMarkersPosition.SelectedItem;
+            _intellectualEntity.MarkersPosition = (AxisMarkersPosition)CbMarkersPosition.SelectedItem;
         }
 
         #region Visibility
 
-        void ChangeOrientVisibility()
+        private void ChangeOrientVisibility()
         {
-            if (Axis.MarkersPosition == AxisMarkersPosition.Both || Axis.MarkersPosition == AxisMarkersPosition.Top)
+            if (_intellectualEntity.MarkersPosition == AxisMarkersPosition.Both || _intellectualEntity.MarkersPosition == AxisMarkersPosition.Top)
             {
-                TbTopOrientText.Visibility = Axis.TopOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
+                TbTopOrientText.Visibility = _intellectualEntity.TopOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
             }
             else
             {
                 TbTopOrientText.Visibility = Visibility.Collapsed;
             }
 
-            if (Axis.MarkersPosition == AxisMarkersPosition.Both || Axis.MarkersPosition == AxisMarkersPosition.Bottom)
+            if (_intellectualEntity.MarkersPosition == AxisMarkersPosition.Both || _intellectualEntity.MarkersPosition == AxisMarkersPosition.Bottom)
             {
                 TbBottomOrientText.Visibility =
-                    Axis.BottomOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
+                    _intellectualEntity.BottomOrientMarkerVisible ? Visibility.Visible : Visibility.Collapsed;
             }
             else
             {
@@ -105,7 +114,7 @@
             }
         }
 
-        void ChangeSecondVisibility(bool show)
+        private void ChangeSecondVisibility(bool show)
         {
             if (show)
             {
@@ -117,7 +126,7 @@
             }
         }
 
-        void ChangeThirdVisibility(bool show)
+        private void ChangeThirdVisibility(bool show)
         {
             if (show)
             {
@@ -130,19 +139,5 @@
         }
 
         #endregion
-
-        private void AxisValueEditor_OnPreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                DialogResult = false;
-            }
-
-            if (e.Key == Key.Enter)
-            {
-                OnAccept();
-                DialogResult = true;
-            }
-        }
     }
 }

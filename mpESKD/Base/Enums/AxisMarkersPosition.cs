@@ -2,6 +2,9 @@
 {
     using Attributes;
 
+    /// <summary>
+    /// Позиция маркеров оси
+    /// </summary>
     public enum AxisMarkersPosition
     {
         /// <summary>С обеих сторон</summary>

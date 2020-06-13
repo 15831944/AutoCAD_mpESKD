@@ -5,8 +5,8 @@
     using Autodesk.AutoCAD.Geometry;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
     using Base.Overrules;
+    using Base.Utils;
     using ModPlusAPI;
 
     /// <summary>
@@ -19,10 +19,6 @@
             GroundLine = groundLine;
             GripIndex = index;
             GripType = GripType.Minus;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
         }
 
         /// <summary>
@@ -35,7 +31,7 @@
         /// </summary>
         public int GripIndex { get; }
 
-        // Подсказка в зависимости от имени ручки
+        /// <inheritdoc />
         public override string GetTooltip()
         {
             return Language.GetItem(Invariables.LangItem, "gp3"); // "Удалить вершину";
@@ -65,7 +61,7 @@
 
                 GroundLine.UpdateEntities();
                 GroundLine.BlockRecord.UpdateAnonymousBlocks();
-                using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
                     if (newInsertionPoint.HasValue)

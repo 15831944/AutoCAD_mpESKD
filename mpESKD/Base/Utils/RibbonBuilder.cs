@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Utils
 {
     using System;
     using System.Collections.Generic;
@@ -9,17 +9,24 @@
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpGroundLine;
+    using Functions.mpLevelMark;
     using Functions.mpSection;
     using ModPlus.Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
+    /// <summary>
+    /// Методы построения ленты
+    /// </summary>
     public class RibbonBuilder
     {
         private static bool _wasActive;
         private static int _colorTheme = 1;
 
+        /// <summary>
+        /// Построить вкладку ЕСКД на ленте
+        /// </summary>
         public static void BuildRibbon()
         {
             if (!IsLoaded())
@@ -31,12 +38,38 @@
             }
         }
 
+        /// <summary>
+        /// Удалить вкладку ЕСКД с ленты
+        /// </summary>
+        public static void RemoveRibbon()
+        {
+            try
+            {
+                if (IsLoaded())
+                {
+                    var ribbonControl = ComponentManager.Ribbon;
+                    var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
+                    foreach (var tab in ribbonControl.Tabs.Where(
+                        tab => tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName)))
+                    {
+                        ribbonControl.Tabs.Remove(tab);
+                        Application.SystemVariableChanged -= AcadApp_SystemVariableChanged;
+                        break;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                ExceptionBox.Show(exception);
+            }
+        }
+
         private static bool IsLoaded()
         {
             var loaded = false;
-            var ribCntrl = ComponentManager.Ribbon;
+            var ribbonControl = ComponentManager.Ribbon;
             var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-            foreach (var tab in ribCntrl.Tabs)
+            foreach (var tab in ribbonControl.Tabs)
             {
                 if (tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName))
                 {
@@ -50,9 +83,9 @@
 
         private static bool IsActive()
         {
-            var ribCntrl = ComponentManager.Ribbon;
+            var ribbonControl = ComponentManager.Ribbon;
             var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-            foreach (var tab in ribCntrl.Tabs)
+            foreach (var tab in ribbonControl.Tabs)
             {
                 if (tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName))
                 {
@@ -61,29 +94,6 @@
             }
 
             return false;
-        }
-
-        public static void RemoveRibbon()
-        {
-            try
-            {
-                if (IsLoaded())
-                {
-                    var ribCntrl = ComponentManager.Ribbon;
-                    var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-                    foreach (var tab in ribCntrl.Tabs.Where(
-                        tab => tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName)))
-                    {
-                        ribCntrl.Tabs.Remove(tab);
-                        Application.SystemVariableChanged -= AcadApp_SystemVariableChanged;
-                        break;
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
         }
 
         private static void AcadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
@@ -106,7 +116,7 @@
             try
             {
                 var sv = Application.GetSystemVariable("COLORTHEME").ToString();
-                if (int.TryParse(sv, out int i))
+                if (int.TryParse(sv, out var i))
                 {
                     _colorTheme = i;
                 }
@@ -125,28 +135,29 @@
         {
             try
             {
-                var ribCntrl = ComponentManager.Ribbon;
+                var ribbonControl = ComponentManager.Ribbon;
 
                 // add the tab
                 var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-                var ribTab = new RibbonTab { Title = tabName, Id = "ModPlus_ESKD" };
-                ribCntrl.Tabs.Add(ribTab);
+                var ribbonTab = new RibbonTab { Title = tabName, Id = "ModPlus_ESKD" };
+                ribbonControl.Tabs.Add(ribbonTab);
 
                 // add content
-                AddAxisPanel(ribTab);
-                AddLinesPanel(ribTab);
-                AddViewsPanel(ribTab);
+                AddAxisPanel(ribbonTab);
+                AddLevelMarksPanel(ribbonTab);
+                AddLinesPanel(ribbonTab);
+                AddViewsPanel(ribbonTab);
 
                 // tools 
-                AddToolsPanel(ribTab);
+                AddToolsPanel(ribbonTab);
 
                 // add settings panel
-                AddSettingsPanel(ribTab);
-                ////////////////////////
-                ribCntrl.UpdateLayout();
+                AddSettingsPanel(ribbonTab);
+                
+                ribbonControl.UpdateLayout();
                 if (_wasActive)
                 {
-                    ribTab.IsActive = true;
+                    ribbonTab.IsActive = true;
                 }
             }
             catch (Exception exception)
@@ -158,23 +169,38 @@
         /// <summary>
         /// Панель "Оси"
         /// </summary>
-        private static void AddAxisPanel(RibbonTab ribTab)
+        private static void AddAxisPanel(RibbonTab ribbonTab)
         {
-            // create the panel source
             var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab3") };
-
-            // now the panel
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
-            ribTab.Panels.Add(ribPanel);
-
+            ribbonTab.Panels.Add(ribPanel);
             var ribRowPanel = new RibbonRowPanel();
 
             // mpAxis
-            var ribBtn = GetBigButton(AxisDescriptor.Instance);
-            if (ribBtn != null)
+            var ribbonButton = GetBigButton(AxisDescriptor.Instance);
+            if (ribbonButton != null)
             {
-                ribRowPanel.Items.Add(ribBtn);
+                ribRowPanel.Items.Add(ribbonButton);
             }
+
+            if (ribRowPanel.Items.Any())
+            {
+                ribSourcePanel.Items.Add(ribRowPanel);
+            }
+        }
+
+        /// <summary>
+        /// Панель "Отметки уровня"
+        /// </summary>
+        private static void AddLevelMarksPanel(RibbonTab ribbonTab)
+        {
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab11") };
+            var ribPanel = new RibbonPanel { Source = ribSourcePanel };
+            ribbonTab.Panels.Add(ribPanel);
+            var ribRowPanel = new RibbonRowPanel();
+
+            // mpLevelMark
+            ribRowPanel.Items.Add(GetSplitButton(LevelMarkDescriptor.Instance));
 
             if (ribRowPanel.Items.Any())
             {
@@ -185,14 +211,14 @@
         /// <summary>
         /// Панель "Линии"
         /// </summary>
-        private static void AddLinesPanel(RibbonTab ribTab)
+        private static void AddLinesPanel(RibbonTab ribbonTab)
         {
             // create the panel source
             var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab1") };
 
             // now the panel
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
-            ribTab.Panels.Add(ribPanel);
+            ribbonTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
 
@@ -211,12 +237,12 @@
         /// <summary>
         /// Панель "Виды, разрезы"
         /// </summary>
-        private static void AddViewsPanel(RibbonTab ribTab)
+        private static void AddViewsPanel(RibbonTab ribbonTab)
         {
             // create the panel source
             var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab8") };
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
-            ribTab.Panels.Add(ribPanel);
+            ribbonTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
 
@@ -232,7 +258,7 @@
         /// <summary>
         /// Добавить панель "Утилиты"
         /// </summary>
-        private static void AddToolsPanel(RibbonTab ribTab)
+        private static void AddToolsPanel(RibbonTab ribbonTab)
         {
             // create the panel source
             var ribSourcePanel = new RibbonPanelSource
@@ -245,7 +271,7 @@
             {
                 Source = ribSourcePanel
             };
-            ribTab.Panels.Add(ribPanel);
+            ribbonTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
             ribRowPanel.Items.Add(
@@ -253,9 +279,9 @@
                     "mpESKDSearch",
                     Language.GetItem(Invariables.LangItem, "tab10"),
                     _colorTheme == 1 // 1 - light
-                        ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/SearchEntities_32x32.png"
-                        : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/SearchEntities_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, "", "", "help/mpeskd"));
+                        ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntities_32x32.png"
+                        : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntities_32x32_dark.png",
+                    Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
             ribSourcePanel.Items.Add(ribRowPanel);
         }
 
@@ -283,22 +309,22 @@
                     "mpStyleEditor",
                     Language.GetItem(Invariables.LangItem, "tab4"),
                     _colorTheme == 1 // 1 - light
-                    ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/StyleEditor_32x32.png"
-                    : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/StyleEditor_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, "", "", "help/mpeskd"));
+                    ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/StyleEditor_32x32.png"
+                    : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/StyleEditor_32x32_dark.png",
+                    Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpPropertiesPalette",
                     ConvertLName(Language.GetItem(Invariables.LangItem, "tab6")),
                     _colorTheme == 1 // 1 - light
-                    ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/Properties_32x32.png"
-                    : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Resources/Properties_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab7"), Orientation.Vertical, "", "", "help/mpeskd"));
+                    ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/Properties_32x32.png"
+                    : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/Properties_32x32_dark.png",
+                    Language.GetItem(Invariables.LangItem, "tab7"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
             ribSourcePanel.Items.Add(ribRowPanel);
         }
 
         /// <summary>
-        /// Получить SplitButton (основная функция + все подфункции) для дескриптора функции
+        /// Получить SplitButton (основная команда + все вложенные команды) для дескриптора функции
         /// </summary>
         /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
         /// <param name="orientation">Ориентация кнопки</param>
@@ -329,7 +355,7 @@
                 risSplitBtn.Current = ribBtn;
             }
 
-            // Затем добавляем подфункции
+            // Вложенные команды
             GetBigButtonsForSubFunctions(descriptor, orientation).ForEach(b => risSplitBtn.Items.Add(b));
 
             return risSplitBtn;
@@ -354,15 +380,17 @@
         }
 
         /// <summary>
-        /// Получить список больших кнопок для подфункций функции по дескриптору
+        /// Получить список больших кнопок для вложенных команды по дескриптору
         /// </summary>
-        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий
+        /// интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
         /// <param name="orientation">Ориентация кнопки</param>
-        private static List<RibbonButton> GetBigButtonsForSubFunctions(IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
+        private static List<RibbonButton> GetBigButtonsForSubFunctions(
+            IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
         {
-            List<RibbonButton> buttons = new List<RibbonButton>();
+            var buttons = new List<RibbonButton>();
 
-            for (int i = 0; i < descriptor.SubFunctionsNames.Count; i++)
+            for (var i = 0; i < descriptor.SubFunctionsNames.Count; i++)
             {
                 buttons.Add(RibbonHelpers.AddBigButton(
                     descriptor.SubFunctionsNames[i],
@@ -381,28 +409,26 @@
         private static string GetBigIconForFunction(string functionName, string subFunctionName)
         {
             return _colorTheme == 1
-                ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
-                  functionName + "/Icons/" + subFunctionName + "_32x32.png"
-                : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
-                  functionName + "/Icons/" + subFunctionName + "_32x32_dark.png";
+                ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Functions/{functionName}/Icons/{subFunctionName}_32x32.png"
+                : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Functions/{functionName}/Icons/{subFunctionName}_32x32_dark.png";
         }
 
         private static string GetSmallIconForFunction(string functionName, string subFunctionName)
         {
             return _colorTheme == 1
-                ? "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
-                   functionName + "/Icons/" + subFunctionName + "_16x16.png"
-                : "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
-                  functionName + "/Icons/" + subFunctionName + "_16x16_dark.png";
+                ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Functions/{functionName}/Icons/{subFunctionName}_16x16.png"
+                : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Functions/{functionName}/Icons/{subFunctionName}_16x16_dark.png";
         }
 
         private static string GetHelpImageForFunction(string functionName, string imgName)
         {
-            return "pack://application:,,,/mpESKD_" + ModPlusConnector.Instance.AvailProductExternalVersion + ";component/Functions/" +
-                   functionName + "/Help/" + imgName;
+            return
+                $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Functions/{functionName}/Help/{imgName}";
         }
 
-        /// <summary>Вспомогательный метод для добавления символа перехода на новую строку в именах функций на палитре</summary>
+        /// <summary>
+        /// Вспомогательный метод для добавления символа перехода на новую строку в именах функций на палитре
+        /// </summary>
         private static string ConvertLName(string lName)
         {
             if (!lName.Contains(" "))

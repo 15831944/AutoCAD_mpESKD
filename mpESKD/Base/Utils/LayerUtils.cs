@@ -1,21 +1,24 @@
-﻿namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Utils
 {
     using System;
     using System.Xml.Linq;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
 
-    public static class LayerHelper
+    /// <summary>
+    /// Утилиты работы со слоями
+    /// </summary>
+    public static class LayerUtils
     {
         /// <summary>Проверка наличия слоя в документе по имени</summary>
         /// <param name="layerName">Имя слоя</param>
         public static bool HasLayer(string layerName)
         {
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
-                using (OpenCloseTransaction tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    LayerTable lt = tr.GetObject(AcadHelpers.Database.LayerTableId, OpenMode.ForRead) as LayerTable;
+                    var lt = tr.GetObject(AcadUtils.Database.LayerTableId, OpenMode.ForRead) as LayerTable;
                     if (lt != null)
                     {
                         if (lt.Has(layerName))
@@ -33,14 +36,14 @@
         /// <param name="layerName">Имя слоя</param>
         public static LayerTableRecord GetLayerTableRecordByLayerName(string layerName)
         {
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
-                using (OpenCloseTransaction tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    LayerTable lt = tr.GetObject(AcadHelpers.Database.LayerTableId, OpenMode.ForRead) as LayerTable;
+                    var lt = tr.GetObject(AcadUtils.Database.LayerTableId, OpenMode.ForRead) as LayerTable;
                     if (lt != null)
                     {
-                        foreach (ObjectId layerId in lt)
+                        foreach (var layerId in lt)
                         {
                             var layer = tr.GetObject(layerId, OpenMode.ForRead) as LayerTableRecord;
                             if (layer != null && layer.Name.Equals(layerName))
@@ -61,14 +64,14 @@
         /// <param name="layerName">Имя слоя</param>
         public static bool IsLockedLayer(string layerName)
         {
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
-                using (OpenCloseTransaction tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    LayerTable lt = tr.GetObject(AcadHelpers.Database.LayerTableId, OpenMode.ForRead) as LayerTable;
+                    var lt = tr.GetObject(AcadUtils.Database.LayerTableId, OpenMode.ForRead) as LayerTable;
                     if (lt != null)
                     {
-                        foreach (ObjectId layerId in lt)
+                        foreach (var layerId in lt)
                         {
                             var layer = tr.GetObject(layerId, OpenMode.ForRead) as LayerTableRecord;
                             if (layer != null && layer.Name.Equals(layerName))
@@ -83,19 +86,21 @@
             return false;
         }
 
-        /// <summary>Создание слоя в текущем документе по данным, сохраненным в файле стилей</summary>
-        /// <param name="layerXElement"></param>
-        public static bool AddLayerFromXelement(XElement layerXElement)
+        /// <summary>
+        /// Создание слоя в текущем документе по данным, сохраненным в файле стилей
+        /// </summary>
+        /// <param name="layerXElement">Xml layer data node</param>
+        public static bool AddLayerFromXElement(XElement layerXElement)
         {
             var layer = GetLayerFromXml(layerXElement);
             var layerCreated = false;
             if (layer != null)
             {
-                using (AcadHelpers.Document.LockDocument())
+                using (AcadUtils.Document.LockDocument())
                 {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                     {
-                        using (var lyrTbl = tr.GetObject(AcadHelpers.Database.LayerTableId, OpenMode.ForWrite) as LayerTable)
+                        using (var lyrTbl = tr.GetObject(AcadUtils.Database.LayerTableId, OpenMode.ForWrite) as LayerTable)
                         {
                             if (lyrTbl != null)
                             {
@@ -120,7 +125,11 @@
             return layerCreated;
         }
 
-        // save layers to xml
+        /// <summary>
+        /// save layers to xml
+        /// </summary>
+        /// <param name="layerTableRecord">Instance of <see cref="LayerTableRecord"/></param>
+        /// <returns></returns>
         public static XElement SetLayerXml(LayerTableRecord layerTableRecord)
         {
             if (layerTableRecord == null)
@@ -128,7 +137,7 @@
                 return new XElement("LayerTableRecord");
             }
 
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
                 var layerTableRecordXml = new XElement("LayerTableRecord");
                 layerTableRecordXml.SetAttributeValue("Name", layerTableRecord.Name); // string
@@ -139,7 +148,7 @@
                 layerTableRecordXml.SetAttributeValue("IsOff", layerTableRecord.IsOff); // bool
                 layerTableRecordXml.SetAttributeValue("IsPlottable", layerTableRecord.IsPlottable); // bool
                 layerTableRecordXml.SetAttributeValue("Color", layerTableRecord.Color.ColorIndex); // color
-                layerTableRecordXml.SetAttributeValue("Linetype", AcadHelpers.GetLineTypeName(layerTableRecord.LinetypeObjectId)); // ObjectId
+                layerTableRecordXml.SetAttributeValue("Linetype", AcadUtils.GetLineTypeName(layerTableRecord.LinetypeObjectId)); // ObjectId
                 layerTableRecordXml.SetAttributeValue("LineWeight", layerTableRecord.LineWeight); // LineWeight
                 layerTableRecordXml.SetAttributeValue("ViewportVisibilityDefault", layerTableRecord.ViewportVisibilityDefault); // bool
 
@@ -160,7 +169,7 @@
                 layerTblR.Description = layerXElement.Attribute("Description")?.Value;
 
                 // bool
-                layerTblR.IsFrozen = bool.TryParse(layerXElement.Attribute("IsFrozen")?.Value, out bool b) && b;
+                layerTblR.IsFrozen = bool.TryParse(layerXElement.Attribute("IsFrozen")?.Value, out var b) && b;
                 layerTblR.IsHidden = bool.TryParse(layerXElement.Attribute("IsHidden")?.Value, out b) && b;
                 layerTblR.IsLocked = bool.TryParse(layerXElement.Attribute("IsLocked")?.Value, out b) && b;
                 layerTblR.IsOff = bool.TryParse(layerXElement.Attribute("IsOff")?.Value, out b) && b;
@@ -171,10 +180,10 @@
                 // color
                 layerTblR.Color = Color.FromColorIndex(
                     ColorMethod.ByAci,
-                    short.TryParse(layerXElement.Attribute("Color")?.Value, out short sh) ? sh : short.Parse("7"));
+                    short.TryParse(layerXElement.Attribute("Color")?.Value, out var sh) ? sh : short.Parse("7"));
 
                 // linetype
-                layerTblR.LinetypeObjectId = AcadHelpers.GetLineTypeObjectId(layerXElement.Attribute("Linetype")?.Value);
+                layerTblR.LinetypeObjectId = AcadUtils.GetLineTypeObjectId(layerXElement.Attribute("Linetype")?.Value);
 
                 // LineWeight
                 layerTblR.LineWeight = Enum.TryParse(layerXElement.Attribute("LineWeight")?.Value, out LineWeight lw) ? lw : LineWeight.ByLineWeightDefault;

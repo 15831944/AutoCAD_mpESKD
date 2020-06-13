@@ -4,8 +4,8 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
     using Base.Overrules;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Section = mpSection.Section;
@@ -23,10 +23,6 @@
             CachedAcrossTopShelfTextOffset = section.AcrossTopShelfTextOffset;
             CachedAlongBottomShelfTextOffset = section.AlongBottomShelfTextOffset;
             CachedAcrossBottomShelfTextOffset = section.AcrossBottomShelfTextOffset;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
         }
 
         /// <summary>
@@ -60,7 +56,7 @@
                 // По этим данным я потом получаю экземпляр класса section
                 if (newStatus == Status.GripEnd)
                 {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                         using (var resBuf = Section.GetDataForXData())

@@ -1,10 +1,13 @@
-﻿namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Utils
 {
     using System;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
 
-    public class JigHelper
+    /// <summary>
+    /// Утилиты работы с <see cref="Jig"/>
+    /// </summary>
+    public class JigUtils
     {
         public class PointSampler
         {

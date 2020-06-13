@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Utils
 {
     using System;
     using System.Collections.Generic;
@@ -6,26 +6,39 @@
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
-    using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
-    public static class AcadHelpers
+    /// <summary>
+    /// Различные утилиты работы с AutoCAD
+    /// </summary>
+    public static class AcadUtils
     {
-        /// <summary>БД активного документа</summary>
+        /// <summary>
+        /// БД активного документа
+        /// </summary>
         public static Database Database => HostApplicationServices.WorkingDatabase;
 
-        /// <summary>Коллекция документов</summary>
+        /// <summary>
+        /// Коллекция документов
+        /// </summary>
         public static DocumentCollection Documents => AcApp.DocumentManager;
 
-        /// <summary>Активный документ</summary>
+        /// <summary>
+        /// Активный документ
+        /// </summary>
         public static Document Document => AcApp.DocumentManager.MdiActiveDocument;
 
-        /// <summary>Редактор активного документа</summary>
+        /// <summary>
+        /// Редактор активного документа
+        /// </summary>
         public static Editor Editor => AcApp.DocumentManager.MdiActiveDocument.Editor;
 
+        /// <summary>
+        /// Возвращает коллекцию аннотационных масштабов текущей БД чертежа
+        /// </summary>
         public static ObjectContextCollection ObjectContextCollection
         {
             get
@@ -35,7 +48,9 @@
             }
         }
 
-        /// <summary>Список слоев текущей базы данных</summary>
+        /// <summary>
+        /// Список слоев текущей базы данных
+        /// </summary>
         public static List<string> Layers
         {
             get
@@ -64,7 +79,9 @@
             }
         }
 
-        /// <summary>Список масштабов текущего чертежа</summary>
+        /// <summary>
+        /// Список масштабов текущего чертежа
+        /// </summary>
         public static List<string> Scales
         {
             get
@@ -92,7 +109,9 @@
             return ObjectContextCollection.CurrentContext as AnnotationScale;
         }
 
-        /// <summary>Текстовые стили текущего чертежа</summary>
+        /// <summary>
+        /// Текстовые стили текущего чертежа
+        /// </summary>
         public static List<string> TextStyles
         {
             get
@@ -121,11 +140,10 @@
         /// <summary>
         /// Открыть объект для чтения
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="objectId"></param>
-        /// <param name="openErased"></param>
-        /// <param name="forceOpenOnLockedLayer"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">Тип объекта</typeparam>
+        /// <param name="objectId">Идентификатор примитива</param>
+        /// <param name="openErased">Открыть с меткой "Стерто"</param>
+        /// <param name="forceOpenOnLockedLayer">Открыть объект на заблокированном слое</param>
         public static T Read<T>(this ObjectId objectId, bool openErased = false, bool forceOpenOnLockedLayer = true)
             where T : DBObject
         {
@@ -135,11 +153,10 @@
         /// <summary>
         /// Открыть объект для записи
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="objectId"></param>
-        /// <param name="openErased"></param>
-        /// <param name="forceOpenOnLockedLayer"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">Тип объекта</typeparam>
+        /// <param name="objectId">Идентификатор примитива</param>
+        /// <param name="openErased">Открыть с меткой "Стерто"</param>
+        /// <param name="forceOpenOnLockedLayer">Открыть объект на заблокированном слое</param>
         public static T Write<T>(this ObjectId objectId, bool openErased = false, bool forceOpenOnLockedLayer = true)
             where T : DBObject
         {
@@ -147,32 +164,14 @@
         }
 
         /// <summary>
-        /// 
+        /// Получение аннотативного масштаба по имени из текущего чертежа
         /// </summary>
-        /// <param name="point"></param>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        public static BlockReference GetBlockReference(Point3d point, IEnumerable<Entity> entities)
-        {
-            var blockTableRecord = new BlockTableRecord
-            {
-                Name = "*U"
-            };
-            foreach (var enity in entities)
-            {
-                blockTableRecord.AppendEntity(enity);
-            }
-
-            return new BlockReference(point, blockTableRecord.ObjectId);
-        }
-
-        /// <summary>Получение аннотативного масштаба по имени из текущего чертежа</summary>
         /// <param name="name">Имя масштаба</param>
         /// <returns>Аннотативный масштаб с таким именем или текущий масштаб в БД</returns>
         public static AnnotationScale GetAnnotationScaleByName(string name)
         {
             var ocm = Database.ObjectContextManager;
-            if (ocm != null)
+            if (ocm != null && !string.IsNullOrEmpty(name))
             {
                 var occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
                 if (occ != null)
@@ -194,6 +193,7 @@
         /// <summary>
         /// Возвращает численный масштаб (отношение единиц чертежа к единицам листа)
         /// </summary>
+        /// <param name="scale">Аннотативный масштаб</param>
         public static double GetNumericScale(this AnnotationScale scale)
         {
             return scale.DrawingUnits / scale.PaperUnits;
@@ -212,7 +212,7 @@
 
             if (!layerName.Equals(Language.GetItem(Invariables.LangItem, "defl"))) //// "По умолчанию"
             {
-                if (LayerHelper.HasLayer(layerName))
+                if (LayerUtils.HasLayer(layerName))
                 {
                     using (Document.LockDocument())
                     {
@@ -232,7 +232,7 @@
                 {
                     if (MainSettings.Instance.IfNoLayer == 1)
                     {
-                        if (LayerHelper.AddLayerFromXelement(layerXmlData))
+                        if (LayerUtils.AddLayerFromXElement(layerXmlData))
                         {
                             using (Document.LockDocument())
                             {
@@ -271,10 +271,14 @@
             }
         }
 
+        /// <summary>
+        /// Написать сообщение в командную строку при сборке в Debug
+        /// </summary>
+        /// <param name="message">Сообщение</param>
         public static void WriteMessageInDebug(string message)
         {
 #if DEBUG
-            Editor?.WriteMessage("\n" + message);
+            Editor?.WriteMessage($"\n{message}");
 #endif
         }
 
@@ -303,12 +307,12 @@
         }
 
         /// <summary>Получить ObjectId типа линии по имени в текущем документе</summary>
-        /// <param name="ltname">Имя типа линии</param>
+        /// <param name="lineTypeName">Имя типа линии</param>
         /// <returns></returns>
-        public static ObjectId GetLineTypeObjectId(string ltname)
+        public static ObjectId GetLineTypeObjectId(string lineTypeName)
         {
-            var ltid = ObjectId.Null;
-            if (string.IsNullOrEmpty(ltname))
+            var lineTypeObjectId = ObjectId.Null;
+            if (string.IsNullOrEmpty(lineTypeName))
             {
                 return ObjectId.Null;
             }
@@ -317,12 +321,12 @@
             {
                 using (var tr = Database.TransactionManager.StartTransaction())
                 {
-                    var lttbl = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
-                    if (lttbl != null)
+                    var linetypeTable = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+                    if (linetypeTable != null)
                     {
-                        if (lttbl.Has(ltname))
+                        if (linetypeTable.Has(lineTypeName))
                         {
-                            ltid = lttbl[ltname];
+                            lineTypeObjectId = linetypeTable[lineTypeName];
                         }
                         else
                         {
@@ -331,8 +335,8 @@
                             {
                                 var path = HostApplicationServices.Current.FindFile(
                                     filename, Database, FindFileHint.Default);
-                                Database.LoadLineTypeFile(ltname, path);
-                                ltid = lttbl[ltname];
+                                Database.LoadLineTypeFile(lineTypeName, path);
+                                lineTypeObjectId = linetypeTable[lineTypeName];
                             }
                             catch (Autodesk.AutoCAD.Runtime.Exception exception)
                             {
@@ -346,7 +350,7 @@
                                 }
                                 else
                                 {
-                                    MessageBox.Show(Language.GetItem(Invariables.LangItem, "err2") + ": " + ltname, MessageBoxIcon.Close); // Не удалось загрузить тип линий
+                                    MessageBox.Show(Language.GetItem(Invariables.LangItem, "err2") + ": " + lineTypeName, MessageBoxIcon.Close); // Не удалось загрузить тип линий
                                 }
                             }
                         }
@@ -356,10 +360,14 @@
                 }
             }
 
-            return ltid;
+            return lineTypeObjectId;
         }
 
-        /// <summary>Установка типа линии для блока согласно стиля</summary>
+        /// <summary>
+        /// Установка типа линии для блока согласно стиля
+        /// </summary>
+        /// <param name="blkRefObjectId">Идентификатор блока</param>
+        /// <param name="lineTypeName">Имя типа линии</param>
         public static void SetLineType(ObjectId blkRefObjectId, string lineTypeName)
         {
             if (blkRefObjectId == ObjectId.Null)
@@ -395,10 +403,10 @@
         /// <summary>Проверка наличия типа линии в документе</summary>
         private static bool HasLineType(string lineTypeName, Transaction tr)
         {
-            var linetypeTable = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
-            if (linetypeTable != null)
+            var lineTypeTable = tr.GetObject(Database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+            if (lineTypeTable != null)
             {
-                return linetypeTable.Has(lineTypeName);
+                return lineTypeTable.Has(lineTypeName);
             }
 
             return false;
@@ -443,6 +451,11 @@
             return loaded;
         }
 
+        /// <summary>
+        /// Возвращает идентификатор текстового стиля по имени
+        /// </summary>
+        /// <param name="textStyleName">Имя текстового стиля</param>
+        /// <returns><see cref="ObjectId"/></returns>
         public static ObjectId GetTextStyleIdByName(string textStyleName)
         {
             using (Document.LockDocument())
@@ -467,10 +480,10 @@
         /// <summary>
         /// Найти все блоки в текущем пространстве (модель/лист), представляющие интеллектуальный примитив указанного типа
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="entityType"></param>
-        /// <returns></returns>
-        public static List<T> GetAllIntellectualEntitiesInCurrentSpace<T>(Type entityType) where T : IntellectualEntity
+        /// <typeparam name="T">Допустимый тип</typeparam>
+        /// <param name="entityType">Тип интеллектуального объекта для поиска</param>
+        public static List<T> GetAllIntellectualEntitiesInCurrentSpace<T>(Type entityType) 
+            where T : IntellectualEntity
         {
             var list = new List<T>();
             var appName = $"mp{entityType.Name}";
@@ -489,7 +502,7 @@
                         var xData = blockReference.GetXDataForApplication(appName);
                         if (xData != null)
                         {
-                            list.Add(EntityReaderFactory.Instance.GetFromEntity<T>(blockReference));
+                            list.Add(EntityReaderService.Instance.GetFromEntity<T>(blockReference));
                         }
                     }
                 }
@@ -498,6 +511,28 @@
             }
 
             return list;
+        }
+
+        /// <summary>
+        /// Парсинг аннотативного масштаба из строки
+        /// </summary>
+        /// <param name="str">Строка с масштабом</param>
+        public static AnnotationScale AnnotationScaleFromString(string str)
+        {
+            var defaultScale = new AnnotationScale { Name = "1:1", DrawingUnits = 1.0, PaperUnits = 1.0 };
+            var splitted = str.Split(':');
+            if (splitted.Length == 2)
+            {
+                var scale = new AnnotationScale
+                {
+                    Name = str,
+                    PaperUnits = double.TryParse(splitted[0], out var d) ? d : 1.0,
+                    DrawingUnits = double.TryParse(splitted[1], out d) ? d : 1.0
+                };
+                return scale;
+            }
+
+            return defaultScale;
         }
     }
 }

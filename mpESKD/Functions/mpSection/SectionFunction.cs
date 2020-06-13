@@ -9,12 +9,13 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
     using Base.Styles;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Overrules;
 
+    /// <inheritdoc />
     public class SectionFunction : IIntellectualEntityFunction
     {
         /// <inheritdoc />
@@ -36,8 +37,9 @@
         /// <inheritdoc />
         public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
-            // send statistic
+#if !DEBUG
             Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+#endif
             try
             {
                 Overrule.Overruling = false;
@@ -46,7 +48,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
 
                 var sectionLastLetterValue = string.Empty;
                 var sectionLastIntegerValue = string.Empty;
@@ -69,34 +71,45 @@
             }
         }
 
+        /// <summary>
+        /// Команда создания обозначения разреза
+        /// </summary>
         [CommandMethod("ModPlus", "mpSection", CommandFlags.Modal)]
         public void CreateSectionCommand()
         {
             CreateSection(true);
         }
 
+        /// <summary>
+        /// Команда создания обозначения ломанного разреза
+        /// </summary>
         [CommandMethod("ModPlus", "mpSectionBroken", CommandFlags.Modal)]
         public void CreateSimplySectionCommand()
         {
             CreateSection(false);
         }
 
+        /// <summary>
+        /// Команда создания обозначения разреза из полилинии
+        /// </summary>
         [CommandMethod("ModPlus", "mpSectionFromPolyline", CommandFlags.Modal)]
         public void CreateSectionFromPolylineCommand()
         {
-            // send statistic
+#if !DEBUG
             Statistic.SendCommandStarting("mpSectionFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
+#endif
             try
             {
-                var peo = new PromptEntityOptions("\n" + Language.GetItem(Invariables.LangItem, "msg6"))
+                // Выберите полилинию:
+                var peo = new PromptEntityOptions($"\n{Language.GetItem(Invariables.LangItem, "msg6")}")
                 {
                     AllowNone = false,
                     AllowObjectOnLockedLayer = true
                 };
-                peo.SetRejectMessage("\n" + Language.GetItem(Invariables.LangItem, "wrong"));
+                peo.SetRejectMessage($"\n{Language.GetItem(Invariables.LangItem, "wrong")}");
                 peo.AddAllowedClass(typeof(Polyline), true);
 
-                var per = AcadHelpers.Editor.GetEntity(peo);
+                var per = AcadUtils.Editor.GetEntity(peo);
                 if (per.Status != PromptStatus.OK)
                 {
                     return;
@@ -106,7 +119,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
 
                 var style = StyleManager.GetCurrentStyle(typeof(Section));
                 var sectionLastLetterValue = string.Empty;
@@ -119,9 +132,9 @@
 
                 var plineId = per.ObjectId;
 
-                using (AcadHelpers.Document.LockDocument(DocumentLockMode.ProtectedAutoWrite, null, null, true))
+                using (AcadUtils.Document.LockDocument(DocumentLockMode.ProtectedAutoWrite, null, null, true))
                 {
-                    using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = AcadUtils.Document.TransactionManager.StartOpenCloseTransaction())
                     {
                         var dbObj = tr.GetObject(plineId, OpenMode.ForRead);
                         if (dbObj is Polyline pline)
@@ -153,13 +166,13 @@
                         tr.Commit();
                     }
 
-                    AcadHelpers.Document.TransactionManager.QueueForGraphicsFlush();
-                    AcadHelpers.Document.TransactionManager.FlushGraphics();
+                    AcadUtils.Document.TransactionManager.QueueForGraphicsFlush();
+                    AcadUtils.Document.TransactionManager.FlushGraphics();
 
                     // "Удалить исходную полилинию?"
                     if (MessageBox.ShowYesNo(Language.GetItem(Invariables.LangItem, "msg7"), MessageBoxIcon.Question))
                     {
-                        using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                        using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                         {
                             var dbObj = tr.GetObject(plineId, OpenMode.ForWrite, true, true);
                             dbObj.Erase(true);
@@ -176,9 +189,9 @@
 
         private static void CreateSection(bool isSimple)
         {
-            // send statistic
+#if !DEBUG
             Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-
+#endif
             try
             {
                 Overrule.Overruling = false;
@@ -187,7 +200,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(SectionDescriptor.Instance.Name);
 
                 var style = StyleManager.GetCurrentStyle(typeof(Section));
                 var sectionLastLetterValue = string.Empty;
@@ -212,14 +225,14 @@
 
         private static void InsertSectionWithJig(bool isSimple, Section section, BlockReference blockReference)
         {
+            var nextPointPrompt = Language.GetItem(Invariables.LangItem, "msg5");
             var entityJig = new DefaultEntityJig(
                 section,
                 blockReference,
-                new Point3d(20, 0, 0),
-                Language.GetItem(Invariables.LangItem, "msg5"));
+                new Point3d(20, 0, 0));
             do
             {
-                var status = AcadHelpers.Editor.Drag(entityJig).Status;
+                var status = AcadUtils.Editor.Drag(entityJig).Status;
                 if (status == PromptStatus.OK)
                 {
                     if (isSimple)
@@ -227,6 +240,7 @@
                         if (entityJig.JigState == JigState.PromptInsertPoint)
                         {
                             entityJig.JigState = JigState.PromptNextPoint;
+                            entityJig.PromptForNextPoint = nextPointPrompt;
                         }
                         else
                         {
@@ -261,9 +275,9 @@
                     else
                     {
                         // if no middle points - remove entity
-                        using (AcadHelpers.Document.LockDocument())
+                        using (AcadUtils.Document.LockDocument())
                         {
-                            using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                            using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                             {
                                 var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                                 obj.Erase(true);
@@ -274,11 +288,12 @@
 
                     break;
                 }
-            } while (true);
+            }
+            while (true);
 
             if (!section.BlockId.IsErased)
             {
-                using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                 {
                     var ent = tr.GetObject(section.BlockId, OpenMode.ForWrite, true, true);
                     ent.XData = section.GetDataForXData();
@@ -294,7 +309,7 @@
         {
             if (MainSettings.Instance.SectionSaveLastTextAndContinueNew)
             {
-                var sections = AcadHelpers.GetAllIntellectualEntitiesInCurrentSpace<Section>(typeof(Section));
+                var sections = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<Section>(typeof(Section));
                 if (sections.Any())
                 {
                     sections.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
@@ -309,38 +324,6 @@
                     }
                 }
             }
-        }
-
-        public static void DoubleClickEdit(BlockReference blockReference, Point3d location, Transaction tr)
-        {
-            BeditCommandWatcher.UseBedit = false;
-            var section = EntityReaderFactory.Instance.GetFromEntity<Section>(blockReference);
-            section.UpdateEntities();
-            bool saveBack = false;
-            if (MainSettings.Instance.SectionUsePluginTextEditor)
-            {
-                SectionValueEditor sectionValueEditor = new SectionValueEditor { Section = section };
-                if (sectionValueEditor.ShowDialog() == true)
-                {
-                    saveBack = true;
-                }
-            }
-            else
-            {
-                MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg4"));
-            }
-
-            if (saveBack)
-            {
-                section.UpdateEntities();
-                section.BlockRecord.UpdateAnonymousBlocks();
-                using (var resBuf = section.GetDataForXData())
-                {
-                    blockReference.XData = resBuf;
-                }
-            }
-
-            section.Dispose();
         }
     }
 }

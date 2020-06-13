@@ -10,9 +10,9 @@ namespace mpESKD.Base.Properties
     using Attributes;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
-    using Helpers;
     using ModPlusAPI.Windows;
     using Styles;
+    using Utils;
 
     public class EntityPropertyProvider
     {
@@ -22,7 +22,7 @@ namespace mpESKD.Base.Properties
             {
                 IsValid = true;
                 _blkRefObjectId = blkRefObjectId;
-                using (BlockReference blkRef = blkRefObjectId.Open(OpenMode.ForRead, false, true) as BlockReference)
+                using (var blkRef = blkRefObjectId.Open(OpenMode.ForRead, false, true) as BlockReference)
                 {
                     if (blkRef != null)
                     {
@@ -68,7 +68,7 @@ namespace mpESKD.Base.Properties
 
         private void BlkRef_Modified(object sender, EventArgs e)
         {
-            BlockReference blkRef = sender as BlockReference;
+            var blkRef = sender as BlockReference;
             if (blkRef != null)
             {
                 Update(blkRef);
@@ -83,7 +83,7 @@ namespace mpESKD.Base.Properties
                 return;
             }
 
-            var intellectualEntity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
+            var intellectualEntity = EntityReaderService.Instance.GetFromEntity(blockReference);
             if (intellectualEntity != null)
             {
                 _intellectualEntity = intellectualEntity;
@@ -93,14 +93,12 @@ namespace mpESKD.Base.Properties
                 foreach (var propertyInfo in entityType.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
                 {
                     var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
-                    var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
                     if (attribute != null)
                     {
                         if (attribute.Name == "Style")
                         {
-                            IntellectualEntityProperty property = new IntellectualEntityProperty(
+                            var property = new IntellectualEntityProperty(
                                 attribute,
-                                keyForEditorAttribute,
                                 entityType,
                                 StyleManager.GetStyleNameByGuid(entityType, _intellectualEntity.StyleGuid),
                                 _blkRefObjectId);
@@ -109,15 +107,21 @@ namespace mpESKD.Base.Properties
                         }
                         else if (attribute.Name == "LayerName")
                         {
-                            IntellectualEntityProperty property =
-                                new IntellectualEntityProperty(attribute, keyForEditorAttribute, entityType, blockReference.Layer, _blkRefObjectId);
+                            var property = new IntellectualEntityProperty(
+                                attribute, 
+                                entityType,
+                                blockReference.Layer,
+                                _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
                         else if (attribute.Name == "LineType")
                         {
-                            IntellectualEntityProperty property =
-                                new IntellectualEntityProperty(attribute, keyForEditorAttribute, entityType, blockReference.Linetype, _blkRefObjectId);
+                            var property = new IntellectualEntityProperty(
+                                attribute,
+                                entityType,
+                                blockReference.Linetype,
+                                _blkRefObjectId);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
@@ -126,8 +130,11 @@ namespace mpESKD.Base.Properties
                             var value = propertyInfo.GetValue(intellectualEntity);
                             if (value != null)
                             {
-                                IntellectualEntityProperty property =
-                                    new IntellectualEntityProperty(attribute, keyForEditorAttribute, entityType, value, _blkRefObjectId);
+                                var property = new IntellectualEntityProperty(
+                                    attribute, 
+                                    entityType, 
+                                    value,
+                                    _blkRefObjectId);
                                 property.PropertyChanged += Property_PropertyChanged;
                                 Properties.Add(property);
                             }
@@ -157,7 +164,7 @@ namespace mpESKD.Base.Properties
                     return;
                 }
 
-                var intellectualEntity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
+                var intellectualEntity = EntityReaderService.Instance.GetFromEntity(blockReference);
                 if (intellectualEntity != null)
                 {
                     _intellectualEntity = intellectualEntity;
@@ -172,7 +179,7 @@ namespace mpESKD.Base.Properties
                         var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                         if (attribute != null)
                         {
-                            foreach (IntellectualEntityProperty property in Properties)
+                            foreach (var property in Properties)
                             {
                                 if (property.Name == attribute.Name)
                                 {
@@ -214,15 +221,15 @@ namespace mpESKD.Base.Properties
             }
 
             Overrule.Overruling = false;
-            IntellectualEntityProperty intellectualEntityProperty = (IntellectualEntityProperty)sender;
+            var intellectualEntityProperty = (IntellectualEntityProperty)sender;
             try
             {
-                using (AcadHelpers.Document.LockDocument())
+                using (AcadUtils.Document.LockDocument())
                 {
                     using (var blockReference = _blkRefObjectId.Open(OpenMode.ForWrite, true, true) as BlockReference)
                     {
-                        Type entityType = _intellectualEntity.GetType();
-                        PropertyInfo propertyInfo = entityType.GetProperty(intellectualEntityProperty.Name);
+                        var entityType = _intellectualEntity.GetType();
+                        var propertyInfo = entityType.GetProperty(intellectualEntityProperty.Name);
                         if (propertyInfo != null)
                         {
                             if (intellectualEntityProperty.Name == "Style")

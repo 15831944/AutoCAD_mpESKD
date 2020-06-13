@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Utils
 {
     using System;
     using System.Collections.Generic;
@@ -7,9 +7,12 @@
     using Attributes;
     using Enums;
 
-    public static class LocalizationHelper
+    /// <summary>
+    /// Утилиты локализации
+    /// </summary>
+    public static class LocalizationUtils
     {
-        static LocalizationHelper()
+        static LocalizationUtils()
         {
             if (EnumPropertiesLocalizationValues == null)
             {
@@ -54,15 +57,17 @@
                 return EnumPropertiesLocalizationValues[enumType];
             }
 
-            List<string> enumPropertyLocalizationValues = new List<string>();
-            foreach (FieldInfo fieldInfo in enumType.GetFields().Where(f => f.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>() != null))
+            var enumPropertyLocalizationValues = new List<string>();
+            foreach (var fieldInfo in enumType.GetFields()
+                .Where(f => f.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>() != null))
             {
                 var attribute = fieldInfo.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>();
                 if (attribute != null)
                 {
                     try
                     {
-                        enumPropertyLocalizationValues.Add(ModPlusAPI.Language.GetItem(Invariables.LangItem, attribute.LocalizationKey));
+                        enumPropertyLocalizationValues.Add(
+                            ModPlusAPI.Language.GetItem(Invariables.LangItem, attribute.LocalizationKey));
                     }
                     catch
                     {
@@ -127,7 +132,8 @@
             }
 
             var type = category.GetType();
-            foreach (FieldInfo fieldInfo in type.GetFields().Where(f => f.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>() != null))
+            foreach (var fieldInfo in type.GetFields()
+                .Where(f => f.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>() != null))
             {
                 if (fieldInfo.Name != category.ToString())
                 {

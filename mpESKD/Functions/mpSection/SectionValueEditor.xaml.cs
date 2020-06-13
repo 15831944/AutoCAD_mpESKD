@@ -3,21 +3,31 @@
     using System.Windows;
     using Base;
 
+    /// <summary>
+    /// Редактор значений разреза
+    /// </summary>
     public partial class SectionValueEditor
     {
-        public Section Section;
+        private readonly Section _intellectualEntity;
 
-        public SectionValueEditor()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SectionValueEditor"/> class.
+        /// </summary>
+        /// <param name="intellectualEntity">Редактируемый экземпляр интеллектуального объекта</param>
+        public SectionValueEditor(IntellectualEntity intellectualEntity)
         {
+            _intellectualEntity = (Section)intellectualEntity;
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h94");
+            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h79");
+
+            SetValues();
         }
 
-        private void SectionValueEditor_OnLoaded(object sender, RoutedEventArgs e)
+        private void SetValues()
         {
-            TbDesignation.Text = Section.Designation;
-            TbDesignationPrefix.Text = Section.DesignationPrefix;
-            TbSheetNumber.Text = Section.SheetNumber;
+            TbDesignation.Text = _intellectualEntity.Designation;
+            TbDesignationPrefix.Text = _intellectualEntity.DesignationPrefix;
+            TbSheetNumber.Text = _intellectualEntity.SheetNumber;
             TbDesignation.Focus();
         }
 
@@ -29,16 +39,16 @@
 
         private void OnAccept()
         {
-            Section.Designation = TbDesignation.Text;
-            Section.DesignationPrefix = TbDesignationPrefix.Text;
-            Section.SheetNumber = TbSheetNumber.Text;
+            _intellectualEntity.Designation = TbDesignation.Text;
+            _intellectualEntity.DesignationPrefix = TbDesignationPrefix.Text;
+            _intellectualEntity.SheetNumber = TbSheetNumber.Text;
 
             if (ChkRestoreTextPosition.IsChecked.HasValue && ChkRestoreTextPosition.IsChecked.Value)
             {
-                Section.AlongBottomShelfTextOffset = double.NaN;
-                Section.AlongTopShelfTextOffset = double.NaN;
-                Section.AcrossBottomShelfTextOffset = double.NaN;
-                Section.AcrossTopShelfTextOffset = double.NaN;
+                _intellectualEntity.AlongBottomShelfTextOffset = double.NaN;
+                _intellectualEntity.AlongTopShelfTextOffset = double.NaN;
+                _intellectualEntity.AcrossBottomShelfTextOffset = double.NaN;
+                _intellectualEntity.AcrossTopShelfTextOffset = double.NaN;
             }
         }
     }

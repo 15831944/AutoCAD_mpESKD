@@ -1,6 +1,5 @@
-﻿namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Utils
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
@@ -8,18 +7,18 @@
     /// <summary>Вспомогательные методы работы с расширенными данными
     /// Есть аналогичные в MpCadHelpers. Некоторые будут совпадать
     /// но все-равно делаю отдельно</summary>
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static class ExtendedDataHelpers
+    public static class ExtendedDataUtils
     {
         /// <summary>
         /// Добавление регистрации приложения в соответствующую таблицу чертежа
         /// </summary>
+        /// <param name="appName">Имя типа интеллектуального объекта</param>
         public static void AddRegAppTableRecord(string appName)
         {
-            using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+            using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
             {
                 var rat =
-                    (RegAppTable)tr.GetObject(AcadHelpers.Database.RegAppTableId, OpenMode.ForRead, false);
+                    (RegAppTable)tr.GetObject(AcadUtils.Database.RegAppTableId, OpenMode.ForRead, false);
                 if (!rat.Has(appName))
                 {
                     rat.UpgradeOpen();
@@ -38,8 +37,8 @@
         /// <summary>
         /// Проверка поддерживаемости примитива для Overrule
         /// </summary>
-        /// <param name="rxObject"></param>
-        /// <param name="appName"></param>
+        /// <param name="rxObject">Instance of <see cref="RXObject"/></param>
+        /// <param name="appName">Имя типа интеллектуального объекта</param>
         /// <param name="checkIsNullId">comment #16 - http://adn-cis.org/forum/index.php?topic=8910.15 </param>
         public static bool IsApplicable(RXObject rxObject, string appName, bool checkIsNullId = false)
         {
@@ -60,7 +59,7 @@
             if (dbObject is BlockReference)
             {
                 // Всегда нужно проверять по наличию расширенных данных
-                // иначе может привести к фаталам при работе с динамическими блоками
+                // иначе может привести к фатальным ошибкам при работе с динамическими блоками
                 return IsIntellectualEntity(dbObject, appName);
             }
 
@@ -70,6 +69,7 @@
         /// <summary>
         /// Проверка поддерживаемости вставки блока путем проверки наличия XData с поддерживаемым кодом 1001
         /// </summary>
+        /// <param name="blockReference">Вхождение блока</param>
         public static bool IsApplicable(BlockReference blockReference)
         {
             if (blockReference.XData == null)
@@ -84,17 +84,43 @@
         }
 
         /// <summary>
+        /// Возвращает имя типа поддерживаемого интеллектуального объекта, если такое содержится в расширенных данных блока
+        /// </summary>
+        /// <param name="blockReference">Вхождение блока</param>
+        public static string ApplicableAppName(BlockReference blockReference)
+        {
+            if (blockReference.XData == null)
+            {
+                return null;
+            }
+
+            var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
+            foreach (var typedValue in blockReference.XData.AsArray())
+            {
+                var value = typedValue.Value.ToString();
+                if (typedValue.TypeCode == (int)DxfCode.ExtendedDataRegAppName && applicableCommands.Contains(value))
+                    return value;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Проверка по XData вхождения блока, что он является любым ЕСКД примитивом
         /// </summary>
         /// <param name="blkRef">Вхождение блока</param>
-        /// <param name="appName"></param>
-        /// <returns></returns>
+        /// <param name="appName">Название типа интеллектуального объекта</param>
         public static bool IsIntellectualEntity(Entity blkRef, string appName)
         {
             var rb = blkRef.GetXDataForApplication(appName);
             return rb != null;
         }
 
+        /// <summary>
+        /// Проверка по XData вхождения блока, что он является любым ЕСКД примитивом
+        /// </summary>
+        /// <param name="dbObject">Вхождение блока</param>
+        /// <param name="appName">Название типа интеллектуального объекта</param>
         public static bool IsIntellectualEntity(DBObject dbObject, string appName)
         {
             var rb = dbObject.GetXDataForApplication(appName);

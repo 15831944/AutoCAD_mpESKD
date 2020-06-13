@@ -3,26 +3,35 @@ namespace mpESKD.Functions.mpGroundLine
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
     using Base.Attributes;
     using Base.Enums;
-    using Base.Helpers;
+    using Base.Utils;
     using ModPlusAPI.Windows;
 
+    /// <summary>
+    /// Линия грунта
+    /// </summary>
     [IntellectualEntityDisplayNameKey("h73")]
     public class GroundLine : IntellectualEntity
     {
         #region Constructor
 
-        /// <inheritdoc />
-        public GroundLine(ObjectId objectId) : base(objectId)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GroundLine"/> class.
+        /// </summary>
+        public GroundLine()
         {
         }
 
-        public GroundLine()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GroundLine"/> class.
+        /// </summary>
+        /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
+        public GroundLine(ObjectId objectId) 
+            : base(objectId)
         {
         }
 
@@ -40,7 +49,7 @@ namespace mpESKD.Functions.mpGroundLine
         {
             get
             {
-                List<Point3d> points = new List<Point3d>();
+                var points = new List<Point3d>();
                 MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
                 return points;
             }
@@ -50,58 +59,50 @@ namespace mpESKD.Functions.mpGroundLine
 
         #region Properties
 
-        /// <summary>
-        /// Минимальная длина линии грунта
-        /// </summary>
-        public double GroundLineMinLength => 20.0;
+        /// <inheritdoc/>
+        public override double MinDistanceBetweenPoints => 20.0;
 
         /// <summary>
         /// Отступ первого штриха в каждом сегменте полилинии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "p36", "d36",
-            GroundLineFirstStrokeOffset.ByHalfSpace, null, null)]
-        [PropertyNameKeyInStyleEditor("p36-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p36", GroundLineFirstStrokeOffset.ByHalfSpace, descLocalKey: "d36", nameSymbol: "a")]
         [SaveToXData]
         public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineFirstStrokeOffset.ByHalfSpace;
 
         /// <summary>
         /// Длина штриха
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 2, "p37", "d37", 8, 1, 10)]
-        [PropertyNameKeyInStyleEditor("p37-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p37", 8, 1, 10, nameSymbol: "l")]
         [SaveToXData]
         public int StrokeLength { get; set; } = 8;
 
         /// <summary>
         /// Расстояние между штрихами
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p38", "d38", 4, 1, 10)]
-        [PropertyNameKeyInStyleEditor("p38-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p38", 4, 1, 10, nameSymbol: "b")]
         [SaveToXData]
         public int StrokeOffset { get; set; } = 4;
 
         /// <summary>
         /// Угол наклона штриха в градусах
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, "p39", "d39", 60, 30, 90)]
-        [PropertyNameKeyInStyleEditor("p39-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p39", 60, 30, 90, nameSymbol: "α")]
         [SaveToXData]
         public int StrokeAngle { get; set; } = 60;
 
         /// <summary>
         /// Отступ группы штрихов
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, "p40", "d40", 10, 1, 20)]
-        [PropertyNameKeyInStyleEditor("p40-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p40", 10, 1, 20, nameSymbol: "c")]
         [SaveToXData]
         public int Space { get; set; } = 10;
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 4, "p35", "d35", "Continuous", null, null)]
+        [EntityProperty(PropertiesCategory.General, 4, "p35", "Continuous", descLocalKey: "d35")]
         public override string LineType { get; set; }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 5, "p6", "d6", 1.0, 0.0, 1.0000E+99)]
+        [EntityProperty(PropertiesCategory.General, 5, "p6", 1.0, 0.0, 1.0000E+99, descLocalKey: "d6")]
         public override double LineTypeScale { get; set; }
 
         /// <inheritdoc />
@@ -159,6 +160,17 @@ namespace mpESKD.Functions.mpGroundLine
         }
 
         /// <inheritdoc />
+        public override IEnumerable<Point3d> GetPointsForOsnap()
+        {
+            yield return InsertionPoint;
+            yield return EndPoint;
+            foreach (var middlePoint in MiddlePoints)
+            {
+                yield return middlePoint;
+            }
+        }
+
+        /// <inheritdoc />
         public override void UpdateEntities()
         {
             try
@@ -170,7 +182,7 @@ namespace mpESKD.Functions.mpGroundLine
                     // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
-                else if (length < GroundLineMinLength * scale && MiddlePoints.Count == 0)
+                else if (length < MinDistanceBetweenPoints * scale && MiddlePoints.Count == 0)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
                     MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
@@ -194,7 +206,8 @@ namespace mpESKD.Functions.mpGroundLine
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                var tmpEndPoint = new Point3d(InsertionPointOCS.X + (GroundLineMinLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
+                var tmpEndPoint = new Point3d(
+                    InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength)
@@ -202,22 +215,14 @@ namespace mpESKD.Functions.mpGroundLine
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, GroundLineMinLength * scale);
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                    InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
         }
 
-        /// <summary>
-        /// Создание примитивов ЕСКД элемента
-        /// </summary>
-        /// <param name="insertionPoint"></param>
-        /// <param name="middlePoints"></param>
-        /// <param name="endPoint"></param>
-        /// <param name="scale"></param>
-        private void CreateEntities(
-            Point3d insertionPoint, List<Point3d> middlePoints,
-            Point3d endPoint, double scale)
+        private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
         {
             var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
             _mainPolyline = new Polyline(points.Count);
@@ -229,7 +234,7 @@ namespace mpESKD.Functions.mpGroundLine
 
             // create strokes
             _strokes.Clear();
-            if (_mainPolyline.Length >= GroundLineMinLength)
+            if (_mainPolyline.Length >= MinDistanceBetweenPoints)
             {
                 for (var i = 1; i < _mainPolyline.NumberOfVertices; i++)
                 {
@@ -240,31 +245,26 @@ namespace mpESKD.Functions.mpGroundLine
             }
         }
 
-        /// <summary>
-        /// Создание штрихов на сегменте полилинии
-        /// </summary>
-        /// <param name="previousPoint"></param>
-        /// <param name="currentPoint"></param>
-        /// <param name="scale">Масштаб ЕСКД объекта</param>
-        private List<Line> CreateStrokesOnMainPolylineSegment(
+        private IEnumerable<Line> CreateStrokesOnMainPolylineSegment(
             Point3d currentPoint, Point3d previousPoint, double scale)
         {
-            List<Line> segmentStrokeDependencies = new List<Line>();
+            var segmentStrokeDependencies = new List<Line>();
 
-            Vector3d segmentVector = currentPoint - previousPoint;
-            double segmentLength = segmentVector.Length;
-            Vector3d perpendicular = segmentVector.GetPerpendicularVector().Negate();
-            double distanceAtSegmentStart = _mainPolyline.GetDistAtPoint(previousPoint);
+            var segmentVector = currentPoint - previousPoint;
+            var segmentLength = segmentVector.Length;
+            var perpendicular = segmentVector.GetPerpendicularVector().Negate();
+            var distanceAtSegmentStart = _mainPolyline.GetDistAtPoint(previousPoint);
 
             var overflowIndex = 0;
 
             // Индекс штриха. Возможные значения - 0, 1, 2
             var strokeIndex = 0;
-            var summDistanceAtSegment = 0.0;
+            var sumDistanceAtSegment = 0.0;
             while (true)
             {
-                double distance = 0.0;
-                if (Math.Abs(summDistanceAtSegment) < 0.0001)
+                overflowIndex++;
+                var distance = 0.0;
+                if (Math.Abs(sumDistanceAtSegment) < 0.0001)
                 {
                     if (FirstStrokeOffset == GroundLineFirstStrokeOffset.ByHalfSpace)
                     {
@@ -301,25 +301,24 @@ namespace mpESKD.Functions.mpGroundLine
                     strokeIndex++;
                 }
 
-                summDistanceAtSegment += distance;
+                sumDistanceAtSegment += distance;
 
-                if (summDistanceAtSegment >= segmentLength)
+                if (sumDistanceAtSegment >= segmentLength)
                 {
                     break;
                 }
 
-                var firstStrokePoint = _mainPolyline.GetPointAtDist(distanceAtSegmentStart + summDistanceAtSegment);
+                var firstStrokePoint = _mainPolyline.GetPointAtDist(distanceAtSegmentStart + sumDistanceAtSegment);
                 var helpPoint =
                     firstStrokePoint + (segmentVector.Negate().GetNormal() * StrokeLength * scale * Math.Cos(StrokeAngle.DegreeToRadian()));
                 var secondStrokePoint =
                     helpPoint + (perpendicular * StrokeLength * scale * Math.Sin(StrokeAngle.DegreeToRadian()));
-                Line stroke = new Line(firstStrokePoint, secondStrokePoint);
+                var stroke = new Line(firstStrokePoint, secondStrokePoint);
                 SetImmutablePropertiesToNestedEntity(stroke);
 
                 // индекс сегмента равен "левой" вершине
                 segmentStrokeDependencies.Add(stroke);
 
-                Debug.Assert(overflowIndex < 1000, "Overflow in stroke creation");
                 if (overflowIndex >= 1000)
                 {
                     break;

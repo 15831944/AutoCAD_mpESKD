@@ -3,28 +3,38 @@
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
-    using Base.Helpers;
+    using Base.Enums;
     using Base.Overrules;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
 
-    /// <summary>Описание ручки линии обрыва</summary>
+    /// <summary>
+    /// Описание ручки оси
+    /// </summary>
     public class AxisGrip : IntellectualEntityGripData
     {
-        public AxisGrip()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AxisGrip"/> class.
+        /// </summary>
+        /// <param name="axis">Экземпляр класса <see cref="mpAxis.Axis"/>, связанный с этой ручкой</param>
+        public AxisGrip(Axis axis)
         {
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
+            Axis = axis;
+            GripType = GripType.Point;
         }
 
-        // Экземпляр класса Axis, связанный с этой ручкой
-        public Axis Axis { get; set; }
+        /// <summary>
+        /// Экземпляр класса <see cref="mpAxis.Axis"/>, связанный с этой ручкой
+        /// </summary>
+        public Axis Axis { get; }
 
-        // Имя ручки
+        /// <summary>
+        /// Имя ручки
+        /// </summary>
         public AxisGripName GripName { get; set; }
 
-        // Подсказка в зависимости от имени ручки
+        /// <inheritdoc />
         public override string GetTooltip()
         {
             switch (GripName)
@@ -57,7 +67,7 @@
         private Point3d _bottomOrientGripTmp;
         private Point3d _topOrientGripTmp;
 
-        // Обработка изменения статуса ручки
+        /// <inheritdoc />
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
             try
@@ -77,7 +87,7 @@
                 // По этим данным я потом получаю экземпляр класса axis
                 if (newStatus == Status.GripEnd)
                 {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(Axis.BlockId, OpenMode.ForWrite, true, true);
                         using (var resBuf = Axis.GetDataForXData())

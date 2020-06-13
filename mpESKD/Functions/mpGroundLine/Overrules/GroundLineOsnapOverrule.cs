@@ -5,14 +5,16 @@
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
-    using Base;
-    using Base.Helpers;
-    using ModPlusAPI.Windows;
+    using Base.Utils;
 
+    /// <inheritdoc />
     public class GroundLineOsnapOverrule : OsnapOverrule
     {
         private static GroundLineOsnapOverrule _instance;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         public static GroundLineOsnapOverrule Instance()
         {
             if (_instance != null)
@@ -27,26 +29,14 @@
             return _instance;
         }
 
+        /// <inheritdoc />
         public override void GetObjectSnapPoints(Entity entity, ObjectSnapModes snapMode, IntPtr gsSelectionMark, Point3d pickPoint,
             Point3d lastPoint, Matrix3d viewTransform, Point3dCollection snapPoints, IntegerCollection geometryIds)
         {
             Debug.Print("GroundLineOsnapOverrule");
             if (IsApplicable(entity))
             {
-                try
-                {
-                    var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(entity);
-                    if (groundLine != null)
-                    {
-                        snapPoints.Add(groundLine.InsertionPoint);
-                        groundLine.MiddlePoints.ForEach(p => snapPoints.Add(p));
-                        snapPoints.Add(groundLine.EndPoint);
-                    }
-                }
-                catch (Autodesk.AutoCAD.Runtime.Exception exception)
-                {
-                    ExceptionBox.Show(exception);
-                }
+                EntityUtils.OsnapOverruleProcess(entity, snapPoints);
             }
             else
             {
@@ -54,9 +44,10 @@
             }
         }
 
+        /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name);
         }
     }
 }

@@ -2,7 +2,6 @@
 namespace mpESKD.Base.Styles
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
@@ -16,13 +15,19 @@ namespace mpESKD.Base.Styles
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Windows;
     using Enums;
-    using Helpers;
     using ModPlusAPI.Windows;
     using ModPlusStyle.Controls;
     using Properties;
+    using Utils;
 
+    /// <summary>
+    /// Редактор стилей
+    /// </summary>
     public partial class StyleEditor
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StyleEditor"/> class.
+        /// </summary>
         public StyleEditor()
         {
             InitializeComponent();
@@ -106,7 +111,7 @@ namespace mpESKD.Base.Styles
 
         private void ShowStyleProperties(IntellectualEntityStyle style)
         {
-            Grid topGrid = new Grid();
+            var topGrid = new Grid();
             topGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             topGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             topGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -115,7 +120,7 @@ namespace mpESKD.Base.Styles
 
             #region Set main data
 
-            TextBlock headerName = new TextBlock
+            var headerName = new TextBlock
             {
                 Margin = (Thickness)FindResource("ModPlusDefaultMargin"),
                 Text = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h54")
@@ -123,9 +128,9 @@ namespace mpESKD.Base.Styles
             Grid.SetRow(headerName, 0);
             topGrid.Children.Add(headerName);
 
-            TextBox tbName = new TextBox { IsEnabled = style.StyleType == StyleType.User };
+            var tbName = new TextBox { IsEnabled = style.StyleType == StyleType.User };
             Grid.SetRow(tbName, 1);
-            Binding binding = new Binding
+            var binding = new Binding
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
@@ -135,7 +140,7 @@ namespace mpESKD.Base.Styles
             BindingOperations.SetBinding(tbName, TextBox.TextProperty, binding);
             topGrid.Children.Add(tbName);
 
-            TextBlock headerDescription = new TextBlock
+            var headerDescription = new TextBlock
             {
                 Margin = (Thickness)FindResource("ModPlusDefaultMargin"),
                 Text = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h55")
@@ -143,7 +148,7 @@ namespace mpESKD.Base.Styles
             Grid.SetRow(headerDescription, 2);
             topGrid.Children.Add(headerDescription);
 
-            TextBox tbDescription = new TextBox { IsEnabled = style.StyleType == StyleType.User };
+            var tbDescription = new TextBox { IsEnabled = style.StyleType == StyleType.User };
             Grid.SetRow(tbDescription, 3);
             binding = new Binding
             {
@@ -157,20 +162,20 @@ namespace mpESKD.Base.Styles
 
             #endregion
 
-            Grid propertiesGrid = new Grid();
+            var propertiesGrid = new Grid();
             propertiesGrid.ColumnDefinitions.Add(new ColumnDefinition());
             propertiesGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             propertiesGrid.ColumnDefinitions.Add(new ColumnDefinition());
             Grid.SetRow(propertiesGrid, 4);
 
-            List<IGrouping<PropertiesCategory, IntellectualEntityProperty>> groupsByCategory = style.Properties.GroupBy(p => p.Category).ToList();
+            var groupsByCategory = style.Properties.GroupBy(p => p.Category).ToList();
             groupsByCategory.Sort((g1, g2) => g1.Key.CompareTo(g2.Key));
             var rowIndex = 0;
-            foreach (IGrouping<PropertiesCategory, IntellectualEntityProperty> categoryGroup in groupsByCategory)
+            foreach (var categoryGroup in groupsByCategory)
             {
                 propertiesGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-                TextBox categoryHeader = new TextBox { Text = LocalizationHelper.GetCategoryLocalizationName(categoryGroup.Key) };
+                var categoryHeader = new TextBox { Text = LocalizationUtils.GetCategoryLocalizationName(categoryGroup.Key) };
                 Grid.SetRow(categoryHeader, rowIndex);
                 Grid.SetColumn(categoryHeader, 0);
                 Grid.SetColumnSpan(categoryHeader, 3);
@@ -178,7 +183,7 @@ namespace mpESKD.Base.Styles
                 propertiesGrid.Children.Add(categoryHeader);
                 rowIndex++;
                 var gridSplitterStartIndex = rowIndex;
-                foreach (IntellectualEntityProperty property in categoryGroup.OrderBy(p => p.OrderIndex))
+                foreach (var property in categoryGroup.OrderBy(p => p.OrderIndex))
                 {
                     propertiesGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
@@ -198,10 +203,10 @@ namespace mpESKD.Base.Styles
                     {
                         try
                         {
-                            ComboBox cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
+                            var cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
                             Grid.SetColumn(cb, 2);
                             Grid.SetRow(cb, rowIndex);
-                            var layers = AcadHelpers.Layers;
+                            var layers = AcadUtils.Layers;
                             layers.Insert(0, ModPlusAPI.Language.GetItem(Invariables.LangItem, "defl")); // "По умолчанию"
                             if (!layers.Contains(style.GetLayerNameProperty()))
                             {
@@ -223,10 +228,10 @@ namespace mpESKD.Base.Styles
                     {
                         try
                         {
-                            ComboBox cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
+                            var cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
                             Grid.SetColumn(cb, 2);
                             Grid.SetRow(cb, rowIndex);
-                            cb.ItemsSource = AcadHelpers.Scales;
+                            cb.ItemsSource = AcadUtils.Scales;
                             cb.Style = Resources["PropertyValueComboBoxForStyleEditor"] as Style;
                             SetDescription(cb, propertyDescription);
                             BindingOperations.SetBinding(cb, ComboBox.TextProperty, CreateTwoWayBindingForProperty(property, new AnnotationScaleValueConverter()));
@@ -241,7 +246,7 @@ namespace mpESKD.Base.Styles
                     {
                         try
                         {
-                            TextBox tb = new TextBox { IsEnabled = style.StyleType == StyleType.User };
+                            var tb = new TextBox { IsEnabled = style.StyleType == StyleType.User };
                             Grid.SetColumn(tb, 2);
                             Grid.SetRow(tb, rowIndex);
                             tb.Cursor = Cursors.Hand;
@@ -260,10 +265,10 @@ namespace mpESKD.Base.Styles
                     {
                         try
                         {
-                            ComboBox cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
+                            var cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
                             Grid.SetColumn(cb, 2);
                             Grid.SetRow(cb, rowIndex);
-                            cb.ItemsSource = AcadHelpers.TextStyles;
+                            cb.ItemsSource = AcadUtils.TextStyles;
                             cb.Style = Resources["PropertyValueComboBoxForStyleEditor"] as Style;
                             SetDescription(cb, propertyDescription);
                             BindingOperations.SetBinding(cb, Selector.SelectedItemProperty, CreateTwoWayBindingForProperty(property));
@@ -278,13 +283,13 @@ namespace mpESKD.Base.Styles
                     {
                         try
                         {
-                            ComboBox cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
+                            var cb = new ComboBox { IsEnabled = style.StyleType == StyleType.User };
                             Grid.SetColumn(cb, 2);
                             Grid.SetRow(cb, rowIndex);
                             cb.Style = Resources["PropertyValueComboBoxForStyleEditor"] as Style;
-                            Type type = property.Value.GetType();
+                            var type = property.Value.GetType();
                             SetDescription(cb, propertyDescription);
-                            cb.ItemsSource = LocalizationHelper.GetEnumPropertyLocalizationFields(type);
+                            cb.ItemsSource = LocalizationUtils.GetEnumPropertyLocalizationFields(type);
 
                             BindingOperations.SetBinding(cb, ComboBox.TextProperty,
                                 CreateTwoWayBindingForProperty(property, new EnumPropertyValueConverter()));
@@ -300,7 +305,10 @@ namespace mpESKD.Base.Styles
                     {
                         try
                         {
-                            NumericBox tb = new NumericBox { IsEnabled = style.StyleType == StyleType.User };
+                            var tb = new NumericBox
+                            {
+                                IsEnabled = style.StyleType == StyleType.User
+                            };
                             Grid.SetColumn(tb, 2);
                             Grid.SetRow(tb, rowIndex);
                             tb.Minimum = Convert.ToInt32(property.Minimum);
@@ -319,7 +327,10 @@ namespace mpESKD.Base.Styles
                     {
                         try
                         {
-                            NumericBox tb = new NumericBox { IsEnabled = style.StyleType == StyleType.User };
+                            var tb = new NumericBox
+                            {
+                                IsEnabled = style.StyleType == StyleType.User
+                            };
                             Grid.SetColumn(tb, 2);
                             Grid.SetRow(tb, rowIndex);
                             tb.Minimum = Convert.ToDouble(property.Minimum);
@@ -339,17 +350,17 @@ namespace mpESKD.Base.Styles
                     {
                         try
                         {
-                            CheckBox chb = new CheckBox { IsEnabled = style.StyleType == StyleType.User };
+                            var chb = new CheckBox { IsEnabled = style.StyleType == StyleType.User };
                             SetDescription(chb, propertyDescription);
                             BindingOperations.SetBinding(chb, ToggleButton.IsCheckedProperty, CreateTwoWayBindingForProperty(property));
 
-                            Border outterBorder = new Border();
-                            outterBorder.Style = Resources["PropertyBorderForCheckBoxForStyleEditor"] as Style;
-                            Grid.SetColumn(outterBorder, 2);
-                            Grid.SetRow(outterBorder, rowIndex);
+                            var outerBorder = new Border();
+                            outerBorder.Style = Resources["PropertyBorderForCheckBoxForStyleEditor"] as Style;
+                            Grid.SetColumn(outerBorder, 2);
+                            Grid.SetRow(outerBorder, rowIndex);
 
-                            outterBorder.Child = chb;
-                            propertiesGrid.Children.Add(outterBorder);
+                            outerBorder.Child = chb;
+                            propertiesGrid.Children.Add(outerBorder);
                         }
                         catch (Exception exception)
                         {
@@ -360,7 +371,7 @@ namespace mpESKD.Base.Styles
                     {
                         try
                         {
-                            TextBox tb = new TextBox { IsEnabled = style.StyleType == StyleType.User };
+                            var tb = new TextBox { IsEnabled = style.StyleType == StyleType.User };
                             Grid.SetColumn(tb, 2);
                             Grid.SetRow(tb, rowIndex);
                             tb.Style = Resources["PropertyValueTextBoxForStyleEditor"] as Style;
@@ -392,7 +403,7 @@ namespace mpESKD.Base.Styles
         /// <param name="rowSpan">Количество пересекаемых строк</param>
         private GridSplitter CreateGridSplitter(int startRowIndex, int rowSpan)
         {
-            GridSplitter gridSplitter = new GridSplitter
+            var gridSplitter = new GridSplitter
             {
                 BorderThickness = new Thickness(2, 0, 0, 0),
                 BorderBrush = (Brush)Resources["MidGrayBrush"],
@@ -413,21 +424,18 @@ namespace mpESKD.Base.Styles
         {
             try
             {
-                if (!string.IsNullOrEmpty(property.DisplayNameLocalizationKeyForStyleEditor))
+                var displayName =
+                    ModPlusAPI.Language.GetItem(Invariables.LangItem, property.DisplayNameLocalizationKey);
+                if (!string.IsNullOrEmpty(displayName))
                 {
-                    var displayName = ModPlusAPI.Language.GetItem(Invariables.LangItem, property.DisplayNameLocalizationKeyForStyleEditor);
-                    if (!string.IsNullOrEmpty(displayName))
+                    if (!string.IsNullOrEmpty(property.NameSymbolForStyleEditor))
                     {
-                        return displayName;
+                        // Обозначение свойства в редакторе стилей должно быть в скобочках и находиться в конце имени перед двоеточием
+                        var symbol = property.NameSymbolForStyleEditor.TrimStart('(').TrimEnd(')');
+                        displayName = $"{displayName.TrimEnd(':').Trim()} ({symbol}):";
                     }
-                }
 
-                {
-                    var displayName = ModPlusAPI.Language.GetItem(Invariables.LangItem, property.DisplayNameLocalizationKey);
-                    if (!string.IsNullOrEmpty(displayName))
-                    {
-                        return displayName;
-                    }
+                    return displayName;
                 }
             }
             catch
@@ -468,7 +476,7 @@ namespace mpESKD.Base.Styles
         /// <returns>Объект типа <see cref="Binding"/></returns>
         private Binding CreateTwoWayBindingForProperty(IntellectualEntityProperty entityProperty, IValueConverter converter = null)
         {
-            Binding binding = new Binding
+            var binding = new Binding
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
@@ -490,12 +498,12 @@ namespace mpESKD.Base.Styles
         /// Это нужно, чтобы решить эту специфическую проблему в данном проекте и не менять из-за этого
         /// библиотеку оформления
         /// </summary>
-        /// <param name="entityProperty"></param>
-        /// <param name="isInteger"></param>
-        /// <returns></returns>
-        private Binding CreateTwoWayBindingForPropertyForNumericValue(IntellectualEntityProperty entityProperty, bool isInteger)
+        /// <param name="entityProperty">Свойство</param>
+        /// <param name="isInteger">True - целое число. False - дробное число</param>
+        private Binding CreateTwoWayBindingForPropertyForNumericValue(
+            IntellectualEntityProperty entityProperty, bool isInteger)
         {
-            Binding binding = new Binding
+            var binding = new Binding
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
@@ -550,14 +558,14 @@ namespace mpESKD.Base.Styles
         /// </summary>
         private void LineType_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
                 var ltd = new LinetypeDialog { IncludeByBlockByLayer = false };
                 if (ltd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     if (!ltd.Linetype.IsNull)
                     {
-                        using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
+                        using (var tr = AcadUtils.Document.TransactionManager.StartOpenCloseTransaction())
                         {
                             using (var ltr = tr.GetObject(ltd.Linetype, OpenMode.ForRead) as LinetypeTableRecord)
                             {
@@ -642,7 +650,7 @@ namespace mpESKD.Base.Styles
             {
                 if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(Invariables.LangItem, "h69"), MessageBoxIcon.Question))
                 {
-                    foreach (EntityStyles entityStyles in _styles)
+                    foreach (var entityStyles in _styles)
                     {
                         if (entityStyles.Styles.Contains(style))
                         {
@@ -695,7 +703,7 @@ namespace mpESKD.Base.Styles
 
         private void StyleEditor_OnClosing(object sender, CancelEventArgs e)
         {
-            foreach (EntityStyles entityStyles in _styles)
+            foreach (var entityStyles in _styles)
             {
                 if (entityStyles.HasStylesWithSameName)
                 {
@@ -713,10 +721,10 @@ namespace mpESKD.Base.Styles
         private void StyleEditor_OnClosed(object sender, EventArgs e)
         {
             // save styles
-            foreach (EntityStyles entityStyles in _styles)
+            foreach (var entityStyles in _styles)
             {
                 StyleManager.SaveStylesToXml(entityStyles.EntityType);
-                foreach (IntellectualEntityStyle style in entityStyles.Styles)
+                foreach (var style in entityStyles.Styles)
                 {
                     if (style.IsCurrent)
                     {
@@ -781,22 +789,22 @@ namespace mpESKD.Base.Styles
             try
             {
                 Hide();
-                PromptEntityOptions promptEntityOptions =
+                var promptEntityOptions =
                     new PromptEntityOptions("\n" + ModPlusAPI.Language.GetItem(Invariables.LangItem, "msg3"));
                 promptEntityOptions.SetRejectMessage("\nWrong entity");
                 promptEntityOptions.AllowNone = false;
                 promptEntityOptions.AddAllowedClass(typeof(BlockReference), true);
                 promptEntityOptions.AllowObjectOnLockedLayer = true;
-                var selectionResult = AcadHelpers.Document.Editor.GetEntity(promptEntityOptions);
+                var selectionResult = AcadUtils.Document.Editor.GetEntity(promptEntityOptions);
                 if (selectionResult.Status == PromptStatus.OK)
                 {
                     var newStyleGuid = string.Empty;
-                    using (OpenCloseTransaction tr = new OpenCloseTransaction())
+                    using (var tr = new OpenCloseTransaction())
                     {
                         var obj = tr.GetObject(selectionResult.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference blockReference)
                         {
-                            var entity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
+                            var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
                             var newStyle = new IntellectualEntityStyle(entity.GetType())
                             {
                                 Name = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h13"),
@@ -805,7 +813,7 @@ namespace mpESKD.Base.Styles
                             };
                             newStyle.GetPropertiesFromEntity(entity, blockReference);
                             newStyleGuid = newStyle.Guid;
-                            foreach (EntityStyles entityStyles in _styles)
+                            foreach (var entityStyles in _styles)
                             {
                                 if (entityStyles.EntityType == entity.GetType())
                                 {
@@ -836,12 +844,12 @@ namespace mpESKD.Base.Styles
         /// <summary>Поиск и выбор в TreeView стиля по Guid</summary>
         private void SearchInTreeViewByGuid(string styleGuid)
         {
-            foreach (object item in TvStyles.Items)
+            foreach (var item in TvStyles.Items)
             {
                 if (item is EntityStyles entityStyles)
                 {
                     var collapseIt = true;
-                    foreach (IntellectualEntityStyle style in entityStyles.Styles)
+                    foreach (var style in entityStyles.Styles)
                     {
                         if (style.Guid == styleGuid)
                         {

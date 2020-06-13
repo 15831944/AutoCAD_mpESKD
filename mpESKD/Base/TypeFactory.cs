@@ -6,12 +6,19 @@
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpGroundLine;
+    using Functions.mpLevelMark;
     using Functions.mpSection;
 
+    /// <summary>
+    /// Фабрика типов интеллектуальных примитивов
+    /// </summary>
     public class TypeFactory
     {
         private static TypeFactory _instance;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         public static TypeFactory Instance => _instance ?? (_instance = new TypeFactory());
 
         /// <summary>
@@ -24,7 +31,8 @@
                 typeof(BreakLine),
                 typeof(Axis),
                 typeof(GroundLine),
-                typeof(Section)
+                typeof(Section),
+                typeof(LevelMark)
             };
         }
 
@@ -39,7 +47,7 @@
             {
                 return BreakLineDescriptor.Instance;
             }
-
+            
             if (entityType == typeof(Axis))
             {
                 return AxisDescriptor.Instance;
@@ -55,6 +63,11 @@
                 return SectionDescriptor.Instance;
             }
 
+            if (entityType == typeof(LevelMark))
+            {
+                return LevelMarkDescriptor.Instance;
+            }
+
             return null;
         }
 
@@ -68,7 +81,8 @@
                 new BreakLineFunction(),
                 new AxisFunction(),
                 new GroundLineFunction(),
-                new SectionFunction()
+                new SectionFunction(),
+                new LevelMarkFunction()
             };
         }
 
@@ -81,6 +95,10 @@
             return GetEntityTypes().Select(t => $"mp{t.Name}").ToList();
         }
 
+        /// <summary>
+        /// Возвращает локализованное описание базового стиля
+        /// </summary>
+        /// <param name="entityType">Тип интеллектуального примитива</param>
         public string GetSystemStyleLocalizedDescription(Type entityType)
         {
             switch (entityType.Name)
@@ -93,12 +111,14 @@
                     return TryGetLocalizationValue("h78");
                 case nameof(Section):
                     return TryGetLocalizationValue("h96");
+                case nameof(LevelMark):
+                    return TryGetLocalizationValue("h108");
             }
 
             return string.Empty;
         }
 
-        private string TryGetLocalizationValue(string key)
+        private static string TryGetLocalizationValue(string key)
         {
             try
             {

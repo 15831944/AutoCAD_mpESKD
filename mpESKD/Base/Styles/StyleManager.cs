@@ -9,12 +9,15 @@
     using Attributes;
     using Autodesk.AutoCAD.DatabaseServices;
     using Enums;
-    using Helpers;
     using JetBrains.Annotations;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Properties;
+    using Utils;
 
+    /// <summary>
+    /// Менеджер стилей
+    /// </summary>
     public static class StyleManager
     {
         static StyleManager()
@@ -61,7 +64,7 @@
 
                 if (needToCreate)
                 {
-                    XElement fXel = new XElement("Styles");
+                    var fXel = new XElement("Styles");
                     fXel.Save(stylesFile);
                 }
             });
@@ -77,7 +80,7 @@
             {
                 var systemStyle = new IntellectualEntityStyle(et)
                 {
-                    Name = LocalizationHelper.GetEntityLocalizationName(et) + " [" + Language.GetItem(Invariables.LangItem, "h12") + "]",
+                    Name = LocalizationUtils.GetEntityLocalizationName(et) + " [" + Language.GetItem(Invariables.LangItem, "h12") + "]",
                     Description = TypeFactory.Instance.GetSystemStyleLocalizedDescription(et),
                     Guid = "00000000-0000-0000-0000-000000000000",
                     StyleType = StyleType.System
@@ -94,12 +97,13 @@
         /// <summary>
         /// Наполнение стиля свойствами со значениями по умолчанию
         /// </summary>
+        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
         public static void FillStyleDefaultProperties(this IntellectualEntityStyle style, Type entityType)
         {
-            foreach (PropertyInfo propertyInfo in entityType.GetProperties())
+            foreach (var propertyInfo in entityType.GetProperties())
             {
                 var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
-                var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
                 if (attribute != null && attribute.Name != "Style")
                 {
                     if (attribute.PropertyScope != PropertyScope.PaletteAndStyleEditor)
@@ -110,15 +114,17 @@
                     if (attribute.Name == "Scale")
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
-                            attribute, keyForEditorAttribute, entityType,
-                            Parsers.AnnotationScaleFromString(attribute.DefaultValue.ToString()),
+                            attribute, 
+                            entityType,
+                            AcadUtils.AnnotationScaleFromString(attribute.DefaultValue.ToString()),
                             ObjectId.Null));
                     }
                     else if (attribute.Name == "LayerName")
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
-                            attribute, keyForEditorAttribute, entityType,
-                            AcadHelpers.Layers.Contains(attribute.DefaultValue.ToString())
+                            attribute, 
+                            entityType,
+                            AcadUtils.Layers.Contains(attribute.DefaultValue.ToString())
                                 ? attribute.DefaultValue
                                 : Language.GetItem(Invariables.LangItem, "defl"),
                             ObjectId.Null));
@@ -127,7 +133,6 @@
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
                             attribute,
-                            keyForEditorAttribute,
                             entityType,
                             attribute.DefaultValue,
                             ObjectId.Null));
@@ -144,11 +149,10 @@
         /// <param name="blockReference">Вставка блока, представляющая интеллектуальный примитив в AutoCAD</param>
         public static void GetPropertiesFromEntity(this IntellectualEntityStyle style, IntellectualEntity entity, BlockReference blockReference)
         {
-            Type entityType = entity.GetType();
-            foreach (PropertyInfo propertyInfo in entityType.GetProperties())
+            var entityType = entity.GetType();
+            foreach (var propertyInfo in entityType.GetProperties())
             {
                 var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
-                var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
                 if (attribute != null && attribute.Name != "Style")
                 {
                     if (attribute.PropertyScope != PropertyScope.PaletteAndStyleEditor)
@@ -159,7 +163,8 @@
                     if (attribute.Name == "LayerName")
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
-                            attribute, keyForEditorAttribute, entityType,
+                            attribute, 
+                            entityType,
                             blockReference.Layer,
                             ObjectId.Null));
                     }
@@ -167,7 +172,6 @@
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
                             attribute,
-                            keyForEditorAttribute,
                             entityType,
                             blockReference.Linetype,
                             ObjectId.Null));
@@ -176,7 +180,6 @@
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
                             attribute,
-                            keyForEditorAttribute,
                             entityType,
                             propertyInfo.GetValue(entity),
                             ObjectId.Null));
@@ -218,10 +221,12 @@
                 }
 
                 var fXel = XElement.Load(stylesFile);
-                foreach (XElement styleXel in fXel.Elements("UserStyle"))
+                foreach (var styleXel in fXel.Elements("UserStyle"))
                 {
-                    var style = new IntellectualEntityStyle(entityType);
-                    style.StyleType = StyleType.User;
+                    var style = new IntellectualEntityStyle(entityType)
+                    {
+                        StyleType = StyleType.User
+                    };
                     style.Name = styleXel.Attribute(nameof(style.Name))?.Value;
                     style.Description = styleXel.Attribute(nameof(style.Description))?.Value;
 
@@ -243,13 +248,12 @@
                     style.TextStyleXmlData = textStyleData ?? null;
 
                     // get properties from file
-                    foreach (PropertyInfo propertyInfo in entityType.GetProperties())
+                    foreach (var propertyInfo in entityType.GetProperties())
                     {
                         var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
-                        var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
                         if (attribute != null)
                         {
-                            XElement xmlProperty = styleXel.Elements("Property").FirstOrDefault(e => e.Attribute("Name")?.Value == attribute.Name);
+                            var xmlProperty = styleXel.Elements("Property").FirstOrDefault(e => e.Attribute("Name")?.Value == attribute.Name);
                             if (xmlProperty != null)
                             {
                                 var xmlValue = xmlProperty.Attribute("Value")?.Value;
@@ -257,8 +261,9 @@
                                 if (attribute.Name == "Scale")
                                 {
                                     style.Properties.Add(new IntellectualEntityProperty(
-                                        attribute, keyForEditorAttribute, entityType,
-                                        Parsers.AnnotationScaleFromString(xmlValue),
+                                        attribute, 
+                                        entityType,
+                                        AcadUtils.AnnotationScaleFromString(xmlValue),
                                         ObjectId.Null));
                                 }
                                 else
@@ -266,26 +271,32 @@
                                     if (valueType == typeof(string))
                                     {
                                         style.Properties.Add(new IntellectualEntityProperty(
-                                            attribute, keyForEditorAttribute, entityType, xmlProperty.Attribute("Value").Value, ObjectId.Null));
+                                            attribute,
+                                            entityType,
+                                            xmlProperty.Attribute("Value").Value,
+                                            ObjectId.Null));
                                     }
                                     else if (valueType == typeof(int))
                                     {
                                         style.Properties.Add(new IntellectualEntityProperty(
-                                            attribute, keyForEditorAttribute, entityType,
+                                            attribute, 
+                                            entityType,
                                             int.TryParse(xmlValue, out var i) ? i : attribute.DefaultValue,
                                             ObjectId.Null));
                                     }
                                     else if (valueType == typeof(double))
                                     {
                                         style.Properties.Add(new IntellectualEntityProperty(
-                                            attribute, keyForEditorAttribute, entityType,
+                                            attribute, 
+                                            entityType,
                                             double.TryParse(xmlValue, out var d) ? d : attribute.DefaultValue,
                                             ObjectId.Null));
                                     }
                                     else if (valueType == typeof(bool))
                                     {
                                         style.Properties.Add(new IntellectualEntityProperty(
-                                            attribute, keyForEditorAttribute, entityType,
+                                            attribute, 
+                                            entityType,
                                             bool.TryParse(xmlValue, out var b) ? b : attribute.DefaultValue,
                                             ObjectId.Null));
                                     }
@@ -294,13 +305,18 @@
                                         try
                                         {
                                             style.Properties.Add(new IntellectualEntityProperty(
-                                                attribute, keyForEditorAttribute, entityType,
+                                                attribute,
+                                                entityType,
                                                 Enum.Parse(attribute.DefaultValue.GetType(), xmlValue),
                                                 ObjectId.Null));
                                         }
                                         catch
                                         {
-                                            style.Properties.Add(new IntellectualEntityProperty(attribute, keyForEditorAttribute, entityType, attribute.DefaultValue, ObjectId.Null));
+                                            style.Properties.Add(new IntellectualEntityProperty(
+                                                attribute, 
+                                                entityType,
+                                                attribute.DefaultValue,
+                                                ObjectId.Null));
                                         }
                                     }
                                 }
@@ -324,10 +340,9 @@
         /// <param name="entityType">Тип примитива</param>
         private static void CheckMissedProperties(this IntellectualEntityStyle style, Type entityType)
         {
-            foreach (PropertyInfo propertyInfo in entityType.GetProperties())
+            foreach (var propertyInfo in entityType.GetProperties())
             {
                 var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
-                var keyForEditorAttribute = propertyInfo.GetCustomAttribute<PropertyNameKeyInStyleEditor>();
                 if (attribute != null && attribute.Name != "Style")
                 {
                     if (attribute.PropertyScope != PropertyScope.PaletteAndStyleEditor)
@@ -340,7 +355,6 @@
                     {
                         style.Properties.Add(new IntellectualEntityProperty(
                         attribute,
-                        keyForEditorAttribute,
                         entityType,
                         attribute.DefaultValue,
                         ObjectId.Null));
@@ -352,6 +366,7 @@
         /// <summary>
         /// Сохранение стилей указанного типа
         /// </summary>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
         public static void SaveStylesToXml(Type entityType)
         {
             var stylesFile = Path.Combine(MainFunction.StylesPath, entityType.Name + "Styles.xml");
@@ -367,7 +382,7 @@
                 var fXel = XElement.Load(stylesFile);
                 fXel.RemoveAll();
 
-                foreach (IntellectualEntityStyle style in EntityStyles.Where(s => s.EntityType == entityType))
+                foreach (var style in EntityStyles.Where(s => s.EntityType == entityType))
                 {
                     if (!style.CanEdit)
                     {
@@ -390,12 +405,12 @@
         /// </summary>
         private static XElement ConvertToXElement(this IntellectualEntityStyle style)
         {
-            XElement styleXel = new XElement("UserStyle");
+            var styleXel = new XElement("UserStyle");
             styleXel.SetAttributeValue(nameof(style.Name), style.Name);
             styleXel.SetAttributeValue(nameof(style.Description), style.Description);
             styleXel.SetAttributeValue(nameof(style.Guid), style.Guid);
 
-            foreach (IntellectualEntityProperty entityProperty in style.Properties)
+            foreach (var entityProperty in style.Properties)
             {
                 if (entityProperty.Name == "Scale")
                 {
@@ -413,9 +428,9 @@
                 }
             }
 
-            if (LayerHelper.HasLayer(style.GetLayerNameProperty()))
+            if (LayerUtils.HasLayer(style.GetLayerNameProperty()))
             {
-                styleXel.Add(LayerHelper.SetLayerXml(LayerHelper.GetLayerTableRecordByLayerName(style.GetLayerNameProperty())));
+                styleXel.Add(LayerUtils.SetLayerXml(LayerUtils.GetLayerTableRecordByLayerName(style.GetLayerNameProperty())));
             }
             else if (style.LayerXmlData != null)
             {
@@ -423,9 +438,9 @@
             }
 
             // add text style
-            if (TextStyleHelper.HasTextStyle(style.GetTextStyleProperty()))
+            if (TextStyleUtils.HasTextStyle(style.GetTextStyleProperty()))
             {
-                styleXel.Add(TextStyleHelper.SetTextStyleTableRecordXElement(TextStyleHelper.GetTextStyleTableRecordByName(style.GetTextStyleProperty())));
+                styleXel.Add(TextStyleUtils.SetTextStyleTableRecordXElement(TextStyleUtils.GetTextStyleTableRecordByName(style.GetTextStyleProperty())));
             }
             else if (style.TextStyleXmlData != null)
             {
@@ -435,9 +450,13 @@
             return styleXel;
         }
 
+        /// <summary>
+        /// Возвращает идентификатор текущего стиля для объекта указанного типа
+        /// </summary>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
         public static string GetCurrentStyleGuidForEntity(Type entityType)
         {
-            return CurrentStyleGuid("mp" + entityType.Name);
+            return CurrentStyleGuid($"mp{entityType.Name}");
         }
 
         /// <summary>
@@ -466,15 +485,10 @@
         /// <summary>
         /// Сохранить стиль как Текущий в настройки пользователя
         /// </summary>
-        /// <param name="style"></param>
+        /// <param name="style">Сохраняемый стиль</param>
         public static void SaveCurrentStyleToSettings(IntellectualEntityStyle style)
         {
-            UserConfigFile.SetValue(
-                UserConfigFile.ConfigFileZone.Settings,
-                "mp" + style.EntityType.Name,
-                "CurrentStyleGuid",
-                style.Guid,
-                true);
+            UserConfigFile.SetValue($"mp{style.EntityType.Name}", "CurrentStyleGuid", style.Guid, true);
         }
 
         /// <summary>
@@ -490,8 +504,7 @@
         /// <summary>
         /// Получить текущий стиль для типа примитива
         /// </summary>
-        /// <param name="entityType"></param>
-        /// <returns></returns>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
         public static IntellectualEntityStyle GetCurrentStyle(Type entityType)
         {
             try
@@ -500,7 +513,7 @@
 
                 var currentStyleGuid = GetCurrentStyleGuid(entityType);
 
-                foreach (IntellectualEntityStyle style in EntityStyles)
+                foreach (var style in EntityStyles)
                 {
                     if (style.EntityType == entityType &&
                         style.Guid == currentStyleGuid)
@@ -520,8 +533,7 @@
         /// <summary>
         /// Получить все стили для типа примитива
         /// </summary>
-        /// <param name="entityType"></param>
-        /// <returns></returns>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
         public static List<IntellectualEntityStyle> GetStyles(Type entityType)
         {
             LoadStylesFromXmlFile(entityType);
@@ -532,9 +544,11 @@
         /// <summary>
         /// Возвращает имя стиля с указанными идентификатором для указанного типа примитива
         /// </summary>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
+        /// <param name="guid">Идентификатор стиля</param>
         public static string GetStyleNameByGuid(Type entityType, string guid)
         {
-            IntellectualEntityStyle style = EntityStyles.FirstOrDefault(s => s.EntityType == entityType && s.Guid == guid);
+            var style = EntityStyles.FirstOrDefault(s => s.EntityType == entityType && s.Guid == guid);
             if (style != null)
             {
                 return style.Name;
@@ -547,6 +561,8 @@
         /// <summary>
         /// Возвращает стиль для указанного типа примитива по указанному имени стиля
         /// </summary>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
+        /// <param name="styleName">Имя стиля</param>
         [CanBeNull]
         public static IntellectualEntityStyle GetStyleByName(Type entityType, string styleName)
         {
@@ -556,6 +572,7 @@
         /// <summary>
         /// Добавить стиль в список
         /// </summary>
+        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
         public static void AddStyle(IntellectualEntityStyle style)
         {
             EntityStyles.Add(style);
@@ -564,6 +581,7 @@
         /// <summary>
         /// Удаление стиля из списка
         /// </summary>
+        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
         public static void RemoveStyle(IntellectualEntityStyle style)
         {
             EntityStyles.Remove(style);
@@ -572,9 +590,10 @@
         /// <summary>
         /// Возвращает значение свойства "Имя слоя" из стиля
         /// </summary>
+        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
         public static string GetLayerNameProperty(this IntellectualEntityStyle style)
         {
-            foreach (IntellectualEntityProperty property in style.Properties)
+            foreach (var property in style.Properties)
             {
                 if (property.Name == "LayerName")
                 {
@@ -588,10 +607,11 @@
         /// <summary>
         /// Возвращает значение свойства "Тип линии" из стиля
         /// </summary>
+        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
         /// <returns>В случае неудачи возвращает "Continuous"</returns>
         public static string GetLineTypeProperty(this IntellectualEntityStyle style)
         {
-            foreach (IntellectualEntityProperty property in style.Properties)
+            foreach (var property in style.Properties)
             {
                 if (property.Name == "LineType")
                 {
@@ -605,10 +625,11 @@
         /// <summary>
         /// Возвращает значение свойства "Текстовый стиль" из стиля
         /// </summary>
+        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
         /// <returns>В случае неудачи возвращает "Standard"</returns>
         public static string GetTextStyleProperty(this IntellectualEntityStyle style)
         {
-            foreach (IntellectualEntityProperty property in style.Properties)
+            foreach (var property in style.Properties)
             {
                 if (property.Name == "TextStyle")
                 {
@@ -629,7 +650,7 @@
         public static void ApplyStyle(this IntellectualEntity entity, IntellectualEntityStyle style, bool isOnEntityCreation)
         {
             var type = entity.GetType();
-            foreach (PropertyInfo propertyInfo in type.GetProperties())
+            foreach (var propertyInfo in type.GetProperties())
             {
                 var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                 if (attribute != null)
@@ -647,7 +668,7 @@
                                 }
                                 else
                                 {
-                                    entity.Scale = AcadHelpers.GetCurrentScale();
+                                    entity.Scale = AcadUtils.GetCurrentScale();
                                 }
                             }
                             else
@@ -668,19 +689,19 @@
                                 if (MainSettings.Instance.UseLayerFromStyle)
                                 {
                                     propertyInfo.SetValue(entity, layerName);
-                                    AcadHelpers.SetLayerByName(entity.BlockId, layerName, style.LayerXmlData);
+                                    AcadUtils.SetLayerByName(entity.BlockId, layerName, style.LayerXmlData);
                                 }
                             }
                             else
                             {
                                 propertyInfo.SetValue(entity, layerName);
-                                AcadHelpers.SetLayerByName(entity.BlockId, layerName, style.LayerXmlData);
+                                AcadUtils.SetLayerByName(entity.BlockId, layerName, style.LayerXmlData);
                             }
                         }
                         else if (attribute.Name == "LineType")
                         {
                             var lineType = propertyFromStyle.Value.ToString();
-                            AcadHelpers.SetLineType(entity.BlockId, lineType);
+                            AcadUtils.SetLineType(entity.BlockId, lineType);
                         }
                         else if (attribute.Name == "TextStyle")
                         {
@@ -700,14 +721,14 @@
                             if (apply)
                             {
                                 var textStyleName = propertyFromStyle.Value.ToString();
-                                if (TextStyleHelper.HasTextStyle(textStyleName))
+                                if (TextStyleUtils.HasTextStyle(textStyleName))
                                 {
                                     propertyInfo.SetValue(entity, textStyleName);
                                 }
                                 else
                                 {
                                     if (MainSettings.Instance.IfNoTextStyle == 1 &&
-                                        TextStyleHelper.CreateTextStyle(style.TextStyleXmlData))
+                                        TextStyleUtils.CreateTextStyle(style.TextStyleXmlData))
                                     {
                                         propertyInfo.SetValue(entity, textStyleName);
                                     }

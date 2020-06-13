@@ -14,8 +14,10 @@
     using Autodesk.AutoCAD.Windows;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
+    using Base.Styles;
+    using Base.Utils;
     using Functions.mpAxis;
+    using Functions.mpLevelMark;
     using Functions.mpSection;
     using Functions.SearchEntities;
     using ModPlus;
@@ -23,9 +25,13 @@
     using mpESKD.Base.Properties;
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
+    /// <summary>
+    /// Основные команды и инициализация приложения
+    /// </summary>
     public class MainFunction : IExtensionApplication
     {
         private static ContextMenuExtension _intellectualEntityContextMenu;
+        private static StyleEditor _styleEditor;
 
         /// <summary>
         /// Путь к папке хранения пользовательских стилей
@@ -62,10 +68,10 @@
             BeditCommandWatcher.Initialize();
             AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
 
-            AcadHelpers.Documents.DocumentCreated += Documents_DocumentCreated;
-            AcadHelpers.Documents.DocumentActivated += Documents_DocumentActivated;
+            AcadUtils.Documents.DocumentCreated += Documents_DocumentCreated;
+            AcadUtils.Documents.DocumentActivated += Documents_DocumentActivated;
 
-            foreach (Document document in AcadHelpers.Documents)
+            foreach (Document document in AcadUtils.Documents)
             {
                 document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
             }
@@ -120,17 +126,39 @@
         }
 
         /// <summary>
+        /// Команда открытия редактора стилей и настроек
+        /// </summary>
+        [CommandMethod("ModPlus", "mpStyleEditor", CommandFlags.Modal)]
+        public static void OpenStyleEditor()
+        {
+            if (_styleEditor == null)
+            {
+                _styleEditor = new StyleEditor();
+                _styleEditor.Closed += (sender, args) => _styleEditor = null;
+            }
+
+            if (_styleEditor.IsLoaded)
+            {
+                _styleEditor.Activate();
+            }
+            else
+            {
+                AcApp.ShowModalWindow(AcApp.MainWindow.Handle, _styleEditor, false);
+            }
+        }
+
+        /// <summary>
         /// Команда "Создать аналог"
         /// </summary>
         [CommandMethod("ModPlus", "mpESKDCreateAnalog", CommandFlags.UsePickSet)]
         public void CreateAnalogCommand()
         {
-            var psr = AcadHelpers.Editor.SelectImplied();
+            var psr = AcadUtils.Editor.SelectImplied();
             if (psr.Value == null || psr.Value.Count != 1) 
                 return;
 
             IntellectualEntity intellectualEntity = null;
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
                 using (var tr = new OpenCloseTransaction())
                 {
@@ -144,7 +172,7 @@
                         var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                         if (obj is BlockReference blockReference)
                         {
-                            intellectualEntity = EntityReaderFactory.Instance.GetFromEntity(blockReference);
+                            intellectualEntity = EntityReaderService.Instance.GetFromEntity(blockReference);
                         }
                     }
 
@@ -165,7 +193,7 @@
             {
                 var promptKeywordOptions =
                     new PromptKeywordOptions("\n" + Language.GetItem(Invariables.LangItem, "msg8"), "Yes No");
-                var promptResult = AcadHelpers.Editor.GetKeywords(promptKeywordOptions);
+                var promptResult = AcadUtils.Editor.GetKeywords(promptKeywordOptions);
                 if (promptResult.Status == PromptStatus.OK)
                 {
                     if (promptResult.StringResult == "No")
@@ -188,19 +216,23 @@
             function?.CreateAnalog(intellectualEntity, copyLayer);
         }
 
+        /// <summary>
+        /// Создание блока для интеллектуального объекта
+        /// </summary>
+        /// <param name="intellectualEntity">Интеллектуальный объект</param>
         public static BlockReference CreateBlock(IntellectualEntity intellectualEntity)
         {
             BlockReference blockReference;
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
                 ObjectId objectId;
-                using (var transaction = AcadHelpers.Document.TransactionManager.StartTransaction())
+                using (var transaction = AcadUtils.Document.TransactionManager.StartTransaction())
                 {
-                    using (var blockTable = AcadHelpers.Database.BlockTableId.Write<BlockTable>())
+                    using (var blockTable = AcadUtils.Database.BlockTableId.Write<BlockTable>())
                     {
                         var blockTableRecordObjectId = blockTable.Add(intellectualEntity.BlockRecord);
                         blockReference = new BlockReference(intellectualEntity.InsertionPoint, blockTableRecordObjectId);
-                        using (var blockTableRecord = AcadHelpers.Database.CurrentSpaceId.Write<BlockTableRecord>())
+                        using (var blockTableRecord = AcadUtils.Database.CurrentSpaceId.Write<BlockTableRecord>())
                         {
                             blockTableRecord.BlockScaling = BlockScaling.Uniform;
                             objectId = blockTableRecord.AppendEntity(blockReference);
@@ -308,12 +340,12 @@
             Autodesk.Windows.ComponentManager.ItemInitialized -= ComponentManager_ItemInitialized;
         }
 
-        /// <summary>Обработка двойного клика по блоку</summary>
+        /// <summary>
+        /// Обработка двойного клика по блоку
+        /// </summary>
         private static void AcApp_BeginDoubleClick(object sender, BeginDoubleClickEventArgs e)
         {
-            var pt = e.Location;
-
-            var psr = AcadHelpers.Editor.SelectImplied();
+            var psr = AcadUtils.Editor.SelectImplied();
             if (psr.Status != PromptStatus.OK)
             {
                 return;
@@ -324,23 +356,30 @@
             if (ids.Length != 1) 
                 return;
 
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
-                using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                 {
                     var obj = tr.GetObject(ids[0], OpenMode.ForWrite, true, true);
                     if (obj is BlockReference blockReference)
                     {
-                        // axis
-                        if (ExtendedDataHelpers.IsIntellectualEntity(blockReference, AxisDescriptor.Instance.Name))
-                        {
-                            AxisFunction.DoubleClickEdit(blockReference, pt, tr);
-                        }
+                        var applicableAppName = ExtendedDataUtils.ApplicableAppName(blockReference);
 
-                        // section
-                        else if (ExtendedDataHelpers.IsIntellectualEntity(blockReference, SectionDescriptor.Instance.Name))
+                        if (string.IsNullOrEmpty(applicableAppName))
                         {
-                            SectionFunction.DoubleClickEdit(blockReference, pt, tr);
+                            BeditCommandWatcher.UseBedit = true;
+                        }
+                        else if (applicableAppName == AxisDescriptor.Instance.Name)
+                        {
+                            EntityUtils.DoubleClickEdit(blockReference, entity => new AxisValueEditor(entity));
+                        }
+                        else if (applicableAppName == SectionDescriptor.Instance.Name)
+                        {
+                            EntityUtils.DoubleClickEdit(blockReference, entity => new SectionValueEditor(entity));
+                        }
+                        else if (applicableAppName == LevelMarkDescriptor.Instance.Name)
+                        {
+                            EntityUtils.DoubleClickEdit(blockReference, entity => new LevelMarkValueEditor(entity));
                         }
                         else
                         {
@@ -381,12 +420,12 @@
             try
             {
                 var timer = Stopwatch.StartNew();
-                using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Document.TransactionManager.StartOpenCloseTransaction())
                 {
                     foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfIntellectualEntities(
                         TypeFactory.Instance.GetEntityCommandNames(), tr))
                     {
-                        var ie = EntityReaderFactory.Instance.GetFromEntity(blockReference);
+                        var ie = EntityReaderService.Instance.GetFromEntity(blockReference);
                         if (ie != null)
                         {
                             blockReference.UpgradeOpen();
@@ -418,11 +457,11 @@
 
         private static void Document_ImpliedSelectionChanged(object sender, EventArgs e)
         {
-            var psr = AcadHelpers.Editor.SelectImplied();
+            var psr = AcadUtils.Editor.SelectImplied();
             var detach = true;
             if (psr.Value != null && psr.Value.Count == 1)
             {
-                using (AcadHelpers.Document.LockDocument())
+                using (AcadUtils.Document.LockDocument())
                 {
                     using (var tr = new OpenCloseTransaction())
                     {
@@ -435,7 +474,7 @@
 
                             var obj = tr.GetObject(selectedObject.ObjectId, OpenMode.ForRead);
                             if (obj is BlockReference blockReference &&
-                                ExtendedDataHelpers.IsApplicable(blockReference))
+                                ExtendedDataUtils.IsApplicable(blockReference))
                             {
                                 AttachCreateAnalogContextMenu();
                                 detach = false;

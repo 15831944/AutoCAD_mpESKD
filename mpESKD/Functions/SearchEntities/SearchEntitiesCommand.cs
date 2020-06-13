@@ -8,28 +8,34 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
 
+    /// <summary>
+    /// Поиск интеллектуальных объектов в чертеже
+    /// </summary>
     public static class SearchEntitiesCommand
     {
+        /// <summary>
+        /// Запуск команды поиска интеллектуальных объектов в чертеже
+        /// </summary>
         [CommandMethod("ModPlus", "mpESKDSearch", CommandFlags.Modal)]
         public static void Start()
         {
             try
             {
-                List<Type> types = TypeFactory.Instance.GetEntityTypes();
-                SearchEntitiesSettings settings = new SearchEntitiesSettings();
+                var types = TypeFactory.Instance.GetEntityTypes();
+                var settings = new SearchEntitiesSettings();
 
-                foreach (Type entityType in types)
+                foreach (var entityType in types)
                 {
-                    CheckBox checkBox = new CheckBox
+                    var checkBox = new CheckBox
                     {
                         Content = TypeFactory.Instance.GetDescriptor(entityType).LName,
                         Tag = entityType
                     };
-                    ListBoxItem listBoxItem = new ListBoxItem
+                    var listBoxItem = new ListBoxItem
                     {
                         Content = checkBox
                     };
@@ -41,9 +47,9 @@
                     return;
                 }
 
-                SearchProceedOption searchProceedOption = (SearchProceedOption)settings.CbSearchProceedOption.SelectedIndex;
+                var searchProceedOption = (SearchProceedOption)settings.CbSearchProceedOption.SelectedIndex;
 
-                List<string> entitiesToProceed = new List<string>();
+                var entitiesToProceed = new List<string>();
                 foreach (var item in settings.LbEntities.Items)
                 {
                     if (item is ListBoxItem listBoxItem &&
@@ -59,9 +65,9 @@
                     return;
                 }
 
-                using (Transaction tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                 {
-                    var btr = (BlockTableRecord)tr.GetObject(AcadHelpers.Database.CurrentSpaceId, OpenMode.ForRead);
+                    var btr = (BlockTableRecord)tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead);
 
                     var blockReferences = GetBlockReferencesOfIntellectualEntities(entitiesToProceed, tr).ToList();
 
@@ -70,7 +76,7 @@
                         switch (searchProceedOption)
                         {
                             case SearchProceedOption.Select:
-                                AcadHelpers.Editor.SetImpliedSelection(blockReferences.Select(b => b.ObjectId).ToArray());
+                                AcadUtils.Editor.SetImpliedSelection(blockReferences.Select(b => b.ObjectId).ToArray());
                                 break;
                             case SearchProceedOption.RemoveData:
                                 foreach (var blockReference in blockReferences)
@@ -89,12 +95,12 @@
                                 foreach (var blockReference in blockReferences)
                                 {
                                     blockReference.UpgradeOpen();
-                                    using (DBObjectCollection dbObjCol = new DBObjectCollection())
+                                    using (var dbObjCol = new DBObjectCollection())
                                     {
                                         blockReference.Explode(dbObjCol);
                                         foreach (DBObject dbObj in dbObjCol)
                                         {
-                                            Entity acEnt = dbObj as Entity;
+                                            var acEnt = dbObj as Entity;
 
                                             btr.AppendEntity(acEnt);
                                             tr.AddNewlyCreatedDBObject(dbObj, true);
@@ -140,7 +146,7 @@
         public static IEnumerable<BlockReference> GetBlockReferencesOfIntellectualEntities(
             ICollection<string> typeNames, Transaction tr)
         {
-            var btr = (BlockTableRecord)tr.GetObject(AcadHelpers.Database.CurrentSpaceId, OpenMode.ForRead);
+            var btr = (BlockTableRecord)tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead);
             foreach (var objectId in btr)
             {
                 if (tr.GetObject(objectId, OpenMode.ForRead) is BlockReference blockReference &&

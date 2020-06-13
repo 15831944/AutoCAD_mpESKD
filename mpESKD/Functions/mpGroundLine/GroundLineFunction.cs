@@ -8,12 +8,13 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
     using Base.Styles;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Overrules;
 
+    /// <inheritdoc />
     public class GroundLineFunction : IIntellectualEntityFunction
     {
         /// <inheritdoc />
@@ -35,8 +36,9 @@
         /// <inheritdoc />
         public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
         {
-            // send statistic
+#if !DEBUG
             Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+#endif
 
             try
             {
@@ -46,7 +48,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
 
                 var groundLine = new GroundLine();
                 var blockReference = MainFunction.CreateBlock(groundLine);
@@ -90,7 +92,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
 
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();
@@ -112,17 +114,18 @@
 
         private static void InsertGroundLineWithJig(GroundLine groundLine, BlockReference blockReference)
         {
+            var nextPointPrompt = Language.GetItem(Invariables.LangItem, "msg5");
             var entityJig = new DefaultEntityJig(
                 groundLine,
                 blockReference,
-                new Point3d(20, 0, 0),
-                Language.GetItem(Invariables.LangItem, "msg5"));
+                new Point3d(20, 0, 0));
             do
             {
-                var status = AcadHelpers.Editor.Drag(entityJig).Status;
+                var status = AcadUtils.Editor.Drag(entityJig).Status;
                 if (status == PromptStatus.OK)
                 {
                     entityJig.JigState = JigState.PromptNextPoint;
+                    entityJig.PromptForNextPoint = nextPointPrompt;
                     if (entityJig.PreviousPoint == null)
                     {
                         entityJig.PreviousPoint = groundLine.MiddlePoints.Any()
@@ -147,9 +150,9 @@
                     else
                     {
                         // if no middle points - remove entity
-                        using (AcadHelpers.Document.LockDocument())
+                        using (AcadUtils.Document.LockDocument())
                         {
-                            using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                            using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                             {
                                 var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
                                 obj.Erase(true);
@@ -160,11 +163,12 @@
 
                     break;
                 }
-            } while (true);
+            }
+            while (true);
 
             if (!groundLine.BlockId.IsErased)
             {
-                using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                 {
                     var ent = tr.GetObject(groundLine.BlockId, OpenMode.ForWrite, true, true);
                     ent.XData = groundLine.GetDataForXData();
@@ -187,7 +191,7 @@
                 peo.SetRejectMessage("\n" + Language.GetItem(Invariables.LangItem, "wrong"));
                 peo.AddAllowedClass(typeof(Polyline), true);
 
-                var per = AcadHelpers.Editor.GetEntity(peo);
+                var per = AcadUtils.Editor.GetEntity(peo);
                 if (per.Status != PromptStatus.OK)
                 {
                     return;
@@ -197,7 +201,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataHelpers.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(GroundLineDescriptor.Instance.Name);
 
                 // style
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
@@ -208,9 +212,9 @@
 
                 var plineId = per.ObjectId;
 
-                using (AcadHelpers.Document.LockDocument(DocumentLockMode.ProtectedAutoWrite, null, null, true))
+                using (AcadUtils.Document.LockDocument(DocumentLockMode.ProtectedAutoWrite, null, null, true))
                 {
-                    using (var tr = AcadHelpers.Document.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = AcadUtils.Document.TransactionManager.StartOpenCloseTransaction())
                     {
                         var dbObj = tr.GetObject(plineId, OpenMode.ForRead);
                         if (dbObj is Polyline pline)
@@ -242,13 +246,13 @@
                         tr.Commit();
                     }
 
-                    AcadHelpers.Document.TransactionManager.QueueForGraphicsFlush();
-                    AcadHelpers.Document.TransactionManager.FlushGraphics();
+                    AcadUtils.Document.TransactionManager.QueueForGraphicsFlush();
+                    AcadUtils.Document.TransactionManager.FlushGraphics();
 
                     // "Удалить исходную полилинию?"
                     if (MessageBox.ShowYesNo(Language.GetItem(Invariables.LangItem, "msg7"), MessageBoxIcon.Question))
                     {
-                        using (var tr = AcadHelpers.Document.TransactionManager.StartTransaction())
+                        using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                         {
                             var dbObj = tr.GetObject(plineId, OpenMode.ForWrite, true, true);
                             dbObj.Erase(true);

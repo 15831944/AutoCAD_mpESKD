@@ -1,7 +1,10 @@
-﻿namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Utils
 {
     using System;
 
+    /// <summary>
+    /// Математические вспомогательные методы расширения
+    /// </summary>
     public static class MathExtensions
     {
         /// <summary>

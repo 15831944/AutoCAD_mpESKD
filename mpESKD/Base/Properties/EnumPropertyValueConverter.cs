@@ -14,6 +14,7 @@
     {
         private Type _enumType;
 
+        /// <inheritdoc />
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is Enum e)
@@ -30,6 +31,7 @@
             return value;
         }
 
+        /// <inheritdoc />
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is string s && _enumType != null)
@@ -47,6 +49,12 @@
             }
 
             return value;
+        }
+
+        public object ConvertBack(object value, Type enumType)
+        {
+            _enumType = enumType;
+            return ConvertBack(value, null, null, null);
         }
     }
 }

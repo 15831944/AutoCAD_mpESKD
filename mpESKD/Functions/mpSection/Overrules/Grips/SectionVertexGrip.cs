@@ -7,8 +7,8 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
     using Base.Overrules;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Section = mpSection.Section;
@@ -18,16 +18,19 @@
     /// </summary>
     public class SectionVertexGrip : IntellectualEntityGripData
     {
+        private readonly List<Point3d> _points;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SectionVertexGrip"/> class.
+        /// </summary>
+        /// <param name="section">Экземпляр класса <see cref="mpSection.Section"/></param>
+        /// <param name="index">Индекс ручки</param>
         public SectionVertexGrip(Section section, int index)
         {
             Section = section;
             GripIndex = index;
             GripType = GripType.Point;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
-
+            
             /* При инициализации ручки нужно собрать все точки разреза и поместить их в поле _points.
              * Это создаст кэш точек разреза. Если в методе WorldDraw брать точки из самого разреза (Section),
              * то вспомогательные линии будут меняться при зуммировании. Это связано с тем, что в методе
@@ -37,18 +40,17 @@
             _points.Add(Section.EndPoint);
         }
 
-        private readonly List<Point3d> _points;
-
         /// <summary>
-        /// Экземпляр класса Section
+        /// Экземпляр класса <see cref="mpSection.Section"/>
         /// </summary>
         public Section Section { get; }
 
         /// <summary>
-        /// Индекс точки
+        /// Индекс ручки
         /// </summary>
         public int GripIndex { get; }
 
+        /// <inheritdoc />
         public override string GetTooltip()
         {
             return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
@@ -57,6 +59,7 @@
         // Временное значение ручки
         private Point3d _gripTmp;
 
+        /// <inheritdoc />
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
             try
@@ -72,7 +75,7 @@
                 // По этим данным я потом получаю экземпляр класса section
                 if (newStatus == Status.GripEnd)
                 {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                         using (var resBuf = Section.GetDataForXData())
@@ -115,12 +118,13 @@
             }
         }
 
+        /// <inheritdoc />
         public override bool WorldDraw(WorldDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint, double dGripSize)
         {
             if (GripIndex > 0 && MainSettings.Instance.SectionShowHelpLineOnSelection)
             {
-                short backupColor = worldDraw.SubEntityTraits.Color;
-                FillType backupFillType = worldDraw.SubEntityTraits.FillType;
+                var backupColor = worldDraw.SubEntityTraits.Color;
+                var backupFillType = worldDraw.SubEntityTraits.FillType;
 
                 worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
                 worldDraw.SubEntityTraits.Color = 40;

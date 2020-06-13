@@ -3,8 +3,8 @@
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base.Enums;
-    using Base.Helpers;
     using Base.Overrules;
+    using Base.Utils;
     using Section = mpSection.Section;
 
     /// <summary>
@@ -16,10 +16,6 @@
         {
             Section = section;
             GripType = GripType.Mirror;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
         }
 
         /// <summary>
@@ -27,6 +23,7 @@
         /// </summary>
         public Section Section { get; }
 
+        /// <inheritdoc/>
         public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
         {
             using (Section)
@@ -52,7 +49,7 @@
 
                 Section.UpdateEntities();
                 Section.BlockRecord.UpdateAnonymousBlocks();
-                using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                     ((BlockReference)blkRef).Position = newInsertionPoint;

@@ -1,17 +1,20 @@
-﻿// ReSharper disable InconsistentNaming
-namespace mpESKD.Functions.mpGroundLine.Overrules
+﻿namespace mpESKD.Functions.mpGroundLine.Overrules
 {
     using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Helpers;
-    using ModPlusAPI.Windows;
+    using Base.Utils;
 
+    /// <inheritdoc />
     public class GroundLineObjectOverrule : ObjectOverrule
     {
-        protected static GroundLineObjectOverrule _groundLineObjectOverrule;
+        private static GroundLineObjectOverrule _groundLineObjectOverrule;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
+        /// <returns></returns>
         public static GroundLineObjectOverrule Instance()
         {
             if (_groundLineObjectOverrule != null)
@@ -26,39 +29,23 @@ namespace mpESKD.Functions.mpGroundLine.Overrules
             return _groundLineObjectOverrule;
         }
 
+        /// <inheritdoc />
         public override void Close(DBObject dbObject)
         {
             Debug.Print("GroundLineObjectOverrule");
             if (IsApplicable(dbObject))
             {
-                try
-                {
-                    if (AcadHelpers.Document != null)
-                    {
-                        if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
-                            dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
-                        {
-                            var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>((Entity)dbObject);
-                            if (groundLine != null)
-                            {
-                                groundLine.UpdateEntities();
-                                groundLine.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
-                            }
-                        }
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ExceptionBox.Show(exception);
-                }
+                EntityUtils.ObjectOverruleProcess(
+                    dbObject, () => EntityReaderService.Instance.GetFromEntity<GroundLine>(dbObject));
             }
 
             base.Close(dbObject);
         }
 
+        /// <inheritdoc/>
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name, true);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name, true);
         }
     }
 }

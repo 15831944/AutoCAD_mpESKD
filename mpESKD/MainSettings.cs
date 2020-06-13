@@ -59,7 +59,9 @@
             }
         }
 
-        /// <summary>Использовать слой из стиля</summary>
+        /// <summary>
+        /// Использовать слой из стиля
+        /// </summary>
         public bool UseLayerFromStyle
         {
             get => bool.TryParse(UserConfigFile.GetValue(PName, nameof(UseLayerFromStyle)), out var b) && b; // false
@@ -70,7 +72,9 @@
             }
         }
 
-        /// <summary>Поведение при отсутствии слоя: 0 - применить текущий, 1 - создать новый</summary>
+        /// <summary>
+        /// Поведение при отсутствии слоя: 0 - применить текущий, 1 - создать новый
+        /// </summary>
         public int IfNoLayer
         {
             get => int.TryParse(UserConfigFile.GetValue(PName, nameof(IfNoLayer)), out var i) ? i
@@ -82,7 +86,9 @@
             }
         }
 
-        /// <summary>Использовать текстовый стиль из стиля</summary>
+        /// <summary>
+        /// Использовать текстовый стиль из стиля
+        /// </summary>
         public bool UseTextStyleFromStyle
         {
             get => bool.TryParse(UserConfigFile.GetValue(PName, nameof(UseTextStyleFromStyle)), out var b) && b; // false
@@ -93,7 +99,9 @@
             }
         }
 
-        /// <summary>Поведение при отсутствии текстового стиля: 0 - применить текущий, 1 - создать новый</summary>
+        /// <summary>
+        /// Поведение при отсутствии текстового стиля: 0 - применить текущий, 1 - создать новый
+        /// </summary>
         public int IfNoTextStyle
         {
             get => int.TryParse(UserConfigFile.GetValue(PName, nameof(IfNoTextStyle)), out var i) ? i : 0;
@@ -104,7 +112,9 @@
             }
         }
 
-        /// <summary>Предельное количество выбранных объектов для работы палитры</summary>
+        /// <summary>
+        /// Предельное количество выбранных объектов для работы палитры
+        /// </summary>
         public int MaxSelectedObjects
         {
             get => int.TryParse(UserConfigFile.GetValue(PName, nameof(MaxSelectedObjects)), out var i) ? i : 100;
@@ -134,7 +144,9 @@
 
         #region Axis
 
-        /// <summary>Менять масштаб типа линии прямой оси пропорционально масштабу примитива</summary>
+        /// <summary>
+        /// Менять масштаб типа линии прямой оси пропорционально масштабу примитива
+        /// </summary>
         public bool AxisLineTypeScaleProportionScale
         {
             get => !bool.TryParse(
@@ -146,7 +158,9 @@
             }
         }
 
-        /// <summary>Сохранять значения последних созданных осей и продолжать значения создаваемых осей</summary>
+        /// <summary>
+        /// Сохранять значения последних созданных осей и продолжать значения создаваемых осей
+        /// </summary>
         public bool AxisSaveLastTextAndContinueNew
         {
             get => !bool.TryParse(
@@ -158,22 +172,13 @@
             }
         }
 
-        /// <summary>Использовать редактор значений оси из плагина</summary>
-        public bool AxisUsePluginTextEditor
-        {
-            get => !bool.TryParse(
-                       UserConfigFile.GetValue(PName, nameof(AxisUsePluginTextEditor)), out var b) || b; // true
-            set
-            {
-                UserConfigFile.SetValue(PName, nameof(AxisUsePluginTextEditor), value.ToString(), true);
-                OnPropertyChanged();
-            }
-        }
         #endregion
 
         #region Section
 
-        /// <summary>Сохранять значения последних созданных разрезов и продолжать значения создаваемых разрезов</summary>
+        /// <summary>
+        /// Сохранять значения последних созданных разрезов и продолжать значения создаваемых разрезов
+        /// </summary>
         public bool SectionSaveLastTextAndContinueNew
         {
             get => !bool.TryParse(
@@ -185,7 +190,9 @@
             }
         }
 
-        /// <summary>Показывать вспомогательную линию сечения</summary>
+        /// <summary>
+        /// Показывать вспомогательную линию сечения
+        /// </summary>
         public bool SectionShowHelpLineOnSelection
         {
             get => !bool.TryParse(
@@ -197,19 +204,9 @@
             }
         }
 
-        /// <summary>Использовать редактор значений разреза из плагина</summary>
-        public bool SectionUsePluginTextEditor
-        {
-            get => !bool.TryParse(
-                       UserConfigFile.GetValue(PName, nameof(SectionUsePluginTextEditor)), out var b) || b; // true
-            set
-            {
-                UserConfigFile.SetValue(PName, nameof(SectionUsePluginTextEditor), value.ToString(), true);
-                OnPropertyChanged();
-            }
-        }
-        
-        /// <summary>Зависимое перемещение текста</summary>
+        /// <summary>
+        /// Зависимое перемещение текста
+        /// </summary>
         public bool SectionDependentTextMovement
         {
             get => !bool.TryParse(
@@ -217,6 +214,24 @@
             set
             {
                 UserConfigFile.SetValue(PName, nameof(SectionDependentTextMovement), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region LevelMark
+
+        /// <summary>
+        /// Показывать вспомогательные линии
+        /// </summary>
+        public bool LevelMarkShowHelpLinesOnSelection
+        {
+            get => !bool.TryParse(
+                UserConfigFile.GetValue(PName, nameof(LevelMarkShowHelpLinesOnSelection)), out var b) || b; // true
+            set
+            {
+                UserConfigFile.SetValue(PName, nameof(LevelMarkShowHelpLinesOnSelection), value.ToString(), true);
                 OnPropertyChanged();
             }
         }

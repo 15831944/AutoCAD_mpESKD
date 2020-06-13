@@ -1,22 +1,25 @@
-﻿namespace mpESKD.Base.Helpers
+﻿namespace mpESKD.Base.Utils
 {
     using System;
     using System.Xml.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.GraphicsInterface;
 
-    public static class TextStyleHelper
+    /// <summary>
+    /// Утилиты работы с текстовыми стилями
+    /// </summary>
+    public static class TextStyleUtils
     {
         /// <summary>Проверка наличия текстового стиля в текущем документе</summary>
         /// <param name="textStyleName">Имя текстового стиля</param>
         public static bool HasTextStyle(string textStyleName)
         {
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
-                using (OpenCloseTransaction tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var txtstbl = (TextStyleTable)tr.GetObject(AcadHelpers.Database.TextStyleTableId, OpenMode.ForWrite);
-                    if (txtstbl.Has(textStyleName))
+                    var textStyleTable = (TextStyleTable)tr.GetObject(AcadUtils.Database.TextStyleTableId, OpenMode.ForWrite);
+                    if (textStyleTable.Has(textStyleName))
                     {
                         return true;
                     }
@@ -26,18 +29,21 @@
             return false;
         }
 
-        /// <summary>Создать текстовый стиль по данным из Xml</summary>
+        /// <summary>
+        /// Создать текстовый стиль по данным из Xml
+        /// </summary>
+        /// <param name="textStyleXmlData">Xml данные текстового стиля</param>
         public static bool CreateTextStyle(XElement textStyleXmlData)
         {
             var textStyle = GetTextStyleTableRecordFromXElement(textStyleXmlData);
             var textStyleCreated = false;
             if (textStyle != null)
             {
-                using (AcadHelpers.Document.LockDocument())
+                using (AcadUtils.Document.LockDocument())
                 {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartTransaction())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                     {
-                        using (var txtStyleTbl = tr.GetObject(AcadHelpers.Database.TextStyleTableId, OpenMode.ForWrite) as TextStyleTable)
+                        using (var txtStyleTbl = tr.GetObject(AcadUtils.Database.TextStyleTableId, OpenMode.ForWrite) as TextStyleTable)
                         {
                             if (txtStyleTbl != null)
                             {
@@ -64,12 +70,12 @@
 
         public static TextStyleTableRecord GetTextStyleTableRecordByName(string textStyleName)
         {
-            using (AcadHelpers.Document.LockDocument())
+            using (AcadUtils.Document.LockDocument())
             {
-                using (OpenCloseTransaction tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var txtstbl = (TextStyleTable)tr.GetObject(AcadHelpers.Database.TextStyleTableId, OpenMode.ForWrite);
-                    foreach (ObjectId objectId in txtstbl)
+                    var textStyleTable = (TextStyleTable)tr.GetObject(AcadUtils.Database.TextStyleTableId, OpenMode.ForWrite);
+                    foreach (var objectId in textStyleTable)
                     {
                         var textStyleTableRecord = tr.GetObject(objectId, OpenMode.ForRead) as TextStyleTableRecord;
                         if (textStyleTableRecord != null && textStyleTableRecord.Name.Equals(textStyleName))
@@ -95,7 +101,7 @@
                 int.TryParse(textStyleTableRecordXElement.Element("Font")?.Attribute("CharacterSet")?.Value, out var i) ? i : int.MinValue,
                 int.TryParse(textStyleTableRecordXElement.Element("Font")?.Attribute("PitchAndFamily")?.Value, out i) ? i : int.MinValue);
 
-            // textstyle
+            // textStyle
             var returnedTextStyle = new TextStyleTableRecord
             {
                 Font = font,

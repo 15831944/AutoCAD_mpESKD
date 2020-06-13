@@ -5,8 +5,8 @@
     using Autodesk.AutoCAD.Geometry;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
     using Base.Overrules;
+    using Base.Utils;
     using ModPlusAPI;
     using Section = mpSection.Section;
 
@@ -15,33 +15,35 @@
     /// </summary>
     public class SectionRemoveVertexGrip : IntellectualEntityGripData
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SectionRemoveVertexGrip"/> class.
+        /// </summary>
+        /// <param name="section">Экземпляр класса <see cref="mpSection.Section"/></param>
+        /// <param name="index">Индекс ручки</param>
         public SectionRemoveVertexGrip(Section section, int index)
         {
             Section = section;
             GripIndex = index;
             GripType = GripType.Minus;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
         }
 
         /// <summary>
-        /// Экземпляр класса Section
+        /// Экземпляр класса <see cref="mpSection.Section"/>
         /// </summary>
         public Section Section { get; }
 
         /// <summary>
-        /// Индекс точки
+        /// Индекс ручки
         /// </summary>
         public int GripIndex { get; }
 
-        // Подсказка в зависимости от имени ручки
+        /// <inheritdoc />
         public override string GetTooltip()
         {
             return Language.GetItem(Invariables.LangItem, "gp3"); // "Удалить вершину";
         }
 
+        /// <inheritdoc />
         public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
         {
             using (Section)
@@ -66,7 +68,7 @@
 
                 Section.UpdateEntities();
                 Section.BlockRecord.UpdateAnonymousBlocks();
-                using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
                     if (newInsertionPoint.HasValue)

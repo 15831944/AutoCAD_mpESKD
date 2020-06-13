@@ -9,6 +9,9 @@
     using ModPlusAPI.Mvvm;
     using Properties;
 
+    /// <summary>
+    /// Стиль интеллектуального объекта
+    /// </summary>
     public class IntellectualEntityStyle : VmBase
     {
         private string _name;
@@ -16,6 +19,11 @@
         private FontWeight _fontWeight;
         private bool _isCurrent;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IntellectualEntityStyle"/> class.
+        /// </summary>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
+        /// <param name="fillDefaultProperties">Заполнять ли значениями по умолчанию</param>
         public IntellectualEntityStyle(Type entityType, bool fillDefaultProperties = false)
         {
             EntityType = entityType;

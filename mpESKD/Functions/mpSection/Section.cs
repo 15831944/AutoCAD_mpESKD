@@ -1,5 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-namespace mpESKD.Functions.mpSection
+﻿namespace mpESKD.Functions.mpSection
 {
     using System;
     using System.Collections.Generic;
@@ -9,45 +8,55 @@ namespace mpESKD.Functions.mpSection
     using Base;
     using Base.Attributes;
     using Base.Enums;
-    using Base.Helpers;
+    using Base.Utils;
     using ModPlusAPI.Windows;
     using Overrules.Grips;
 
+    /// <summary>
+    /// Разрез
+    /// </summary>
     [IntellectualEntityDisplayNameKey("h79")]
     public class Section : IntellectualEntity
     {
-        #region Constructors
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Section"/> class.
+        /// </summary>
         public Section()
         {
         }
 
-        /// <inheritdoc />
-        public Section(ObjectId objectId) : base(objectId)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Section"/> class.
+        /// </summary>
+        /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
+        public Section(ObjectId objectId) 
+            : base(objectId)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Section"/> class.
+        /// </summary>
+        /// <param name="lastIntegerValue">Числовое значение последней созданной оси</param>
+        /// <param name="lastLetterValue">Буквенное значение последней созданной оси</param>
         public Section(string lastIntegerValue, string lastLetterValue)
         {
-            LastIntegerValue = lastIntegerValue;
-            LastLetterValue = lastLetterValue;
+            _lastIntegerValue = lastIntegerValue;
+            _lastLetterValue = lastLetterValue;
         }
-
-        #endregion
-
-        #region Points and Grips
-
+        
         /// <summary>
         /// Промежуточные точки
         /// </summary>
         [SaveToXData]
         public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
 
+        // ReSharper disable once InconsistentNaming
         private List<Point3d> MiddlePointsOCS
         {
             get
             {
-                List<Point3d> points = new List<Point3d>();
+                var points = new List<Point3d>();
                 MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
                 return points;
             }
@@ -64,11 +73,7 @@ namespace mpESKD.Functions.mpSection
         /// </summary>
         [SaveToXData]
         public Point3d BottomDesignationPoint { get; private set; } = Point3d.Origin;
-
-        #endregion
-
-        #region Properties
-
+        
         /// <inheritdoc />
         /// В примитиве не используется!
         public override string LineType { get; set; }
@@ -78,118 +83,107 @@ namespace mpESKD.Functions.mpSection
         public override double LineTypeScale { get; set; }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.Content, 1, "p41", "d41", "Standard", null, null)]
+        [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
         [SaveToXData]
         public override string TextStyle { get; set; }
 
-        /// <summary>
-        /// Минимальная длина
-        /// </summary>
-        public double SectionMinLength => 0.2;
+        /// <inheritdoc />
+        public override double MinDistanceBetweenPoints => 0.2;
 
         /// <summary>
         /// Длина среднего штриха (половина длины полилинии на переломе)
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "h42", "d42", 8, 1, 20)]
-        [PropertyNameKeyInStyleEditor("p42-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "h42", 8, 1, 20, descLocalKey: "d42", nameSymbol: "a")]
         [SaveToXData]
         public int MiddleStrokeLength { get; set; } = 8;
 
         /// <summary>
         /// Толщина штрихов
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 2, "p43", "d43", 0.5, 0, 2)]
-        [PropertyNameKeyInStyleEditor("p43-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p43", 0.5, 0, 2, descLocalKey: "d43", nameSymbol: "w")]
         [SaveToXData]
         public double StrokeWidth { get; set; } = 0.5;
 
         /// <summary>
         /// Длина верхнего и нижнего штриха
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p44", "d44", 10, 5, 10)]
-        [PropertyNameKeyInStyleEditor("p44-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p44", 10, 5, 10, descLocalKey: "d44", nameSymbol: "b")]
         [SaveToXData]
         public int StrokeLength { get; set; } = 10;
 
         /// <summary>
         /// Отступ полки по длине штриха в процентах
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, "p45", "d45", 80, 0, 100)]
-        [PropertyNameKeyInStyleEditor("p45-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p45", 80, 0, 100, descLocalKey: "d45", nameSymbol: "c")]
         [SaveToXData]
         public int ShelfOffset { get; set; } = 80;
 
         /// <summary>
         /// Длина полки
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, "p46", "d46", 10, 5, 15)]
-        [PropertyNameKeyInStyleEditor("p46-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p46", 10, 5, 15, nameSymbol: "d")]
         [SaveToXData]
         public int ShelfLength { get; set; } = 10;
 
         /// <summary>
         /// Длина стрелки
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 6, "p47", "d47", 5, 1, 8)]
-        [PropertyNameKeyInStyleEditor("p47-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 6, "p47", 5, 1, 8, nameSymbol: "e")]
         [SaveToXData]
         public int ShelfArrowLength { get; set; } = 5;
 
         /// <summary>
         /// Толщина стрелки
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 7, "p48", "d48", 1.5, 0.1, 5)]
-        [PropertyNameKeyInStyleEditor("p48-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 7, "p48", 1.5, 0.1, 5, nameSymbol: "t")]
         [SaveToXData]
         public double ShelfArrowWidth { get; set; } = 1.5;
 
         /// <summary>
         /// Высота текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 2, "p49", "d49", 3.5, 0.000000001, 1.0000E+99)]
-        [PropertyNameKeyInStyleEditor("p49-1")]
+        [EntityProperty(PropertiesCategory.Content, 2, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
         [SaveToXData]
         public double MainTextHeight { get; set; } = 3.5;
 
         /// <summary>
         /// Высота малого текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 3, "p50", "d50", 2.5, 0.000000001, 1.0000E+99)]
-        [PropertyNameKeyInStyleEditor("p50-1")]
+        [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
         [SaveToXData]
         public double SecondTextHeight { get; set; } = 2.5;
 
         /// <summary>
         /// Обозначение разреза
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 4, "p51", "d51", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 4, "p51", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string Designation { get; set; } = string.Empty;
 
         /// <summary>
         /// Префикс обозначения
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 5, "p52", "d52", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 5, "p52", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string DesignationPrefix { get; set; } = string.Empty;
 
         /// <summary>
         /// Номер листа (пишется в скобках после обозначения)
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 6, "p53", "d53", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 6, "p53", "", propertyScope: PropertyScope.Palette, descLocalKey: "d53")]
         [SaveToXData]
         public string SheetNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// Позиция номера листа
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 7, "p54", "d54", AxisMarkersPosition.Both, null, null)]
+        [EntityProperty(PropertiesCategory.Content, 7, "p54", AxisMarkersPosition.Both, descLocalKey: "d54")]
         [SaveToXData]
         public AxisMarkersPosition SheetNumberPosition { get; set; } = AxisMarkersPosition.Both;
 
-        private readonly string LastIntegerValue = string.Empty;
+        private readonly string _lastIntegerValue = string.Empty;
 
-        private readonly string LastLetterValue = string.Empty;
+        private readonly string _lastLetterValue = string.Empty;
 
         /// <summary>
         /// Отступ средней точки верхнего текста вдоль верхней полки
@@ -215,9 +209,15 @@ namespace mpESKD.Functions.mpSection
         [SaveToXData]
         public double AcrossBottomShelfTextOffset { get; set; } = double.NaN;
 
+        /// <summary>
+        /// Конечная точка верхней полки
+        /// </summary>
         [SaveToXData]
         public Point3d TopShelfEndPoint { get; private set; }
 
+        /// <summary>
+        /// Конечная точка нижней полки
+        /// </summary>
         [SaveToXData]
         public Point3d BottomShelfEndPoint { get; private set; }
 
@@ -227,11 +227,7 @@ namespace mpESKD.Functions.mpSection
         /// </summary>
         [SaveToXData]
         public EntityDirection EntityDirection { get; set; } = EntityDirection.LeftToRight;
-
-        #endregion
-
-        #region Geometry
-
+        
         /// <summary>
         /// Средние штрихи - штрихи, создаваемые в средних точках
         /// </summary>
@@ -275,6 +271,7 @@ namespace mpESKD.Functions.mpSection
 
         #endregion
 
+        /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
             get
@@ -304,6 +301,17 @@ namespace mpESKD.Functions.mpSection
         }
 
         /// <inheritdoc />
+        public override IEnumerable<Point3d> GetPointsForOsnap()
+        {
+            yield return InsertionPoint;
+            yield return EndPoint;
+            foreach (var middlePoint in MiddlePoints)
+            {
+                yield return middlePoint;
+            }
+        }
+
+        /// <inheritdoc />
         public override void UpdateEntities()
         {
             try
@@ -315,7 +323,7 @@ namespace mpESKD.Functions.mpSection
                     // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
-                else if (length < SectionMinLength * scale && MiddlePoints.Count == 0)
+                else if (length < MinDistanceBetweenPoints * scale && MiddlePoints.Count == 0)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
                     MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
@@ -350,7 +358,8 @@ namespace mpESKD.Functions.mpSection
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                var tmpEndPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y - (SectionMinLength * scale), InsertionPointOCS.Z);
+                var tmpEndPoint = new Point3d(
+                    InsertionPointOCS.X, InsertionPointOCS.Y - (MinDistanceBetweenPoints * scale), InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength)
@@ -358,22 +367,14 @@ namespace mpESKD.Functions.mpSection
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, SectionMinLength * scale);
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                    InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
         }
 
-        /// <summary>
-        /// Создание примитивов ЕСКД элемента
-        /// </summary>
-        /// <param name="insertionPoint"></param>
-        /// <param name="middlePoints"></param>
-        /// <param name="endPoint"></param>
-        /// <param name="scale"></param>
-        private void CreateEntities(
-            Point3d insertionPoint, List<Point3d> middlePoints,
-            Point3d endPoint, double scale)
+        private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
         {
             var strokesWidth = StrokeWidth * scale;
 
@@ -428,7 +429,7 @@ namespace mpESKD.Functions.mpSection
             var textContentsForBottomText = GetTextContents(false);
             if (!string.IsNullOrEmpty(textContentsForTopText) && !string.IsNullOrEmpty(textContentsForBottomText))
             {
-                var textStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
+                var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
                 var textHeight = MainTextHeight * scale;
                 _topMText = new MText
                 {
@@ -475,7 +476,7 @@ namespace mpESKD.Functions.mpSection
                     _topMText.Location = topTextCenterPoint;
                 }
 
-                TopDesignationPoint = _topMText.Bounds.Value.MinPoint.TransformBy(BlockTransform);
+                TopDesignationPoint = _topMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
 
                 // bottom
                 alongShelfTextOffset = _bottomMText.ActualWidth / 2;
@@ -502,7 +503,7 @@ namespace mpESKD.Functions.mpSection
                     _bottomMText.Location = bottomTextCenterPoint;
                 }
 
-                BottomDesignationPoint = _bottomMText.Bounds.Value.MinPoint.TransformBy(BlockTransform);
+                BottomDesignationPoint = _bottomMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
             }
 
             _middleStrokes.Clear();
@@ -582,20 +583,20 @@ namespace mpESKD.Functions.mpSection
         {
             if (IsValueCreated)
             {
-                bool setStandard = true;
-                if (!string.IsNullOrEmpty(LastIntegerValue))
+                var setStandard = true;
+                if (!string.IsNullOrEmpty(_lastIntegerValue))
                 {
-                    if (int.TryParse(LastIntegerValue, out var i))
+                    if (int.TryParse(_lastIntegerValue, out var i))
                     {
                         Designation = (i + 1).ToString();
                         setStandard = false;
                     }
                 }
-                else if (!string.IsNullOrEmpty(LastLetterValue))
+                else if (!string.IsNullOrEmpty(_lastLetterValue))
                 {
-                    if (Invariables.AxisRusAlphabet.Contains(LastLetterValue))
+                    if (Invariables.AxisRusAlphabet.Contains(_lastLetterValue))
                     {
-                        var index = Invariables.AxisRusAlphabet.IndexOf(LastLetterValue);
+                        var index = Invariables.AxisRusAlphabet.IndexOf(_lastLetterValue);
                         if (index == Invariables.AxisRusAlphabet.Count - 1)
                         {
                             Designation = Invariables.AxisRusAlphabet[0];
@@ -671,7 +672,5 @@ namespace mpESKD.Functions.mpSection
 
             return prefixAndDesignation;
         }
-
-        #endregion
     }
 }

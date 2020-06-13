@@ -3,7 +3,7 @@
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using Helpers;
+    using Utils;
 
     public class EntityStyles
     {
@@ -21,7 +21,7 @@
         /// <summary>
         /// Отображаемое имя примитива
         /// </summary>
-        public string DisplayName => LocalizationHelper.GetEntityLocalizationName(EntityType);
+        public string DisplayName => LocalizationUtils.GetEntityLocalizationName(EntityType);
 
         /// <summary>
         /// Коллекция стилей для указанного типа примитива

@@ -1,14 +1,16 @@
 ﻿namespace mpESKD
 {
     using Autodesk.AutoCAD.ApplicationServices.Core;
-    using Base.Helpers;
+    using Base.Utils;
 
     /// <summary>
-    /// Слежение за командой "редактор блоков" автокада
+    /// Слежение за командой AutoCAD "редактор блоков"
     /// </summary>
     public class BeditCommandWatcher
     {
-        /// <summary>True - использовать редактор блоков. False - не использовать</summary>
+        /// <summary>
+        /// True - использовать редактор блоков. False - не использовать
+        /// </summary>
         public static bool UseBedit = true;
 
         public static void Initialize()
@@ -31,7 +33,7 @@
             }
             catch (System.Exception exception)
             {
-                AcadHelpers.WriteMessageInDebug($"\nException {exception.Message}");
+                AcadUtils.WriteMessageInDebug($"\nException {exception.Message}");
             }
         }
     }

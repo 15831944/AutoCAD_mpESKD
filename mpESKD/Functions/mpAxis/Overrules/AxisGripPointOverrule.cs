@@ -1,6 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-
-namespace mpESKD.Functions.mpAxis.Overrules
+﻿namespace mpESKD.Functions.mpAxis.Overrules
 {
     using System;
     using System.Diagnostics;
@@ -9,52 +7,55 @@ namespace mpESKD.Functions.mpAxis.Overrules
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
+    using Base.Utils;
     using Grips;
     using ModPlusAPI.Windows;
     using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
-    public class AxisGripPointsOverrule : GripOverrule
+    /// <inheritdoc />
+    public class AxisGripPointOverrule : GripOverrule
     {
-        protected static AxisGripPointsOverrule _axisGripPointOverrule;
+        private static AxisGripPointOverrule _axisGripPointOverrule;
 
-        public static AxisGripPointsOverrule Instance()
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
+        public static AxisGripPointOverrule Instance()
         {
             if (_axisGripPointOverrule != null)
             {
                 return _axisGripPointOverrule;
             }
 
-            _axisGripPointOverrule = new AxisGripPointsOverrule();
+            _axisGripPointOverrule = new AxisGripPointOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
             _axisGripPointOverrule.SetXDataFilter(AxisDescriptor.Instance.Name);
             return _axisGripPointOverrule;
         }
 
-        private Point3d InitEndPoint;
-        private Point3d InitInsertionPoint;
-        private Point3d InitBottomOrientPoint;
-        private Point3d InitTopOrientPoint;
+        private Point3d _initInsertionPoint;
+        private Point3d _initBottomOrientPoint;
+        private Point3d _initTopOrientPoint;
 
-        /// <summary>Получение ручек для примитива</summary>
+        /// <inheritdoc />
         public override void GetGripPoints(
             Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
         {
             try
             {
-                Debug.Print("AxisGripPointsOverrule");
+                Debug.Print("AxisGripPointOverrule");
 
                 // Проверка дополнительных условий
                 if (IsApplicable(entity))
                 {
-                    // Чтобы "отключить" точку вставки блока, нужно получить сначал блок
+                    // Чтобы "отключить" точку вставки блока, нужно получить сначала блок
                     // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
-                    BlockReference blkRef = (BlockReference)entity;
+                    var blkRef = (BlockReference)entity;
 
                     // Удаляем стандартную ручку позиции блока (точки вставки)
                     GripData toRemove = null;
-                    foreach (GripData gd in grips)
+                    foreach (var gd in grips)
                     {
                         if (gd.GripPoint == blkRef.Position)
                         {
@@ -70,51 +71,43 @@ namespace mpESKD.Functions.mpAxis.Overrules
 
                     // Получаем экземпляр класса, который описывает как должен выглядеть примитив
                     // т.е. правила построения графики внутри блока
-                    // Информация соберается по XData и свойствам самого блока
-                    var axis = EntityReaderFactory.Instance.GetFromEntity<Axis>(entity);
+                    // Информация собирается по XData и свойствам самого блока
+                    var axis = EntityReaderService.Instance.GetFromEntity<Axis>(entity);
 
-                    // Параноя программиста =)
+                    // Паранойя программиста =)
                     if (axis != null)
                     {
                         // Получаем первую ручку (совпадает с точкой вставки блока)
-                        var gp = new AxisGrip
+                        var gp = new AxisGrip(axis)
                         {
-                            GripType = GripType.Point,
-                            Axis = axis,
                             GripName = AxisGripName.StartGrip,
                             GripPoint = axis.InsertionPoint // вот эта точка из экземпляра класса axis
                         };
                         grips.Add(gp);
-                        InitInsertionPoint = axis.InsertionPoint;
+                        _initInsertionPoint = axis.InsertionPoint;
 
                         // получаем среднюю ручку
-                        gp = new AxisGrip
+                        gp = new AxisGrip(axis)
                         {
-                            GripType = GripType.Point,
-                            Axis = axis,
                             GripName = AxisGripName.MiddleGrip,
                             GripPoint = axis.MiddlePoint
                         };
                         grips.Add(gp);
 
                         // получаем конечную ручку
-                        gp = new AxisGrip
+                        gp = new AxisGrip(axis)
                         {
-                            GripType = GripType.Point,
-                            Axis = axis,
                             GripName = AxisGripName.EndGrip,
                             GripPoint = axis.EndPoint
                         };
                         grips.Add(gp);
-                        InitEndPoint = axis.EndPoint;
+
                         if (axis.MarkersPosition == AxisMarkersPosition.Both ||
                             axis.MarkersPosition == AxisMarkersPosition.Bottom)
                         {
                             // other points
-                            gp = new AxisGrip
+                            gp = new AxisGrip(axis)
                             {
-                                GripType = GripType.Point,
-                                Axis = axis,
                                 GripName = AxisGripName.BottomMarkerGrip,
                                 GripPoint = axis.BottomMarkerPoint
                             };
@@ -124,10 +117,8 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         if (axis.MarkersPosition == AxisMarkersPosition.Both ||
                             axis.MarkersPosition == AxisMarkersPosition.Top)
                         {
-                            gp = new AxisGrip
+                            gp = new AxisGrip(axis)
                             {
-                                GripType = GripType.Point,
-                                Axis = axis,
                                 GripName = AxisGripName.TopMarkerGrip,
                                 GripPoint = axis.TopMarkerPoint
                             };
@@ -139,15 +130,13 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         {
                             if (axis.BottomOrientMarkerVisible)
                             {
-                                gp = new AxisGrip
+                                gp = new AxisGrip(axis)
                                 {
-                                    GripType = GripType.Point,
-                                    Axis = axis,
                                     GripName = AxisGripName.BottomOrientGrip,
                                     GripPoint = axis.BottomOrientPoint
                                 };
                                 grips.Add(gp);
-                                InitBottomOrientPoint = axis.BottomOrientPoint;
+                                _initBottomOrientPoint = axis.BottomOrientPoint;
                             }
                         }
 
@@ -155,15 +144,13 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         {
                             if (axis.TopOrientMarkerVisible)
                             {
-                                gp = new AxisGrip
+                                gp = new AxisGrip(axis)
                                 {
-                                    GripType = GripType.Point,
-                                    Axis = axis,
                                     GripName = AxisGripName.TopOrientGrip,
                                     GripPoint = axis.TopOrientPoint
                                 };
                                 grips.Add(gp);
-                                InitTopOrientPoint = axis.TopOrientPoint;
+                                _initTopOrientPoint = axis.TopOrientPoint;
                             }
                         }
                     }
@@ -176,15 +163,16 @@ namespace mpESKD.Functions.mpAxis.Overrules
             }
         }
 
-        /// <summary>Перемещение ручек</summary>
-        public override void MoveGripPointsAt(Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
+        /// <inheritdoc />
+        public override void MoveGripPointsAt(
+            Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
         {
             try
             {
                 if (IsApplicable(entity))
                 {
                     // Проходим по коллекции ручек
-                    foreach (GripData gripData in grips)
+                    foreach (var gripData in grips)
                     {
                         // Приводим ручку к моему классу
                         var gripPoint = gripData as AxisGrip;
@@ -193,37 +181,40 @@ namespace mpESKD.Functions.mpAxis.Overrules
                         if (gripPoint != null)
                         {
                             // Далее, в зависимости от имени ручки произвожу действия
+                            var axis = gripPoint.Axis;
+                            var scale = axis.GetFullScale();
+
                             if (gripPoint.GripName == AxisGripName.StartGrip)
                             {
                                 // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
                                 // Все точки всегда совпадают (+ ручка)
                                 var newPt = gripPoint.GripPoint + offset;
-                                var length = gripPoint.Axis.EndPoint.DistanceTo(newPt);
-                                if (length < gripPoint.Axis.AxisMinLength * GetFullScale(gripPoint))
+                                var length = axis.EndPoint.DistanceTo(newPt);
+                                if (length < axis.MinDistanceBetweenPoints * scale)
                                 {
                                     /* Если новая точка получается на расстоянии меньше минимального, то
                                      * переносим ее в направлении между двумя точками на минимальное расстояние
                                      */
                                     var tmpInsertionPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                        gripPoint.Axis.EndPoint, newPt, gripPoint.Axis.EndPoint,
-                                        gripPoint.Axis.AxisMinLength * GetFullScale(gripPoint));
+                                        axis.EndPoint, newPt, axis.EndPoint,
+                                        axis.MinDistanceBetweenPoints * scale);
 
-                                    if (gripPoint.Axis.EndPoint.Equals(newPt))
+                                    if (axis.EndPoint.Equals(newPt))
                                     {
                                         // Если точки совпали, то задаем минимальное значение
                                         tmpInsertionPoint = new Point3d(
-                                            gripPoint.Axis.EndPoint.X,
-                                            gripPoint.Axis.EndPoint.Y - (gripPoint.Axis.AxisMinLength * GetFullScale(gripPoint)),
-                                            gripPoint.Axis.EndPoint.Z);
+                                            axis.EndPoint.X,
+                                            axis.EndPoint.Y - (axis.MinDistanceBetweenPoints * scale),
+                                            axis.EndPoint.Z);
                                     }
 
                                     ((BlockReference)entity).Position = tmpInsertionPoint;
-                                    gripPoint.Axis.InsertionPoint = tmpInsertionPoint;
+                                    axis.InsertionPoint = tmpInsertionPoint;
                                 }
                                 else
                                 {
                                     ((BlockReference)entity).Position = gripPoint.GripPoint + offset;
-                                    gripPoint.Axis.InsertionPoint = gripPoint.GripPoint + offset;
+                                    axis.InsertionPoint = gripPoint.GripPoint + offset;
                                 }
                             }
 
@@ -232,123 +223,117 @@ namespace mpESKD.Functions.mpAxis.Overrules
                                 // Т.к. средняя точка нужна для переноса примитива, но не соответствует точки вставки блока
                                 // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
                                 // точку вставки
-                                var lenghtVector = (gripPoint.Axis.InsertionPoint - gripPoint.Axis.EndPoint) / 2;
-                                ((BlockReference)entity).Position = gripPoint.GripPoint + offset + lenghtVector;
+                                var lengthVector = (axis.InsertionPoint - axis.EndPoint) / 2;
+                                ((BlockReference)entity).Position = gripPoint.GripPoint + offset + lengthVector;
                             }
 
                             if (gripPoint.GripName == AxisGripName.EndGrip)
                             {
                                 var newPt = gripPoint.GripPoint + offset;
-                                Point3d newEnedPoint;
+                                Point3d newEndPoint;
                                 if (newPt.Equals(((BlockReference)entity).Position))
                                 {
-                                    var scale = gripPoint.Axis.GetScale();
-                                    newEnedPoint = new Point3d(
+                                    newEndPoint = new Point3d(
                                         ((BlockReference)entity).Position.X,
-                                        ((BlockReference)entity).Position.Y - (gripPoint.Axis.AxisMinLength * scale *
-                                        gripPoint.Axis.BlockTransform.GetScale()),
+                                        ((BlockReference)entity).Position.Y - (axis.MinDistanceBetweenPoints * scale),
                                         ((BlockReference)entity).Position.Z);
-                                    gripPoint.Axis.EndPoint = newEnedPoint;
+                                    axis.EndPoint = newEndPoint;
                                 }
                                 else
                                 {
-                                    gripPoint.Axis.EndPoint = gripPoint.GripPoint + offset;
-                                    newEnedPoint = gripPoint.GripPoint + offset;
+                                    axis.EndPoint = gripPoint.GripPoint + offset;
+                                    newEndPoint = gripPoint.GripPoint + offset;
                                 }
 
                                 // change bottom orient point
-                                gripPoint.Axis.BottomOrientPoint = GetSavePositionPoint(
-                                    InitInsertionPoint,
+                                axis.BottomOrientPoint = GetSavePositionPoint(
+                                    _initInsertionPoint,
                                     gripPoint.GripPoint,
-                                    newEnedPoint,
-                                    InitBottomOrientPoint);
+                                    newEndPoint,
+                                    _initBottomOrientPoint);
                             }
 
                             if (gripPoint.GripName == AxisGripName.BottomMarkerGrip)
                             {
-                                var mainVector = gripPoint.Axis.EndPoint - gripPoint.Axis.InsertionPoint;
+                                var mainVector = axis.EndPoint - axis.InsertionPoint;
                                 var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
-                                gripPoint.Axis.BottomMarkerPoint = gripPoint.GripPoint + (offset.DotProduct(v) * v);
+                                axis.BottomMarkerPoint = gripPoint.GripPoint + (offset.DotProduct(v) * v);
 
                                 // Меняю также точку маркера-ориентира
-                                if (InitBottomOrientPoint != Point3d.Origin)
+                                if (_initBottomOrientPoint != Point3d.Origin)
                                 {
-                                    gripPoint.Axis.BottomOrientPoint = InitBottomOrientPoint + (offset.DotProduct(v) * v);
+                                    axis.BottomOrientPoint = _initBottomOrientPoint + (offset.DotProduct(v) * v);
                                 }
                             }
 
                             if (gripPoint.GripName == AxisGripName.TopMarkerGrip)
                             {
-                                var mainVector = gripPoint.Axis.InsertionPoint - gripPoint.Axis.EndPoint;
+                                var mainVector = axis.InsertionPoint - axis.EndPoint;
                                 var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
-                                gripPoint.Axis.TopMarkerPoint = gripPoint.GripPoint + (offset.DotProduct(v) * v);
+                                axis.TopMarkerPoint = gripPoint.GripPoint + (offset.DotProduct(v) * v);
 
                                 // Меняю также точку маркера-ориентира
-                                if (InitTopOrientPoint != Point3d.Origin)
+                                if (_initTopOrientPoint != Point3d.Origin)
                                 {
-                                    gripPoint.Axis.TopOrientPoint = InitTopOrientPoint + (offset.DotProduct(v) * v);
+                                    axis.TopOrientPoint = _initTopOrientPoint + (offset.DotProduct(v) * v);
                                 }
                             }
 
                             if (gripPoint.GripName == AxisGripName.BottomOrientGrip)
                             {
-                                var mainVector = gripPoint.Axis.EndPoint - gripPoint.Axis.InsertionPoint;
-                                Vector3d v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
+                                var mainVector = axis.EndPoint - axis.InsertionPoint;
+                                var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
                                 var newPoint = gripPoint.GripPoint + (offset.DotProduct(v) * v);
 
-                                if (Math.Abs((newPoint - gripPoint.Axis.BottomMarkerPoint).Length) >
-                                    gripPoint.Axis.MarkersDiameter * GetFullScale(gripPoint))
+                                if (Math.Abs((newPoint - axis.BottomMarkerPoint).Length) >
+                                    axis.MarkersDiameter * scale)
                                 {
-                                    gripPoint.Axis.BottomOrientPoint = newPoint;
+                                    axis.BottomOrientPoint = newPoint;
                                 }
                                 else
                                 {
-                                    if (newPoint.X >= gripPoint.Axis.BottomMarkerPoint.X)
+                                    if (newPoint.X >= axis.BottomMarkerPoint.X)
                                     {
-                                        gripPoint.Axis.BottomOrientPoint =
-                                            gripPoint.Axis.BottomMarkerPoint + (v * -1 * gripPoint.Axis.MarkersDiameter *
-                                            GetFullScale(gripPoint));
+                                        axis.BottomOrientPoint =
+                                            axis.BottomMarkerPoint + (v * -1 * axis.MarkersDiameter * scale);
                                     }
                                     else
                                     {
-                                        gripPoint.Axis.BottomOrientPoint =
-                                            gripPoint.Axis.BottomMarkerPoint + (v * gripPoint.Axis.MarkersDiameter *
-                                            GetFullScale(gripPoint));
+                                        axis.BottomOrientPoint =
+                                            axis.BottomMarkerPoint + (v * axis.MarkersDiameter * scale);
                                     }
                                 }
                             }
 
                             if (gripPoint.GripName == AxisGripName.TopOrientGrip)
                             {
-                                var mainVector = gripPoint.Axis.InsertionPoint - gripPoint.Axis.EndPoint;
-                                Vector3d v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
+                                var mainVector = axis.InsertionPoint - axis.EndPoint;
+                                var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
                                 var newPoint = gripPoint.GripPoint + (offset.DotProduct(v) * v);
 
-                                if (Math.Abs((newPoint - gripPoint.Axis.TopMarkerPoint).Length) >
-                                    gripPoint.Axis.MarkersDiameter * GetFullScale(gripPoint))
+                                if (Math.Abs((newPoint - axis.TopMarkerPoint).Length) >
+                                    axis.MarkersDiameter * scale)
                                 {
-                                    gripPoint.Axis.TopOrientPoint = newPoint;
+                                    axis.TopOrientPoint = newPoint;
                                 }
                                 else
                                 {
-                                    if (newPoint.X >= gripPoint.Axis.TopMarkerPoint.X)
+                                    if (newPoint.X >= axis.TopMarkerPoint.X)
                                     {
-                                        gripPoint.Axis.TopOrientPoint =
-                                            gripPoint.Axis.TopMarkerPoint + (v * gripPoint.Axis.MarkersDiameter *
-                                            GetFullScale(gripPoint));
+                                        axis.TopOrientPoint =
+                                            axis.TopMarkerPoint + (v * axis.MarkersDiameter * scale);
                                     }
                                     else
                                     {
-                                        gripPoint.Axis.TopOrientPoint =
-                                            gripPoint.Axis.TopMarkerPoint + (v * -1 * gripPoint.Axis.MarkersDiameter *
-                                            GetFullScale(gripPoint));
+                                        axis.TopOrientPoint =
+                                            axis.TopMarkerPoint + (v * -1 * axis.MarkersDiameter * scale);
                                     }
                                 }
                             }
 
                             // Вот тут происходит перерисовка примитивов внутри блока
-                            gripPoint.Axis.UpdateEntities();
-                            gripPoint.Axis.BlockRecord.UpdateAnonymousBlocks();
+                            axis.UpdateEntities();
+                            axis.BlockRecord.UpdateAnonymousBlocks();
                         }
                         else
                         {
@@ -368,11 +353,10 @@ namespace mpESKD.Functions.mpAxis.Overrules
             }
         }
 
-        // Проверка поддерживаемости примитива
-        // Проверка происходит по наличию XData с определенным AppName
+        /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, AxisDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, AxisDescriptor.Instance.Name);
         }
 
         #region Helpers
@@ -380,14 +364,14 @@ namespace mpESKD.Functions.mpAxis.Overrules
         /// <summary>Получение нового значения точки, которая должна сохранить свое положение
         /// относительно передвигаемой точки</summary>
         /// <param name="basePoint">Базовая точка - точка, относительно которой все двигается</param>
-        /// <param name="oldMovedpoint">Начальное значение передвигаемой точки</param>
+        /// <param name="oldMovedPoint">Начальное значение передвигаемой точки</param>
         /// <param name="newMovedPoint">Новое значение передвигаемой точки</param>
         /// <param name="oldSavePositionPoint">Начальное значение точки, положение которой должно сохранится
         /// относительно передвигаемой точки</param>
         /// <returns></returns>
-        private static Point3d GetSavePositionPoint(Point3d basePoint, Point3d oldMovedpoint, Point3d newMovedPoint, Point3d oldSavePositionPoint)
+        private static Point3d GetSavePositionPoint(Point3d basePoint, Point3d oldMovedPoint, Point3d newMovedPoint, Point3d oldSavePositionPoint)
         {
-            var vectorOld = oldMovedpoint - basePoint;
+            var vectorOld = oldMovedPoint - basePoint;
             var vectorNew = newMovedPoint - basePoint;
             var l = vectorNew.Length - vectorOld.Length;
             var h = l * vectorOld.GetNormal();
@@ -401,14 +385,6 @@ namespace mpESKD.Functions.mpAxis.Overrules
                 (tmpP.X * Math.Cos(angle)) - (tmpP.Y * Math.Sin(angle)) + basePoint.X,
                 (tmpP.X * Math.Sin(angle)) + (tmpP.Y * Math.Cos(angle)) + basePoint.Y,
                 oldSavePositionPoint.Z);
-        }
-
-        /// <summary>Получение "полного" масштаба примитива (масштаб в свойствах умноженный на масштаб блока)</summary>
-        /// <param name="gripPoint"></param>
-        /// <returns></returns>
-        private static double GetFullScale(AxisGrip gripPoint)
-        {
-            return gripPoint.Axis.GetScale() * gripPoint.Axis.BlockTransform.GetScale();
         }
 
         #endregion

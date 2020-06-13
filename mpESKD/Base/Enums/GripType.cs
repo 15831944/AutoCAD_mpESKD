@@ -33,6 +33,11 @@
         /// <summary>
         /// Ручка "Развернуть"
         /// </summary>
-        Mirror
+        Mirror,
+
+        /// <summary>
+        /// Точка отсчета
+        /// </summary>
+        BasePoint
     }
 }

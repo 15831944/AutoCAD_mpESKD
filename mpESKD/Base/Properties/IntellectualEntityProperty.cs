@@ -1,22 +1,30 @@
 ﻿namespace mpESKD.Base.Properties
 {
     using System;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
     using Attributes;
     using Autodesk.AutoCAD.DatabaseServices;
     using Enums;
     using JetBrains.Annotations;
+    using ModPlusAPI.Mvvm;
 
-    public class IntellectualEntityProperty : INotifyPropertyChanged
+    /// <summary>
+    /// Свойство интеллектуального объекта
+    /// </summary>
+    public class IntellectualEntityProperty : VmBase
     {
         private object _value;
         private double _doubleValue;
         private int _intValue;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IntellectualEntityProperty"/> class.
+        /// </summary>
+        /// <param name="attribute">Атрибут <see cref="EntityPropertyAttribute"/></param>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
+        /// <param name="value">Значение свойства</param>
+        /// <param name="ownerObjectId">Идентификатор блока</param>
         public IntellectualEntityProperty(
             EntityPropertyAttribute attribute,
-            [CanBeNull] PropertyNameKeyInStyleEditor propertyNameKeyInStyleEditor,
             Type entityType,
             object value,
             ObjectId ownerObjectId)
@@ -27,12 +35,9 @@
             OrderIndex = attribute.OrderIndex;
             Name = attribute.Name;
             DisplayNameLocalizationKey = attribute.DisplayNameLocalizationKey;
-            if (propertyNameKeyInStyleEditor != null)
-            {
-                DisplayNameLocalizationKeyForStyleEditor = propertyNameKeyInStyleEditor.LocalizationKey;
-            }
-
+            NameSymbolForStyleEditor = attribute.NameSymbol;
             DescriptionLocalizationKey = attribute.DescriptionLocalizationKey;
+
             if (value != null && value.GetType() == typeof(AnnotationScale))
             {
                 DefaultValue = new AnnotationScale
@@ -65,8 +70,12 @@
             }
 
             PropertyScope = attribute.PropertyScope;
+            IsReadOnly = attribute.IsReadOnly;
         }
 
+        /// <summary>
+        /// Тип интеллектуального объекта
+        /// </summary>
         public Type EntityType { get; }
 
         /// <summary>
@@ -75,20 +84,44 @@
         /// </summary>
         public ObjectId OwnerObjectId { get; }
 
+        /// <summary>
+        /// Категория свойства
+        /// </summary>
         public PropertiesCategory Category { get; }
 
+        /// <summary>
+        /// Индекс порядка расположения свойства в палитре
+        /// </summary>
         public int OrderIndex { get; }
 
+        /// <summary>
+        /// Имя свойства
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// Ключ локализации для отображаемого имени свойства
+        /// </summary>
         public string DisplayNameLocalizationKey { get; }
 
-        public string DisplayNameLocalizationKeyForStyleEditor { get; } = string.Empty;
+        /// <summary>
+        /// Условное обозначение на изображении в редакторе стилей
+        /// </summary>
+        public string NameSymbolForStyleEditor { get; }
 
+        /// <summary>
+        /// Ключ локализации для описания свойства
+        /// </summary>
         public string DescriptionLocalizationKey { get; }
 
+        /// <summary>
+        /// Значение по умолчанию
+        /// </summary>
         public object DefaultValue { get; }
 
+        /// <summary>
+        /// Значение свойства
+        /// </summary>
         public object Value
         {
             get => _value;
@@ -142,20 +175,26 @@
             }
         }
 
+        /// <summary>
+        /// Минимальное значение (для int, double)
+        /// </summary>
         [CanBeNull]
         public object Minimum { get; }
 
+        /// <summary>
+        /// Максимальное значение (для int, double)
+        /// </summary>
         [CanBeNull]
         public object Maximum { get; }
 
+        /// <summary>
+        /// Область видимости свойства
+        /// </summary>
         public PropertyScope PropertyScope { get; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        /// <summary>
+        /// Свойство только для чтения. Используется только в палитре свойств
+        /// </summary>
+        public bool IsReadOnly { get; }
     }
 }

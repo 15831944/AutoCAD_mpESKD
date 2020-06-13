@@ -5,14 +5,18 @@
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Helpers;
+    using Base.Utils;
     using Grips;
     using ModPlusAPI.Windows;
 
+    /// <inheritdoc />
     public class GroundLineGripPointOverrule : GripOverrule
     {
         private static GroundLineGripPointOverrule _instance;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         public static GroundLineGripPointOverrule Instance()
         {
             if (_instance != null)
@@ -27,8 +31,9 @@
             return _instance;
         }
 
-        public override void GetGripPoints(Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir,
-            GetGripPointsFlags bitFlags)
+        /// <inheritdoc />
+        public override void GetGripPoints(
+            Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
         {
             try
             {
@@ -37,7 +42,7 @@
                     // Удаляю все ручки - это удалит ручку вставки блока
                     grips.Clear();
 
-                    var groundLine = EntityReaderFactory.Instance.GetFromEntity<GroundLine>(entity);
+                    var groundLine = EntityReaderService.Instance.GetFromEntity<GroundLine>(entity);
                     if (groundLine != null)
                     {
                         // Если средних точек нет, значит линия состоит всего из двух точек
@@ -102,7 +107,7 @@
                                     groundLine,
                                     groundLine.InsertionPoint, groundLine.MiddlePoints[i])
                                 {
-                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.InsertionPoint, groundLine.MiddlePoints[i])
+                                    GripPoint = GeometryUtils.GetMiddlePoint3d(groundLine.InsertionPoint, groundLine.MiddlePoints[i])
                                 };
                                 grips.Add(addVertexGrip);
                             }
@@ -112,7 +117,7 @@
                                     groundLine,
                                     groundLine.MiddlePoints[i - 1], groundLine.MiddlePoints[i])
                                 {
-                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.MiddlePoints[i - 1], groundLine.MiddlePoints[i])
+                                    GripPoint = GeometryUtils.GetMiddlePoint3d(groundLine.MiddlePoints[i - 1], groundLine.MiddlePoints[i])
                                 };
                                 grips.Add(addVertexGrip);
                             }
@@ -124,7 +129,7 @@
                                     groundLine,
                                     groundLine.MiddlePoints[i], groundLine.EndPoint)
                                 {
-                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.MiddlePoints[i], groundLine.EndPoint)
+                                    GripPoint = GeometryUtils.GetMiddlePoint3d(groundLine.MiddlePoints[i], groundLine.EndPoint)
                                 };
                                 grips.Add(addVertexGrip);
                             }
@@ -165,7 +170,7 @@
 
                                 addVertexGrip = new GroundLineAddVertexGrip(groundLine, groundLine.InsertionPoint, groundLine.EndPoint)
                                 {
-                                    GripPoint = GeometryHelpers.GetMiddlePoint3d(groundLine.InsertionPoint, groundLine.EndPoint)
+                                    GripPoint = GeometryUtils.GetMiddlePoint3d(groundLine.InsertionPoint, groundLine.EndPoint)
                                 };
                                 grips.Add(addVertexGrip);
                             }
@@ -193,34 +198,38 @@
             }
         }
 
-        public override void MoveGripPointsAt(Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
+        /// <inheritdoc />
+        public override void MoveGripPointsAt(
+            Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
         {
             try
             {
                 if (IsApplicable(entity))
                 {
-                    foreach (GripData gripData in grips)
+                    foreach (var gripData in grips)
                     {
                         if (gripData is GroundLineVertexGrip vertexGrip)
                         {
+                            var groundLine = vertexGrip.GroundLine;
+
                             if (vertexGrip.GripIndex == 0)
                             {
                                 ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                                vertexGrip.GroundLine.InsertionPoint = vertexGrip.GripPoint + offset;
+                                groundLine.InsertionPoint = vertexGrip.GripPoint + offset;
                             }
-                            else if (vertexGrip.GripIndex == vertexGrip.GroundLine.MiddlePoints.Count + 1)
+                            else if (vertexGrip.GripIndex == groundLine.MiddlePoints.Count + 1)
                             {
-                                vertexGrip.GroundLine.EndPoint = vertexGrip.GripPoint + offset;
+                                groundLine.EndPoint = vertexGrip.GripPoint + offset;
                             }
                             else
                             {
-                                vertexGrip.GroundLine.MiddlePoints[vertexGrip.GripIndex - 1] =
+                                groundLine.MiddlePoints[vertexGrip.GripIndex - 1] =
                                     vertexGrip.GripPoint + offset;
                             }
 
                             // Вот тут происходит перерисовка примитивов внутри блока
-                            vertexGrip.GroundLine.UpdateEntities();
-                            vertexGrip.GroundLine.BlockRecord.UpdateAnonymousBlocks();
+                            groundLine.UpdateEntities();
+                            groundLine.BlockRecord.UpdateAnonymousBlocks();
                         }
                         else if (gripData is GroundLineAddVertexGrip addVertexGrip)
                         {
@@ -244,11 +253,10 @@
             }
         }
 
-        // Проверка поддерживаемости примитива
-        // Проверка происходит по наличию XData с определенным AppName
+        /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name);
         }
     }
 }

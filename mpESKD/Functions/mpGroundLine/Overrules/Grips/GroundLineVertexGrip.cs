@@ -5,8 +5,8 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
     using Base.Overrules;
+    using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
 
@@ -20,10 +20,6 @@
             GroundLine = groundLine;
             GripIndex = index;
             GripType = GripType.Point;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
         }
 
         /// <summary>
@@ -36,7 +32,7 @@
         /// </summary>
         public int GripIndex { get; }
 
-        // Подсказка в зависимости от имени ручки
+        /// <inheritdoc />
         public override string GetTooltip()
         {
             return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
@@ -45,6 +41,7 @@
         // Временное значение ручки
         private Point3d _gripTmp;
 
+        /// <inheritdoc />
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
             try
@@ -60,7 +57,7 @@
                 // По этим данным я потом получаю экземпляр класса groundLine
                 if (newStatus == Status.GripEnd)
                 {
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
                         using (var resBuf = GroundLine.GetDataForXData())

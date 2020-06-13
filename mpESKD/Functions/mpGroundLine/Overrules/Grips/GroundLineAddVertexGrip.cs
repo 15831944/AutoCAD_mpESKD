@@ -5,8 +5,8 @@
     using Autodesk.AutoCAD.Geometry;
     using Base;
     using Base.Enums;
-    using Base.Helpers;
     using Base.Overrules;
+    using Base.Utils;
     using ModPlusAPI;
 
     /// <summary>
@@ -21,10 +21,6 @@
             GripRightPoint = rightPoint;
             GripType = GripType.Plus;
             RubberBandLineDisabled = true;
-
-            // отключение контекстного меню и возможности менять команду
-            // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool
-            ModeKeywordsDisabled = true;
         }
 
         /// <summary>
@@ -53,14 +49,14 @@
         {
             if (newStatus == Status.GripStart)
             {
-                AcadHelpers.Editor.TurnForcedPickOn();
-                AcadHelpers.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
+                AcadUtils.Editor.TurnForcedPickOn();
+                AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
             }
 
             if (newStatus == Status.GripEnd)
             {
-                AcadHelpers.Editor.TurnForcedPickOff();
-                AcadHelpers.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+                AcadUtils.Editor.TurnForcedPickOff();
+                AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
                 using (GroundLine)
                 {
                     Point3d? newInsertionPoint = null;
@@ -87,7 +83,7 @@
 
                     GroundLine.UpdateEntities();
                     GroundLine.BlockRecord.UpdateAnonymousBlocks();
-                    using (var tr = AcadHelpers.Database.TransactionManager.StartOpenCloseTransaction())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
                         if (newInsertionPoint.HasValue)
@@ -107,8 +103,8 @@
 
             if (newStatus == Status.GripAbort)
             {
-                AcadHelpers.Editor.TurnForcedPickOff();
-                AcadHelpers.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+                AcadUtils.Editor.TurnForcedPickOff();
+                AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
             }
 
             base.OnGripStatusChanged(entityId, newStatus);

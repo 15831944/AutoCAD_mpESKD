@@ -1,46 +1,55 @@
-﻿// ReSharper disable InconsistentNaming
-namespace mpESKD.Functions.mpAxis
+﻿namespace mpESKD.Functions.mpAxis
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using Autodesk.AutoCAD.DatabaseServices;
-    using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.Geometry;
     using Base;
     using Base.Attributes;
     using Base.Enums;
-    using Base.Helpers;
+    using Base.Utils;
     using ModPlusAPI.Windows;
 
+    /// <summary>
+    /// Прямая ось
+    /// </summary>
     [IntellectualEntityDisplayNameKey("h41")]
+    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "<Ожидание>")]
     public class Axis : IntellectualEntity
     {
-        #region Constructors
-
-        /// <inheritdoc />
-        public Axis(ObjectId objectId) : base(objectId)
-        {
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Axis"/> class.
+        /// </summary>
         public Axis()
         {
         }
 
-        /// <summary>Инициализация экземпляра класса для BreakLine для создания</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Axis"/> class.
+        /// </summary>
+        /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
+        public Axis(ObjectId objectId)
+            : base(objectId)
+        {
+        }
+
+        /// <summary>
+        /// Инициализация экземпляра класса для BreakLine для создания
+        /// </summary>
+        /// <param name="lastHorizontalValue">Значение последней горизонтальной оси</param>
+        /// <param name="lastVerticalValue">Значение последней вертикальной оси</param>
         public Axis(string lastHorizontalValue, string lastVerticalValue)
         {
             // last values
-            LastHorizontalValue = lastHorizontalValue;
-            LastVerticalValue = lastVerticalValue;
+            _lastHorizontalValue = lastHorizontalValue;
+            _lastVerticalValue = lastVerticalValue;
         }
+        
+        /// <inheritdoc/>
+        public override double MinDistanceBetweenPoints => 1.0;
 
-        #endregion
-
-        #region General Properties
-
-        /// <summary>Минимальная длина от точки вставки до конечной точки</summary>
-        public double AxisMinLength => 1.0;
-
+        /// <inheritdoc/>
         protected override void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
         {
             base.ProcessScaleChange(oldScale, newScale);
@@ -54,37 +63,31 @@ namespace mpESKD.Functions.mpAxis
         }
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 4, "p19", "d19", "осевая", null, null)]
+        [EntityProperty(PropertiesCategory.General, 4, "p19", "осевая")]
         public override string LineType { get; set; } = "осевая";
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.General, 5, "p6", "d6", 10.0, 0.0, 1.0000E+99)]
+        [EntityProperty(PropertiesCategory.General, 5, "p6", 10.0, 0.0, 1.0000E+99, descLocalKey: "d6")]
         public override double LineTypeScale { get; set; } = 10;
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.Content, 1, "p17", "d17", "Standard", null, null)]
-        public override string TextStyle { get; set; }
-
-        #endregion
-
-        #region Axis Properties
-
+        [EntityProperty(PropertiesCategory.Content, 1, "p17", "Standard", descLocalKey: "d17")]
+        public override string TextStyle { get; set; } = "Standard";
+        
         private int _bottomFractureOffset;
 
         /// <summary>Положение маркеров</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "p8", "d8", AxisMarkersPosition.Bottom, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p8", AxisMarkersPosition.Bottom, descLocalKey: "d8")]
         [SaveToXData]
         public AxisMarkersPosition MarkersPosition { get; set; } = AxisMarkersPosition.Bottom;
 
         /// <summary>Излом</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 2, "p9", "d9", 10, 1, 20)]
-        [PropertyNameKeyInStyleEditor("p9-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p9", 10, 1, 20, descLocalKey: "d9", nameSymbol: "b")]
         [SaveToXData]
         public int Fracture { get; set; } = 10;
 
         /// <summary>Нижний отступ излома</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p15", "d15", 0, 0, 30)]
-        [PropertyNameKeyInStyleEditor("p15-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p15", 0, 0, 30, descLocalKey: "d15", nameSymbol: "a")]
         [SaveToXData]
         public int BottomFractureOffset
         {
@@ -96,26 +99,24 @@ namespace mpESKD.Functions.mpAxis
 
                 // нужно сместить зависимые точки
                 var vecNorm = (EndPoint - InsertionPoint).GetNormal() * (value - oldFracture) * GetScale();
-                BottomOrientPoint = BottomOrientPoint + vecNorm;
+                BottomOrientPoint += vecNorm;
             }
         }
 
         /// <summary>Верхний отступ излома</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, "p16", "d16", 0, 0, 30)]
-        [PropertyNameKeyInStyleEditor("p16-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p16", 0, 0, 30, descLocalKey: "d16", nameSymbol: "a")]
         [SaveToXData]
         public int TopFractureOffset { get; set; } = 0;
 
         /// <summary>Диаметр маркеров</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, "p10", "d10", 10, 6, 12)]
-        [PropertyNameKeyInStyleEditor("p10-1")]
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p10", 10, 6, 12, descLocalKey: "d10", nameSymbol: "d")]
         [SaveToXData]
         public int MarkersDiameter { get; set; } = 10;
 
         private int _markersCount = 1;
 
         /// <summary>Количество маркеров</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 6, "p11", "d11", 1, 1, 3)]
+        [EntityProperty(PropertiesCategory.Geometry, 6, "p11", 1, 1, 3, descLocalKey: "d11")]
         [SaveToXData]
         public int MarkersCount
         {
@@ -141,16 +142,24 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        // Типы маркеров: Type 1 - один кружок, Type 2 - два кружка
-        [EntityProperty(PropertiesCategory.Geometry, 7, "p12", "d12", AxisMarkerType.Type1, null, null)]
+        /// <summary>
+        /// Тип первого маркера: Type 1 - один кружок, Type 2 - два кружка
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 7, "p12", AxisMarkerType.Type1, descLocalKey: "d12")]
         [SaveToXData]
         public AxisMarkerType FirstMarkerType { get; set; } = AxisMarkerType.Type1;
 
-        [EntityProperty(PropertiesCategory.Geometry, 8, "p13", "d13", AxisMarkerType.Type1, null, null)]
+        /// <summary>
+        /// Тип второго маркера: Type 1 - один кружок, Type 2 - два кружка
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 8, "p13", AxisMarkerType.Type1, descLocalKey: "d13")]
         [SaveToXData]
         public AxisMarkerType SecondMarkerType { get; set; } = AxisMarkerType.Type1;
 
-        [EntityProperty(PropertiesCategory.Geometry, 8, "p14", "d14", AxisMarkerType.Type1, null, null)]
+        /// <summary>
+        /// Тип третьего маркера: Type 1 - один кружок, Type 2 - два кружка
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 8, "p14", AxisMarkerType.Type1, descLocalKey: "d14")]
         [SaveToXData]
         public AxisMarkerType ThirdMarkerType { get; set; } = AxisMarkerType.Type1;
 
@@ -158,8 +167,10 @@ namespace mpESKD.Functions.mpAxis
 
         private bool _bottomOrientMarkerVisible;
 
-        /// <summary>Видимость нижнего бокового кружка</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 9, "p32", "d32", false, null, null)]
+        /// <summary>
+        /// Видимость нижнего бокового кружка
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 9, "p32", false, descLocalKey: "d32")]
         [PropertyVisibilityDependency(new[] { nameof(BottomOrientText) })]
         [SaveToXData]
         public bool BottomOrientMarkerVisible
@@ -181,8 +192,10 @@ namespace mpESKD.Functions.mpAxis
 
         private bool _topOrientMarkerVisible;
 
-        /// <summary>Видимость верхнего бокового кружка</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 10, "p33", "d33", false, null, null)]
+        /// <summary>
+        /// Видимость верхнего бокового кружка
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 10, "p33", false, descLocalKey: "d33")]
         [PropertyVisibilityDependency(new[] { nameof(TopOrientText) })]
         [SaveToXData]
         public bool TopOrientMarkerVisible
@@ -202,18 +215,19 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        [EntityProperty(PropertiesCategory.Geometry, 10, "", "", "", null, null, PropertyScope.Hidden)]
+        [EntityProperty(PropertiesCategory.Geometry, 10, "", "", propertyScope: PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(OrientMarkerType), nameof(ArrowsSize) })]
         [SaveToXData]
         public bool OrientMarkerVisibilityDependency { get; private set; }
 
-        [EntityProperty(PropertiesCategory.Geometry, 11, "p34", "d34", AxisMarkerType.Type1, null, null)]
+        [EntityProperty(PropertiesCategory.Geometry, 11, "p34", AxisMarkerType.Type1, descLocalKey: "d34")]
         [SaveToXData]
         public AxisMarkerType OrientMarkerType { get; set; } = AxisMarkerType.Type1;
 
-        /// <summary>Размер стрелок</summary>
-        [EntityProperty(PropertiesCategory.Geometry, 12, "p29", "d29", 3, 0, 10)]
-        [PropertyNameKeyInStyleEditor("p29-1")]
+        /// <summary>
+        /// Размер стрелок
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 12, "p29", 3, 0, 10, nameSymbol: "c")]
         [SaveToXData]
         public int ArrowsSize { get; set; } = 3;
 
@@ -224,76 +238,73 @@ namespace mpESKD.Functions.mpAxis
         [SaveToXData]
         private double TopOrientMarkerOffset { get; set; } = double.NaN;
 
-        // текст и текстовые значения
-        [EntityProperty(PropertiesCategory.Content, 1, "p18", "d18", 3.5, 0.000000001, 1.0000E+99)]
-        [PropertyNameKeyInStyleEditor("p18-1")]
+        //// текст и текстовые значения
+
+        /// <summary>
+        /// Высота текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 2, "p18", 3.5, 0.000000001, 1.0000E+99, descLocalKey: "d18", nameSymbol: "h")]
         [SaveToXData]
         public double TextHeight { get; set; } = 3.5;
 
-        [EntityProperty(PropertiesCategory.Content, 2, "p20", "d20", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 3, "p20", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string FirstTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 3, "p22", "d22", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 4, "p22", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string FirstText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 4, "p21", "d21", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 5, "p21", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string FirstTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 4, "", "", "", null, null, PropertyScope.Hidden)]
+        [EntityProperty(PropertiesCategory.Content, 6, "", "", propertyScope: PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(SecondText), nameof(SecondTextPrefix), nameof(SecondTextSuffix), nameof(SecondMarkerType) })]
         [SaveToXData]
         public bool SecondTextVisibility { get; set; }
 
-        [EntityProperty(PropertiesCategory.Content, 5, "p23", "d23", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 7, "p23", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string SecondTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 6, "p25", "d25", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 8, "p25", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string SecondText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 7, "p24", "d24", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 9, "p24", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string SecondTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 7, "", "", "", null, null, PropertyScope.Hidden)]
+        [EntityProperty(PropertiesCategory.Content, 10, "", "", propertyScope: PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(ThirdText), nameof(ThirdTextPrefix), nameof(ThirdTextSuffix), nameof(ThirdMarkerType) })]
         [SaveToXData]
         public bool ThirdTextVisibility { get; set; }
 
-        [EntityProperty(PropertiesCategory.Content, 8, "p26", "d26", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 11, "p26", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string ThirdTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 9, "p28", "d28", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 12, "p28", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string ThirdText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 10, "p27", "d27", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 13, "p27", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string ThirdTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 11, "p30", "d30", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 14, "p30", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string BottomOrientText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 12, "p31", "d31", "", null, null, PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 15, "p31", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string TopOrientText { get; set; } = string.Empty;
 
         // last values
-        private readonly string LastHorizontalValue = string.Empty;
+        private readonly string _lastHorizontalValue = string.Empty;
 
-        private readonly string LastVerticalValue = string.Empty;
-
-        #endregion
-
-        #region Geometry
-
-        #region Points and Grips
+        private readonly string _lastVerticalValue = string.Empty;
 
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
         public Point3d MiddlePoint => new Point3d(
@@ -398,30 +409,22 @@ namespace mpESKD.Functions.mpAxis
                 TopOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale() / BlockTransform.GetScale();
             }
         }
-
+        
         // Получение управляющих точек в системе координат блока для отрисовки содержимого
         private Point3d BottomMarkerPointOCS => BottomMarkerPoint.TransformBy(BlockTransform.Inverse());
-
+        
         private Point3d TopMarkerPointOCS => TopMarkerPoint.TransformBy(BlockTransform.Inverse());
 
         private Point3d BottomOrientPointOCS => BottomOrientPoint.TransformBy(BlockTransform.Inverse());
 
         private Point3d TopOrientPointOCS => TopOrientPoint.TransformBy(BlockTransform.Inverse());
-
-        #endregion
-
-        /// <summary>Установка свойств для однострочного текста</summary>
+        
         private void SetPropertiesToDBText(DBText dbText)
         {
-            dbText.Height = TextHeight * GetScale();
-            dbText.HorizontalMode = TextHorizontalMode.TextCenter;
-            dbText.Justify = AttachmentPoint.MiddleCenter;
-            dbText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-            dbText.Linetype = "ByBlock";
-            dbText.LineWeight = LineWeight.ByBlock;
-            dbText.TextStyleId = AcadHelpers.GetTextStyleIdByName(TextStyle);
+            dbText.SetPropertiesToDbText(
+                TextStyle, TextHeight * GetScale(), TextHorizontalMode.TextCenter, null, AttachmentPoint.MiddleCenter);
         }
-
+        
         /// <summary>Средняя (основная) линия оси</summary>
         private Line _mainLine;
 
@@ -517,6 +520,7 @@ namespace mpESKD.Functions.mpAxis
 
         #endregion
 
+        /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
             get
@@ -556,6 +560,7 @@ namespace mpESKD.Functions.mpAxis
                     _bottomOrientDBText,
                     _topOrientDBText
                 };
+
                 foreach (var e in entities)
                 {
                     if (e != null && !(e is DBText))
@@ -576,6 +581,33 @@ namespace mpESKD.Functions.mpAxis
         }
 
         /// <inheritdoc />
+        public override IEnumerable<Point3d> GetPointsForOsnap()
+        {
+            yield return InsertionPoint;
+            yield return EndPoint;
+            
+            if (MarkersPosition == AxisMarkersPosition.Both ||
+                MarkersPosition == AxisMarkersPosition.Bottom)
+            {
+                yield return BottomMarkerPoint;
+                if (BottomOrientMarkerVisible)
+                {
+                    yield return BottomOrientPoint;
+                }
+            }
+
+            if (MarkersPosition == AxisMarkersPosition.Both ||
+                MarkersPosition == AxisMarkersPosition.Top)
+            {
+                yield return TopMarkerPoint;
+                if (TopOrientMarkerVisible)
+                {
+                    yield return TopOrientPoint;
+                }
+            }
+        }
+
+        /// <inheritdoc />
         public override void UpdateEntities()
         {
             try
@@ -587,7 +619,7 @@ namespace mpESKD.Functions.mpAxis
                     // Задание точки вставки (т.е. второй точки еще нет)
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
-                else if (length < AxisMinLength * scale)
+                else if (length < MinDistanceBetweenPoints * scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
                     MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
@@ -618,24 +650,28 @@ namespace mpESKD.Functions.mpAxis
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                var tmpEndPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y - (AxisMinLength * scale), InsertionPointOCS.Z);
+                var tmpEndPoint = new Point3d(
+                    InsertionPointOCS.X, InsertionPointOCS.Y - (MinDistanceBetweenPoints * scale), InsertionPointOCS.Z);
                 var tmpBottomMarkerPoint = new Point3d(tmpEndPoint.X, tmpEndPoint.Y - (Fracture * scale), tmpEndPoint.Z);
                 var tmpTopMarkerPoint = new Point3d(InsertionPointOCS.X, InsertionPointOCS.Y + (Fracture * scale), InsertionPointOCS.Z);
 
                 SetEntitiesPoints(InsertionPointOCS, tmpEndPoint, tmpBottomMarkerPoint, tmpTopMarkerPoint, scale);
             }
-            else if (variant == UpdateVariant.SetEndPointMinLength) // изменение вершин полилинии
+            else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, AxisMinLength * scale);
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                    InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
                 SetEntitiesPoints(InsertionPointOCS, tmpEndPoint, BottomMarkerPointOCS, TopMarkerPointOCS, scale);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
         }
 
-        /// <summary>Изменение примитивов по точкам</summary>
+        /// <summary>
+        /// Изменение примитивов по точкам
+        /// </summary>
         private void SetEntitiesPoints(Point3d insertionPoint, Point3d endPoint, Point3d bottomMarkerPoint, Point3d topMarkerPoint, double scale)
         {
             // main line
@@ -647,6 +683,7 @@ namespace mpESKD.Functions.mpAxis
             var mainVector = endPoint - insertionPoint;
 
             #region Bottom
+
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Bottom)
             {
@@ -702,10 +739,10 @@ namespace mpESKD.Functions.mpAxis
                 if (MarkersCount > 1)
                 {
                     // Значит второй маркер точно есть (независимо от 3-го)
-                    var secontMarkerCenter = firstMarkerCenter + (mainVector.GetNormal() * MarkersDiameter * scale);
+                    var secondMarkerCenter = firstMarkerCenter + (mainVector.GetNormal() * MarkersDiameter * scale);
                     _bottomSecondMarker = new Circle
                     {
-                        Center = secontMarkerCenter,
+                        Center = secondMarkerCenter,
                         Diameter = MarkersDiameter * scale
                     };
 
@@ -716,8 +753,8 @@ namespace mpESKD.Functions.mpAxis
                     {
                         _bottomSecondDBText = new DBText();
                         SetPropertiesToDBText(_bottomSecondDBText);
-                        _bottomSecondDBText.Position = secontMarkerCenter;
-                        _bottomSecondDBText.AlignmentPoint = secontMarkerCenter;
+                        _bottomSecondDBText.Position = secondMarkerCenter;
+                        _bottomSecondDBText.AlignmentPoint = secondMarkerCenter;
                     }
 
                     // второй кружок второго маркера
@@ -725,7 +762,7 @@ namespace mpESKD.Functions.mpAxis
                     {
                         _bottomSecondMarkerType2 = new Circle
                         {
-                            Center = secontMarkerCenter,
+                            Center = secondMarkerCenter,
                             Diameter = (MarkersDiameter - 2) * scale
                         };
                     }
@@ -733,7 +770,7 @@ namespace mpESKD.Functions.mpAxis
                     // Если количество маркеров больше двух, тогда рисую 3-ий маркер
                     if (MarkersCount > 2)
                     {
-                        var thirdMarkerCenter = secontMarkerCenter + (mainVector.GetNormal() * MarkersDiameter * scale);
+                        var thirdMarkerCenter = secondMarkerCenter + (mainVector.GetNormal() * MarkersDiameter * scale);
                         _bottomThirdMarker = new Circle
                         {
                             Center = thirdMarkerCenter,
@@ -775,31 +812,32 @@ namespace mpESKD.Functions.mpAxis
                     };
 
                     // line
-                    var _bottomOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                    var bottomOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, bottomOrientMarkerCenter, firstMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    var _bottomOrientLineEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                    var bottomOrientLineEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         bottomOrientMarkerCenter, firstMarkerCenter, bottomOrientMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    if (!_bottomOrientLineEndPoint.IsEqualTo(_bottomOrientLineStartPoint, Tolerance.Global))
+
+                    if (!bottomOrientLineEndPoint.IsEqualTo(bottomOrientLineStartPoint, Tolerance.Global))
                     {
                         _bottomOrientLine = new Line
                         {
-                            StartPoint = _bottomOrientLineStartPoint,
-                            EndPoint = _bottomOrientLineEndPoint
+                            StartPoint = bottomOrientLineStartPoint,
+                            EndPoint = bottomOrientLineEndPoint
                         };
 
                         // arrow
-                        if (!(Math.Abs((_bottomOrientLineEndPoint - _bottomOrientLineStartPoint).Length) < ArrowsSize * scale) &&
+                        if (!(Math.Abs((bottomOrientLineEndPoint - bottomOrientLineStartPoint).Length) < ArrowsSize * scale) &&
                             ArrowsSize != 0)
                         {
                             _bottomOrientArrow = new Polyline(2);
                             var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                _bottomOrientLineEndPoint,
-                                _bottomOrientLineStartPoint,
-                                _bottomOrientLineEndPoint, ArrowsSize * scale);
+                                bottomOrientLineEndPoint,
+                                bottomOrientLineStartPoint,
+                                bottomOrientLineEndPoint, ArrowsSize * scale);
                             _bottomOrientArrow.AddVertexAt(0, arrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
-                            _bottomOrientArrow.AddVertexAt(1, _bottomOrientLineEndPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
+                            _bottomOrientArrow.AddVertexAt(1, bottomOrientLineEndPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
                         }
                     }
 
@@ -825,9 +863,30 @@ namespace mpESKD.Functions.mpAxis
 
                 #endregion
             }
+            else
+            {
+                _bottomFractureOffsetLine = null;
+                _bottomMarkerLine = null;
+                _bottomOrientArrow = null;
+                _bottomOrientLine = null;
+                _bottomFirstDBText = null;
+                _bottomFirstMarker = null;
+                _bottomFirstMarkerType2 = null;
+                _bottomSecondDBText = null;
+                _bottomSecondMarker = null;
+                _bottomSecondMarkerType2 = null;
+                _bottomOrientDBText = null;
+                _bottomOrientMarkerType2 = null;
+                _bottomOrientMarker = null;
+                _bottomThirdDBText = null;
+                _bottomThirdMarker = null;
+                _bottomThirdMarkerType2 = null;
+            }
+
             #endregion
 
             #region Top
+
             if (MarkersPosition == AxisMarkersPosition.Both ||
                 MarkersPosition == AxisMarkersPosition.Top)
             {
@@ -883,10 +942,10 @@ namespace mpESKD.Functions.mpAxis
                 if (MarkersCount > 1)
                 {
                     // Значит второй маркер точно есть (независимо от 3-го)
-                    var secontMarkerCenter = firstMarkerCenter - (mainVector.GetNormal() * MarkersDiameter * scale);
+                    var secondMarkerCenter = firstMarkerCenter - (mainVector.GetNormal() * MarkersDiameter * scale);
                     _topSecondMarker = new Circle
                     {
-                        Center = secontMarkerCenter,
+                        Center = secondMarkerCenter,
                         Diameter = MarkersDiameter * scale
                     };
 
@@ -897,8 +956,8 @@ namespace mpESKD.Functions.mpAxis
                     {
                         _topSecondDBText = new DBText();
                         SetPropertiesToDBText(_topSecondDBText);
-                        _topSecondDBText.Position = secontMarkerCenter;
-                        _topSecondDBText.AlignmentPoint = secontMarkerCenter;
+                        _topSecondDBText.Position = secondMarkerCenter;
+                        _topSecondDBText.AlignmentPoint = secondMarkerCenter;
                     }
 
                     // второй кружок второго маркера
@@ -906,7 +965,7 @@ namespace mpESKD.Functions.mpAxis
                     {
                         _topSecondMarkerType2 = new Circle
                         {
-                            Center = secontMarkerCenter,
+                            Center = secondMarkerCenter,
                             Diameter = (MarkersDiameter - 2) * scale
                         };
                     }
@@ -914,7 +973,7 @@ namespace mpESKD.Functions.mpAxis
                     // Если количество маркеров больше двух, тогда рисую 3-ий маркер
                     if (MarkersCount > 2)
                     {
-                        var thirdMarkerCenter = secontMarkerCenter - (mainVector.GetNormal() * MarkersDiameter * scale);
+                        var thirdMarkerCenter = secondMarkerCenter - (mainVector.GetNormal() * MarkersDiameter * scale);
                         _topThirdMarker = new Circle
                         {
                             Center = thirdMarkerCenter,
@@ -956,33 +1015,33 @@ namespace mpESKD.Functions.mpAxis
                     };
 
                     // line
-                    var _topOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                    var topOrientLineStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         firstMarkerCenter, topOrientMarkerCenter, firstMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    var _topOrientLineEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                    var topOrientLineEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                         topOrientMarkerCenter, firstMarkerCenter, topOrientMarkerCenter,
                         MarkersDiameter / 2.0 * scale);
-                    if (!_topOrientLineEndPoint.IsEqualTo(_topOrientLineStartPoint, Tolerance.Global))
+                    if (!topOrientLineEndPoint.IsEqualTo(topOrientLineStartPoint, Tolerance.Global))
                     {
                         _topOrientLine = new Line
                         {
-                            StartPoint = _topOrientLineStartPoint,
-                            EndPoint = _topOrientLineEndPoint
+                            StartPoint = topOrientLineStartPoint,
+                            EndPoint = topOrientLineEndPoint
                         };
 
                         // arrow
-                        if (!(Math.Abs((_topOrientLineEndPoint - _topOrientLineStartPoint).Length) < ArrowsSize * scale) &&
+                        if (!(Math.Abs((topOrientLineEndPoint - topOrientLineStartPoint).Length) < ArrowsSize * scale) &&
                             ArrowsSize != 0)
                         {
                             _topOrientArrow = new Polyline(2);
 
                             // arrow draw
                             var arrowStartPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                _topOrientLineEndPoint,
-                                _topOrientLineStartPoint,
-                                _topOrientLineEndPoint, ArrowsSize * scale);
+                                topOrientLineEndPoint,
+                                topOrientLineStartPoint,
+                                topOrientLineEndPoint, ArrowsSize * scale);
                             _topOrientArrow.AddVertexAt(0, arrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
-                            _topOrientArrow.AddVertexAt(1, _topOrientLineEndPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
+                            _topOrientArrow.AddVertexAt(1, topOrientLineEndPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
                         }
                     }
 
@@ -1008,6 +1067,26 @@ namespace mpESKD.Functions.mpAxis
 
                 #endregion
             }
+            else
+            {
+                _topFractureOffsetLine = null;
+                _topMarkerLine = null;
+                _topOrientArrow = null;
+                _topOrientLine = null;
+                _topFirstDBText = null;
+                _topFirstMarker = null;
+                _topFirstMarkerType2 = null;
+                _topSecondDBText = null;
+                _topSecondMarker = null;
+                _topSecondMarkerType2 = null;
+                _topOrientDBText = null;
+                _topOrientMarkerType2 = null;
+                _topOrientMarker = null;
+                _topThirdDBText = null;
+                _topThirdMarker = null;
+                _topThirdMarkerType2 = null;
+            }
+
             #endregion
         }
 
@@ -1083,19 +1162,19 @@ namespace mpESKD.Functions.mpAxis
         {
             if (direction.Equals("Horizontal"))
             {
-                if (!string.IsNullOrEmpty(LastHorizontalValue))
+                if (!string.IsNullOrEmpty(_lastHorizontalValue))
                 {
                     if (string.IsNullOrEmpty(_newHorizontalMarkValue))
                     {
-                        if (int.TryParse(LastHorizontalValue, out int i))
+                        if (int.TryParse(_lastHorizontalValue, out int i))
                         {
                             _newHorizontalMarkValue = (i + 1).ToString();
                             return _newHorizontalMarkValue;
                         }
 
-                        if (Invariables.AxisRusAlphabet.Contains(LastHorizontalValue))
+                        if (Invariables.AxisRusAlphabet.Contains(_lastHorizontalValue))
                         {
-                            var index = Invariables.AxisRusAlphabet.IndexOf(LastHorizontalValue);
+                            var index = Invariables.AxisRusAlphabet.IndexOf(_lastHorizontalValue);
                             if (index == Invariables.AxisRusAlphabet.Count - 1)
                             {
                                 _newHorizontalMarkValue = Invariables.AxisRusAlphabet[0];
@@ -1119,19 +1198,19 @@ namespace mpESKD.Functions.mpAxis
 
             if (direction.Equals("Vertical"))
             {
-                if (!string.IsNullOrEmpty(LastVerticalValue))
+                if (!string.IsNullOrEmpty(_lastVerticalValue))
                 {
                     if (string.IsNullOrEmpty(_newVerticalMarkValue))
                     {
-                        if (int.TryParse(LastVerticalValue, out int i))
+                        if (int.TryParse(_lastVerticalValue, out int i))
                         {
                             _newVerticalMarkValue = (i + 1).ToString();
                             return _newVerticalMarkValue;
                         }
 
-                        if (Invariables.AxisRusAlphabet.Contains(LastVerticalValue))
+                        if (Invariables.AxisRusAlphabet.Contains(_lastVerticalValue))
                         {
-                            var index = Invariables.AxisRusAlphabet.IndexOf(LastVerticalValue);
+                            var index = Invariables.AxisRusAlphabet.IndexOf(_lastVerticalValue);
                             if (index == Invariables.AxisRusAlphabet.Count - 1)
                             {
                                 _newVerticalMarkValue = Invariables.AxisRusAlphabet[0];
@@ -1155,6 +1234,5 @@ namespace mpESKD.Functions.mpAxis
 
             return string.Empty;
         }
-        #endregion
     }
 }

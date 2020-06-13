@@ -1,18 +1,19 @@
-﻿// ReSharper disable InconsistentNaming
-
-namespace mpESKD.Functions.mpBreakLine.Overrules
+﻿namespace mpESKD.Functions.mpBreakLine.Overrules
 {
     using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
-    using ModPlusAPI.Windows;
-    using Base.Helpers;
     using Base;
+    using Base.Utils;
 
+    /// <inheritdoc />
     public class BreakLineObjectOverrule : ObjectOverrule
     {
-        protected static BreakLineObjectOverrule _breakLineObjectOverrule;
+        private static BreakLineObjectOverrule _breakLineObjectOverrule;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         public static BreakLineObjectOverrule Instance()
         {
             if (_breakLineObjectOverrule != null)
@@ -27,39 +28,23 @@ namespace mpESKD.Functions.mpBreakLine.Overrules
             return _breakLineObjectOverrule;
         }
 
+        /// <inheritdoc />
         public override void Close(DBObject dbObject)
         {
             Debug.Print(dbObject?.GetRXClass().Name);
             if (IsApplicable(dbObject))
             {
-                try
-                {
-                    if (AcadHelpers.Document != null)
-                    {
-                        if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadHelpers.Database ||
-                            dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
-                        {
-                            var breakLine = EntityReaderFactory.Instance.GetFromEntity<BreakLine>((Entity)dbObject);
-                            if (breakLine != null)
-                            {
-                                breakLine.UpdateEntities();
-                                breakLine.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
-                            }
-                        }
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ExceptionBox.Show(exception);
-                }
+                EntityUtils.ObjectOverruleProcess(
+                    dbObject, () => EntityReaderService.Instance.GetFromEntity<BreakLine>(dbObject));
             }
 
             base.Close(dbObject);
         }
 
+        /// <inheritdoc/>
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataHelpers.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name, true);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name, true);
         }
     }
 }
