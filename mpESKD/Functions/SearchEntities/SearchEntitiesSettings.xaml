@@ -13,7 +13,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" IsAsynchronous="False"/>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
