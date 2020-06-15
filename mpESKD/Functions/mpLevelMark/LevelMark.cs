@@ -357,12 +357,13 @@
         /// <param name="point3d">Новое значение точки стрелки</param>
         public void SetArrowPoint(Point3d point3d)
         {
-            var horV = (EndPoint - ObjectPoint).GetNormal();
             EndPoint = point3d;
             ObjectPoint = new Point3d(
                 ObjectPoint.X,
                 EndPoint.Y,
                 ObjectPoint.Z);
+
+            var horV = (EndPoint - ObjectPoint).GetNormal();
 
             if (ObjectLine)
             {
