@@ -10,6 +10,7 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Overrules;
 
     /// <inheritdoc />
     public class BreakLineFunction : IIntellectualEntityFunction
@@ -18,12 +19,16 @@
         public void Initialize()
         {
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance(), true);
         }
 
         /// <inheritdoc />
         public void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance());
         }
 
         /// <inheritdoc />

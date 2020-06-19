@@ -12,6 +12,7 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Overrules;
 
     /// <inheritdoc />
     public class GroundLineFunction : IIntellectualEntityFunction
@@ -20,12 +21,16 @@
         public void Initialize()
         {
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance(), true);
         }
 
         /// <inheritdoc />
         public void Terminate()
         {
             Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance());
         }
 
         /// <inheritdoc />

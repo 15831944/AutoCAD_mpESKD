@@ -48,12 +48,7 @@
             TypeFactory.Instance.GetEntityFunctionTypes().ForEach(f => f.Initialize());
 
             Overrule.Overruling = true;
-
-            Overrule.AddOverrule(
-                RXObject.GetClass(typeof(BlockReference)), IntellectualEntityObjectOverrule.Instance(), true);
-            Overrule.AddOverrule(
-                RXObject.GetClass(typeof(BlockReference)), IntellectualEntityOsnapOverrule.Instance(), true);
-
+            
             // ribbon build for
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
 
@@ -87,11 +82,6 @@
         public void Terminate()
         {
             TypeFactory.Instance.GetEntityFunctionTypes().ForEach(f => f.Terminate());
-
-            Overrule.RemoveOverrule(
-                RXObject.GetClass(typeof(BlockReference)), IntellectualEntityObjectOverrule.Instance());
-            Overrule.RemoveOverrule(
-                RXObject.GetClass(typeof(BlockReference)), IntellectualEntityOsnapOverrule.Instance());
 
             // remove context menu
             DetachCreateAnalogContextMenu();
