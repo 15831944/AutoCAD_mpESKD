@@ -24,5 +24,14 @@
         {
             return degree * Math.PI / 180;
         }
+
+        /// <summary>
+        /// Перевод радианов в градусы
+        /// </summary>
+        /// <param name="radian">Угол в радианах</param>
+        public static double RadianToDegree(this double radian)
+        {
+            return radian * 180 / Math.PI;
+        }
     }
 }

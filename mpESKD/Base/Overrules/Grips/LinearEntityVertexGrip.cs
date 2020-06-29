@@ -1,31 +1,36 @@
-﻿namespace mpESKD.Functions.mpGroundLine.Overrules.Grips
+﻿namespace mpESKD.Base.Overrules.Grips
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Enums;
-    using Base.Overrules;
-    using Base.Utils;
+    using Enums;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Overrules;
+    using Utils;
 
     /// <summary>
-    /// Ручка вершин
+    /// Ручка вершин линейного интеллектуального объекта
     /// </summary>
-    public class GroundLineVertexGrip : IntellectualEntityGripData
+    public class LinearEntityVertexGrip : IntellectualEntityGripData
     {
-        public GroundLineVertexGrip(GroundLine groundLine, int index)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LinearEntityVertexGrip"/> class.
+        /// </summary>
+        /// <param name="intellectualEntity">Instance of <see cref="Base.IntellectualEntity"/> that implement <see cref="ILinearEntity"/></param>
+        /// <param name="index">Grip index</param>
+        public LinearEntityVertexGrip(IntellectualEntity intellectualEntity, int index)
         {
-            GroundLine = groundLine;
+            IntellectualEntity = intellectualEntity;
             GripIndex = index;
             GripType = GripType.Point;
         }
 
         /// <summary>
-        /// Экземпляр класса Section
+        /// Экземпляр интеллектуального объекта
         /// </summary>
-        public GroundLine GroundLine { get; }
+        public IntellectualEntity IntellectualEntity { get; }
 
         /// <summary>
         /// Индекс точки
@@ -59,8 +64,8 @@
                 {
                     using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
-                        using (var resBuf = GroundLine.GetDataForXData())
+                        var blkRef = tr.GetObject(IntellectualEntity.BlockId, OpenMode.ForWrite, true, true);
+                        using (var resBuf = IntellectualEntity.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
                         }
@@ -68,7 +73,7 @@
                         tr.Commit();
                     }
 
-                    GroundLine.Dispose();
+                    IntellectualEntity.Dispose();
                 }
 
                 // При отмене перемещения возвращаем временные значения
@@ -78,15 +83,15 @@
                     {
                         if (GripIndex == 0)
                         {
-                            GroundLine.InsertionPoint = _gripTmp;
+                            IntellectualEntity.InsertionPoint = _gripTmp;
                         }
-                        else if (GripIndex == GroundLine.MiddlePoints.Count + 1)
+                        else if (GripIndex == ((ILinearEntity)IntellectualEntity).MiddlePoints.Count + 1)
                         {
-                            GroundLine.EndPoint = _gripTmp;
+                            IntellectualEntity.EndPoint = _gripTmp;
                         }
                         else
                         {
-                            GroundLine.MiddlePoints[GripIndex - 1] = _gripTmp;
+                            ((ILinearEntity)IntellectualEntity).MiddlePoints[GripIndex - 1] = _gripTmp;
                         }
                     }
                 }

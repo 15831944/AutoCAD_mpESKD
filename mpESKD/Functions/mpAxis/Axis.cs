@@ -247,57 +247,64 @@
         [SaveToXData]
         public double TextHeight { get; set; } = 3.5;
 
-        [EntityProperty(PropertiesCategory.Content, 3, "p20", "", propertyScope: PropertyScope.Palette)]
+        /// <summary>
+        /// Угол поворота текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 3, "p71", 0, 0, 359)]
+        [SaveToXData]
+        public int TextRotationAngle { get; set; } = 0;
+
+        [EntityProperty(PropertiesCategory.Content, 4, "p20", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string FirstTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 4, "p22", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 5, "p22", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string FirstText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 5, "p21", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 6, "p21", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string FirstTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 6, "", "", propertyScope: PropertyScope.Hidden)]
+        [EntityProperty(PropertiesCategory.Content, 7, "", "", propertyScope: PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(SecondText), nameof(SecondTextPrefix), nameof(SecondTextSuffix), nameof(SecondMarkerType) })]
         [SaveToXData]
         public bool SecondTextVisibility { get; set; }
 
-        [EntityProperty(PropertiesCategory.Content, 7, "p23", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 8, "p23", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string SecondTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 8, "p25", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 9, "p25", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string SecondText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 9, "p24", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 10, "p24", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string SecondTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 10, "", "", propertyScope: PropertyScope.Hidden)]
+        [EntityProperty(PropertiesCategory.Content, 11, "", "", propertyScope: PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(ThirdText), nameof(ThirdTextPrefix), nameof(ThirdTextSuffix), nameof(ThirdMarkerType) })]
         [SaveToXData]
         public bool ThirdTextVisibility { get; set; }
 
-        [EntityProperty(PropertiesCategory.Content, 11, "p26", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 12, "p26", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string ThirdTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 12, "p28", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 13, "p28", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string ThirdText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 13, "p27", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 14, "p27", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string ThirdTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 14, "p30", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 15, "p30", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string BottomOrientText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 15, "p31", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 16, "p31", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         public string TopOrientText { get; set; } = string.Empty;
 
@@ -423,6 +430,7 @@
         {
             dbText.SetPropertiesToDbText(
                 TextStyle, TextHeight * GetScale(), TextHorizontalMode.TextCenter, null, AttachmentPoint.MiddleCenter);
+            dbText.Rotation = TextRotationAngle.DegreeToRadian();
         }
         
         /// <summary>Средняя (основная) линия оси</summary>

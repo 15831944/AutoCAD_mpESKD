@@ -1,5 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace mpESKD.Functions.mpGroundLine
+namespace mpESKD.Functions.mpWaterProofing
 {
     using System;
     using System.Collections.Generic;
@@ -12,30 +12,28 @@ namespace mpESKD.Functions.mpGroundLine
     using ModPlusAPI.Windows;
 
     /// <summary>
-    /// Линия грунта
+    /// Линия гидроизоляции
     /// </summary>
-    [IntellectualEntityDisplayNameKey("h73")]
-    public class GroundLine : IntellectualEntity, ILinearEntity
+    [IntellectualEntityDisplayNameKey("h114")]
+    public class WaterProofing : IntellectualEntity, ILinearEntity
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="GroundLine"/> class.
+        /// Initializes a new instance of the <see cref="WaterProofing"/> class.
         /// </summary>
-        public GroundLine()
+        public WaterProofing()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GroundLine"/> class.
+        /// Initializes a new instance of the <see cref="WaterProofing"/> class.
         /// </summary>
         /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
-        public GroundLine(ObjectId objectId) 
+        public WaterProofing(ObjectId objectId)
             : base(objectId)
         {
         }
 
-        /// <summary>
-        /// Промежуточные точки
-        /// </summary>
+        /// <inheritdoc />
         [SaveToXData]
         public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
 
@@ -48,46 +46,37 @@ namespace mpESKD.Functions.mpGroundLine
                 return points;
             }
         }
-        
-        #region Properties
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override double MinDistanceBetweenPoints => 20.0;
 
         /// <summary>
         /// Отступ первого штриха в каждом сегменте полилинии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "p36", GroundLineFirstStrokeOffset.ByHalfSpace, descLocalKey: "d36", nameSymbol: "a")]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p36", WaterProofingFirstStrokeOffset.ByHalfStrokeOffset, descLocalKey: "d36-1", nameSymbol: "a")]
         [SaveToXData]
-        public GroundLineFirstStrokeOffset FirstStrokeOffset { get; set; } = GroundLineFirstStrokeOffset.ByHalfSpace;
+        public WaterProofingFirstStrokeOffset FirstStrokeOffset { get; set; } = WaterProofingFirstStrokeOffset.ByHalfStrokeOffset;
 
         /// <summary>
         /// Длина штриха
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 2, "p37", 8, 1, 10, nameSymbol: "l")]
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p37", 8, 1, 20, nameSymbol: "l")]
         [SaveToXData]
         public int StrokeLength { get; set; } = 8;
 
         /// <summary>
         /// Расстояние между штрихами
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p38", 4, 1, 10, nameSymbol: "b")]
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p38", 6, 1, 20, nameSymbol: "b")]
         [SaveToXData]
-        public int StrokeOffset { get; set; } = 4;
+        public int StrokeOffset { get; set; } = 6;
 
         /// <summary>
-        /// Угол наклона штриха в градусах
+        /// Толщина линии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, "p39", 60, 30, 90, nameSymbol: "α")]
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p70", 2.0, 0.0, 10, nameSymbol: "t")]
         [SaveToXData]
-        public int StrokeAngle { get; set; } = 60;
-
-        /// <summary>
-        /// Отступ группы штрихов
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, "p40", 10, 1, 20, nameSymbol: "c")]
-        [SaveToXData]
-        public int Space { get; set; } = 10;
+        public double LineThickness { get; set; } = 2.0;
 
         /// <inheritdoc />
         [EntityProperty(PropertiesCategory.General, 4, "p35", "Continuous", descLocalKey: "d35")]
@@ -101,19 +90,20 @@ namespace mpESKD.Functions.mpGroundLine
         /// Не используется!
         public override string TextStyle { get; set; }
 
-        #endregion
-
-        #region Geometry
-
         /// <summary>
-        /// Главная полилиния примитива
+        /// Главная полилиния объекта
         /// </summary>
         private Polyline _mainPolyline;
 
         /// <summary>
+        /// Вторая полилиния, являющаяся смещенной копией первой
+        /// </summary>
+        private readonly List<Entity> _offsetPolylineEntities = new List<Entity>();
+
+        /// <summary>
         /// Список штрихов
         /// </summary>
-        private readonly List<Line> _strokes = new List<Line>();
+        private readonly List<Polyline> _strokes = new List<Polyline>();
 
         /// <inheritdoc />
         public override IEnumerable<Entity> Entities
@@ -136,6 +126,12 @@ namespace mpESKD.Functions.mpGroundLine
                 }
 
                 entities.Add(_mainPolyline);
+
+                foreach (var offsetPolylineEntity in _offsetPolylineEntities)
+                {
+                    SetChangeablePropertiesToNestedEntity(offsetPolylineEntity);
+                    entities.Add(offsetPolylineEntity);
+                }
 
                 return entities;
             }
@@ -223,100 +219,172 @@ namespace mpESKD.Functions.mpGroundLine
                 _mainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
             }
 
+            _offsetPolylineEntities.Clear();
+            foreach (Entity offsetCurve in _mainPolyline.GetOffsetCurves(LineThickness))
+            {
+                _offsetPolylineEntities.Add(offsetCurve);
+            }
+
             // create strokes
             _strokes.Clear();
             if (_mainPolyline.Length >= MinDistanceBetweenPoints)
             {
                 for (var i = 1; i < _mainPolyline.NumberOfVertices; i++)
                 {
-                    var previousPoint = _mainPolyline.GetPoint3dAt(i - 1);
-                    var currentPoint = _mainPolyline.GetPoint3dAt(i);
-                    _strokes.AddRange(CreateStrokesOnMainPolylineSegment(currentPoint, previousPoint, scale));
+                    var segmentStartPoint = _mainPolyline.GetPoint3dAt(i - 1);
+                    var segmentEndPoint = _mainPolyline.GetPoint3dAt(i);
+                    Vector3d? previousSegmentVector = null;
+                    Vector3d? nextSegmentVector = null;
+                    if (i > 1)
+                        previousSegmentVector = segmentStartPoint - _mainPolyline.GetPoint3dAt(i - 2);
+                    if (i < _mainPolyline.NumberOfVertices - 1)
+                        nextSegmentVector = _mainPolyline.GetPoint3dAt(i + 1) - segmentEndPoint;
+
+                    _strokes.AddRange(CreateStrokesOnMainPolylineSegment(
+                        segmentEndPoint, segmentStartPoint, scale, previousSegmentVector, nextSegmentVector));
                 }
             }
         }
 
-        private IEnumerable<Line> CreateStrokesOnMainPolylineSegment(
-            Point3d currentPoint, Point3d previousPoint, double scale)
+        private IEnumerable<Polyline> CreateStrokesOnMainPolylineSegment(
+            Point3d segmentEndPoint, Point3d segmentStartPoint, double scale, Vector3d? previousSegmentVector, Vector3d? nextSegmentVector)
         {
-            var segmentStrokeDependencies = new List<Line>();
+            var strokes = new List<Polyline>();
 
-            var segmentVector = currentPoint - previousPoint;
+            var lineThickness = LineThickness * scale;
+            var segmentVector = segmentEndPoint - segmentStartPoint;
+
+            var previousToCurrentCrossProductIndex = 1.0;
+            if (previousSegmentVector != null)
+            {
+                previousToCurrentCrossProductIndex =
+                    previousSegmentVector.Value.CrossProduct(segmentVector).GetNormal().Z;
+            }
+
+            var currentToNextCrossProductIndex = 1.0;
+            if (nextSegmentVector != null)
+            {
+                currentToNextCrossProductIndex = segmentVector.CrossProduct(nextSegmentVector.Value).GetNormal().Z;
+            }
+            
+            var angleToPreviousSegment = previousSegmentVector != null
+                ? previousSegmentVector.Value.GetAngleTo(segmentVector)
+                : 0.0;
+            var startBackOffset = 0.0;
+            if (previousToCurrentCrossProductIndex < 0 && angleToPreviousSegment > 0.0)
+            {
+                startBackOffset = Math.Abs(lineThickness * Math.Tan(Math.PI - (angleToPreviousSegment / 2.0)));
+            }
+
+            var angleToNextSegment = nextSegmentVector != null
+                ? segmentVector.GetAngleTo(nextSegmentVector.Value)
+                : 0.0;
+            var endBackOffset = 0.0;
+            if (currentToNextCrossProductIndex < 0 && angleToNextSegment > 0.0)
+            {
+                endBackOffset = Math.Abs(lineThickness * Math.Tan(Math.PI - (angleToNextSegment / 2.0)));
+            }
+
             var segmentLength = segmentVector.Length;
             var perpendicular = segmentVector.GetPerpendicularVector().Negate();
-            var distanceAtSegmentStart = _mainPolyline.GetDistAtPoint(previousPoint);
+            var distanceAtSegmentStart = _mainPolyline.GetDistAtPoint(segmentStartPoint);
 
             var overflowIndex = 0;
 
-            // Индекс штриха. Возможные значения - 0, 1, 2
-            var strokeIndex = 0;
             var sumDistanceAtSegment = 0.0;
+            var isSpace = true;
+            var isStart = true;
             while (true)
             {
                 overflowIndex++;
-                var distance = 0.0;
-                if (Math.Abs(sumDistanceAtSegment) < 0.0001)
+                double distance;
+                if (isStart)
                 {
-                    if (FirstStrokeOffset == GroundLineFirstStrokeOffset.ByHalfSpace)
+                    if (FirstStrokeOffset == WaterProofingFirstStrokeOffset.ByHalfStrokeOffset)
                     {
-                        distance = Space / 2.0 * scale;
+                        distance = StrokeOffset / 2.0 * scale;
                     }
-                    else if (FirstStrokeOffset == GroundLineFirstStrokeOffset.BySpace)
+                    else if (FirstStrokeOffset == WaterProofingFirstStrokeOffset.ByStrokeOffset)
                     {
-                        distance = Space * scale;
+                        distance = StrokeOffset * scale;
                     }
                     else
                     {
-                        distance = StrokeOffset * scale;
+                        distance = 0.0;
                     }
+
+                    distance += startBackOffset;
+
+                    isStart = false;
                 }
                 else
                 {
-                    if (strokeIndex == 0)
-                    {
-                        distance = Space * scale;
-                    }
-
-                    if (strokeIndex == 1 || strokeIndex == 2)
+                    if (isSpace)
                     {
                         distance = StrokeOffset * scale;
                     }
-                }
-
-                if (strokeIndex == 2)
-                {
-                    strokeIndex = 0;
-                }
-                else
-                {
-                    strokeIndex++;
+                    else
+                    {
+                        distance = StrokeLength * scale;
+                    }
                 }
 
                 sumDistanceAtSegment += distance;
+
+                if (!isSpace)
+                {
+                    var firstStrokePoint = _mainPolyline.GetPointAtDist(distanceAtSegmentStart + sumDistanceAtSegment - distance) +
+                                           (perpendicular * lineThickness / 2.0);
+
+                    if ((sumDistanceAtSegment - distance) < (sumDistanceAtSegment - endBackOffset))
+                    {
+                        // Если индекс, полученный из суммы векторов (текущий и следующий) отрицательный и последний штрих 
+                        // попадает на конец сегмента полилинии, то его нужно построить так, чтобы он попал на точку не основной
+                        // полилинии, а второстепенной
+
+                        Point3d secondStrokePoint;
+                        if (sumDistanceAtSegment >= segmentLength)
+                        {
+                            AcadUtils.WriteMessageInDebug($"segment vector: {segmentVector.GetNormal()}");
+                            secondStrokePoint = 
+                                segmentEndPoint - 
+                                (segmentVector.GetNormal() * endBackOffset) +
+                                (perpendicular * lineThickness / 2.0);
+                            AcadUtils.WriteMessageInDebug($"{nameof(secondStrokePoint)}: {secondStrokePoint}");
+                        }
+                        else
+                        {
+                            secondStrokePoint =
+                                _mainPolyline.GetPointAtDist(distanceAtSegmentStart + sumDistanceAtSegment) +
+                                (perpendicular * lineThickness / 2.0);
+                        }
+
+                        var stroke = new Polyline(2);
+                        stroke.AddVertexAt(0, firstStrokePoint.ConvertPoint3dToPoint2d(), 0.0, lineThickness,
+                            lineThickness);
+                        stroke.AddVertexAt(1, secondStrokePoint.ConvertPoint3dToPoint2d(), 0.0, lineThickness,
+                            lineThickness);
+
+                        SetImmutablePropertiesToNestedEntity(stroke);
+
+                        strokes.Add(stroke);
+                    }
+                }
 
                 if (sumDistanceAtSegment >= segmentLength)
                 {
                     break;
                 }
 
-                var firstStrokePoint = _mainPolyline.GetPointAtDist(distanceAtSegmentStart + sumDistanceAtSegment);
-                var helpPoint =
-                    firstStrokePoint + (segmentVector.Negate().GetNormal() * StrokeLength * scale * Math.Cos(StrokeAngle.DegreeToRadian()));
-                var secondStrokePoint =
-                    helpPoint + (perpendicular * StrokeLength * scale * Math.Sin(StrokeAngle.DegreeToRadian()));
-                var stroke = new Line(firstStrokePoint, secondStrokePoint);
-                SetImmutablePropertiesToNestedEntity(stroke);
-
-                // индекс сегмента равен "левой" вершине
-                segmentStrokeDependencies.Add(stroke);
-
                 if (overflowIndex >= 1000)
                 {
                     break;
                 }
+
+                isSpace = !isSpace;
             }
 
-            return segmentStrokeDependencies;
+            return strokes;
         }
 
         private static Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
@@ -330,7 +398,5 @@ namespace mpESKD.Functions.mpGroundLine
 
             return points;
         }
-
-        #endregion
     }
 }

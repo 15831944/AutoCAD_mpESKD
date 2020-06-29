@@ -109,6 +109,12 @@
     <Compile Include="Base\Binder.cs" />
     <Compile Include="Base\Enums\LayerActionOnCreateAnalog.cs" />
     <Compile Include="Base\Enums\SearchProceedOption.cs" />
+    <Compile Include="Base\Enums\WaterProofingFirstStrokeOffset.cs" />
+    <Compile Include="Base\IIntellectualEntity.cs" />
+    <Compile Include="Base\ILinearEntity.cs" />
+    <Compile Include="Base\Overrules\Grips\LinearEntityAddVertexGrip.cs" />
+    <Compile Include="Base\Overrules\Grips\LinearEntityVertexGrip.cs" />
+    <Compile Include="Base\Overrules\Grips\LinearEntityReverseGrip.cs" />
     <Compile Include="Base\Properties\Converters\ColumnWidthConverter.cs" />
     <Compile Include="Base\Properties\DoubleEqComparer.cs" />
     <Compile Include="Base\Styles\AnnotationScaleValueConverter.cs" />
@@ -187,11 +193,8 @@
     <Compile Include="Functions\mpGroundLine\GroundLine.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLineFunction.cs" />
     <Compile Include="Functions\mpGroundLine\GroundLineDescriptor.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineAddVertexGrip.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineRemoveVertexGrip.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineReverseGrip.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\Grips\GroundLineVertexGrip.cs" />
+    <Compile Include="Base\Overrules\Grips\LinearEntityRemoveVertexGrip.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs" />
     <Compile Include="Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs" />
     <Compile Include="Functions\mpLevelMark\LevelMark.cs" />
@@ -224,6 +227,12 @@
     <Compile Include="Functions\mpSection\SectionValueEditor.xaml.cs">
       <DependentUpon>SectionValueEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Functions\mpWaterProofing\Overrules\WaterProofingGripPointOverrule.cs" />
+    <Compile Include="Functions\mpWaterProofing\Overrules\WaterProofingObjectOverrule.cs" />
+    <Compile Include="Functions\mpWaterProofing\Overrules\WaterProofingOsnapOverrule.cs" />
+    <Compile Include="Functions\mpWaterProofing\WaterProofing.cs" />
+    <Compile Include="Functions\mpWaterProofing\WaterProofingDescriptor.cs" />
+    <Compile Include="Functions\mpWaterProofing\WaterProofingFunction.cs" />
     <Compile Include="Functions\SearchEntities\SearchEntitiesCommand.cs" />
     <Compile Include="Functions\SearchEntities\SearchEntitiesSettings.xaml.cs">
       <DependentUpon>SearchEntitiesSettings.xaml</DependentUpon>
@@ -266,6 +275,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Base\Styles\Images\GroundLine.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Base\Styles\Images\WaterProofing.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -499,6 +512,12 @@
   <ItemGroup>
     <Folder Include="Functions\mpLevelMark\Grips\" />
     <Folder Include="Functions\mpSection\Grips\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32.png" />
+    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32_dark.png" />
+    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32.png" />
+    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32_dark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

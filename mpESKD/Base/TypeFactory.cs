@@ -8,6 +8,7 @@
     using Functions.mpGroundLine;
     using Functions.mpLevelMark;
     using Functions.mpSection;
+    using Functions.mpWaterProofing;
 
     /// <summary>
     /// Фабрика типов интеллектуальных примитивов
@@ -32,7 +33,8 @@
                 typeof(Axis),
                 typeof(GroundLine),
                 typeof(Section),
-                typeof(LevelMark)
+                typeof(LevelMark),
+                typeof(WaterProofing)
             };
         }
 
@@ -44,29 +46,22 @@
         public IIntellectualEntityDescriptor GetDescriptor(Type entityType)
         {
             if (entityType == typeof(BreakLine))
-            {
                 return BreakLineDescriptor.Instance;
-            }
-            
+
             if (entityType == typeof(Axis))
-            {
                 return AxisDescriptor.Instance;
-            }
 
             if (entityType == typeof(GroundLine))
-            {
                 return GroundLineDescriptor.Instance;
-            }
 
             if (entityType == typeof(Section))
-            {
                 return SectionDescriptor.Instance;
-            }
 
             if (entityType == typeof(LevelMark))
-            {
                 return LevelMarkDescriptor.Instance;
-            }
+
+            if (entityType == typeof(WaterProofing))
+                return WaterProofingDescriptor.Instance;
 
             return null;
         }
@@ -82,7 +77,8 @@
                 new AxisFunction(),
                 new GroundLineFunction(),
                 new SectionFunction(),
-                new LevelMarkFunction()
+                new LevelMarkFunction(),
+                new WaterProofingFunction()
             };
         }
 
@@ -113,6 +109,8 @@
                     return TryGetLocalizationValue("h96");
                 case nameof(LevelMark):
                     return TryGetLocalizationValue("h108");
+                case nameof(WaterProofing):
+                    return TryGetLocalizationValue("h114");
             }
 
             return string.Empty;

@@ -1,33 +1,31 @@
-﻿namespace mpESKD.Functions.mpGroundLine.Overrules
+﻿namespace mpESKD.Functions.mpWaterProofing.Overrules
 {
-    using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Overrules.Grips;
     using Base.Utils;
     using ModPlusAPI.Windows;
 
     /// <inheritdoc />
-    public class GroundLineGripPointOverrule : GripOverrule
+    public class WaterProofingGripPointOverrule : GripOverrule
     {
-        private static GroundLineGripPointOverrule _instance;
+        private static WaterProofingGripPointOverrule _instance;
 
         /// <summary>
         /// Singleton instance
         /// </summary>
-        public static GroundLineGripPointOverrule Instance()
+        public static WaterProofingGripPointOverrule Instance()
         {
             if (_instance != null)
             {
                 return _instance;
             }
 
-            _instance = new GroundLineGripPointOverrule();
+            _instance = new WaterProofingGripPointOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _instance.SetXDataFilter(GroundLineDescriptor.Instance.Name);
+            _instance.SetXDataFilter(WaterProofingDescriptor.Instance.Name);
             return _instance;
         }
 
@@ -42,7 +40,7 @@
                     // Удаляю все ручки - это удалит ручку вставки блока
                     grips.Clear();
 
-                    var groundLine = EntityReaderService.Instance.GetFromEntity<GroundLine>(entity);
+                    var groundLine = EntityReaderService.Instance.GetFromEntity<WaterProofing>(entity);
                     if (groundLine != null)
                     {
                         foreach (var grip in EntityUtils.GetLinearEntityGeneralGrips(groundLine, curViewUnitSize))
@@ -85,7 +83,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, WaterProofingDescriptor.Instance.Name);
         }
     }
 }

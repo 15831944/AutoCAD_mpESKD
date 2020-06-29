@@ -21,10 +21,10 @@ namespace mpESKD.Base
     using Utils;
 
     /// <summary>
-    /// Абстрактный класс интеллектуального примитива
+    /// Абстрактный класс интеллектуального объекта
     /// </summary>
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "<Ожидание>")]
-    public abstract class IntellectualEntity : IDisposable
+    public abstract class IntellectualEntity : IIntellectualEntity, IDisposable
     {
         private BlockTableRecord _blockRecord;
 

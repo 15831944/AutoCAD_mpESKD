@@ -1,22 +1,28 @@
-﻿namespace mpESKD.Functions.mpGroundLine.Overrules.Grips
+﻿namespace mpESKD.Base.Overrules.Grips
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
     using Base;
-    using Base.Enums;
-    using Base.Overrules;
-    using Base.Utils;
+    using Enums;
     using ModPlusAPI;
+    using Overrules;
+    using Utils;
 
     /// <summary>
-    /// Ручка добавления вершины
+    /// Ручка добавления вершины линейного интеллектуального объекта
     /// </summary>
-    public class GroundLineAddVertexGrip : IntellectualEntityGripData
+    public class LinearEntityAddVertexGrip : IntellectualEntityGripData
     {
-        public GroundLineAddVertexGrip(GroundLine groundLine, Point3d? leftPoint, Point3d? rightPoint)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LinearEntityAddVertexGrip"/> class.
+        /// </summary>
+        /// <param name="intellectualEntity">Instance of <see cref="Base.IntellectualEntity"/> that implement <see cref="ILinearEntity"/></param>
+        /// <param name="leftPoint">Точка слева</param>
+        /// <param name="rightPoint">Точка справа</param>
+        public LinearEntityAddVertexGrip(IntellectualEntity intellectualEntity, Point3d? leftPoint, Point3d? rightPoint)
         {
-            GroundLine = groundLine;
+            IntellectualEntity = intellectualEntity;
             GripLeftPoint = leftPoint;
             GripRightPoint = rightPoint;
             GripType = GripType.Plus;
@@ -24,9 +30,9 @@
         }
 
         /// <summary>
-        /// Экземпляр класса Section
+        /// Экземпляр интеллектуального объекта
         /// </summary>
-        public GroundLine GroundLine { get; }
+        public IntellectualEntity IntellectualEntity { get; }
 
         /// <summary>
         /// Левая точка
@@ -38,13 +44,18 @@
         /// </summary>
         public Point3d? GripRightPoint { get; }
 
+        /// <summary>
+        /// Новое значение точки вершины
+        /// </summary>
         public Point3d NewPoint { get; set; }
 
+        /// <inheritdoc />
         public override string GetTooltip()
         {
             return Language.GetItem(Invariables.LangItem, "gp4"); // "Добавить вершину";
         }
 
+        /// <inheritdoc />
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
             if (newStatus == Status.GripStart)
@@ -57,41 +68,44 @@
             {
                 AcadUtils.Editor.TurnForcedPickOff();
                 AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
-                using (GroundLine)
+                using (IntellectualEntity)
                 {
                     Point3d? newInsertionPoint = null;
 
-                    if (GripLeftPoint == GroundLine.InsertionPoint)
+                    var linearEntity = (ILinearEntity)IntellectualEntity;
+
+                    if (GripLeftPoint == IntellectualEntity.InsertionPoint)
                     {
-                        GroundLine.MiddlePoints.Insert(0, NewPoint);
+                        linearEntity.MiddlePoints.Insert(0, NewPoint);
                     }
                     else if (GripLeftPoint == null)
                     {
-                        GroundLine.MiddlePoints.Insert(0, GroundLine.InsertionPoint);
-                        GroundLine.InsertionPoint = NewPoint;
+                        linearEntity.MiddlePoints.Insert(0, IntellectualEntity.InsertionPoint);
+                        IntellectualEntity.InsertionPoint = NewPoint;
                         newInsertionPoint = NewPoint;
                     }
                     else if (GripRightPoint == null)
                     {
-                        GroundLine.MiddlePoints.Add(GroundLine.EndPoint);
-                        GroundLine.EndPoint = NewPoint;
+                        linearEntity.MiddlePoints.Add(IntellectualEntity.EndPoint);
+                        IntellectualEntity.EndPoint = NewPoint;
                     }
                     else
                     {
-                        GroundLine.MiddlePoints.Insert(GroundLine.MiddlePoints.IndexOf(GripLeftPoint.Value) + 1, NewPoint);
+                        linearEntity.MiddlePoints.Insert(
+                            linearEntity.MiddlePoints.IndexOf(GripLeftPoint.Value) + 1, NewPoint);
                     }
 
-                    GroundLine.UpdateEntities();
-                    GroundLine.BlockRecord.UpdateAnonymousBlocks();
+                    IntellectualEntity.UpdateEntities();
+                    IntellectualEntity.BlockRecord.UpdateAnonymousBlocks();
                     using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(GroundLine.BlockId, OpenMode.ForWrite, true, true);
+                        var blkRef = tr.GetObject(IntellectualEntity.BlockId, OpenMode.ForWrite, true, true);
                         if (newInsertionPoint.HasValue)
                         {
                             ((BlockReference)blkRef).Position = newInsertionPoint.Value;
                         }
 
-                        using (var resBuf = GroundLine.GetDataForXData())
+                        using (var resBuf = IntellectualEntity.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
                         }
@@ -116,7 +130,7 @@
             {
                 if (GripLeftPoint.HasValue)
                 {
-                    Line leftLine = new Line(GripLeftPoint.Value, pointMonitorEventArgs.Context.ComputedPoint)
+                    var leftLine = new Line(GripLeftPoint.Value, pointMonitorEventArgs.Context.ComputedPoint)
                     {
                         ColorIndex = 150
                     };
@@ -125,7 +139,7 @@
 
                 if (GripRightPoint.HasValue)
                 {
-                    Line rightLine = new Line(pointMonitorEventArgs.Context.ComputedPoint, GripRightPoint.Value)
+                    var rightLine = new Line(pointMonitorEventArgs.Context.ComputedPoint, GripRightPoint.Value)
                     {
                         ColorIndex = 150
                     };

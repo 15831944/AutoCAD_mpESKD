@@ -11,6 +11,7 @@
     using Functions.mpGroundLine;
     using Functions.mpLevelMark;
     using Functions.mpSection;
+    using Functions.mpWaterProofing;
     using ModPlus.Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
@@ -227,6 +228,9 @@
 
             // mpGroundLine
             ribRowPanel.Items.Add(GetSplitButton(GroundLineDescriptor.Instance));
+
+            // mpWaterProofing
+            ribRowPanel.Items.Add(GetSplitButton(WaterProofingDescriptor.Instance));
 
             if (ribRowPanel.Items.Any())
             {
